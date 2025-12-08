@@ -211,7 +211,7 @@ export default function HomePage() {
                 width={420}
                 height={420}
                 priority
-                sizes="(max-width: 640px) 60vw, (max-width: 1024px) 40vw, 420px"
+                sizes="(max-width: 640px) 60vw, (max-width: 1024px) 40vw, 420px" /*Здесь*/
                 className="hero-logo w-56 sm:w-72 lg:w-[420px] xl:w-[480px] h-auto drop-shadow-xl"
               />
 
