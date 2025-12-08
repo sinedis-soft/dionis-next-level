@@ -10,31 +10,37 @@ import type { Lang } from "@/dictionaries/header";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return [{ lang: "ru" }, { lang: "kz" }, { lang: "en" }];
+  return [
+    { lang: "ru" },
+    { lang: "kz" },
+    { lang: "en" },
+  ];
 }
 
-// Нормализация языка из URL → в твой тип Lang
 function normalizeLang(value: string): Lang {
   if (value === "ru" || value === "kz" || value === "en") return value;
   return "ru";
 }
 
+// ❗ НОВЫЙ корректный формат для Next 16
 export default function LangLayout({
   children,
   params,
 }: {
   children: ReactNode;
-  params: { lang: string }; // ВАЖНО: теперь просто string
+  params: { lang: string };
 }) {
-  const lang: Lang = normalizeLang(params.lang);
+  const lang = normalizeLang(params.lang);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header lang={lang} />
-      <main className="flex-1">{children}</main>
-      <SiteFooter lang={lang} />
-      <CookieConsent lang={lang} />
-      <AnalyticsManager />
-    </div>
+    <html lang={lang}>
+      <body className="min-h-screen flex flex-col">
+        <Header lang={lang} />
+        <main className="flex-1">{children}</main>
+        <SiteFooter lang={lang} />
+        <CookieConsent lang={lang} />
+        <AnalyticsManager />
+      </body>
+    </html>
   );
 }
