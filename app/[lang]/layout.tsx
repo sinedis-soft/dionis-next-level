@@ -1,5 +1,4 @@
 // app/[lang]/layout.tsx
-import { use } from "react";
 import type { ReactNode } from "react";
 
 import Header from "@/components/Header";
@@ -14,14 +13,20 @@ export function generateStaticParams() {
   return [{ lang: "ru" }, { lang: "kz" }, { lang: "en" }];
 }
 
+// Нормализация языка из URL → в твой тип Lang
+function normalizeLang(value: string): Lang {
+  if (value === "ru" || value === "kz" || value === "en") return value;
+  return "ru";
+}
+
 export default function LangLayout({
   children,
   params,
 }: {
   children: ReactNode;
-  params: Promise<{ lang: Lang }>;
+  params: { lang: string }; // ВАЖНО: теперь просто string
 }) {
-  const { lang } = use(params);
+  const lang: Lang = normalizeLang(params.lang);
 
   return (
     <div className="min-h-screen flex flex-col">
