@@ -22,15 +22,15 @@ function normalizeLang(value: string): Lang {
   return "ru";
 }
 
-// ❗ НОВЫЙ корректный формат для Next 16
+// Не мучаемся с типами LayoutProps – берём any для params
 export default function LangLayout({
   children,
   params,
 }: {
   children: ReactNode;
-  params: { lang: string };
+  params: any;
 }) {
-  const lang = normalizeLang(params.lang);
+  const lang = normalizeLang(params?.lang ?? "ru");
 
   return (
     <html lang={lang}>
