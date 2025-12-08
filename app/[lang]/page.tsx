@@ -181,17 +181,17 @@ export default function HomePage() {
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#F7F7F7] via-[#ffffff] to-[#e9f0f5]" />
 
-          <div className="max-w-6xl mx-auto px-4 py-12 sm:py-20 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
+          <div className="max-w-6xl mx-auto px-4 py-10 sm:py-16 lg:py-20 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div className="text-left">
               <h1 className="text-3xl sm:text-4xl font-bold text-[#1A3A5F] leading-tight whitespace-pre-line">
                 {t.hero.title}
               </h1>
 
-              <p className="mt-4 text-lg sm:text-xl text-gray-600 max-w-xl">
+              <p className="mt-4 text-base sm:text-lg text-gray-600 max-w-xl">
                 {t.hero.subtitle}
               </p>
 
-              <div className="mt-10 flex flex-col sm:flex-row sm:flex-wrap gap-4">
+              <div className="mt-8 flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
                 <a href={greenCardLink} role="button" className="btn btn-wide">
                   {t.hero.greenCardBtn}
                 </a>
@@ -210,8 +210,11 @@ export default function HomePage() {
                 alt={t.hero.heroAlt}
                 width={420}
                 height={420}
+                priority
+                sizes="(max-width: 640px) 60vw, (max-width: 1024px) 40vw, 420px"
                 className="hero-logo w-56 sm:w-72 lg:w-[420px] xl:w-[480px] h-auto drop-shadow-xl"
               />
+
             </div>
           </div>
         </section>
