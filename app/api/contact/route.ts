@@ -164,12 +164,50 @@ export async function POST(req: Request) {
       ].join("\n");
 
       const html = `
-        <h2>Новое сообщение с сайта DIONIS Insurance</h2>
-        <p><strong>Имя:</strong> ${firstName}</p>
-        <p><strong>Фамилия:</strong> ${lastName}</p>
-        <p><strong>E-mail:</strong> ${email}</p>
-        <p><strong>Телефон:</strong> ${phone}</p>
-        <p><strong>Комментарий:</strong><br>${comment.replace(/\n/g, "<br>")}</p>
+        <div style="max-width: 600px; margin: 0 auto; background-color: #FFFFFF; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+        <img width="60" src="https://cdn.bitrix24.pl/b25731489/landing/2f7/2f7cc21689b3f2b0ca28a528026e2f87/dionis_logo_16_02_2023_1x.png" alt="ДИОНИС" style="display: block; margin-bottom: 20px;">
+          <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">Новое сообщение с сайта DIONIS Insurance</h2>
+          <p style="font-size: 14px; line-height: 1.6; color: #707070; margin: 0 0 20px;">
+            <strong>Имя:</strong> ${firstName}<br>
+            <strong>Фамилия:</strong> ${lastName}<br>
+                <strong>E-mail:</strong> ${email}<br>
+                <strong>Телефон:</strong> ${phone}<br>
+                <strong>Комментарий:</strong><br>${comment.replace(/\n/g, "<br>")}<br>
+                ${pageUrl || "unknown"}<br>
+
+
+
+
+
+          </p>
+          <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">С уважением, Денис БОРОВОЙ</h2>
+        <span style="color: #707070;">директор<br>
+        <a href="http://dionis-insurance.kz" target="_blank" style="color: #C19A6B; text-decoration: none;">ТОО страховой брокер ДИОНИС</a> </span>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+          <tbody>
+          <tr>
+            <td style="padding: 10px; text-align: left; border-bottom: 1px solid #F2F2F2;">
+        <img width="200" src="https://cdn.bitrix24.pl/b25731489/landing/2f7/2f7cc21689b3f2b0ca28a528026e2f87/dionis_logo_16_02_2023_1x.png" alt="ДИОНИС" style="display: block;">
+            </td>
+            <td style="padding: 10px; text-align: left; border-bottom: 1px solid #F2F2F2;">
+        <a href="tel:+375447030303" style="color: #C19A6B; text-decoration: none;">+375 44 703 0303</a><br>
+        <a href="mailto:info@dionis-insurance.kz" style="color: #C19A6B; text-decoration: none;">info@dionis-insurance.kz</a><br>
+        <a href="https://api.whatsapp.com/send/?phone=%2B375447030303" target="_blank" style="color: #C19A6B; text-decoration: none;">WhatsApp</a><br>
+        <a href="https://t.me/Denisins" target="_blank" style="color: #C19A6B; text-decoration: none;">Telegram</a><br>
+        <a href="http://viber://chat?number=%2B375447030303" target="_blank" style="color: #C19A6B; text-decoration: none;">Viber</a>
+            </td>
+          </tr>
+          </tbody>
+          </table>
+        </div>
+        <div style="max-width: 600px; margin: 20px auto; background-color: #FFFFFF; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); font-size: 12px; color: #707070;">
+          <p style="margin: 0;">
+            Информация, содержащаяся в данном сообщении, является конфиденциальной и предназначена исключительно для указанных получателей.<br>
+            Несанкционированный доступ, распространение, копирование или дистрибуция этого сообщения или любых его вложений строго запрещены и могут быть незаконными.<br>
+            Если вы не являетесь предполагаемым получателем, или если вы получили это сообщение по ошибке, пожалуйста, немедленно уведомите отправителя, ответив на это электронное письмо, а затем удалите его из вашей системы.<br>
+            Мы ценим ваше сотрудничество.
+          </p>
+        </div>
       `;
 
       try {
