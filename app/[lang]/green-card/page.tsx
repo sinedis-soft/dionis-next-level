@@ -333,8 +333,8 @@ export default function GreenCardPage() {
     setIsModalOpen(false);
 
     try {
+      // honeypot → бот, просто считаем всё ок
       if (contactFormData.website && contactFormData.website.trim() !== "") {
-        // honeypot → бот, просто считаем всё ок
         setFormStatus("success");
         setFormMessage(t.contact.statusSuccess);
         setContactFormData(initialContactFormData);
@@ -360,6 +360,19 @@ export default function GreenCardPage() {
         }
       }
 
+      // 🔹 Читаем UTM и текущий URL
+      let utm: Record<string, string> = {};
+      let pageUrl: string | undefined = undefined;
+
+      if (typeof window !== "undefined") {
+        try {
+          utm = JSON.parse(localStorage.getItem("utm_data") || "{}");
+        } catch {
+          utm = {};
+        }
+        pageUrl = window.location.href;
+      }
+
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -367,6 +380,8 @@ export default function GreenCardPage() {
           ...contactFormData,
           recaptchaToken,
           context: "green-card-question",
+          utm,       // 🔹 UTM-метки
+          pageUrl,   // 🔹 адрес страницы
         }),
       });
 
@@ -391,6 +406,7 @@ export default function GreenCardPage() {
       setIsModalOpen(true);
     }
   }
+
 
 
   const osagoLink = `/${lang}/osago-rf`;

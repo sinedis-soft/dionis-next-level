@@ -14,14 +14,17 @@ export async function POST(req: Request) {
         website,          // honeypot
         recaptchaToken,   // reCAPTCHA v3
     } = body as {
-        firstName: string;
-        lastName: string;
-        email: string;
-        phone: string;
-        comment: string;
-        agree: boolean;
-        website?: string;
-        recaptchaToken?: string;
+          firstName: string;
+          lastName: string;
+          email: string;
+          phone: string;
+          comment: string;
+          agree: boolean;
+          website?: string;
+          recaptchaToken?: string;
+          context?: string;
+          utm?: Record<string, string>;
+          pageUrl?: string;
     };
 
 
@@ -82,11 +85,15 @@ export async function POST(req: Request) {
         req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 
         const userAgent = req.headers.get("user-agent") || "unknown";
+        const { context, pageUrl, utm } = body;
 
         const metaInfo =
-        `\n\n---\nИсточник: Форма обратной связи DIONIS /ru\n` +
-        `IP: ${ip}\n` +
-        `User-Agent: ${userAgent}\n`;
+          `\n\n---\nИсточник: Форма обратной связи DIONIS\n` +
+          `Страница: ${pageUrl || "unknown"}\n` +
+          `Контекст: ${context || "n/a"}\n` +
+          `UTM: ${utm ? JSON.stringify(utm) : "none"}\n` +
+          `IP: ${ip}\n` +
+          `User-Agent: ${userAgent}\n`;
 
 
 

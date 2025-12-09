@@ -180,6 +180,19 @@ export default function OsagoRfPage() {
         }
       }
 
+      // UTM + адрес страницы
+      let utm: Record<string, string> = {};
+      let pageUrl: string | undefined = undefined;
+
+      if (typeof window !== "undefined") {
+        try {
+          utm = JSON.parse(localStorage.getItem("utm_data") || "{}");
+        } catch {
+          utm = {};
+        }
+        pageUrl = window.location.href;
+      }
+
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -187,6 +200,8 @@ export default function OsagoRfPage() {
           ...contactFormData,
           recaptchaToken,
           context: "osago-rf-question",
+          utm,
+          pageUrl,
         }),
       });
 
@@ -211,6 +226,7 @@ export default function OsagoRfPage() {
       setIsModalOpen(true);
     }
   }
+
 
 
   const greenCardLink = `/${lang}/green-card`;

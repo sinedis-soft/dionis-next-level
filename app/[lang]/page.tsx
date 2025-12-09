@@ -130,12 +130,28 @@ export default function HomePage() {
         }
       }
 
+      // UTM + адрес страницы
+      let utm: Record<string, string> = {};
+      let pageUrl: string | undefined = undefined;
+
+      if (typeof window !== "undefined") {
+        try {
+          utm = JSON.parse(localStorage.getItem("utm_data") || "{}");
+        } catch {
+          utm = {};
+        }
+        pageUrl = window.location.href;
+      }
+
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
           recaptchaToken,
+          context: "site-contact",
+          utm,
+          pageUrl,
         }),
       });
 
@@ -160,6 +176,7 @@ export default function HomePage() {
       setIsModalOpen(true);
     }
   };
+
 
 
   const otherServices = t.services.otherServices.map((service) => ({
