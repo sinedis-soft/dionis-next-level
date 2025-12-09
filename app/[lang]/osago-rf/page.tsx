@@ -153,10 +153,8 @@ export default function OsagoRfPage() {
     setIsModalOpen(false);
 
     try {
-      if (
-        contactFormData.website &&
-        contactFormData.website.trim() !== ""
-      ) {
+      // honeypot → бот, делаем вид, что всё ОК
+      if (contactFormData.website && contactFormData.website.trim() !== "") {
         setFormStatus("success");
         setFormMessage(t.contact.statusSuccess);
         setContactFormData(initialContactFormData);
@@ -169,10 +167,15 @@ export default function OsagoRfPage() {
 
       if (isProd && recaptchaSiteKey && typeof window !== "undefined") {
         const grecaptcha = (window as any).grecaptcha;
-        if (grecaptcha?.execute) {
-          await grecaptcha.ready();
-          recaptchaToken = await grecaptcha.execute(recaptchaSiteKey, {
-            action: "contact",
+
+        if (grecaptcha?.execute && grecaptcha?.ready) {
+          recaptchaToken = await new Promise<string>((resolve, reject) => {
+            grecaptcha.ready(() => {
+              grecaptcha
+                .execute(recaptchaSiteKey, { action: "contact" })
+                .then((token: string) => resolve(token))
+                .catch(reject);
+            });
           });
         }
       }
@@ -208,6 +211,7 @@ export default function OsagoRfPage() {
       setIsModalOpen(true);
     }
   }
+
 
   const greenCardLink = `/${lang}/green-card`;
   const orderAnchor = "#osago-rf-order";

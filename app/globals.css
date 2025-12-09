@@ -6,7 +6,7 @@
   --foreground: #171717;
 }
 
-/* Тёмная тема по системным настройкам */
+/* Тёмная тема */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -14,7 +14,7 @@
   }
 }
 
-/* Проброс переменных в Tailwind-тему */
+/* Проброс переменных в Tailwind */
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -41,8 +41,11 @@ body {
   border-radius: 0.5rem;
   font-weight: 600;
   font-size: 0.95rem;
-  background-color: #c89f4a;
-  color: #1a3a5f;
+
+  /* НОВЫЕ ЦВЕТА */
+  background-color: #ebca45;   /* gold */
+  color: #23376c;              /* dark blue */
+
   border: none;
   text-decoration: none;
   cursor: pointer;
@@ -53,32 +56,31 @@ body {
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
 
-/* Наведение / фокус */
+/* Hover / focus */
 .btn:hover,
 .btn:focus-visible {
-  background-color: #d5a85a;
+  background-color: #f0d562; /* gold hover */
   transform: scale(1.04);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   outline: none;
 }
 
-/* Активное нажатие */
+/* Active */
 .btn:active {
   transform: scale(1.02);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
 }
 
-/* Видимая рамка для клавиатурного фокуса */
+/* Focus outline */
 .btn:focus-visible {
-  box-shadow: 0 0 0 3px rgba(200, 159, 74, 0.6);
+  box-shadow: 0 0 0 3px rgba(235, 202, 69, 0.55);
 }
 
-/* В hero-блоке кнопки одинаковой ширины */
+/* Широкая кнопка */
 .btn-wide {
   width: 100%;
 }
 
-/* Фиксированная ширина на десктопе */
 @media (min-width: 640px) {
   .btn-wide {
     width: 260px;
@@ -86,7 +88,7 @@ body {
 }
 
 /* =========================
-   Карточки DIONIS
+   Карточки
    ========================= */
 
 .card {
@@ -105,10 +107,10 @@ body {
 }
 
 /* =========================
-   Анимации hero / директора
+   Анимации HERO / директора
    ========================= */
 
-/* Логотип в hero */
+/* Логотип HERO */
 .hero-logo {
   opacity: 0;
   transform: translateY(10px) scale(0.97);
@@ -126,7 +128,7 @@ body {
   }
 }
 
-/* Подпись директора в правом нижнем углу */
+/* Подпись директора */
 .director-signature-wrap {
   position: relative;
   margin-top: 1.5rem;
@@ -138,7 +140,6 @@ body {
   right: 0;
   bottom: 0;
   width: 140px;
-  height: auto;
   opacity: 0;
   transform: translateX(8px) translateY(8px) rotate(-2deg);
   animation: director-signature-in 0.7s ease-out 0.4s forwards;
@@ -157,7 +158,7 @@ body {
   }
   100% {
     opacity: 1;
-    transform: translateX(0) translateY(0) rotate(0deg);
+    transform: translateX(0) translateY(0) rotate(0);
   }
 }
 
@@ -181,7 +182,7 @@ body {
   }
 }
 
-/* Логотип в углу блока директора */
+/* Лого возле директора */
 .director-logo {
   opacity: 0;
   transform: translateX(-20px) translateY(40px) scale(0.96);
@@ -199,7 +200,11 @@ body {
     transform: translateX(-120px) translateY(100px) scale(1);
   }
 }
-/* HERO Зеленой карты: анимация полиса и маленького лого */
+
+/* =========================
+   HERO Зеленой карты
+   ========================= */
+
 .gc-hero-visual {
   position: relative;
 }
@@ -245,12 +250,15 @@ body {
   }
 }
 
-/* FAQ гармошка */
+/* FAQ */
 .gc-faq-item + .gc-faq-item {
   border-top: 1px solid #e5e7eb;
 }
 
-/* Калькулятор Green Card */
+/* =========================
+   Калькулятор Green Card
+   ========================= */
+
 .gc-calculator {
   max-width: 1200px;
   margin: 0 auto;
@@ -258,42 +266,19 @@ body {
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+  font-family: "Montserrat", system-ui;
   color: #2c3e50;
 }
 
 .gc-calculator h3 {
   font-size: 28px;
   font-weight: 700;
-  color: #1a3a5f;
+
+  /* НОВЫЙ СИНИЙ */
+  color: #23376c;
+
   margin-bottom: 32px;
   text-align: center;
-}
-
-.gc-row {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  align-items: center;
-  gap: 12px 24px;
-  margin-bottom: 24px;
-}
-
-.gc-row label {
-  font-weight: 600;
-  font-size: 16px;
-  text-align: right;
-}
-
-.gc-row select,
-.gc-row input[type="number"] {
-  width: 100%;
-  padding: 12px;
-  font-size: 16px;
-  border: 1px solid #4a4a4a;
-  border-radius: 6px;
-  background: #ffffff;
-  box-sizing: border-box;
 }
 
 .gc-btn {
@@ -302,8 +287,8 @@ body {
   padding: 16px;
   font-size: 16px;
   font-weight: 700;
-  color: #ffffff;
-  background-color: #c89f4a;
+  color: #23376c;
+  background-color: #ebca45;
   border: none;
   border-radius: 6px;
   text-transform: uppercase;
@@ -313,39 +298,11 @@ body {
 }
 
 .gc-btn:hover {
-  background: #b38e3f;
+  background: #f0d562;
   transform: scale(1.03);
 }
 
 .gc-btn:active {
   transform: scale(0.97);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
-}
-
-.gc-result {
-  margin-top: 24px;
-  font-size: 20px;
-  font-weight: 600;
-  color: #2c3e50;
-  text-align: center;
-}
-
-.gc-note {
-  margin: -12px 0 8px 0;
-  font-size: 12px;
-  opacity: 0.8;
-  text-align: center;
-}
-
-@media (max-width: 768px) {
-  .gc-calculator {
-    padding: 1.5rem;
-  }
-  .gc-row {
-    grid-template-columns: 1fr;
-  }
-  .gc-row label {
-    text-align: left;
-    margin-bottom: 6px;
-  }
 }

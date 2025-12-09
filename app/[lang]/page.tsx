@@ -102,6 +102,7 @@ export default function HomePage() {
     setIsModalOpen(false);
 
     try {
+      // honeypot → бот, делаем вид, что всё ОК
       if (formData.website && formData.website.trim() !== "") {
         setFormStatus("success");
         setFormMessage(t.contact.statusSuccess);
@@ -115,10 +116,16 @@ export default function HomePage() {
 
       if (isProd && recaptchaSiteKey && typeof window !== "undefined") {
         const grecaptcha = (window as any).grecaptcha;
-        if (grecaptcha?.execute) {
-          await grecaptcha.ready();
-          recaptchaToken = await grecaptcha.execute(recaptchaSiteKey, {
-            action: "contact",
+
+        if (grecaptcha?.execute && grecaptcha?.ready) {
+          // ВАЖНО: ready принимает callback, а не используется как промис
+          recaptchaToken = await new Promise<string>((resolve, reject) => {
+            grecaptcha.ready(() => {
+              grecaptcha
+                .execute(recaptchaSiteKey, { action: "contact" })
+                .then((token: string) => resolve(token))
+                .catch(reject);
+            });
           });
         }
       }
@@ -137,9 +144,7 @@ export default function HomePage() {
 
       if (!res.ok || !data?.ok) {
         setFormStatus("error");
-        setFormMessage(
-          data?.message || t.contact.statusError
-        );
+        setFormMessage(data?.message || t.contact.statusError);
         setIsModalOpen(true);
         return;
       }
@@ -155,6 +160,7 @@ export default function HomePage() {
       setIsModalOpen(true);
     }
   };
+
 
   const otherServices = t.services.otherServices.map((service) => ({
     ...service,
