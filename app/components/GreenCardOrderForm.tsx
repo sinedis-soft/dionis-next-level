@@ -63,6 +63,7 @@ export function GreenCardOrderForm({ dict }: Props) {
   const [personIdNumber, setPersonIdNumber] = useState("");
   const [passportNumber, setPassportNumber] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
 
 function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
   e.preventDefault();
@@ -111,6 +112,8 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
       setPersonIdNumber("");
       setPassportNumber("");
       setVehicleBlocks([0]);
+      setStep(1);
+
     })
     .catch((err) => {
       console.error("GREEN CARD ORDER ERROR:", err);
@@ -175,8 +178,12 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
         </p>
 
         <form className="mt-8 space-y-8" onSubmit={handleOrderSubmit}>
-          {/* Контактные данные */}
-          <fieldset className="card px-5 py-5 sm:px-6 sm:py-6">
+  {/* ШАГ 1: Контактные данные + чекбокс юрлица */}
+          <fieldset
+            className={
+              "card px-5 py-5 sm:px-6 sm:py-6" + (step !== 1 ? " hidden" : "")
+            }
+          >
             <legend className="text-lg sm:text-xl font-bold text-[#C89F4A] px-1">
               {dict.contact.legend}
             </legend>
@@ -248,21 +255,35 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                 checked={isCompany}
                 onChange={(e) => setIsCompany(e.target.checked)}
               />
-              <label
-                htmlFor="order-isCompany"
-                className="text-sm text-gray-700"
-              >
+              <label htmlFor="order-isCompany" className="text-sm text-gray-700">
                 {dict.contact.isCompanyLabel}
               </label>
             </div>
           </fieldset>
 
-          {/* Данные компании — только если юрлицо */}
-          {isCompany && (
-            <fieldset className="card px-5 py-5 sm:px-6 sm:py-6">
-              <legend className="text-lg sm:text-xl font-bold text-[#C89F4A] px-1">
-                {dict.company.legend}
-              </legend>
+          {step === 1 && (
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                className="btn w-full sm:w-auto"
+                onClick={() => setStep(2)}
+              >
+                {dict.nextStep ?? "Далее"}
+              </button>
+            </div>
+          )}
+
+          {/* ШАГ 2: Личные данные / Юрлицо */}
+          <fieldset
+            className={
+              "card px-5 py-5 sm:px-6 sm:py-6" + (step !== 2 ? " hidden" : "")
+            }
+          >
+            <legend className="text-lg sm:text-xl font-bold text-[#C89F4A] px-1">
+              {isCompany ? dict.company.legend : dict.person.legend}
+            </legend>
+
+            {isCompany ? (
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -286,133 +307,143 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                   />
                 </div>
               </div>
-            </fieldset>
+            ) : (
+              <>
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {dict.person.middleName}
+                    </label>
+                    <input
+                      type="text"
+                      name="person_middleName"
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {dict.person.gender}
+                    </label>
+                    <select
+                      name="person_gender"
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                    >
+                      <option value="">{dict.notSelected}</option>
+                      <option value="male">{dict.person.genderMale}</option>
+                      <option value="female">{dict.person.genderFemale}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {dict.person.birthDate}
+                    </label>
+                    <input
+                      type="date"
+                      name="person_birthDate"
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {dict.person.idNumber}
+                    </label>
+                    <input
+                      type="text"
+                      name="person_idNumber"
+                      value={personIdNumber}
+                      onChange={(e) =>
+                        setPersonIdNumber(formatIdNumber(e.target.value))
+                      }
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                    />
+                  </div>
+
+                  <CountrySelect
+                    name="person_country"
+                    label={dict.person.countryLabel}
+                    required={false}
+                  />
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {dict.person.address}
+                    </label>
+                    <input
+                      type="text"
+                      name="person_address"
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {dict.person.passportNumber}
+                    </label>
+                    <input
+                      type="text"
+                      name="person_passportNumber"
+                      value={passportNumber}
+                      onChange={(e) =>
+                        setPassportNumber(formatLatinAlnum(e.target.value, 20))
+                      }
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {dict.person.passportIssuer}
+                    </label>
+                    <input
+                      type="text"
+                      name="person_passportIssuer"
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {dict.person.passportIssuedAt}
+                    </label>
+                    <input
+                      type="date"
+                      name="person_passportIssuedAt"
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {dict.person.passportValidTo}
+                    </label>
+                    <input
+                      type="date"
+                      name="person_passportValidTo"
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </fieldset>
+
+          {step === 2 && (
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                className="btn w-full sm:w-auto"
+                onClick={() => setStep(3)}
+              >
+                {dict.nextStep ?? "Далее"}
+              </button>
+            </div>
           )}
 
-          {/* Личные данные страхователя / водителя — только если НЕ юрлицо */}
-          {!isCompany && (
-            <fieldset className="card px-5 py-5 sm:px-6 sm:py-6">
-              <legend className="text-lg sm:text-xl font-bold text-[#C89F4A] px-1">
-                {dict.person.legend}
-              </legend>
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {dict.person.middleName}
-                  </label>
-                  <input
-                    type="text"
-                    name="person_middleName"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {dict.person.gender}
-                  </label>
-                  <select
-                    name="person_gender"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
-                  >
-                    <option value="">{dict.notSelected}</option>
-                    <option value="male">{dict.person.genderMale}</option>
-                    <option value="female">{dict.person.genderFemale}</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {dict.person.birthDate}
-                  </label>
-                  <input
-                    type="date"
-                    name="person_birthDate"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {dict.person.idNumber}
-                  </label>
-                  <input
-                    type="text"
-                    name="person_idNumber"
-                    value={personIdNumber}
-                    onChange={(e) =>
-                      setPersonIdNumber(formatIdNumber(e.target.value))
-                    }
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
-                  />
-                </div>
-
-                <CountrySelect
-                  name="person_country"
-                  label={dict.person.countryLabel}
-                  required={false}
-                />
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {dict.person.address}
-                  </label>
-                  <input
-                    type="text"
-                    name="person_address"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
-                  />
-                </div>
-              </div>
-
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {dict.person.passportNumber}
-                  </label>
-                  <input
-                    type="text"
-                    name="person_passportNumber"
-                    value={passportNumber}
-                    onChange={(e) =>
-                      setPassportNumber(formatLatinAlnum(e.target.value, 20))
-                    }
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {dict.person.passportIssuer}
-                  </label>
-                  <input
-                    type="text"
-                    name="person_passportIssuer"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {dict.person.passportIssuedAt}
-                  </label>
-                  <input
-                    type="date"
-                    name="person_passportIssuedAt"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {dict.person.passportValidTo}
-                  </label>
-                  <input
-                    type="date"
-                    name="person_passportValidTo"
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
-                  />
-                </div>
-              </div>
-            </fieldset>
-          )}
-
-          {/* Параметры страховки – только территория */}
-          <fieldset className="card px-5 py-5 sm:px-6 sm:py-6">
+          {/* ШАГ 3: Параметры страховки */}
+          <fieldset
+            className={
+              "card px-5 py-5 sm:px-6 sm:py-6" + (step !== 3 ? " hidden" : "")
+            }
+          >
             <legend className="text-lg sm:text-xl font-bold text-[#C89F4A] px-1">
               {dict.insurance.legend}
             </legend>
@@ -434,8 +465,24 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
             </div>
           </fieldset>
 
-          {/* Данные по транспорту */}
-          <fieldset className="card px-5 py-5 sm:px-6 sm:py-6">
+          {step === 3 && (
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                className="btn w-full sm:w-auto"
+                onClick={() => setStep(4)}
+              >
+                {dict.nextStep ?? "Далее"}
+              </button>
+            </div>
+          )}
+
+          {/* ШАГ 4: Транспортные средства + отправка */}
+          <fieldset
+            className={
+              "card px-5 py-5 sm:px-6 sm:py-6" + (step !== 4 ? " hidden" : "")
+            }
+          >
             <legend className="text-lg sm:text-xl font-bold text-[#C89F4A] px-1">
               {dict.vehicles.legend}
             </legend>
@@ -482,10 +529,7 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                         type="text"
                         name={`vehicles[${idx}][plate]`}
                         onChange={(e) =>
-                          (e.target.value = formatLatinAlnum(
-                            e.target.value,
-                            12
-                          ))
+                          (e.target.value = formatLatinAlnum(e.target.value, 12))
                         }
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
                       />
@@ -500,10 +544,7 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                         type="text"
                         name={`vehicles[${idx}][techPassportNumber]`}
                         onChange={(e) =>
-                          (e.target.value = formatLatinAlnum(
-                            e.target.value,
-                            20
-                          ))
+                          (e.target.value = formatLatinAlnum(e.target.value, 20))
                         }
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
                       />
@@ -520,24 +561,12 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                         defaultValue=""
                       >
                         <option value="">{dict.notSelected}</option>
-                        <option value="127">
-                          {dict.vehicles.vehicleTypePassenger}
-                        </option>
-                        <option value="131">
-                          {dict.vehicles.vehicleTypeBus}
-                        </option>
-                        <option value="453">
-                          {dict.vehicles.vehicleTypeTruck}
-                        </option>
-                        <option value="251">
-                          {dict.vehicles.vehicleTypeTrailer}
-                        </option>
-                        <option value="217">
-                          {dict.vehicles.vehicleTypeMotorcycle}
-                        </option>
-                        <option value="457">
-                          {dict.vehicles.vehicleTypeSpecial}
-                        </option>
+                        <option value="127">{dict.vehicles.vehicleTypePassenger}</option>
+                        <option value="131">{dict.vehicles.vehicleTypeBus}</option>
+                        <option value="453">{dict.vehicles.vehicleTypeTruck}</option>
+                        <option value="251">{dict.vehicles.vehicleTypeTrailer}</option>
+                        <option value="217">{dict.vehicles.vehicleTypeMotorcycle}</option>
+                        <option value="457">{dict.vehicles.vehicleTypeSpecial}</option>
                       </select>
                     </div>
 
@@ -612,17 +641,19 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
             </div>
           </fieldset>
 
-          <div className="flex justify-end pt-2">
-            <button
-              type="submit"
-              className="btn w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Отправка..." : dict.submit}
-            </button>
-          </div>
-
+          {step === 4 && (
+            <div className="flex justify-end pt-2">
+              <button
+                type="submit"
+                className="btn w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Отправка..." : dict.submit}
+              </button>
+            </div>
+          )}
         </form>
+
       </div>
     </section>
   );

@@ -8,6 +8,7 @@ export type GreenCardFormDictionary = {
   submit: string;
   successMessage: string;
   fileForbidden: string;
+  nextStep: string;
 
   contact: {
     legend: string;
@@ -83,6 +84,7 @@ const ru: GreenCardFormDictionary = {
   submit: "Отправить заявку на Зеленую карту",
   successMessage: "Заявка на Зеленую карту отправлена. Мы свяжемся с вами.",
   fileForbidden: "недопустим (архив, аудио или видео).",
+  nextStep: "Далее",
 
   contact: {
     legend: "Контактные данные (для связи с вами)",
@@ -159,6 +161,7 @@ const en: GreenCardFormDictionary = {
   submit: "Submit Green Card application",
   successMessage: "Green Card application sent. We will contact you.",
   fileForbidden: "is not allowed (archive, audio or video).",
+  nextStep: "Next",
 
   contact: {
     legend: "Contact details",
@@ -235,6 +238,7 @@ const kz: GreenCardFormDictionary = {
   submit: "Жасыл картаға өтінімді жіберу",
   successMessage: "Жасыл картаға өтінім жіберілді. Біз сізбен байланысамыз.",
   fileForbidden: "рұқсат етілмейді (мұрағат, аудио немесе бейне).",
+  nextStep: "Келесі",
 
   contact: {
     legend: "Байланыс деректері",
