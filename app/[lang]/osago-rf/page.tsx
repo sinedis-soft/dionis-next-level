@@ -365,7 +365,7 @@ export default function OsagoRfPage() {
                     onChange={handleContactInputChange}
                     inputMode="email"
                     autoComplete="email"
-                    pattern="^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+                    pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
                     className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
                     required
                   />
