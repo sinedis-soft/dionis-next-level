@@ -198,6 +198,7 @@ export function OsagoOrderForm({ dict }: Props) {
             <div className="mt-4 flex items-center gap-3">
               <input
                 id="order-isCompany"
+                name="order-isCompany"
                 type="checkbox"
                 className="rounded border-gray-300"
                 checked={isCompany}

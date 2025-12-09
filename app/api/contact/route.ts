@@ -172,12 +172,8 @@ export async function POST(req: Request) {
             <strong>Фамилия:</strong> ${lastName}<br>
                 <strong>E-mail:</strong> ${email}<br>
                 <strong>Телефон:</strong> ${phone}<br>
-                <strong>Комментарий:</strong><br>${comment.replace(/\n/g, "<br>")}<br>
-                ${pageUrl || "unknown"}<br>
-
-
-
-
+                <strong>Комментарий:</strong><br>${comment.replace(/\n/g, "<br>")}<br><br>
+                <strong>Отправлено со страницы:</strong><br>${pageUrl || "unknown"}<br>
 
           </p>
           <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">С уважением, Денис БОРОВОЙ</h2>

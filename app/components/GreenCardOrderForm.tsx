@@ -62,22 +62,66 @@ export function GreenCardOrderForm({ dict }: Props) {
   const [contactEmail, setContactEmail] = useState("");
   const [personIdNumber, setPersonIdNumber] = useState("");
   const [passportNumber, setPassportNumber] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    console.log("GREEN CARD ORDER FORM DATA:", Object.fromEntries(formData));
-    alert(dict.successMessage);
-    e.currentTarget.reset();
+function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
+  e.preventDefault();
 
-    setContactFirstNameLat("");
-    setContactLastNameLat("");
-    setContactPhone("");
-    setContactEmail("");
-    setPersonIdNumber("");
-    setPassportNumber("");
-    setVehicleBlocks([0]);
+  // если уже отправляем — просто игнорируем повторный submit
+  if (isSubmitting) return;
+
+  setIsSubmitting(true);
+
+  const formEl = e.currentTarget;
+  const formData = new FormData(formEl);
+
+  // Добавим URL и UTM (если они есть в localStorage)
+  if (typeof window !== "undefined") {
+    try {
+      formData.append("pageUrl", window.location.href);
+      const utm = localStorage.getItem("utm_data");
+      if (utm) {
+        formData.append("utm", utm);
+      }
+    } catch {
+      // ничего страшного
+    }
   }
+
+  fetch("/api/green-card-order", {
+    method: "POST",
+    body: formData,
+  })
+    .then(async (res) => {
+      const data = await res.json().catch(() => null);
+      console.log("GREEN CARD ORDER RESPONSE:", res.status, data);
+
+      if (!res.ok || !data?.ok) {
+        alert(data?.message || "Ошибка при отправке заявки на Зеленую карту");
+        return;
+      }
+
+      alert(dict.successMessage);
+
+      formEl.reset();
+      setContactFirstNameLat("");
+      setContactLastNameLat("");
+      setContactPhone("");
+      setContactEmail("");
+      setPersonIdNumber("");
+      setPassportNumber("");
+      setVehicleBlocks([0]);
+    })
+    .catch((err) => {
+      console.error("GREEN CARD ORDER ERROR:", err);
+      alert("Ошибка на сервере при отправке заявки на Зеленую карту");
+    })
+    .finally(() => {
+      setIsSubmitting(false);
+    });
+}
+
+
 
   const forbiddenTypes = [
     "application/zip",
@@ -198,6 +242,7 @@ export function GreenCardOrderForm({ dict }: Props) {
             <div className="mt-4 flex items-center gap-3">
               <input
                 id="order-isCompany"
+                name="order-isCompany"
                 type="checkbox"
                 className="rounded border-gray-300"
                 checked={isCompany}
@@ -568,10 +613,15 @@ export function GreenCardOrderForm({ dict }: Props) {
           </fieldset>
 
           <div className="flex justify-end pt-2">
-            <button type="submit" className="btn w-full sm:w-auto">
-              {dict.submit}
+            <button
+              type="submit"
+              className="btn w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Отправка..." : dict.submit}
             </button>
           </div>
+
         </form>
       </div>
     </section>
