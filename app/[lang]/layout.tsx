@@ -22,7 +22,7 @@ function normalizeLang(value: string): Lang {
   return "ru";
 }
 
-// Не мучаемся с типами LayoutProps – берём any для params
+
 export default function LangLayout({
   children,
   params,
@@ -35,12 +35,13 @@ export default function LangLayout({
   return (
     <html lang={lang}>
       <body className="min-h-screen flex flex-col">
-        <Header lang={lang} />
+        <Header />
         <main className="flex-1">{children}</main>
-        <SiteFooter lang={lang} />
-        <CookieConsent lang={lang} />
+        <SiteFooter />
+        <CookieConsent lang={lang} /> {/* тут оставьте как есть пока */}
         <AnalyticsManager />
       </body>
     </html>
   );
 }
+

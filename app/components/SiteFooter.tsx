@@ -1,12 +1,20 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+
 import type { Lang } from "@/dictionaries/header";
 import { getFooterDictionary } from "@/dictionaries/footer";
 
-interface SiteFooterProps {
-  lang: Lang;
+function resolveLang(pathname: string): Lang {
+  const seg = pathname.split("/")[1] || "";
+  if (seg === "ru" || seg === "kz" || seg === "en") return seg as Lang;
+  return "ru";
 }
 
-export default function SiteFooter({ lang }: SiteFooterProps) {
+export default function SiteFooter() {
+  const pathname = usePathname() || "/";
+  const lang = resolveLang(pathname);
   const t = getFooterDictionary(lang);
   const base = `/${lang}`;
 

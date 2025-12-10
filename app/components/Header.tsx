@@ -1,4 +1,3 @@
-// app/components/Header.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -9,41 +8,30 @@ import { usePathname } from "next/navigation";
 import type { Lang } from "@/dictionaries/header";
 import { HEADER_DICTIONARY } from "@/dictionaries/header";
 
-interface HeaderProps {
-  lang: Lang;
-}
-
-export default function Header({ lang }: HeaderProps) {
-  const t = HEADER_DICTIONARY[lang];
-  const base = `/${lang}`;
+export default function Header() {
   const pathname = usePathname() || "/";
 
+  // ---------- определяем язык из URL ----------
+  const seg = pathname.split("/")[1] || "";
+  const currentLang: Lang =
+    seg === "ru" || seg === "kz" || seg === "en" ? (seg as Lang) : "ru";
+
+  const t = HEADER_DICTIONARY[currentLang];
+  const base = `/${currentLang}`;
+
+  // ---------- state ----------
   const [menuOpen, setMenuOpen] = useState(false);
   const [insuranceDesktopOpen, setInsuranceDesktopOpen] = useState(false);
   const [insuranceMobileOpen, setInsuranceMobileOpen] = useState(false);
 
-  // ---------- язык из URL (истинный источник) ----------
-  const pathSeg = pathname.split("/")[1] || "";
-  const currentLang: Lang =
-    pathSeg === "ru" || pathSeg === "kz" || pathSeg === "en"
-      ? (pathSeg as Lang)
-      : lang;
-
-  // ---------- helpers ----------
-
-  // строим URL для нового языка, сохраняя путь
+  // ---------- build URL при смене языка ----------
   const buildLangUrl = (targetLang: Lang) => {
-    const parts = pathname.split("/"); // ["", "ru", "green-card", ...]
-    if (parts.length > 1) {
-      parts[1] = targetLang;
-    } else {
-      parts[1] = targetLang;
-    }
-    const newPath = parts.join("/");
-    return newPath.replace(/\/+$/, "") || "/";
+    const parts = pathname.split("/"); // ["", "ru", "green-card"]
+    if (parts.length > 1) parts[1] = targetLang;
+    return parts.join("/").replace(/\/+$/, "") || "/";
   };
 
-  // активная ссылка (меню)
+  // ---------- активная ссылка ----------
   const isActive = (target: string) => {
     if (target === base) {
       return pathname === base || pathname === `${base}/`;
@@ -63,7 +51,7 @@ export default function Header({ lang }: HeaderProps) {
         : "opacity-60 hover:opacity-100"
     }`;
 
-  // при смене маршрута всё закрываем
+  // закрываем меню при смене маршрута
   useEffect(() => {
     setInsuranceDesktopOpen(false);
     setInsuranceMobileOpen(false);
@@ -71,10 +59,10 @@ export default function Header({ lang }: HeaderProps) {
   }, [pathname]);
 
   // ---------- render ----------
-
   return (
     <header className="w-full text-white bg-[#23376C] shadow-md">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        {/* LOGO */}
         <Link href={base} className="flex items-center gap-2">
           <Image
             src="/logo.webp"
@@ -85,26 +73,22 @@ export default function Header({ lang }: HeaderProps) {
           />
         </Link>
 
-        {/* DESKTOP MENU */}
+        {/* DESKTOP NAV */}
         <nav className="hidden lg:flex items-center justify-between gap-8 flex-1 text-sm ml-6">
           <div className="flex items-center gap-6">
             <Link href={base} className={navLinkClass(base)}>
               {t.home}
             </Link>
 
-            <Link
-              href={`${base}/about`}
-              className={navLinkClass(`${base}/about`)}
-            >
+            <Link href={`${base}/about`} className={navLinkClass(`${base}/about`)}>
               {t.about}
             </Link>
 
+            {/* INSURANCE DROPDOWN */}
             <div className="relative">
               <button
                 type="button"
-                onClick={() =>
-                  setInsuranceDesktopOpen((prev) => !prev)
-                }
+                onClick={() => setInsuranceDesktopOpen((prev) => !prev)}
                 className={`transition-colors ${
                   isActive(`${base}/green-card`) ||
                   isActive(`${base}/osago-rf`) ||
@@ -129,6 +113,7 @@ export default function Header({ lang }: HeaderProps) {
                   >
                     {t.greenCard}
                   </Link>
+
                   <Link
                     href={`${base}/osago-rf`}
                     className={`block px-4 py-2 hover:bg-gray-100 ${
@@ -140,6 +125,7 @@ export default function Header({ lang }: HeaderProps) {
                   >
                     {t.osagoRu}
                   </Link>
+
                   <Link
                     href={`${base}/products`}
                     className={`block px-4 py-2 hover:bg-gray-100 ${
@@ -155,10 +141,7 @@ export default function Header({ lang }: HeaderProps) {
               )}
             </div>
 
-            <Link
-              href={`${base}/blog`}
-              className={navLinkClass(`${base}/blog`)}
-            >
+            <Link href={`${base}/blog`} className={navLinkClass(`${base}/blog`)}>
               {t.blog}
             </Link>
             <Link
@@ -169,7 +152,7 @@ export default function Header({ lang }: HeaderProps) {
             </Link>
           </div>
 
-          {/* RIGHT COLUMN */}
+          {/* RIGHT INFO + LANG */}
           <div className="flex flex-col items-end text-xs leading-snug">
             <div className="text-right">{t.addressLine}</div>
 
@@ -181,23 +164,15 @@ export default function Header({ lang }: HeaderProps) {
             </a>
 
             <div className="mt-2 flex items-center gap-3">
-              <a
-                href="https://wa.me/77273573030"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href="https://wa.me/77273573030" target="_blank">
                 <Image src="/wa.webp" alt="WhatsApp" width={27} height={27} />
               </a>
-              <a
-                href="https://t.me/Dionis_insurance_broker_bot"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href="https://t.me/Dionis_insurance_broker_bot" target="_blank">
                 <Image src="/tg.webp" alt="Telegram" width={22} height={22} />
               </a>
             </div>
 
-            {/* LANGUAGE SWITCH DESKTOP */}
+            {/* LANG SWITCH */}
             <div className="mt-2 flex gap-2 uppercase tracking-wide text-[11px]">
               <Link href={buildLangUrl("ru")} className={langLinkClass("ru")}>
                 RU
@@ -228,11 +203,7 @@ export default function Header({ lang }: HeaderProps) {
       {/* MOBILE MENU */}
       {menuOpen && (
         <div className="lg:hidden bg-[#1A2B55] text-white px-4 py-4 space-y-3 text-sm">
-          <Link
-            href={base}
-            className={navLinkClass(base)}
-            onClick={() => setMenuOpen(false)}
-          >
+          <Link href={base} className={navLinkClass(base)} onClick={() => setMenuOpen(false)}>
             {t.home}
           </Link>
           <Link
@@ -243,12 +214,11 @@ export default function Header({ lang }: HeaderProps) {
             {t.about}
           </Link>
 
+          {/* Mobile dropdown */}
           <div>
             <button
               type="button"
-              onClick={() =>
-                setInsuranceMobileOpen((prev) => !prev)
-              }
+              onClick={() => setInsuranceMobileOpen((prev) => !prev)}
               className="w-full text-left"
             >
               {t.insurances} ▾
@@ -266,6 +236,7 @@ export default function Header({ lang }: HeaderProps) {
                 >
                   {t.greenCard}
                 </Link>
+
                 <Link
                   href={`${base}/osago-rf`}
                   className={navLinkClass(`${base}/osago-rf`)}
@@ -276,6 +247,7 @@ export default function Header({ lang }: HeaderProps) {
                 >
                   {t.osagoRu}
                 </Link>
+
                 <Link
                   href={`${base}/products`}
                   className={navLinkClass(`${base}/products`)}
@@ -305,6 +277,7 @@ export default function Header({ lang }: HeaderProps) {
             {t.contacts}
           </Link>
 
+          {/* Info + langs */}
           <div className="pt-3 border-t border-white/20 text-xs leading-snug">
             <div className="text-[#EBCA45]">{t.workTime}</div>
             <div>{t.addressLine}</div>
@@ -314,23 +287,15 @@ export default function Header({ lang }: HeaderProps) {
             </a>
 
             <div className="flex gap-3 mt-3">
-              <a
-                href="https://wa.me/77273573030"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href="https://wa.me/77273573030" target="_blank">
                 <Image src="/wa.webp" width={26} height={26} alt="WhatsApp" />
               </a>
-              <a
-                href="https://t.me/Dionis_insurance_broker_bot"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              <a href="https://t.me/Dionis_insurance_broker_bot" target="_blank">
                 <Image src="/tg.webp" width={26} height={26} alt="Telegram" />
               </a>
             </div>
 
-            {/* LANGUAGE SWITCH MOBILE */}
+            {/* LANG SWITCH MOBILE */}
             <div className="mt-3 flex gap-2 uppercase tracking-wide text-[11px]">
               <Link
                 href={buildLangUrl("ru")}
