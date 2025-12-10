@@ -1,9 +1,10 @@
 // app/components/Header.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import type { Lang } from "@/dictionaries/header";
 import { HEADER_DICTIONARY } from "@/dictionaries/header";
@@ -15,21 +16,64 @@ interface HeaderProps {
 export default function Header({ lang }: HeaderProps) {
   const t = HEADER_DICTIONARY[lang];
   const base = `/${lang}`;
+  const pathname = usePathname() || "/";
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [insuranceDesktopOpen, setInsuranceDesktopOpen] = useState(false);
   const [insuranceMobileOpen, setInsuranceMobileOpen] = useState(false);
 
-  const toggleMenu = () => {
-    setMenuOpen((prev) => {
-      const next = !prev;
-      if (!next) setInsuranceMobileOpen(false);
-      return next;
-    });
+  // ---------- язык из URL (истинный источник) ----------
+  const pathSeg = pathname.split("/")[1] || "";
+  const currentLang: Lang =
+    pathSeg === "ru" || pathSeg === "kz" || pathSeg === "en"
+      ? (pathSeg as Lang)
+      : lang;
+
+  // ---------- helpers ----------
+
+  // строим URL для нового языка, сохраняя путь
+  const buildLangUrl = (targetLang: Lang) => {
+    const parts = pathname.split("/"); // ["", "ru", "green-card", ...]
+    if (parts.length > 1) {
+      parts[1] = targetLang;
+    } else {
+      parts[1] = targetLang;
+    }
+    const newPath = parts.join("/");
+    return newPath.replace(/\/+$/, "") || "/";
   };
 
+  // активная ссылка (меню)
+  const isActive = (target: string) => {
+    if (target === base) {
+      return pathname === base || pathname === `${base}/`;
+    }
+    return pathname === target || pathname.startsWith(`${target}/`);
+  };
+
+  const navLinkClass = (href: string) =>
+    `transition-colors ${
+      isActive(href) ? "text-[#EBCA45] font-semibold" : "text-white"
+    } hover:text-[#EBCA45]`;
+
+  const langLinkClass = (code: Lang) =>
+    `transition-colors ${
+      currentLang === code
+        ? "font-bold text-[#EBCA45]"
+        : "opacity-60 hover:opacity-100"
+    }`;
+
+  // при смене маршрута всё закрываем
+  useEffect(() => {
+    setInsuranceDesktopOpen(false);
+    setInsuranceMobileOpen(false);
+    setMenuOpen(false);
+  }, [pathname]);
+
+  // ---------- render ----------
+
   return (
-    <header className="w-full text-white bg-[#1A3A5F] shadow-md">
+    <header className="w-full text-white bg-[#23376C] shadow-md">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <Link href={base} className="flex items-center gap-2">
           <Image
@@ -42,42 +86,68 @@ export default function Header({ lang }: HeaderProps) {
         </Link>
 
         {/* DESKTOP MENU */}
-        <nav className="hidden lg:flex items-center justify-between gap-8 flex-1 text-sm font-medium ml-6">
+        <nav className="hidden lg:flex items-center justify-between gap-8 flex-1 text-sm ml-6">
           <div className="flex items-center gap-6">
-            <Link href={base} className="hover:text-[#C89F4A]">
+            <Link href={base} className={navLinkClass(base)}>
               {t.home}
             </Link>
 
-            <Link href={`${base}/about`} className="hover:text-[#C89F4A]">
+            <Link
+              href={`${base}/about`}
+              className={navLinkClass(`${base}/about`)}
+            >
               {t.about}
             </Link>
 
             <div className="relative">
               <button
                 type="button"
-                onClick={() => setInsuranceDesktopOpen((prev) => !prev)}
-                className="hover:text-[#C89F4A]"
+                onClick={() =>
+                  setInsuranceDesktopOpen((prev) => !prev)
+                }
+                className={`transition-colors ${
+                  isActive(`${base}/green-card`) ||
+                  isActive(`${base}/osago-rf`) ||
+                  isActive(`${base}/products`)
+                    ? "text-[#EBCA45] font-semibold"
+                    : "text-white hover:text-[#EBCA45]"
+                }`}
               >
                 {t.insurances} ▾
               </button>
 
               {insuranceDesktopOpen && (
-                <div className="absolute left-0 mt-2 bg-white text-[#1A3A5F] shadow-lg rounded-md overflow-hidden min-w-[220px] z-50">
+                <div className="absolute left-0 mt-2 bg-white text-[#23376C] shadow-lg rounded-md overflow-hidden min-w-[220px] z-50">
                   <Link
                     href={`${base}/green-card`}
-                    className="block px-4 py-2 hover:bg-gray-100"
+                    className={`block px-4 py-2 hover:bg-gray-100 ${
+                      isActive(`${base}/green-card`)
+                        ? "font-semibold text-[#23376C]"
+                        : ""
+                    }`}
+                    onClick={() => setInsuranceDesktopOpen(false)}
                   >
                     {t.greenCard}
                   </Link>
                   <Link
                     href={`${base}/osago-rf`}
-                    className="block px-4 py-2 hover:bg-gray-100"
+                    className={`block px-4 py-2 hover:bg-gray-100 ${
+                      isActive(`${base}/osago-rf`)
+                        ? "font-semibold text-[#23376C]"
+                        : ""
+                    }`}
+                    onClick={() => setInsuranceDesktopOpen(false)}
                   >
                     {t.osagoRu}
                   </Link>
                   <Link
                     href={`${base}/products`}
-                    className="block px-4 py-2 hover:bg-gray-100"
+                    className={`block px-4 py-2 hover:bg-gray-100 ${
+                      isActive(`${base}/products`)
+                        ? "font-semibold text-[#23376C]"
+                        : ""
+                    }`}
+                    onClick={() => setInsuranceDesktopOpen(false)}
                   >
                     {t.allProducts}
                   </Link>
@@ -85,20 +155,27 @@ export default function Header({ lang }: HeaderProps) {
               )}
             </div>
 
-            <Link href={`${base}/blog`} className="hover:text-[#C89F4A]">
+            <Link
+              href={`${base}/blog`}
+              className={navLinkClass(`${base}/blog`)}
+            >
               {t.blog}
             </Link>
-            <Link href={`${base}/contacts`} className="hover:text-[#C89F4A]">
+            <Link
+              href={`${base}/contacts`}
+              className={navLinkClass(`${base}/contacts`)}
+            >
               {t.contacts}
             </Link>
           </div>
 
+          {/* RIGHT COLUMN */}
           <div className="flex flex-col items-end text-xs leading-snug">
             <div className="text-right">{t.addressLine}</div>
 
             <a
               href="tel:+77273573030"
-              className="mt-1 font-bold text-base leading-tight text-right hover:text-[#C89F4A]"
+              className="mt-1 font-bold text-base leading-tight text-right hover:text-[#EBCA45]"
             >
               +7 (727) 357-30-30
             </a>
@@ -120,23 +197,15 @@ export default function Header({ lang }: HeaderProps) {
               </a>
             </div>
 
+            {/* LANGUAGE SWITCH DESKTOP */}
             <div className="mt-2 flex gap-2 uppercase tracking-wide text-[11px]">
-              <Link
-                href="/ru"
-                className={lang === "ru" ? "font-bold" : "opacity-70"}
-              >
+              <Link href={buildLangUrl("ru")} className={langLinkClass("ru")}>
                 RU
               </Link>
-              <Link
-                href="/kz"
-                className={lang === "kz" ? "font-bold" : "opacity-70"}
-              >
+              <Link href={buildLangUrl("kz")} className={langLinkClass("kz")}>
                 KZ
               </Link>
-              <Link
-                href="/en"
-                className={lang === "en" ? "font-bold" : "opacity-70"}
-              >
+              <Link href={buildLangUrl("en")} className={langLinkClass("en")}>
                 EN
               </Link>
             </div>
@@ -146,7 +215,7 @@ export default function Header({ lang }: HeaderProps) {
         {/* MOBILE BURGER */}
         <button
           className="lg:hidden flex flex-col gap-1"
-          onClick={toggleMenu}
+          onClick={() => setMenuOpen((prev) => !prev)}
           aria-label="Menu"
           type="button"
         >
@@ -158,18 +227,28 @@ export default function Header({ lang }: HeaderProps) {
 
       {/* MOBILE MENU */}
       {menuOpen && (
-        <div className="lg:hidden bg-[#163455] text-white px-4 py-4 space-y-3 text-sm">
-          <Link href={base} className="block">
+        <div className="lg:hidden bg-[#1A2B55] text-white px-4 py-4 space-y-3 text-sm">
+          <Link
+            href={base}
+            className={navLinkClass(base)}
+            onClick={() => setMenuOpen(false)}
+          >
             {t.home}
           </Link>
-          <Link href={`${base}/about`} className="block">
+          <Link
+            href={`${base}/about`}
+            className={navLinkClass(`${base}/about`)}
+            onClick={() => setMenuOpen(false)}
+          >
             {t.about}
           </Link>
 
           <div>
             <button
               type="button"
-              onClick={() => setInsuranceMobileOpen((prev) => !prev)}
+              onClick={() =>
+                setInsuranceMobileOpen((prev) => !prev)
+              }
               className="w-full text-left"
             >
               {t.insurances} ▾
@@ -177,28 +256,57 @@ export default function Header({ lang }: HeaderProps) {
 
             {insuranceMobileOpen && (
               <div className="ml-4 mt-2 space-y-2">
-                <Link href={`${base}/green-card`} className="block">
+                <Link
+                  href={`${base}/green-card`}
+                  className={navLinkClass(`${base}/green-card`)}
+                  onClick={() => {
+                    setInsuranceMobileOpen(false);
+                    setMenuOpen(false);
+                  }}
+                >
                   {t.greenCard}
                 </Link>
-                <Link href={`${base}/osago-rf`} className="block">
+                <Link
+                  href={`${base}/osago-rf`}
+                  className={navLinkClass(`${base}/osago-rf`)}
+                  onClick={() => {
+                    setInsuranceMobileOpen(false);
+                    setMenuOpen(false);
+                  }}
+                >
                   {t.osagoRu}
                 </Link>
-                <Link href={`${base}/products`} className="block">
+                <Link
+                  href={`${base}/products`}
+                  className={navLinkClass(`${base}/products`)}
+                  onClick={() => {
+                    setInsuranceMobileOpen(false);
+                    setMenuOpen(false);
+                  }}
+                >
                   {t.allProducts}
                 </Link>
               </div>
             )}
           </div>
 
-          <Link href={`${base}/blog`} className="block">
+          <Link
+            href={`${base}/blog`}
+            className={navLinkClass(`${base}/blog`)}
+            onClick={() => setMenuOpen(false)}
+          >
             {t.blog}
           </Link>
-          <Link href={`${base}/contacts`} className="block">
+          <Link
+            href={`${base}/contacts`}
+            className={navLinkClass(`${base}/contacts`)}
+            onClick={() => setMenuOpen(false)}
+          >
             {t.contacts}
           </Link>
 
           <div className="pt-3 border-t border-white/20 text-xs leading-snug">
-            <div className="text-[#C89F4A]">{t.workTime}</div>
+            <div className="text-[#EBCA45]">{t.workTime}</div>
             <div>{t.addressLine}</div>
 
             <a href="tel:+77273573030" className="block font-bold mt-1 text-base">
@@ -222,22 +330,26 @@ export default function Header({ lang }: HeaderProps) {
               </a>
             </div>
 
+            {/* LANGUAGE SWITCH MOBILE */}
             <div className="mt-3 flex gap-2 uppercase tracking-wide text-[11px]">
               <Link
-                href="/ru"
-                className={lang === "ru" ? "font-bold" : "opacity-70"}
+                href={buildLangUrl("ru")}
+                className={langLinkClass("ru")}
+                onClick={() => setMenuOpen(false)}
               >
                 RU
               </Link>
               <Link
-                href="/kz"
-                className={lang === "kz" ? "font-bold" : "opacity-70"}
+                href={buildLangUrl("kz")}
+                className={langLinkClass("kz")}
+                onClick={() => setMenuOpen(false)}
               >
                 KZ
               </Link>
               <Link
-                href="/en"
-                className={lang === "en" ? "font-bold" : "opacity-70"}
+                href={buildLangUrl("en")}
+                className={langLinkClass("en")}
+                onClick={() => setMenuOpen(false)}
               >
                 EN
               </Link>
