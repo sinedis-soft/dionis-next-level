@@ -1,7 +1,7 @@
 // components/GreenCardOrderForm.tsx
 "use client";
 
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useRef } from "react";
 import { CountrySelect } from "@/data/CountrySelect";
 import type { GreenCardFormDictionary } from "@/dictionaries/greenCardForm";
 
@@ -65,66 +65,103 @@ export function GreenCardOrderForm({ dict }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
 
-function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
-  e.preventDefault();
+  const formRef = useRef<HTMLFormElement | null>(null);
 
-  // если уже отправляем — просто игнорируем повторный submit
-  if (isSubmitting) return;
+  const today = new Date();
+  const minAgeDate = new Date(today.getTime() - 6570 * 24 * 60 * 60 * 1000);
+  const maxBirthDate = minAgeDate.toISOString().split("T")[0];
+  const maxIssuedDate = today.toISOString().split("T")[0];
+  const minStartDate = today.toISOString().split("T")[0];
 
-  setIsSubmitting(true);
+  function validateStep(stepToValidate: 1 | 2 | 3 | 4): boolean {
+    if (!formRef.current) return true;
 
-  const formEl = e.currentTarget;
-  const formData = new FormData(formEl);
+    const fieldset = formRef.current.querySelector(
+      `fieldset[data-step="${stepToValidate}"]`
+    ) as HTMLFieldSetElement | null;
 
-  // Добавим URL и UTM (если они есть в localStorage)
-  if (typeof window !== "undefined") {
-    try {
-      formData.append("pageUrl", window.location.href);
-      const utm = localStorage.getItem("utm_data");
-      if (utm) {
-        formData.append("utm", utm);
+    if (!fieldset) return true;
+
+    const elements = fieldset.querySelectorAll<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >("input, select, textarea");
+
+    for (const el of Array.from(elements)) {
+      // пропускаем невидимые (например, другая ветка if / hidden)
+      if ((el as any).offsetParent === null) continue;
+
+      if (!el.checkValidity()) {
+        el.reportValidity();
+        el.focus();
+        return false;
       }
-    } catch {
-      // ничего страшного
     }
+
+    return true;
   }
 
-  fetch("/api/green-card-order", {
-    method: "POST",
-    body: formData,
-  })
-    .then(async (res) => {
-      const data = await res.json().catch(() => null);
-      console.log("GREEN CARD ORDER RESPONSE:", res.status, data);
+  function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
 
-      if (!res.ok || !data?.ok) {
-        alert(data?.message || "Ошибка при отправке заявки на Зеленую карту");
-        return;
+    if (isSubmitting) return;
+
+    // финальная валидация всех шагов перед отправкой
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4)) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const formEl = e.currentTarget;
+    const formData = new FormData(formEl);
+
+    // Добавим URL и UTM (если они есть в localStorage)
+    if (typeof window !== "undefined") {
+      try {
+        formData.append("pageUrl", window.location.href);
+        const utm = localStorage.getItem("utm_data");
+        if (utm) {
+          formData.append("utm", utm);
+        }
+      } catch {
+        // ничего страшного
       }
+    }
 
-      alert(dict.successMessage);
-
-      formEl.reset();
-      setContactFirstNameLat("");
-      setContactLastNameLat("");
-      setContactPhone("");
-      setContactEmail("");
-      setPersonIdNumber("");
-      setPassportNumber("");
-      setVehicleBlocks([0]);
-      setStep(1);
-
+    fetch("/api/green-card-order", {
+      method: "POST",
+      body: formData,
     })
-    .catch((err) => {
-      console.error("GREEN CARD ORDER ERROR:", err);
-      alert("Ошибка на сервере при отправке заявки на Зеленую карту");
-    })
-    .finally(() => {
-      setIsSubmitting(false);
-    });
-}
+      .then(async (res) => {
+        const data = await res.json().catch(() => null);
+        console.log("GREEN CARD ORDER RESPONSE:", res.status, data);
 
+        if (!res.ok || !data?.ok) {
+          alert(data?.message || "Ошибка при отправке заявки на Зеленую карту");
+          return;
+        }
 
+        alert(dict.successMessage);
+
+        formEl.reset();
+        setContactFirstNameLat("");
+        setContactLastNameLat("");
+        setContactPhone("");
+        setContactEmail("");
+        setPersonIdNumber("");
+        setPassportNumber("");
+        setVehicleBlocks([0]);
+        setIsCompany(false);
+        setStep(1);
+      })
+      .catch((err) => {
+        console.error("GREEN CARD ORDER ERROR:", err);
+        alert("Ошибка на сервере при отправке заявки на Зеленую карту");
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  }
 
   const forbiddenTypes = [
     "application/zip",
@@ -177,9 +214,14 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
           {dict.intro}
         </p>
 
-        <form className="mt-8 space-y-8" onSubmit={handleOrderSubmit}>
-  {/* ШАГ 1: Контактные данные + чекбокс юрлица */}
+        <form
+          ref={formRef}
+          className="mt-8 space-y-8"
+          onSubmit={handleOrderSubmit}
+        >
+          {/* ШАГ 1: Контактные данные + чекбокс юрлица */}
           <fieldset
+            data-step="1"
             className={
               "card px-5 py-5 sm:px-6 sm:py-6" + (step !== 1 ? " hidden" : "")
             }
@@ -266,7 +308,9 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
               <button
                 type="button"
                 className="btn w-full sm:w-auto"
-                onClick={() => setStep(2)}
+                onClick={() => {
+                  if (validateStep(1)) setStep(2);
+                }}
               >
                 {dict.nextStep ?? "Далее"}
               </button>
@@ -275,6 +319,7 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
 
           {/* ШАГ 2: Личные данные / Юрлицо */}
           <fieldset
+            data-step="2"
             className={
               "card px-5 py-5 sm:px-6 sm:py-6" + (step !== 2 ? " hidden" : "")
             }
@@ -293,6 +338,7 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                     type="text"
                     name="company_bin"
                     className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                    required
                   />
                 </div>
 
@@ -304,6 +350,7 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                     type="email"
                     name="company_email"
                     className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                    required
                   />
                 </div>
               </div>
@@ -327,6 +374,7 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                     <select
                       name="person_gender"
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                      required
                     >
                       <option value="">{dict.notSelected}</option>
                       <option value="male">{dict.person.genderMale}</option>
@@ -340,7 +388,9 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                     <input
                       type="date"
                       name="person_birthDate"
+                      max={maxBirthDate}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                      required
                     />
                   </div>
                   <div>
@@ -355,13 +405,14 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                         setPersonIdNumber(formatIdNumber(e.target.value))
                       }
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                      required
                     />
                   </div>
 
                   <CountrySelect
                     name="person_country"
                     label={dict.person.countryLabel}
-                    required={false}
+                    required={true}
                   />
 
                   <div>
@@ -372,6 +423,7 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                       type="text"
                       name="person_address"
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                      required
                     />
                   </div>
                 </div>
@@ -389,6 +441,7 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                         setPassportNumber(formatLatinAlnum(e.target.value, 20))
                       }
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                      required
                     />
                   </div>
                   <div>
@@ -399,6 +452,7 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                       type="text"
                       name="person_passportIssuer"
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                      required
                     />
                   </div>
                   <div>
@@ -408,7 +462,9 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                     <input
                       type="date"
                       name="person_passportIssuedAt"
+                      max={maxIssuedDate}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                      required
                     />
                   </div>
                   <div>
@@ -418,7 +474,9 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                     <input
                       type="date"
                       name="person_passportValidTo"
+                      min={minStartDate}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                      required
                     />
                   </div>
                 </div>
@@ -427,11 +485,20 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
           </fieldset>
 
           {step === 2 && (
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-between pt-2 gap-3">
+              <button
+                type="button"
+                className="px-4 py-2 rounded-md border text-sm"
+                onClick={() => setStep(1)}
+              >
+                {dict.prevStep ?? "Назад"}
+              </button>
               <button
                 type="button"
                 className="btn w-full sm:w-auto"
-                onClick={() => setStep(3)}
+                onClick={() => {
+                  if (validateStep(2)) setStep(3);
+                }}
               >
                 {dict.nextStep ?? "Далее"}
               </button>
@@ -440,6 +507,7 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
 
           {/* ШАГ 3: Параметры страховки */}
           <fieldset
+            data-step="3"
             className={
               "card px-5 py-5 sm:px-6 sm:py-6" + (step !== 3 ? " hidden" : "")
             }
@@ -455,7 +523,8 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                 <select
                   name="insurance_territory"
                   className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
-                  defaultValue="1155"
+                  defaultValue=""
+                  required
                 >
                   <option value="">{dict.notSelected}</option>
                   <option value="1155">{dict.insurance.territoryAll}</option>
@@ -466,11 +535,20 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
           </fieldset>
 
           {step === 3 && (
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-between pt-2 gap-3">
+              <button
+                type="button"
+                className="px-4 py-2 rounded-md border text-sm"
+                onClick={() => setStep(2)}
+              >
+                {dict.prevStep ?? "Назад"}
+              </button>
               <button
                 type="button"
                 className="btn w-full sm:w-auto"
-                onClick={() => setStep(4)}
+                onClick={() => {
+                  if (validateStep(3)) setStep(4);
+                }}
               >
                 {dict.nextStep ?? "Далее"}
               </button>
@@ -479,6 +557,7 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
 
           {/* ШАГ 4: Транспортные средства + отправка */}
           <fieldset
+            data-step="4"
             className={
               "card px-5 py-5 sm:px-6 sm:py-6" + (step !== 4 ? " hidden" : "")
             }
@@ -488,7 +567,9 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
             </legend>
 
             <div className="mt-2 flex justify-between items-center">
-              <p className="text-xs text-gray-600">{dict.vehicles.description}</p>
+              <p className="text-xs text-gray-600">
+                {dict.vehicles.description}
+              </p>
               <button
                 type="button"
                 className="text-xs sm:text-sm text-[#1A3A5F] underline underline-offset-2"
@@ -529,9 +610,13 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                         type="text"
                         name={`vehicles[${idx}][plate]`}
                         onChange={(e) =>
-                          (e.target.value = formatLatinAlnum(e.target.value, 12))
+                          (e.target.value = formatLatinAlnum(
+                            e.target.value,
+                            12
+                          ))
                         }
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                        required
                       />
                     </div>
 
@@ -544,9 +629,13 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                         type="text"
                         name={`vehicles[${idx}][techPassportNumber]`}
                         onChange={(e) =>
-                          (e.target.value = formatLatinAlnum(e.target.value, 20))
+                          (e.target.value = formatLatinAlnum(
+                            e.target.value,
+                            20
+                          ))
                         }
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                        required
                       />
                     </div>
 
@@ -559,14 +648,27 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                         name={`vehicles[${idx}][type]`}
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
                         defaultValue=""
+                        required
                       >
                         <option value="">{dict.notSelected}</option>
-                        <option value="127">{dict.vehicles.vehicleTypePassenger}</option>
-                        <option value="131">{dict.vehicles.vehicleTypeBus}</option>
-                        <option value="453">{dict.vehicles.vehicleTypeTruck}</option>
-                        <option value="251">{dict.vehicles.vehicleTypeTrailer}</option>
-                        <option value="217">{dict.vehicles.vehicleTypeMotorcycle}</option>
-                        <option value="457">{dict.vehicles.vehicleTypeSpecial}</option>
+                        <option value="127">
+                          {dict.vehicles.vehicleTypePassenger}
+                        </option>
+                        <option value="131">
+                          {dict.vehicles.vehicleTypeBus}
+                        </option>
+                        <option value="453">
+                          {dict.vehicles.vehicleTypeTruck}
+                        </option>
+                        <option value="251">
+                          {dict.vehicles.vehicleTypeTrailer}
+                        </option>
+                        <option value="217">
+                          {dict.vehicles.vehicleTypeMotorcycle}
+                        </option>
+                        <option value="457">
+                          {dict.vehicles.vehicleTypeSpecial}
+                        </option>
                       </select>
                     </div>
 
@@ -578,7 +680,8 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                       <select
                         name={`vehicles[${idx}][country]`}
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
-                        defaultValue="385"
+                        defaultValue=""
+                        required
                       >
                         <option value="">{dict.notSelected}</option>
                         <option value="385">{dict.vehicles.countryKZ}</option>
@@ -594,7 +697,9 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                       <input
                         type="date"
                         name={`vehicles[${idx}][startDate]`}
+                        min={minStartDate}
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
+                        required
                       />
                     </div>
 
@@ -607,6 +712,7 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
                         name={`vehicles[${idx}][period]`}
                         className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A]"
                         defaultValue=""
+                        required
                       >
                         <option value="">{dict.notSelected}</option>
                         <option value="115">{dict.vehicles.period1m}</option>
@@ -642,7 +748,15 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
           </fieldset>
 
           {step === 4 && (
-            <div className="flex justify-end pt-2">
+            <div className="flex justify-between pt-2 gap-3">
+              <button
+                type="button"
+                className="px-4 py-2 rounded-md border text-sm"
+                onClick={() => setStep(3)}
+                disabled={isSubmitting}
+              >
+                {dict.prevStep ?? "Назад"}
+              </button>
               <button
                 type="submit"
                 className="btn w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
@@ -653,7 +767,6 @@ function handleOrderSubmit(e: FormEvent<HTMLFormElement>) {
             </div>
           )}
         </form>
-
       </div>
     </section>
   );

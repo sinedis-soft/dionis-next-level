@@ -151,7 +151,12 @@ function GreenCardCalculator({ dict }: GreenCardCalculatorProps) {
   return (
     <section className="py-12 sm:py-16 bg-[#F4F6FA]">
       <div className="gc-calculator" id="green-card-calculator">
-        <h3>{dict.title}</h3>
+        <h3 className="text-2xl sm:text-3xl">
+          {dict.title}
+        </h3>
+        <p className="mt-2 text-sm sm:text-base text-gray-600 text-center">
+          {dict.subtitle}
+        </p>
 
         <div className="gc-row">
           <label htmlFor="gc-region">{dict.labels.region}</label>
@@ -222,7 +227,10 @@ function GreenCardCalculator({ dict }: GreenCardCalculatorProps) {
         </button>
 
         <div className="gc-result" id="gc-result">
-          {result}
+          <h3 className="mt-2 text-2xl sm:text-3xl">
+            {result}
+          </h3>
+
         </div>
       </div>
     </section>

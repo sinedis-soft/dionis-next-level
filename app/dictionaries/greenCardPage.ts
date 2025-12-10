@@ -17,6 +17,7 @@ export type GreenCardPageDictionary = {
   };
   calculator: {
     title: string;
+    subtitle: string;
     labels: {
       region: string;
       vehicle: string;
@@ -85,11 +86,12 @@ const ru: GreenCardPageDictionary = {
   },
   calculator: {
     title: "Расчёт стоимости Green Card",
+    subtitle: "Онлайн расчет за 20 секунд!",
     labels: {
-      region: "Направление",
-      vehicle: "Категория ТС",
-      period: "Срок действия",
-      rate: "Курс тенге за $",
+      region: "Направление    ",
+      vehicle: "Категория ТС    ",
+      period: "Срок действия    ",
+      rate: "Курс тенге за $    ",
     },
     regionOptions: {
       group1: "Только страны: Турция, Молдова, Украина",
@@ -227,11 +229,12 @@ const en: GreenCardPageDictionary = {
   },
   calculator: {
     title: "Green Card price calculator",
+    subtitle: "Online quote in 20 seconds!",
     labels: {
-      region: "Destination",
-      vehicle: "Vehicle category",
-      period: "Policy period",
-      rate: "KZT per 1 USD",
+      region: "Destination    ",
+      vehicle: "Vehicle category    ",
+      period: "Policy period     ",
+      rate: "KZT per 1 USD    ",
     },
     regionOptions: {
       group1: "Only Türkiye, Moldova, Ukraine",
@@ -371,11 +374,12 @@ const kz: GreenCardPageDictionary = {
   },
   calculator: {
     title: "Green Card құнын есептеу",
+    subtitle: "Онлайн есептеу – 20 секундта!",
     labels: {
-      region: "Бағыт",
-      vehicle: "Көлік құралының санаты",
-      period: "Полис мерзімі",
-      rate: "1 АҚШ долларына теңге курсы",
+      region: "Бағыт    ",
+      vehicle: "Көлік құралының санаты    ",
+      period: "Полис мерзімі    ",
+      rate: "1 АҚШ долларына теңге курсы    ",
     },
     regionOptions: {
       group1: "Тек Түркия, Молдова, Украина",

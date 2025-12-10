@@ -262,7 +262,7 @@ body {
 .gc-calculator {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 3rem;
+  padding: 1.5rem 3rem 2rem;
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
@@ -273,12 +273,13 @@ body {
 .gc-calculator h3 {
   font-size: 28px;
   font-weight: 700;
-
-  /* НОВЫЙ СИНИЙ */
   color: #23376c;
-
-  margin-bottom: 32px;
+  margin: 1rem 3 1rem;
   text-align: center;
+}
+
+.gc-calculator p {
+  margin: 0 0 2rem;        
 }
 
 .gc-btn {
@@ -305,4 +306,36 @@ body {
 .gc-btn:active {
   transform: scale(0.97);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.gc-row {
+  display: grid;
+  grid-template-columns: 220px 1fr; /* Лейбл 220px, поле тянется */
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.gc-row label {
+  font-weight: 600;
+  color: #23376c;
+  text-align: right; /* аккуратное выравнивание */
+}
+
+.gc-row select,
+.gc-row input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.gc-row select:focus,
+.gc-row input:focus {
+  outline: none;
+  border-color: #c89f4a;
+  box-shadow: 0 0 0 2px rgba(200, 159, 74, 0.3);
 }
