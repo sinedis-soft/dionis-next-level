@@ -87,8 +87,8 @@ export function GreenCardOrderForm({ dict }: Props) {
     >("input, select, textarea");
 
     for (const el of Array.from(elements)) {
-      // пропускаем невидимые (например, другая ветка if / hidden)
-      if ((el as any).offsetParent === null) continue;
+      // пропускаем невидимые (display: none, hidden и т.п.)
+      if (el.offsetParent === null) continue;
 
       if (!el.checkValidity()) {
         el.reportValidity();
@@ -96,6 +96,7 @@ export function GreenCardOrderForm({ dict }: Props) {
         return false;
       }
     }
+
 
     return true;
   }

@@ -6,12 +6,28 @@ export const runtime = "nodejs"; // важно: нужен node, не edge
 const BITRIX_BASE = process.env.BITRIX_WEBHOOK_URL;
 
 // задержка
-function sleep(ms: number) {
+function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+type BitrixPayload = Record<string, unknown>;
+
+type BitrixRawResponse<T> = {
+  result?: T;
+  error?: string;
+  error_description?: string;
+};
+
+function getErrorMessage(e: unknown): string {
+  return e instanceof Error ? e.message : String(e);
+}
+
 // универсальный вызов Bitrix с retry + timeout + mandatory delay
-async function bitrix(method: string, payload: any, attempt = 1): Promise<any> {
+async function bitrix<T = unknown>(
+  method: string,
+  payload: BitrixPayload,
+  attempt = 1
+): Promise<T> {
   if (!BITRIX_BASE) {
     throw new Error("BITRIX_WEBHOOK_URL is not set");
   }
@@ -37,9 +53,9 @@ async function bitrix(method: string, payload: any, attempt = 1): Promise<any> {
 
     clearTimeout(timeoutId);
 
-    let data: any;
+    let data: BitrixRawResponse<T>;
     try {
-      data = await res.json();
+      data = (await res.json()) as BitrixRawResponse<T>;
     } catch {
       throw new Error(`Bitrix: invalid JSON, HTTP ${res.status}`);
     }
@@ -52,24 +68,21 @@ async function bitrix(method: string, payload: any, attempt = 1): Promise<any> {
       );
     }
 
-    return data.result;
-  } catch (err: any) {
+    // Bitrix иногда возвращает result: null — оставляем как есть
+    return data.result as T;
+  } catch (err) {
     clearTimeout(timeoutId);
 
-    // === RETRY BLOCK ===
     if (attempt < MAX_ATTEMPTS) {
       console.warn(
         `Bitrix ${method} failed on attempt ${attempt}, retrying...`,
-        err?.message || err
+        getErrorMessage(err)
       );
 
-      // дополнительная задержка перед новой попыткой
       await sleep(1500 * attempt);
-
-      return bitrix(method, payload, attempt + 1);
+      return bitrix<T>(method, payload, attempt + 1);
     }
 
-    // после 3 попыток — окончательная ошибка
     console.error(`Bitrix ${method} failed after ${attempt} attempts`, err);
     throw err;
   }
@@ -83,7 +96,6 @@ function parseDateToDDMMYYYY(dateStr: string | null): string | null {
 }
 
 // Bitrix для дат контакта обычно принимает YYYY-MM-DD.
-// Валидация минимальная: пропускаем пустое/мусор.
 function parseDateISO(dateStr: string | null): string | null {
   if (!dateStr) return null;
   const s = String(dateStr).trim();
@@ -98,7 +110,17 @@ async function fileToBitrixFileData(file: File): Promise<[string, string]> {
   return [file.name, base64];
 }
 
-export async function POST(req: Request) {
+type VehicleInput = {
+  plate?: string;
+  techPassportNumber?: string;
+  type?: string;
+  country?: string;
+  startDate?: string | null; // DD.MM.YYYY (для сделки)
+  period?: string;
+  techPassportFiles: File[];
+};
+
+export async function POST(req: Request): Promise<Response> {
   try {
     const formData = await req.formData();
 
@@ -113,11 +135,8 @@ export async function POST(req: Request) {
     const contact_phone = String(formData.get("contact_phone") || "").trim();
 
     if (!contact_email || !contact_firstNameLat || !contact_lastNameLat) {
-      return new Response(
-        JSON.stringify({
-          ok: false,
-          message: "Не заполнены обязательные контактные данные",
-        }),
+      return Response.json(
+        { ok: false, message: "Не заполнены обязательные контактные данные" },
         { status: 400 }
       );
     }
@@ -137,10 +156,7 @@ export async function POST(req: Request) {
       formData.get("person_middleName") || ""
     ).trim();
 
-    const person_gender_raw = String(
-      formData.get("person_gender") || ""
-    ).trim(); // может быть "45"/"47" или "male"/"female"
-
+    const person_gender_raw = String(formData.get("person_gender") || "").trim();
     const person_gender =
       person_gender_raw === "male"
         ? "45"
@@ -153,22 +169,18 @@ export async function POST(req: Request) {
     );
 
     const person_idNumber = String(formData.get("person_idNumber") || "").trim();
-
-    const person_country = String(formData.get("person_country") || "").trim(); // ID enum
+    const person_country = String(formData.get("person_country") || "").trim(); // enum ID
     const person_address = String(formData.get("person_address") || "").trim();
 
     const person_passportNumber = String(
       formData.get("person_passportNumber") || ""
     ).trim();
-
     const person_passportIssuer = String(
       formData.get("person_passportIssuer") || ""
     ).trim();
-
     const person_passportIssuedAt = parseDateISO(
       String(formData.get("person_passportIssuedAt") || "") || null
     );
-
     const person_passportValidTo = parseDateISO(
       String(formData.get("person_passportValidTo") || "") || null
     );
@@ -177,27 +189,17 @@ export async function POST(req: Request) {
     const pageUrlRaw = String(formData.get("pageUrl") || "").trim();
     const pageUrl = pageUrlRaw || undefined;
 
-    let utm: any = undefined;
+    let utm: unknown = undefined;
     const utmRaw = formData.get("utm");
     if (typeof utmRaw === "string" && utmRaw) {
       try {
-        utm = JSON.parse(utmRaw);
+        utm = JSON.parse(utmRaw) as unknown;
       } catch {
         utm = undefined;
       }
     }
 
     // --- 2. Парсим транспортные средства ---
-    type VehicleInput = {
-      plate?: string;
-      techPassportNumber?: string;
-      type?: string;
-      country?: string;
-      startDate?: string | null; // DD.MM.YYYY (для сделки)
-      period?: string;
-      techPassportFiles: File[];
-    };
-
     const vehiclesMap = new Map<number, VehicleInput>();
 
     for (const [key, value] of formData.entries()) {
@@ -220,7 +222,8 @@ export async function POST(req: Request) {
       } else if (field === "startDate") {
         v.startDate = parseDateToDDMMYYYY(String(value));
       } else {
-        (v as any)[field] = String(value);
+        // value в FormData всегда string | File, здесь ожидаем string
+        (v as Record<string, unknown>)[field] = String(value);
       }
     }
 
@@ -229,11 +232,8 @@ export async function POST(req: Request) {
       .map(([, v]) => v);
 
     if (!vehicles.length) {
-      return new Response(
-        JSON.stringify({
-          ok: false,
-          message: "Не указано ни одного транспортного средства",
-        }),
+      return Response.json(
+        { ok: false, message: "Не указано ни одного транспортного средства" },
         { status: 400 }
       );
     }
@@ -241,16 +241,19 @@ export async function POST(req: Request) {
     // --- 3. Контакт: поиск по EMAIL, либо создание ---
     let contactId: number | null = null;
 
-    const foundContacts = await bitrix("crm.contact.list", {
-      filter: { EMAIL: contact_email },
-      select: ["ID"],
-      start: 0,
-    });
+    const foundContacts = await bitrix<Array<{ ID: string }>>(
+      "crm.contact.list",
+      {
+        filter: { EMAIL: contact_email },
+        select: ["ID"],
+        start: 0,
+      }
+    );
 
     if (Array.isArray(foundContacts) && foundContacts.length > 0) {
       contactId = Number(foundContacts[0].ID);
     } else {
-      const newContactId = await bitrix("crm.contact.add", {
+      const newContactId = await bitrix<string>("crm.contact.add", {
         fields: {
           NAME: contact_firstNameLat,
           LAST_NAME: contact_lastNameLat,
@@ -268,9 +271,8 @@ export async function POST(req: Request) {
     }
 
     // --- 3b. Обновление контакта (физлицо) ---
-    // Обновляем только если НЕ юрлицо и есть что записать
     if (!order_isCompany) {
-      const contactUpdateFields: any = {};
+      const contactUpdateFields: Record<string, unknown> = {};
 
       if (person_middleName) contactUpdateFields.SECOND_NAME = person_middleName;
       if (person_birthDate) contactUpdateFields.BIRTHDATE = person_birthDate;
@@ -278,18 +280,14 @@ export async function POST(req: Request) {
       if (person_idNumber)
         contactUpdateFields.UF_CRM_1694347707628 = person_idNumber;
 
-      // Пол (enum IDs 45/47)
       if (person_gender)
         contactUpdateFields.UF_CRM_1686138296718 = person_gender;
 
-      // Страна проживания (enum ID)
       if (person_country)
         contactUpdateFields.UF_CRM_1686138527330 = person_country;
 
-      // Адрес проживания с индексом
       if (person_address) contactUpdateFields.ADDRESS = person_address;
 
-      // Паспорт
       if (person_passportNumber)
         contactUpdateFields.UF_CRM_CONTACT_1686145698592 = person_passportNumber;
 
@@ -303,7 +301,7 @@ export async function POST(req: Request) {
         contactUpdateFields.UF_CRM_1696422396430 = person_passportValidTo;
 
       if (Object.keys(contactUpdateFields).length > 0) {
-        await bitrix("crm.contact.update", {
+        await bitrix<boolean>("crm.contact.update", {
           id: contactId,
           fields: contactUpdateFields,
         });
@@ -315,26 +313,28 @@ export async function POST(req: Request) {
 
     if (order_isCompany) {
       if (!company_bin) {
-        return new Response(
-          JSON.stringify({
+        return Response.json(
+          {
             ok: false,
-            message:
-              "Отмечено 'договор на юрлицо', но не указан БИН компании.",
-          }),
+            message: "Отмечено 'договор на юрлицо', но не указан БИН компании.",
+          },
           { status: 400 }
         );
       }
 
-      const foundCompanies = await bitrix("crm.company.list", {
-        filter: { UF_CRM_COMPANY_1692911328252: company_bin },
-        select: ["ID"],
-        start: 0,
-      });
+      const foundCompanies = await bitrix<Array<{ ID: string }>>(
+        "crm.company.list",
+        {
+          filter: { UF_CRM_COMPANY_1692911328252: company_bin },
+          select: ["ID"],
+          start: 0,
+        }
+      );
 
       if (Array.isArray(foundCompanies) && foundCompanies.length > 0) {
         companyId = Number(foundCompanies[0].ID);
       } else {
-        const newCompanyId = await bitrix("crm.company.add", {
+        const newCompanyId = await bitrix<string>("crm.company.add", {
           fields: {
             TITLE: company_bin,
             UF_CRM_COMPANY_1692911328252: company_bin,
@@ -348,12 +348,9 @@ export async function POST(req: Request) {
     } else {
       companyId = 1817;
 
-      // обновляем контакт, чтобы подвязать к фиксированной компании
-      await bitrix("crm.contact.update", {
+      await bitrix<boolean>("crm.contact.update", {
         id: contactId,
-        fields: {
-          COMPANY_ID: companyId,
-        },
+        fields: { COMPANY_ID: companyId },
       });
     }
 
@@ -361,48 +358,33 @@ export async function POST(req: Request) {
     const createdDeals: number[] = [];
 
     const commonCommentParts: string[] = [];
-
     if (pageUrl) commonCommentParts.push(`Страница: ${pageUrl}`);
-    if (utm) commonCommentParts.push(`UTM: ${JSON.stringify(utm)}`);
-
+    if (utm !== undefined) commonCommentParts.push(`UTM: ${JSON.stringify(utm)}`);
     commonCommentParts.push(
       `Контакт: ${contact_firstNameLat} ${contact_lastNameLat} <${contact_email}>`
     );
     if (contact_phone) commonCommentParts.push(`Телефон: ${contact_phone}`);
-
-    if (order_isCompany) {
-      commonCommentParts.push(`Договор на юрлицо, БИН: ${company_bin}`);
-    } else {
-      commonCommentParts.push(`Договор на физлицо (компания ID=1817)`);
-    }
+    commonCommentParts.push(
+      order_isCompany
+        ? `Договор на юрлицо, БИН: ${company_bin}`
+        : `Договор на физлицо (компания ID=1817)`
+    );
 
     const commonComment = commonCommentParts.join("\n");
 
     for (const vehicle of vehicles) {
-      const dealFields: any = {
+      const dealFields: Record<string, unknown> = {
         TITLE: `Заявка Green Card: ${vehicle.plate || "ТС"}`,
         CONTACT_ID: contactId,
         COMPANY_ID: companyId,
 
-        // страна регистрации ТС
         UF_CRM_1686152306664: vehicle.country || null,
-
-        // госномер
         UF_CRM_1686152485641: vehicle.plate || null,
-
-        // серия и номер техпаспорта
         UF_CRM_1686152429219: vehicle.techPassportNumber || null,
-
-        // тип ТС
         UF_CRM_1686152567597: vehicle.type || null,
-
-        // срок страхования
         UF_CRM_1686152209741: vehicle.period || null,
-
-        // начало действия (DD.MM.YYYY)
         UF_CRM_1686152149204: vehicle.startDate || null,
 
-        // фиксированные значения
         UF_CRM_1690539097: 429,
         UF_CRM_1700656576088: insurance_territory || null,
         UF_CRM_1693578066803: 1169,
@@ -411,8 +393,7 @@ export async function POST(req: Request) {
         COMMENTS: commonComment,
       };
 
-      // файлы техпаспорта → UF_CRM_1686154280439 как массив fileData
-      if (vehicle.techPassportFiles && vehicle.techPassportFiles.length > 0) {
+      if (vehicle.techPassportFiles.length > 0) {
         const filesData = await Promise.all(
           vehicle.techPassportFiles.map((f) => fileToBitrixFileData(f))
         );
@@ -422,27 +403,22 @@ export async function POST(req: Request) {
         }));
       }
 
-      const dealId = await bitrix("crm.deal.add", { fields: dealFields });
+      const dealId = await bitrix<string>("crm.deal.add", { fields: dealFields });
       createdDeals.push(Number(dealId));
     }
 
-    return new Response(
-      JSON.stringify({
-        ok: true,
-        deals: createdDeals,
-        contactId,
-        companyId,
-      }),
+    return Response.json(
+      { ok: true, deals: createdDeals, contactId, companyId },
       { status: 200 }
     );
-  } catch (e: any) {
+  } catch (e) {
     console.error("GREEN CARD ORDER API ERROR:", e);
-    return new Response(
-      JSON.stringify({
+    return Response.json(
+      {
         ok: false,
         message: "Ошибка при обработке заявки Green Card",
-        error: e?.message,
-      }),
+        error: getErrorMessage(e),
+      },
       { status: 500 }
     );
   }

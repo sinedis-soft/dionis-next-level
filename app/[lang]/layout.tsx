@@ -9,7 +9,7 @@ import type { Lang } from "@/dictionaries/header";
 
 export const dynamicParams = false;
 
-export function generateStaticParams() {
+export function generateStaticParams(): Array<{ lang: Lang }> {
   return [{ lang: "ru" }, { lang: "kz" }, { lang: "en" }];
 }
 
@@ -17,17 +17,18 @@ function normalizeLang(value: unknown): Lang {
   return value === "ru" || value === "kz" || value === "en" ? value : "ru";
 }
 
+type LangParams = { lang?: string };
+type MaybePromise<T> = T | Promise<T>;
+
 export default async function LangLayout(props: {
   children: ReactNode;
-  params: any;
+  params: MaybePromise<LangParams>;
 }) {
-  const resolvedParams = await Promise.resolve(props.params);
+  const resolvedParams = await props.params;
   const lang = normalizeLang(resolvedParams?.lang);
 
   return (
     <>
-      {/* Если хочешь менять lang атрибут у <html> — делай это в RootLayout через generateMetadata.
-          Здесь <html>/<body> использовать нельзя. */}
       <Header />
       <main className="flex-1">{props.children}</main>
       <SiteFooter />

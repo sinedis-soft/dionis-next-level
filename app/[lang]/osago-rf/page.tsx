@@ -5,11 +5,7 @@ import { useParams } from "next/navigation";
 import type { Lang } from "@/dictionaries/header";
 import Image from "next/image";
 import Script from "next/script";
-import {
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-} from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 
 import { getHomeDictionary } from "@/dictionaries/home";
 import { getAgreementDictionary } from "@/dictionaries/agreement";
@@ -23,43 +19,70 @@ import {
 
 import { BrokerSection } from "@/components/BrokerSection";
 
-// ----- Контактная форма (как на главной) -----
+// -------------------- Типы --------------------
 
-const initialContactFormData = {
+type HomeDictionary = ReturnType<typeof getHomeDictionary>;
+
+type Grecaptcha = {
+  ready: (cb: () => void) => void;
+  execute: (siteKey: string, options: { action: string }) => Promise<string>;
+};
+
+declare global {
+  interface Window {
+    grecaptcha?: Grecaptcha;
+  }
+}
+
+type ContactFormData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  comment: string;
+  agree: boolean;
+  website: string; // honeypot
+};
+
+const initialContactFormData: ContactFormData = {
   firstName: "",
   lastName: "",
   email: "",
   phone: "",
   comment: "",
   agree: false,
-  website: "", // honeypot
+  website: "",
 };
 
+type ContactApiResponse = {
+  ok: boolean;
+  message?: string;
+};
+
+// -------------------- Helpers --------------------
+
 function normalizeLang(value: string): Lang {
-  if (value === "ru" || value === "kz" || value === "en") return value;
-  return "ru";
+  return value === "ru" || value === "kz" || value === "en" ? value : "ru";
 }
 
-// Маска телефона
 function formatPhone(raw: string): string {
   const digits = raw.replace(/\D/g, "");
   if (!digits) return "";
-  return "+" + digits;
+  return `+${digits}`;
 }
 
-// Фильтр e-mail
 function formatEmail(raw: string): string {
   return raw.replace(/\s/g, "").replace(/[^a-zA-Z0-9@._\-+]/g, "");
 }
+
+// -------------------- FAQ --------------------
 
 type FAQSectionProps = {
   dict: OsagoRfPageDictionary["faq"];
 };
 
 function FAQSection({ dict }: FAQSectionProps) {
-  const [openId, setOpenId] = useState<string | null>(
-    dict.items[0]?.id ?? null
-  );
+  const [openId, setOpenId] = useState<string | null>(dict.items[0]?.id ?? null);
 
   return (
     <section className="py-12 sm:py-16 bg-white">
@@ -77,17 +100,14 @@ function FAQSection({ dict }: FAQSectionProps) {
                 <button
                   type="button"
                   className="w-full flex items-center justify-between px-5 py-4 text-left"
-                  onClick={() =>
-                    setOpenId((prev) => (prev === item.id ? null : item.id))
-                  }
+                  onClick={() => setOpenId((prev) => (prev === item.id ? null : item.id))}
                 >
                   <span className="font-semibold text-sm sm:text-base text-[#1A3A5F]">
                     {item.question}
                   </span>
-                  <span className="ml-4 text-xl text-gray-400">
-                    {isOpen ? "−" : "+"}
-                  </span>
+                  <span className="ml-4 text-xl text-gray-400">{isOpen ? "−" : "+"}</span>
                 </button>
+
                 {isOpen && (
                   <div className="px-5 pb-4 text-sm sm:text-base text-gray-700">
                     {item.answer}
@@ -102,22 +122,25 @@ function FAQSection({ dict }: FAQSectionProps) {
   );
 }
 
+// -------------------- Page --------------------
+
 export default function OsagoRfPage() {
   const { lang: rawLang } = useParams<{ lang: string }>();
   const lang = normalizeLang(rawLang);
 
-  const t = getHomeDictionary(lang) as any;
+  // ✅ убрали any
+  const t: HomeDictionary = getHomeDictionary(lang);
+
   const agreement = getAgreementDictionary(lang);
   const osagoFormDict = getOsagoRfFormDictionary(lang);
   const osagoPageDict = getOsagoRfPageDictionary(lang);
 
-  // контактная форма (вопросы по ОСАГО)
-  const [contactFormData, setContactFormData] = useState(
-    initialContactFormData
+  const [contactFormData, setContactFormData] =
+    useState<ContactFormData>(initialContactFormData);
+
+  const [formStatus, setFormStatus] = useState<"idle" | "loading" | "success" | "error">(
+    "idle"
   );
-  const [formStatus, setFormStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
   const [formMessage, setFormMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAgreementOpen, setIsAgreementOpen] = useState(false);
@@ -128,21 +151,20 @@ export default function OsagoRfPage() {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
     const target = e.target;
-    const { name, value } = target;
+    const name = target.name as keyof ContactFormData;
 
-    let newValue: string | boolean = value;
+    let newValue: ContactFormData[keyof ContactFormData];
 
     if (target instanceof HTMLInputElement && target.type === "checkbox") {
       newValue = target.checked;
+    } else {
+      newValue = target.value;
     }
 
-    if (name === "phone") newValue = formatPhone(String(value));
-    if (name === "email") newValue = formatEmail(String(value));
+    if (name === "phone") newValue = formatPhone(String(newValue));
+    if (name === "email") newValue = formatEmail(String(newValue));
 
-    setContactFormData((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
+    setContactFormData((prev) => ({ ...prev, [name]: newValue }));
   }
 
   async function handleContactSubmit(e: FormEvent<HTMLFormElement>) {
@@ -154,7 +176,7 @@ export default function OsagoRfPage() {
 
     try {
       // honeypot → бот, делаем вид, что всё ОК
-      if (contactFormData.website && contactFormData.website.trim() !== "") {
+      if (contactFormData.website.trim() !== "") {
         setFormStatus("success");
         setFormMessage(t.contact.statusSuccess);
         setContactFormData(initialContactFormData);
@@ -162,18 +184,18 @@ export default function OsagoRfPage() {
         return;
       }
 
-      let recaptchaToken: string | undefined = undefined;
+      let recaptchaToken: string | undefined;
       const isProd = process.env.NODE_ENV === "production";
 
       if (isProd && recaptchaSiteKey && typeof window !== "undefined") {
-        const grecaptcha = (window as any).grecaptcha;
+        const grecaptcha = window.grecaptcha;
 
         if (grecaptcha?.execute && grecaptcha?.ready) {
           recaptchaToken = await new Promise<string>((resolve, reject) => {
             grecaptcha.ready(() => {
               grecaptcha
                 .execute(recaptchaSiteKey, { action: "contact" })
-                .then((token: string) => resolve(token))
+                .then(resolve)
                 .catch(reject);
             });
           });
@@ -182,14 +204,19 @@ export default function OsagoRfPage() {
 
       // UTM + адрес страницы
       let utm: Record<string, string> = {};
-      let pageUrl: string | undefined = undefined;
+      let pageUrl: string | undefined;
 
       if (typeof window !== "undefined") {
         try {
-          utm = JSON.parse(localStorage.getItem("utm_data") || "{}");
+          const raw = localStorage.getItem("utm_data");
+          const parsed = raw ? (JSON.parse(raw) as unknown) : {};
+          if (parsed && typeof parsed === "object") {
+            utm = parsed as Record<string, string>;
+          }
         } catch {
           utm = {};
         }
+
         pageUrl = window.location.href;
       }
 
@@ -205,8 +232,7 @@ export default function OsagoRfPage() {
         }),
       });
 
-      const data = await res.json().catch(() => null);
-      console.log("OSAGO CONTACT RESPONSE:", res.status, data);
+      const data = (await res.json().catch(() => null)) as ContactApiResponse | null;
 
       if (!res.ok || !data?.ok) {
         setFormStatus("error");
@@ -226,8 +252,6 @@ export default function OsagoRfPage() {
       setIsModalOpen(true);
     }
   }
-
-
 
   const greenCardLink = `/${lang}/green-card`;
   const orderAnchor = "#osago-rf-order";
@@ -336,9 +360,7 @@ export default function OsagoRfPage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t.contact.fields.firstName}{" "}
-                      <span className="text-red-500">
-                        {t.contact.requiredMark}
-                      </span>
+                      <span className="text-red-500">{t.contact.requiredMark}</span>
                     </label>
                     <input
                       type="text"
@@ -349,12 +371,11 @@ export default function OsagoRfPage() {
                       required
                     />
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       {t.contact.fields.lastName}{" "}
-                      <span className="text-red-500">
-                        {t.contact.requiredMark}
-                      </span>
+                      <span className="text-red-500">{t.contact.requiredMark}</span>
                     </label>
                     <input
                       type="text"
@@ -370,9 +391,7 @@ export default function OsagoRfPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t.contact.fields.email}{" "}
-                    <span className="text-red-500">
-                      {t.contact.requiredMark}
-                    </span>
+                    <span className="text-red-500">{t.contact.requiredMark}</span>
                   </label>
                   <input
                     type="email"
@@ -390,9 +409,7 @@ export default function OsagoRfPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t.contact.fields.phone}{" "}
-                    <span className="text-red-500">
-                      {t.contact.requiredMark}
-                    </span>
+                    <span className="text-red-500">{t.contact.requiredMark}</span>
                   </label>
                   <input
                     type="tel"
@@ -410,9 +427,7 @@ export default function OsagoRfPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {t.contact.fields.comment}{" "}
-                    <span className="text-red-500">
-                      {t.contact.requiredMark}
-                    </span>
+                    <span className="text-red-500">{t.contact.requiredMark}</span>
                   </label>
                   <textarea
                     name="comment"
@@ -444,10 +459,7 @@ export default function OsagoRfPage() {
                       {t.contact.agreeLink}
                     </button>
                     {t.contact.agreeSuffix}
-                    <span className="text-red-500">
-                      {" "}
-                      {t.contact.requiredMark}
-                    </span>
+                    <span className="text-red-500"> {t.contact.requiredMark}</span>
                   </label>
                 </div>
 
@@ -464,14 +476,8 @@ export default function OsagoRfPage() {
                 )}
 
                 <div className="pt-2">
-                  <button
-                    type="submit"
-                    className="btn w-full"
-                    disabled={formStatus === "loading"}
-                  >
-                    {formStatus === "loading"
-                      ? t.contact.submitLoading
-                      : t.contact.submitDefault}
+                  <button type="submit" className="btn w-full" disabled={formStatus === "loading"}>
+                    {formStatus === "loading" ? t.contact.submitLoading : t.contact.submitDefault}
                   </button>
                 </div>
               </form>
@@ -479,7 +485,7 @@ export default function OsagoRfPage() {
           </div>
         </section>
 
-        {/* ПРЕИМУЩЕСТВА (4 карточки) */}
+        {/* ПРЕИМУЩЕСТВА */}
         <section className="border-t border-gray-200 bg-[#F7F7F7] py-12 sm:py-16">
           <div className="max-w-5xl mx-auto px-4">
             <h2 className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center">
@@ -498,16 +504,14 @@ export default function OsagoRfPage() {
                   <div className="text-sm font-extrabold text-[#1A3A5F] uppercase">
                     {item.title}
                   </div>
-                  <p className="mt-3 text-sm text-gray-600 text-center">
-                    {item.text}
-                  </p>
+                  <p className="mt-3 text-sm text-gray-600 text-center">{item.text}</p>
                 </article>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Текстовый блок: что такое ОСАГО РФ для нерезидентов */}
+        {/* INFO */}
         <section className="py-10 sm:py-12 bg-white">
           <div className="max-w-4xl mx-auto px-4 space-y-4 text-sm sm:text-base text-gray-700">
             <h2 className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center mb-4">
@@ -519,7 +523,7 @@ export default function OsagoRfPage() {
           </div>
         </section>
 
-        {/* Детализированные преимущества ОСАГО РФ */}
+        {/* BENEFITS */}
         <section className="py-10 sm:py-12 bg-[#F5F7FA]">
           <div className="max-w-4xl mx-auto px-4">
             <h2 className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center mb-4">
@@ -528,9 +532,7 @@ export default function OsagoRfPage() {
             <ul className="list-disc pl-6 space-y-3 text-sm sm:text-base text-gray-700">
               {osagoPageDict.benefits.items.map((item) => (
                 <li key={item.title}>
-                  <strong className="block text-[#1A3A5F]">
-                    {item.title}
-                  </strong>
+                  <strong className="block text-[#1A3A5F]">{item.title}</strong>
                   <span>{item.text}</span>
                 </li>
               ))}
@@ -538,7 +540,7 @@ export default function OsagoRfPage() {
           </div>
         </section>
 
-        {/* ДОПРОДАЖА ЗЕЛЕНОЙ КАРТЫ */}
+        {/* UPSALE GREEN CARD */}
         <section className="py-10 sm:py-12 bg-[#F5F7FA]">
           <div className="max-w-5xl mx-auto px-4">
             <article className="card overflow-hidden flex flex-col md:flex-row items-stretch">
@@ -564,11 +566,7 @@ export default function OsagoRfPage() {
                   </p>
                 </div>
                 <div className="mt-4 flex justify-end">
-                  <a
-                    href={greenCardLink}
-                    className="btn w-full sm:w-auto"
-                    role="button"
-                  >
+                  <a href={greenCardLink} className="btn w-full sm:w-auto" role="button">
                     {osagoPageDict.greenCardUpsell.btn}
                   </a>
                 </div>
@@ -577,31 +575,25 @@ export default function OsagoRfPage() {
           </div>
         </section>
 
-        {/* FAQ по ОСАГО РФ */}
+        {/* FAQ */}
         <FAQSection dict={osagoPageDict.faq} />
 
-        {/* Форма заявки на полис ОСАГО РФ */}
+        {/* Форма заявки */}
         <OsagoOrderForm dict={osagoFormDict} />
 
-        {/* BROKER BLOCK */}
+        {/* BROKER */}
         <BrokerSection broker={t.broker} />
       </main>
 
-      {/* MODAL STATUS для контактной формы */}
+      {/* MODAL STATUS */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
             <h3 className="text-lg font-semibold text-[#1A3A5F] mb-3">
-              {formStatus === "success"
-                ? t.contact.modalSuccessTitle
-                : t.contact.modalErrorTitle}
+              {formStatus === "success" ? t.contact.modalSuccessTitle : t.contact.modalErrorTitle}
             </h3>
             <p className="text-sm text-gray-700 mb-5">{formMessage}</p>
-            <button
-              type="button"
-              className="btn w-full"
-              onClick={() => setIsModalOpen(false)}
-            >
+            <button type="button" className="btn w-full" onClick={() => setIsModalOpen(false)}>
               {t.contact.modalClose}
             </button>
           </div>
@@ -611,9 +603,7 @@ export default function OsagoRfPage() {
       {isAgreementOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full p-6 max-h-[85vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-[#1A3A5F] mb-4">
-              {agreement.title}
-            </h3>
+            <h3 className="text-lg font-bold text-[#1A3A5F] mb-4">{agreement.title}</h3>
 
             <div className="text-sm text-gray-700 space-y-4">
               <p>{agreement.intro1}</p>
@@ -632,18 +622,16 @@ export default function OsagoRfPage() {
               <p>{agreement.purposesIntro}</p>
 
               <ul className="list-disc pl-6 space-y-1">
-                {agreement.purposesList.map((item: string) => (
+                {agreement.purposesList.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
 
               <p>{agreement.consentText}</p>
 
-              <h4 className="font-semibold text-[#1A3A5F] mt-4">
-                {agreement.contactsTitle}
-              </h4>
+              <h4 className="font-semibold text-[#1A3A5F] mt-4">{agreement.contactsTitle}</h4>
               <ul className="list-disc pl-6 space-y-1">
-                {agreement.contactsList.map((item: string) => (
+                {agreement.contactsList.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>

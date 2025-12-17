@@ -5,12 +5,7 @@ import { useParams } from "next/navigation";
 import type { Lang } from "@/dictionaries/header";
 import Image from "next/image";
 import Script from "next/script";
-import {
-  useState,
-  useEffect,
-  type ChangeEvent,
-  type FormEvent,
-} from "react";
+import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
 
 import { getHomeDictionary } from "@/dictionaries/home";
 import { getAgreementDictionary } from "@/dictionaries/agreement";
@@ -22,28 +17,50 @@ import {
 } from "@/dictionaries/greenCardPage";
 import { BrokerSection } from "@/components/BrokerSection";
 
-// ----- Контактная форма (как на главной) -----
+// -------------------- Типы --------------------
 
-const initialContactFormData = {
+type HomeDictionary = ReturnType<typeof getHomeDictionary>;
+
+type Grecaptcha = {
+  ready: (cb: () => void) => void;
+  execute: (siteKey: string, options: { action: string }) => Promise<string>;
+};
+
+declare global {
+  interface Window {
+    grecaptcha?: Grecaptcha;
+  }
+}
+
+type ContactFormData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  comment: string;
+  agree: boolean;
+  website: string; // honeypot
+};
+
+const initialContactFormData: ContactFormData = {
   firstName: "",
   lastName: "",
   email: "",
   phone: "",
   comment: "",
   agree: false,
-  website: "", // honeypot
+  website: "",
 };
 
 function normalizeLang(value: string): Lang {
-  if (value === "ru" || value === "kz" || value === "en") return value;
-  return "ru";
+  return value === "ru" || value === "kz" || value === "en" ? value : "ru";
 }
 
 // Маска телефона
 function formatPhone(raw: string): string {
   const digits = raw.replace(/\D/g, "");
   if (!digits) return "";
-  return "+" + digits;
+  return `+${digits}`;
 }
 
 // Фильтр e-mail
@@ -51,7 +68,7 @@ function formatEmail(raw: string): string {
   return raw.replace(/\s/g, "").replace(/[^a-zA-Z0-9@._\-+]/g, "");
 }
 
-// ----- Калькулятор Green Card -----
+// -------------------- Калькулятор Green Card --------------------
 
 type RegionKey = "group1" | "group2";
 type VehicleKey =
@@ -61,28 +78,27 @@ type VehicleKey =
   | "trailer"
   | "motorcycle"
   | "tractor";
+type PeriodKey = "1" | "3" | "6" | "12";
 
-const RATES_USD: Record<
-  RegionKey,
-  Record<VehicleKey, Record<"1" | "3" | "6" | "12", number>>
-> = {
-  group1: {
-    passenger: { 1: 16, 3: 39, 6: 78, 12: 141 },
-    bus: { 1: 146, 3: 372, 6: 556, 12: 1055 },
-    truck: { 1: 65, 3: 87, 6: 194, 12: 362 },
-    trailer: { 1: 6, 3: 10, 6: 39, 12: 65 },
-    motorcycle: { 1: 13, 3: 32, 6: 52, 12: 78 },
-    tractor: { 1: 23, 3: 49, 6: 74, 12: 97 },
-  },
-  group2: {
-    passenger: { 1: 55, 3: 126, 6: 239, 12: 453 },
-    bus: { 1: 237, 3: 495, 6: 855, 12: 1546 },
-    truck: { 1: 116, 3: 343, 6: 647, 12: 971 },
-    trailer: { 1: 16, 3: 42, 6: 72, 12: 91 },
-    motorcycle: { 1: 42, 3: 92, 6: 132, 12: 173 },
-    tractor: { 1: 45, 3: 102, 6: 146, 12: 190 },
-  },
-};
+const RATES_USD: Record<RegionKey, Record<VehicleKey, Record<PeriodKey, number>>> =
+  {
+    group1: {
+      passenger: { 1: 16, 3: 39, 6: 78, 12: 141 },
+      bus: { 1: 146, 3: 372, 6: 556, 12: 1055 },
+      truck: { 1: 65, 3: 87, 6: 194, 12: 362 },
+      trailer: { 1: 6, 3: 10, 6: 39, 12: 65 },
+      motorcycle: { 1: 13, 3: 32, 6: 52, 12: 78 },
+      tractor: { 1: 23, 3: 49, 6: 74, 12: 97 },
+    },
+    group2: {
+      passenger: { 1: 55, 3: 126, 6: 239, 12: 453 },
+      bus: { 1: 237, 3: 495, 6: 855, 12: 1546 },
+      truck: { 1: 116, 3: 343, 6: 647, 12: 971 },
+      trailer: { 1: 16, 3: 42, 6: 72, 12: 91 },
+      motorcycle: { 1: 42, 3: 92, 6: 132, 12: 173 },
+      tractor: { 1: 45, 3: 102, 6: 146, 12: 190 },
+    },
+  };
 
 function formatKzt(value: number): string {
   try {
@@ -96,28 +112,33 @@ type GreenCardCalculatorProps = {
   dict: GreenCardPageDictionary["calculator"];
 };
 
+type NbkRateResponse = {
+  ok: boolean;
+  rate?: number | string;
+  message?: string;
+};
+
 function GreenCardCalculator({ dict }: GreenCardCalculatorProps) {
   const [region, setRegion] = useState<RegionKey>("group1");
   const [vehicle, setVehicle] = useState<VehicleKey>("passenger");
-  const [period, setPeriod] = useState<"1" | "3" | "6" | "12">("12");
+  const [period, setPeriod] = useState<PeriodKey>("12");
   const [rate, setRate] = useState<string>("");
   const [autoRateNote, setAutoRateNote] = useState<string>("");
   const [result, setResult] = useState<string>("");
 
-  // авто-подстановка курса из НБРК
   useEffect(() => {
     async function autoFillKztRate() {
       try {
         const resp = await fetch("/api/nbk-rate");
-        const data = await resp.json();
+        const data = (await resp.json()) as NbkRateResponse;
 
-        if (!resp.ok || !data?.ok || !data?.rate) {
+        if (!resp.ok || !data?.ok || !data.rate) {
           throw new Error(data?.message || "NBK API returned error");
         }
 
         const parsed = Number(data.rate);
-        if (!parsed || Number.isNaN(parsed) || parsed <= 0) {
-          throw new Error(`Invalid rate: ${data.rate}`);
+        if (!Number.isFinite(parsed) || parsed <= 0) {
+          throw new Error(`Invalid rate: ${String(data.rate)}`);
         }
 
         setRate(parsed.toFixed(2));
@@ -133,9 +154,9 @@ function GreenCardCalculator({ dict }: GreenCardCalculatorProps) {
 
   function handleCalculate() {
     const priceUsd = RATES_USD[region][vehicle][period];
-    const kztRate = parseFloat(rate.replace(",", "."));
+    const kztRate = Number(rate.replace(",", "."));
 
-    if (!kztRate || isNaN(kztRate) || kztRate <= 0) {
+    if (!Number.isFinite(kztRate) || kztRate <= 0) {
       setResult(dict.errorInvalidRate);
       return;
     }
@@ -151,9 +172,7 @@ function GreenCardCalculator({ dict }: GreenCardCalculatorProps) {
   return (
     <section className="py-12 sm:py-16 bg-[#F4F6FA]">
       <div className="gc-calculator" id="green-card-calculator">
-        <h3 className="text-2xl sm:text-3xl">
-          {dict.title}
-        </h3>
+        <h3 className="text-2xl sm:text-3xl">{dict.title}</h3>
         <p className="mt-2 text-sm sm:text-base text-gray-600 text-center">
           {dict.subtitle}
         </p>
@@ -181,9 +200,7 @@ function GreenCardCalculator({ dict }: GreenCardCalculatorProps) {
             <option value="bus">{dict.vehicleOptions.bus}</option>
             <option value="truck">{dict.vehicleOptions.truck}</option>
             <option value="trailer">{dict.vehicleOptions.trailer}</option>
-            <option value="motorcycle">
-              {dict.vehicleOptions.motorcycle}
-            </option>
+            <option value="motorcycle">{dict.vehicleOptions.motorcycle}</option>
             <option value="tractor">{dict.vehicleOptions.tractor}</option>
           </select>
         </div>
@@ -193,9 +210,7 @@ function GreenCardCalculator({ dict }: GreenCardCalculatorProps) {
           <select
             id="gc-period"
             value={period}
-            onChange={(e) =>
-              setPeriod(e.target.value as "1" | "3" | "6" | "12")
-            }
+            onChange={(e) => setPeriod(e.target.value as PeriodKey)}
           >
             <option value="12">{dict.periodOptions["12"]}</option>
             <option value="6">{dict.periodOptions["6"]}</option>
@@ -227,17 +242,14 @@ function GreenCardCalculator({ dict }: GreenCardCalculatorProps) {
         </button>
 
         <div className="gc-result" id="gc-result">
-          <h3 className="mt-2 text-2xl sm:text-3xl">
-            {result}
-          </h3>
-
+          <h3 className="mt-2 text-2xl sm:text-3xl">{result}</h3>
         </div>
       </div>
     </section>
   );
 }
 
-// ----- FAQ -----
+// -------------------- FAQ --------------------
 
 type FAQSectionProps = {
   dict: GreenCardPageDictionary["faq"];
@@ -289,20 +301,23 @@ function FAQSection({ dict }: FAQSectionProps) {
   );
 }
 
-// ----- Страница Green Card -----
+// -------------------- Страница Green Card --------------------
+
+type ContactApiResponse = { ok: boolean; message?: string };
 
 export default function GreenCardPage() {
   const { lang: rawLang } = useParams<{ lang: string }>();
   const lang = normalizeLang(rawLang);
-  const t = getHomeDictionary(lang) as any;
+
+  // ✅ убрали any
+  const t: HomeDictionary = getHomeDictionary(lang);
   const agreement = getAgreementDictionary(lang);
   const gcFormDict = getGreenCardFormDictionary(lang);
   const gcPageDict = getGreenCardPageDictionary(lang);
 
-  // контактная форма (вопросы по ЗК)
-  const [contactFormData, setContactFormData] = useState(
-    initialContactFormData
-  );
+  const [contactFormData, setContactFormData] =
+    useState<ContactFormData>(initialContactFormData);
+
   const [formStatus, setFormStatus] = useState<
     "idle" | "loading" | "success" | "error"
   >("idle");
@@ -316,21 +331,20 @@ export default function GreenCardPage() {
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
     const target = e.target;
-    const { name, value } = target;
+    const name = target.name as keyof ContactFormData;
 
-    let newValue: string | boolean = value;
+    let newValue: ContactFormData[keyof ContactFormData];
 
     if (target instanceof HTMLInputElement && target.type === "checkbox") {
       newValue = target.checked;
+    } else {
+      newValue = target.value;
     }
 
-    if (name === "phone") newValue = formatPhone(String(value));
-    if (name === "email") newValue = formatEmail(String(value));
+    if (name === "phone") newValue = formatPhone(String(newValue));
+    if (name === "email") newValue = formatEmail(String(newValue));
 
-    setContactFormData((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
+    setContactFormData((prev) => ({ ...prev, [name]: newValue }));
   }
 
   async function handleContactSubmit(e: FormEvent<HTMLFormElement>) {
@@ -342,7 +356,7 @@ export default function GreenCardPage() {
 
     try {
       // honeypot → бот, просто считаем всё ок
-      if (contactFormData.website && contactFormData.website.trim() !== "") {
+      if (contactFormData.website.trim() !== "") {
         setFormStatus("success");
         setFormMessage(t.contact.statusSuccess);
         setContactFormData(initialContactFormData);
@@ -350,31 +364,35 @@ export default function GreenCardPage() {
         return;
       }
 
-      let recaptchaToken: string | undefined = undefined;
+      let recaptchaToken: string | undefined;
       const isProd = process.env.NODE_ENV === "production";
 
       if (isProd && recaptchaSiteKey && typeof window !== "undefined") {
-        const grecaptcha = (window as any).grecaptcha;
+        const grecaptcha = window.grecaptcha;
 
         if (grecaptcha?.execute && grecaptcha?.ready) {
           recaptchaToken = await new Promise<string>((resolve, reject) => {
             grecaptcha.ready(() => {
               grecaptcha
                 .execute(recaptchaSiteKey, { action: "contact" })
-                .then((token: string) => resolve(token))
+                .then(resolve)
                 .catch(reject);
             });
           });
         }
       }
 
-      // 🔹 Читаем UTM и текущий URL
+      // UTM и текущий URL
       let utm: Record<string, string> = {};
-      let pageUrl: string | undefined = undefined;
+      let pageUrl: string | undefined;
 
       if (typeof window !== "undefined") {
         try {
-          utm = JSON.parse(localStorage.getItem("utm_data") || "{}");
+          const raw = localStorage.getItem("utm_data");
+          const parsed = raw ? (JSON.parse(raw) as unknown) : {};
+          if (parsed && typeof parsed === "object") {
+            utm = parsed as Record<string, string>;
+          }
         } catch {
           utm = {};
         }
@@ -388,13 +406,12 @@ export default function GreenCardPage() {
           ...contactFormData,
           recaptchaToken,
           context: "green-card-question",
-          utm,       // 🔹 UTM-метки
-          pageUrl,   // 🔹 адрес страницы
+          utm,
+          pageUrl,
         }),
       });
 
-      const data = await res.json().catch(() => null);
-      console.log("GC CONTACT RESPONSE:", res.status, data);
+      const data = (await res.json().catch(() => null)) as ContactApiResponse | null;
 
       if (!res.ok || !data?.ok) {
         setFormStatus("error");
@@ -414,8 +431,6 @@ export default function GreenCardPage() {
       setIsModalOpen(true);
     }
   }
-
-
 
   const osagoLink = `/${lang}/osago-rf`;
   const orderAnchor = "#green-card-order";
@@ -451,10 +466,7 @@ export default function GreenCardPage() {
             </div>
 
             <div className="flex justify-center lg:justify-end">
-              {/* Мобильная версия — можно добавить картинку позже */}
               <div className="w-full max-w-xs sm:max-w-sm lg:hidden" />
-
-              {/* Десктоп — авто + полис + маленькое лого */}
               <div className="hidden lg:block">
                 <div className="gc-hero-visual w-[520px] h-[280px] xl:w-[620px] xl:h-[320px] relative">
                   <Image
@@ -671,7 +683,7 @@ export default function GreenCardPage() {
           </div>
         </section>
 
-        {/* ПРЕИМУЩЕСТВА (4 карточки) */}
+        {/* ПРЕИМУЩЕСТВА */}
         <section className="border-t border-gray-200 bg-[#F7F7F7] py-12 sm:py-16">
           <div className="max-w-5xl mx-auto px-4">
             <h2 className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center">
@@ -699,10 +711,10 @@ export default function GreenCardPage() {
           </div>
         </section>
 
-        {/* КАЛЬКУЛЯТОР GREEN CARD */}
+        {/* КАЛЬКУЛЯТОР */}
         <GreenCardCalculator dict={gcPageDict.calculator} />
 
-        {/* Форма заявки на полис */}
+        {/* Форма заявки */}
         <GreenCardOrderForm dict={gcFormDict} />
 
         {/* ДОПРОДАЖА ОСАГО РФ */}
@@ -747,11 +759,11 @@ export default function GreenCardPage() {
         {/* FAQ */}
         <FAQSection dict={gcPageDict.faq} />
 
-        {/* BROKER BLOCK */}
+        {/* BROKER */}
         <BrokerSection broker={t.broker} />
       </main>
 
-      {/* MODAL STATUS для контактной формы */}
+      {/* MODAL STATUS */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
@@ -796,7 +808,7 @@ export default function GreenCardPage() {
               <p>{agreement.purposesIntro}</p>
 
               <ul className="list-disc pl-6 space-y-1">
-                {agreement.purposesList.map((item: string) => (
+                {agreement.purposesList.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
@@ -807,7 +819,7 @@ export default function GreenCardPage() {
                 {agreement.contactsTitle}
               </h4>
               <ul className="list-disc pl-6 space-y-1">
-                {agreement.contactsList.map((item: string) => (
+                {agreement.contactsList.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>

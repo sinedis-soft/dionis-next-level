@@ -10,6 +10,15 @@ import { useRef, useState } from "react";
 import { getHomeDictionary } from "@/dictionaries/home";
 import { getAgreementDictionary } from "@/dictionaries/agreement";
 
+type Grecaptcha = {
+  ready: (cb: () => void) => void;
+  execute: (
+    siteKey: string,
+    options: { action: string }
+  ) => Promise<string>;
+};
+
+
 const initialFormData = {
   firstName: "",
   lastName: "",
@@ -115,7 +124,7 @@ export default function HomePage() {
       const isProd = process.env.NODE_ENV === "production";
 
       if (isProd && recaptchaSiteKey && typeof window !== "undefined") {
-        const grecaptcha = (window as any).grecaptcha;
+        const grecaptcha = (window as Window & { grecaptcha?: Grecaptcha }).grecaptcha;
 
         if (grecaptcha?.execute && grecaptcha?.ready) {
           // ВАЖНО: ready принимает callback, а не используется как промис

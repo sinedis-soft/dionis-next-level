@@ -30,6 +30,9 @@ export default function CookieConsent({ lang }: Props) {
   const [consent, setConsent] = useState<ConsentValue | null>(null);
   const [isOpen, setIsOpen] = useState(false);
 
+  const isAccepted = consent === "accepted";
+  const isRejected = consent === "rejected";
+
   useEffect(() => {
     const stored = readConsent();
     if (!stored) {
@@ -49,6 +52,10 @@ export default function CookieConsent({ lang }: Props) {
     }
   };
 
+  // мини-статус рядом с кнопкой (чтобы consent реально использовался)
+  const statusLabel =
+    consent === "accepted" ? "✓" : consent === "rejected" ? "✕" : "";
+
   return (
     <>
       {/* Кнопка «печенька» доступна всегда */}
@@ -56,8 +63,9 @@ export default function CookieConsent({ lang }: Props) {
         type="button"
         onClick={() => setIsOpen(true)}
         className="fixed bottom-4 left-4 z-40 rounded-full bg-[#0f2238] text-white text-xs px-4 py-2 shadow-lg hover:bg-[#123056]"
+        aria-label={t.manageBtn}
       >
-        {t.manageBtn}
+        {t.manageBtn} {statusLabel}
       </button>
 
       {isOpen && (
@@ -69,7 +77,17 @@ export default function CookieConsent({ lang }: Props) {
                   {t.modalTitle}
                 </div>
                 <h2 className="text-2xl font-semibold mt-1">{t.introTitle}</h2>
+
+                {/* Показываем текущий выбор (используем consent) */}
+                <div className="mt-2 text-xs text-gray-600">
+                  {consent === "accepted"
+                    ? "Статус: принято"
+                    : consent === "rejected"
+                      ? "Статус: отклонено"
+                      : "Статус: не выбрано"}
+                </div>
               </div>
+
               <button
                 type="button"
                 className="text-gray-400 hover:text-gray-600"
@@ -142,15 +160,20 @@ export default function CookieConsent({ lang }: Props) {
             <div className="mt-8 flex flex-col sm:flex-row justify-end gap-2">
               <button
                 type="button"
-                className="px-4 py-2 rounded-md border text-xs sm:text-sm hover:bg-gray-100"
+                className="px-4 py-2 rounded-md border text-xs sm:text-sm hover:bg-gray-100 disabled:opacity-60 disabled:hover:bg-transparent"
                 onClick={() => handleChoice("rejected")}
+                disabled={isRejected}
+                aria-disabled={isRejected}
               >
                 {t.rejectAllBtn}
               </button>
+
               <button
                 type="button"
-                className="px-4 py-2 rounded-md bg-[#C89F4A] text-white text-xs sm:text-sm rounded-lg hover:opacity-90"
+                className="px-4 py-2 rounded-md bg-[#C89F4A] text-white text-xs sm:text-sm rounded-lg hover:opacity-90 disabled:opacity-60 disabled:hover:opacity-60"
                 onClick={() => handleChoice("accepted")}
+                disabled={isAccepted}
+                aria-disabled={isAccepted}
               >
                 {t.acceptAllBtn}
               </button>
