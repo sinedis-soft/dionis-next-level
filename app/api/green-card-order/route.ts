@@ -38,7 +38,6 @@ async function bitrix(method: string, payload: any, attempt = 1): Promise<any> {
     clearTimeout(timeoutId);
 
     let data: any;
-
     try {
       data = await res.json();
     } catch {
@@ -76,12 +75,20 @@ async function bitrix(method: string, payload: any, attempt = 1): Promise<any> {
   }
 }
 
-
 function parseDateToDDMMYYYY(dateStr: string | null): string | null {
   if (!dateStr) return null;
   const [y, m, d] = dateStr.split("-");
   if (!y || !m || !d) return null;
   return `${d}.${m}.${y}`;
+}
+
+// Bitrix для дат контакта обычно принимает YYYY-MM-DD.
+// Валидация минимальная: пропускаем пустое/мусор.
+function parseDateISO(dateStr: string | null): string | null {
+  if (!dateStr) return null;
+  const s = String(dateStr).trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
+  return s;
 }
 
 // конвертация File → [filename, base64] для fileData
@@ -125,6 +132,47 @@ export async function POST(req: Request) {
       formData.get("insurance_territory") || ""
     ).trim();
 
+    // --- 1b. Данные физлица (для обновления контакта) ---
+    const person_middleName = String(
+      formData.get("person_middleName") || ""
+    ).trim();
+
+    const person_gender_raw = String(
+      formData.get("person_gender") || ""
+    ).trim(); // может быть "45"/"47" или "male"/"female"
+
+    const person_gender =
+      person_gender_raw === "male"
+        ? "45"
+        : person_gender_raw === "female"
+          ? "47"
+          : person_gender_raw; // если уже ID
+
+    const person_birthDate = parseDateISO(
+      String(formData.get("person_birthDate") || "") || null
+    );
+
+    const person_idNumber = String(formData.get("person_idNumber") || "").trim();
+
+    const person_country = String(formData.get("person_country") || "").trim(); // ID enum
+    const person_address = String(formData.get("person_address") || "").trim();
+
+    const person_passportNumber = String(
+      formData.get("person_passportNumber") || ""
+    ).trim();
+
+    const person_passportIssuer = String(
+      formData.get("person_passportIssuer") || ""
+    ).trim();
+
+    const person_passportIssuedAt = parseDateISO(
+      String(formData.get("person_passportIssuedAt") || "") || null
+    );
+
+    const person_passportValidTo = parseDateISO(
+      String(formData.get("person_passportValidTo") || "") || null
+    );
+
     // UTM и URL страницы (если переданы)
     const pageUrlRaw = String(formData.get("pageUrl") || "").trim();
     const pageUrl = pageUrlRaw || undefined;
@@ -145,10 +193,9 @@ export async function POST(req: Request) {
       techPassportNumber?: string;
       type?: string;
       country?: string;
-      startDate?: string | null;
+      startDate?: string | null; // DD.MM.YYYY (для сделки)
       period?: string;
-      files: File[];
-      techPassportFiles?: File[];
+      techPassportFiles: File[];
     };
 
     const vehiclesMap = new Map<number, VehicleInput>();
@@ -161,14 +208,14 @@ export async function POST(req: Request) {
       const field = m[2] as keyof VehicleInput;
 
       if (!vehiclesMap.has(index)) {
-        vehiclesMap.set(index, { files: [] });
+        vehiclesMap.set(index, { techPassportFiles: [] });
       }
 
       const v = vehiclesMap.get(index)!;
 
       if (field === "techPassportFiles") {
         if (value instanceof File && value.size > 0) {
-          v.files.push(value);
+          v.techPassportFiles.push(value);
         }
       } else if (field === "startDate") {
         v.startDate = parseDateToDDMMYYYY(String(value));
@@ -195,7 +242,7 @@ export async function POST(req: Request) {
     let contactId: number | null = null;
 
     const foundContacts = await bitrix("crm.contact.list", {
-      filter: { "EMAIL": contact_email },
+      filter: { EMAIL: contact_email },
       select: ["ID"],
       start: 0,
     });
@@ -217,7 +264,50 @@ export async function POST(req: Request) {
     }
 
     if (!contactId || Number.isNaN(contactId)) {
-        throw new Error("Не удалось определить ID контакта (search/add)");
+      throw new Error("Не удалось определить ID контакта (search/add)");
+    }
+
+    // --- 3b. Обновление контакта (физлицо) ---
+    // Обновляем только если НЕ юрлицо и есть что записать
+    if (!order_isCompany) {
+      const contactUpdateFields: any = {};
+
+      if (person_middleName) contactUpdateFields.SECOND_NAME = person_middleName;
+      if (person_birthDate) contactUpdateFields.BIRTHDATE = person_birthDate;
+
+      if (person_idNumber)
+        contactUpdateFields.UF_CRM_1694347707628 = person_idNumber;
+
+      // Пол (enum IDs 45/47)
+      if (person_gender)
+        contactUpdateFields.UF_CRM_1686138296718 = person_gender;
+
+      // Страна проживания (enum ID)
+      if (person_country)
+        contactUpdateFields.UF_CRM_1686138527330 = person_country;
+
+      // Адрес проживания с индексом
+      if (person_address) contactUpdateFields.ADDRESS = person_address;
+
+      // Паспорт
+      if (person_passportNumber)
+        contactUpdateFields.UF_CRM_CONTACT_1686145698592 = person_passportNumber;
+
+      if (person_passportIssuer)
+        contactUpdateFields.UF_CRM_1694347754648 = person_passportIssuer;
+
+      if (person_passportIssuedAt)
+        contactUpdateFields.UF_CRM_1694347737519 = person_passportIssuedAt;
+
+      if (person_passportValidTo)
+        contactUpdateFields.UF_CRM_1696422396430 = person_passportValidTo;
+
+      if (Object.keys(contactUpdateFields).length > 0) {
+        await bitrix("crm.contact.update", {
+          id: contactId,
+          fields: contactUpdateFields,
+        });
+      }
     }
 
     // --- 4. Компания: либо по UF_CRM_COMPANY_1692911328252, либо фикс ID=1817 ---
@@ -236,7 +326,7 @@ export async function POST(req: Request) {
       }
 
       const foundCompanies = await bitrix("crm.company.list", {
-        filter: { "UF_CRM_COMPANY_1692911328252": company_bin },
+        filter: { UF_CRM_COMPANY_1692911328252: company_bin },
         select: ["ID"],
         start: 0,
       });
@@ -270,21 +360,16 @@ export async function POST(req: Request) {
     // --- 5. Сделки по каждому авто ---
     const createdDeals: number[] = [];
 
-    // для COMMENTS можно собрать общую информацию (utm, url, базовые данные)
     const commonCommentParts: string[] = [];
 
-    if (pageUrl) {
-      commonCommentParts.push(`Страница: ${pageUrl}`);
-    }
-    if (utm) {
-      commonCommentParts.push(`UTM: ${JSON.stringify(utm)}`);
-    }
+    if (pageUrl) commonCommentParts.push(`Страница: ${pageUrl}`);
+    if (utm) commonCommentParts.push(`UTM: ${JSON.stringify(utm)}`);
+
     commonCommentParts.push(
       `Контакт: ${contact_firstNameLat} ${contact_lastNameLat} <${contact_email}>`
     );
-    if (contact_phone) {
-      commonCommentParts.push(`Телефон: ${contact_phone}`);
-    }
+    if (contact_phone) commonCommentParts.push(`Телефон: ${contact_phone}`);
+
     if (order_isCompany) {
       commonCommentParts.push(`Договор на юрлицо, БИН: ${company_bin}`);
     } else {
@@ -327,9 +412,9 @@ export async function POST(req: Request) {
       };
 
       // файлы техпаспорта → UF_CRM_1686154280439 как массив fileData
-      if (vehicle.files && vehicle.files.length > 0) {
+      if (vehicle.techPassportFiles && vehicle.techPassportFiles.length > 0) {
         const filesData = await Promise.all(
-          vehicle.files.map((f) => fileToBitrixFileData(f))
+          vehicle.techPassportFiles.map((f) => fileToBitrixFileData(f))
         );
 
         dealFields.UF_CRM_1686154280439 = filesData.map((fd) => ({
