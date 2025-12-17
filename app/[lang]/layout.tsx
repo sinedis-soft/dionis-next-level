@@ -10,38 +10,29 @@ import type { Lang } from "@/dictionaries/header";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return [
-    { lang: "ru" },
-    { lang: "kz" },
-    { lang: "en" },
-  ];
+  return [{ lang: "ru" }, { lang: "kz" }, { lang: "en" }];
 }
 
-function normalizeLang(value: string): Lang {
-  if (value === "ru" || value === "kz" || value === "en") return value;
-  return "ru";
+function normalizeLang(value: unknown): Lang {
+  return value === "ru" || value === "kz" || value === "en" ? value : "ru";
 }
 
-
-export default function LangLayout({
-  children,
-  params,
-}: {
+export default async function LangLayout(props: {
   children: ReactNode;
   params: any;
 }) {
-  const lang = normalizeLang(params?.lang ?? "ru");
+  const resolvedParams = await Promise.resolve(props.params);
+  const lang = normalizeLang(resolvedParams?.lang);
 
   return (
-    <html lang={lang}>
-      <body className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
-        <CookieConsent lang={lang} /> {/* тут оставьте как есть пока */}
-        <AnalyticsManager />
-      </body>
-    </html>
+    <>
+      {/* Если хочешь менять lang атрибут у <html> — делай это в RootLayout через generateMetadata.
+          Здесь <html>/<body> использовать нельзя. */}
+      <Header />
+      <main className="flex-1">{props.children}</main>
+      <SiteFooter />
+      <CookieConsent lang={lang} />
+      <AnalyticsManager />
+    </>
   );
 }
-

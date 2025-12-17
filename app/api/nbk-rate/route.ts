@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const resp = await fetch("https://nationalbank.kz/rss/rates_all.xml", {
-      cache: "no-store",
+      next: { revalidate: 3600 }, // 1 час кэш
     });
 
     if (!resp.ok) {
@@ -16,7 +16,6 @@ export async function GET() {
 
     const xmlText = await resp.text();
 
-    // Грубый, но рабочий парсинг USD через RegExp
     const match = xmlText.match(
       /<item>\s*<title>\s*USD\s*<\/title>[\s\S]*?<description>\s*([^<]+)\s*<\/description>/i
     );
@@ -38,7 +37,15 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json({ ok: true, rate: parsed });
+    
+    return NextResponse.json(
+      { ok: true, rate: parsed },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=300",
+        },
+      }
+    );
   } catch (e) {
     console.error("NBK RATE ERROR:", e);
     return NextResponse.json(

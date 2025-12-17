@@ -108,7 +108,7 @@ function GreenCardCalculator({ dict }: GreenCardCalculatorProps) {
   useEffect(() => {
     async function autoFillKztRate() {
       try {
-        const resp = await fetch("/api/nbk-rate", { cache: "no-store" });
+        const resp = await fetch("/api/nbk-rate");
         const data = await resp.json();
 
         if (!resp.ok || !data?.ok || !data?.rate) {
