@@ -1,11 +1,11 @@
 // app/[lang]/layout.tsx
 import type { ReactNode } from "react";
+import type { Lang } from "@/dictionaries/header";
 
 import Header from "@/components/Header";
 import SiteFooter from "@/components/SiteFooter";
 import CookieConsent from "@/components/CookieConsent";
 import AnalyticsManager from "@/components/AnalyticsManager";
-import type { Lang } from "@/dictionaries/header";
 
 export const dynamicParams = false;
 
@@ -17,21 +17,21 @@ function normalizeLang(value: unknown): Lang {
   return value === "ru" || value === "kz" || value === "en" ? value : "ru";
 }
 
-type LangParams = { lang?: string };
-type MaybePromise<T> = T | Promise<T>;
-
-export default async function LangLayout(props: {
+export default async function LangLayout({
+  children,
+  params,
+}: {
   children: ReactNode;
-  params: MaybePromise<LangParams>;
+  params: Promise<{ lang: string }>;
 }) {
-  const resolvedParams = await props.params;
-  const lang = normalizeLang(resolvedParams?.lang);
+  const { lang: rawLang } = await params;
+  const lang = normalizeLang(rawLang);
 
   return (
     <>
-      <Header />
-      <main className="flex-1">{props.children}</main>
-      <SiteFooter />
+      <Header lang={lang} />
+      <main className="flex-1">{children}</main>
+      <SiteFooter lang={lang} />
       <CookieConsent lang={lang} />
       <AnalyticsManager />
     </>

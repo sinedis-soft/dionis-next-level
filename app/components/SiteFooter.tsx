@@ -1,39 +1,30 @@
-"use client";
-
+// components/SiteFooter.tsx
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 import type { Lang } from "@/dictionaries/header";
 import { getFooterDictionary } from "@/dictionaries/footer";
 
-function resolveLang(pathname: string): Lang {
-  const seg = pathname.split("/")[1] || "";
-  if (seg === "ru" || seg === "kz" || seg === "en") return seg as Lang;
-  return "ru";
-}
+type SiteFooterProps = {
+  lang: Lang;
+};
 
-export default function SiteFooter() {
-  const pathname = usePathname() || "/";
-  const lang = resolveLang(pathname);
+export default function SiteFooter({ lang }: SiteFooterProps) {
   const t = getFooterDictionary(lang);
   const base = `/${lang}`;
 
   return (
     <footer className="w-full bg-[#0f2238] text-gray-100 text-sm mt-8">
       <div className="mx-auto max-w-6xl px-4 py-10 grid gap-8 md:grid-cols-4">
-        {/* Колонка 1 — контакты */}
+        {/* ===== Колонка 1 — контакты ===== */}
         <div>
           <h3 className="text-xs font-bold tracking-[0.12em] uppercase mb-4">
             {t.contactsTitle}
           </h3>
 
           <ul className="space-y-2">
-            <li>
-              <span>{t.addressLine1}</span>
-            </li>
-            <li>
-              <span>{t.addressLine2}</span>
-            </li>
+            <li>{t.addressLine1}</li>
+            <li>{t.addressLine2}</li>
+
             <li>
               <a
                 href="mailto:info@dionis-insurance.kz"
@@ -42,6 +33,7 @@ export default function SiteFooter() {
                 {t.emailLabel}
               </a>
             </li>
+
             <li>
               <a
                 href="tel:+77273573030"
@@ -53,22 +45,25 @@ export default function SiteFooter() {
           </ul>
         </div>
 
-        {/* Колонка 2 — категории */}
+        {/* ===== Колонка 2 — категории ===== */}
         <div>
           <h3 className="text-xs font-bold tracking-[0.12em] uppercase mb-4">
             {t.categoriesTitle}
           </h3>
+
           <ul className="space-y-2">
             <li>
               <Link href={base} className="hover:text-[#FCD671]">
                 {t.homeLabel}
               </Link>
             </li>
+
             <li>
               <Link href={`${base}/about`} className="hover:text-[#FCD671]">
                 {t.aboutLabel}
               </Link>
             </li>
+
             <li>
               <Link
                 href={`${base}/green-card`}
@@ -77,6 +72,7 @@ export default function SiteFooter() {
                 {t.greenCardLabel}
               </Link>
             </li>
+
             <li>
               <Link
                 href={`${base}/osago-rf`}
@@ -85,6 +81,7 @@ export default function SiteFooter() {
                 {t.osagoLabel}
               </Link>
             </li>
+
             <li>
               <Link href={`${base}/blog`} className="hover:text-[#FCD671]">
                 {t.blogLabel}
@@ -93,11 +90,12 @@ export default function SiteFooter() {
           </ul>
         </div>
 
-        {/* Колонка 3 — поддержка клиентов */}
+        {/* ===== Колонка 3 — поддержка клиентов ===== */}
         <div>
           <h3 className="text-xs font-bold tracking-[0.12em] uppercase mb-4">
             {t.supportTitle}
           </h3>
+
           <ul className="space-y-2">
             <li>
               <a
@@ -112,11 +110,12 @@ export default function SiteFooter() {
           </ul>
         </div>
 
-        {/* Колонка 4 — законодательство */}
+        {/* ===== Колонка 4 — законодательство ===== */}
         <div>
           <h3 className="text-xs font-bold tracking-[0.12em] uppercase mb-4">
             {t.lawTitle}
           </h3>
+
           <ul className="space-y-2">
             <li>
               <a href="#" className="hover:text-[#FCD671]">
@@ -127,7 +126,7 @@ export default function SiteFooter() {
         </div>
       </div>
 
-      {/* Нижняя полоса с копирайтом */}
+      {/* ===== Нижняя полоса ===== */}
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-6xl px-4 py-3 text-xs text-gray-300">
           {t.copyright}

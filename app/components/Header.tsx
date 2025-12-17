@@ -8,34 +8,23 @@ import { usePathname } from "next/navigation";
 import type { Lang } from "@/dictionaries/header";
 import { HEADER_DICTIONARY } from "@/dictionaries/header";
 
-export default function Header() {
+export default function Header({ lang }: { lang: Lang }) {
   const pathname = usePathname() || "/";
+  const t = HEADER_DICTIONARY[lang];
+  const base = `/${lang}`;
 
-  // ---------- определяем язык из URL ----------
-  const seg = pathname.split("/")[1] || "";
-  const currentLang: Lang =
-    seg === "ru" || seg === "kz" || seg === "en" ? (seg as Lang) : "ru";
-
-  const t = HEADER_DICTIONARY[currentLang];
-  const base = `/${currentLang}`;
-
-  // ---------- state ----------
   const [menuOpen, setMenuOpen] = useState(false);
   const [insuranceDesktopOpen, setInsuranceDesktopOpen] = useState(false);
   const [insuranceMobileOpen, setInsuranceMobileOpen] = useState(false);
 
-  // ---------- build URL при смене языка ----------
   const buildLangUrl = (targetLang: Lang) => {
-    const parts = pathname.split("/"); // ["", "ru", "green-card"]
+    const parts = pathname.split("/");
     if (parts.length > 1) parts[1] = targetLang;
     return parts.join("/").replace(/\/+$/, "") || "/";
   };
 
-  // ---------- активная ссылка ----------
   const isActive = (target: string) => {
-    if (target === base) {
-      return pathname === base || pathname === `${base}/`;
-    }
+    if (target === base) return pathname === base || pathname === `${base}/`;
     return pathname === target || pathname.startsWith(`${target}/`);
   };
 
@@ -45,11 +34,9 @@ export default function Header() {
     } hover:text-[#EBCA45]`;
 
   const langLinkClass = (code: Lang) =>
-    `transition-colors ${
-      currentLang === code
-        ? "font-bold text-[#EBCA45]"
-        : "opacity-60 hover:opacity-100"
-    }`;
+  `transition-colors ${
+    lang === code ? "font-bold text-[#EBCA45]" : "opacity-60 hover:opacity-100"
+  }`;
 
   // закрываем меню при смене маршрута
   useEffect(() => {
