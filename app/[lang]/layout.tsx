@@ -8,7 +8,10 @@ import SiteFooter from "@/components/SiteFooter";
 import CookieConsent from "@/components/CookieConsent";
 import AnalyticsManager from "@/components/AnalyticsManager";
 
-const SITE_URL = "https://dionis-insurance.com";
+// ✅ PROD домен + можно переопределять через env
+const SITE_URL =
+  (process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") as string | undefined) ??
+  "https://dionis-insurance.kz";
 
 const HREFLANG: Record<Lang, string> = {
   ru: "ru",
@@ -36,25 +39,31 @@ function abs(path: string) {
   return `${SITE_URL}${path}`;
 }
 
+// ✅ Главная /ru — брендовая (без продуктового интента)
+// Продукты — на отдельных страницах
 function getSeo(lang: Lang) {
   if (lang === "ru") {
     return {
-      title: "Dionis Insurance — страхование онлайн",
+      title:
+        "Dionis Insurance Broker — страховой брокер в Казахстане (Алматы) | Официально",
       description:
-        "Оформление страховых продуктов онлайн: Зеленая карта, ОСАГО, страхование грузов и ответственность перевозчиков.",
+        "Страховой брокер в Казахстане: подбор страховых программ, консультации и сопровождение. Официально по лицензии. Алматы, связь по телефону и в мессенджерах.",
     };
   }
+
   if (lang === "kz") {
     return {
-      title: "Dionis Insurance — онлайн сақтандыру",
+      title:
+        "Dionis Insurance Broker — Қазақстандағы сақтандыру брокері (Алматы) | Ресми",
       description:
-        "Онлайн сақтандыру: Green Card, ОСАГО және басқа сақтандыру өнімдері. Жылдам өтінім және кеңес.",
+        "Қазақстандағы сақтандыру брокері: бағдарламаларды таңдау, кеңес беру және сүйемелдеу. Лицензия бойынша ресми жұмыс. Алматы, байланыс телефоны және мессенджерлер.",
     };
   }
+
   return {
-    title: "Dionis Insurance — online insurance",
+    title: "Dionis Insurance Broker — insurance broker in Kazakhstan (Almaty) | Official",
     description:
-      "Buy insurance online: Green Card, OSAGO and other insurance products. Fast request and support.",
+      "Insurance broker in Kazakhstan: program selection, consulting and support. Officially licensed. Almaty, phone and messengers.",
   };
 }
 
@@ -84,6 +93,9 @@ export async function generateMetadata({
         "x-default": abs(LANG_PATH.ru),
       },
     },
+
+    // (не обязательно, но полезно)
+    metadataBase: new URL(SITE_URL),
   };
 }
 

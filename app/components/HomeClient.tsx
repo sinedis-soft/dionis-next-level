@@ -185,9 +185,11 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                     {t.director.heading}
                   </h2>
 
-                  <div className="space-y-3 text-sm sm:text-base text-gray-700 max-w-xl">
-                    {t.director.paragraphs.map((p) => (
-                      <p key={p}>{p}</p>
+                  <div className="space-y-3 text-sm sm:text-base text-gray-700 text-justify">
+                    {t.director.paragraphs.map((p, i) => (
+                      <p key={i} className="leading-relaxed">
+                        {p}
+                      </p>
                     ))}
                   </div>
 
@@ -200,8 +202,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                     ))}
                   </div>
 
-                  <div className="director-signature-wrap">
-                    {/* НЕ-LCP → quality=60 + sizes */}
+                  <div className="director-signature-wrap flex justify-end -mt-20">
                     <Image
                       src="/director-signature.webp"
                       alt={t.director.signatureAlt}
@@ -215,7 +216,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                   </div>
                 </article>
 
-                <div className="hidden lg:flex justify-center lg:mt-70">
+                <div className="hidden lg:flex justify-center lg:mt-77">
                   {/* НЕ-LCP → quality=60 + sizes */}
                   <Image
                     src="/director-borovoy.webp"

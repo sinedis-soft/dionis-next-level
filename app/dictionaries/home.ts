@@ -122,19 +122,19 @@ export type HomeDictionary = {
 
 const ru: HomeDictionary = {
   hero: {
-    title: "Страхование для международных поездок\nи грузоперевозчиков",
+    title: "Страховой брокер в Казахстане\nдля частных лиц и бизнеса",
     subtitle:
-      "Зелёная карта, ОСАГО РФ для нерезидентов, автоКаско, грузы и ответственность.",
-    greenCardBtn: "Заказать Зелёную карту",
-    osagoBtn: "Заказать ОСАГО РФ",
-    otherBtn: "Прочие страховки",
+          "Подбор страховых программ, консультации и сопровождение. Работаем официально, по лицензии. Алматы, связь по телефону и в мессенджерах.",    
+    greenCardBtn: "Зелёная карта",
+    osagoBtn: "ОСАГО РФ",
+    otherBtn: "Все услуги",
     heroAlt:
-      "Dionis Insurance — страхование для международных перевозчиков",
+      "Dionis Insurance Broker — страховой брокер в Казахстане",
   },
 
   benefits: {
     title: "Почему с Dionis удобно работать",
-    subtitle: "Оформляем страховки для въезда в Россию и Европу",
+    subtitle: "Официальный страховой брокер: подбираем решения и сопровождаем клиентов",
     cards: [
       {
         value: "100%",
@@ -167,7 +167,7 @@ const ru: HomeDictionary = {
       "Позже я изучал страховой рынок с разных сторон: был клиентом, агентом, брокером, предпринимателем. И теперь я точно знаю, что важно для каждого, кто выходит на дорогу — будь то личная поездка или международная грузоперевозка.",
       "Мы создали Dionis, чтобы дать вам не просто страховой полис, а надёжную защиту и простую, понятную поддержку в любой ситуации. Мы выбираем проверенных партнёров, следим за актуальностью тарифов, помогаем экономить время и деньги.",
       "У нас нет лишней бюрократии. Есть уважение к клиенту, компетентность и ответственность.",
-      "Если вы ищете страховку для выезда за границу, полис для бизнеса или партнёра в сфере логистики — мы рядом.",
+      "Если вам нужен страховой брокер для личных задач или бизнеса — мы рядом.",
       "Спасибо за ваше доверие. Dionis — страхование, на которое можно опереться.",
     ],
     signLines: [
@@ -298,19 +298,19 @@ const ru: HomeDictionary = {
 
   broker: {
     titlePrefix: "МЫ ",
-    titleHighlight: "СТРАХОВОЙ БРОКЕР",
-    titleSuffix: " НОВОГО ПОКОЛЕНИЯ",
-    lead: "Имеем лицензирование в Казахстане и работаем по международным стандартам.",
+    titleHighlight: "СТРАХОВОЙ БРОКЕР В КАЗАХСТАНЕ",
+    titleSuffix: " НОВОГО ПОКОЛЕНИЯ ",
+    lead: "Работаем официально, по лицензии. Консультируем, подбираем и сопровождаем страховые решения.",
     paragraph1:
-      "Мы специализируемся на Зелёных картах для выезда за границу, страховании транзитного транспорта, туристов и релокантов. Наши клиенты — частные водители, логистические компании, перевозчики и путешественники, которым важны скорость, прозрачность и надёжность.",
+      "Dionis Insurance Broker — страховой брокер в Казахстане. Мы подбираем страховые программы под задачу клиента, объясняем условия простым языком и сопровождаем на всех этапах — от заявки до получения документов.",
     bulletPoints: [
-      "Страховка онлайн",
+      "Подбор страховых программ",
       "Работаем официально, по лицензии",
-      "Полисы действуют в ЕС, Турции, Иране, Сербии и других странах",
-      "Говорим на русском, казахском и английском",
+      "Консультации и сопровождение",
+      "Русский, казахский и английский",
     ],
     paragraph2:
-      "Мы не просто оформляем полисы — мы берём на себя ответственность, чтобы ваша поездка прошла спокойно. Вся страховка — легальная, проверенная и признанная за границей. Если вам нужна реальная защита без очередей и бюрократии — вы по адресу.",
+      "На сайте вы найдёте отдельные страницы по продуктам. Если вы не уверены, что именно нужно — напишите нам: уточним задачу и предложим оптимальный вариант.",
     logoAlt: "Dionis Insurance Broker — Казахстан",
   },
 
@@ -345,19 +345,19 @@ const ru: HomeDictionary = {
 
 const kz: HomeDictionary = {
   hero: {
-    title: "Халықаралық сапарлар мен\nжүк тасымалдаушыларына арналған сақтандыру",
+    title: "Қазақстандағы жеке тұлғалар мен бизнеске\nарналған сақтандыру брокері",
     subtitle:
-      "Жасыл карта, РФ ОСАГО (резидент еместер үшін), автоКАСКО, жүктер және жауапкершілік.",
-    greenCardBtn: "Жасыл картаны рәсімдеу",
-    osagoBtn: "РФ ОСАГО рәсімдеу",
-    otherBtn: "Басқа сақтандырулар",
+      "Сақтандыру бағдарламаларын іріктеу, кеңес беру және толық сүйемелдеу. Лицензия негізінде ресми жұмыс істейміз. Алматы, телефон және мессенджерлер арқылы байланыс.",
+    greenCardBtn: "Green Card",
+    osagoBtn: "РФ ОСАГО",
+    otherBtn: "Барлық қызметтер",
     heroAlt:
-      "Dionis Insurance — халықаралық тасымалдаушыларға арналған сақтандыру",
+      "Dionis Insurance Broker — Қазақстандағы сақтандыру брокері",
   },
 
   benefits: {
     title: "Dionis-пен жұмыс істеудің артықшылықтары",
-    subtitle: "Ресейге және Еуропаға кіруге арналған сақтандыруды рәсімдейміз",
+    subtitle: "Ресми сақтандыру брокері: шешімдерді іріктейміз және клиенттерді толық сүйемелдейміз",
     cards: [
       {
         value: "100%",
@@ -385,14 +385,15 @@ const kz: HomeDictionary = {
   director: {
     heading: "Құрметті достар, серіктестер және клиенттер!",
     paragraphs: [
-      "Менің атым — Денис Боровой, мен Dionis сақтандыру брокерінің директоры және негізін қалаушысымын.",
-      "Менің жолым — жастайымнан көлік саласында жұмыс істеген адам жолы: диспетчерден бастап көлік компаниясы директорына дейінгі жолды жүріп өттім. Осы саладағы барлық қиындықтарды өз көзіммен көрдім.",
-      "Кейін сақтандыру нарығын әртүрлі қырынан зерттедім: клиент те болдым, агент те, брокер де, кәсіпкер де. Сондықтан сапарға шығатын әр адамға не маңызды екенін жақсы білемін.",
-      "Біз Dionis-ті сізге тек сақтандыру полисін емес, кез келген жағдайда нақты қорғаныс пен түсінікті қолдау көрсету үшін құрдық. Біз тексерілген серіктестермен жұмыс істейміз, тарифтердің өзектілігін қадағалаймыз, уақытыңыз бен қаражатыңызды үнемдеуге көмектесеміз.",
-      "Бізде артық бюрократия жоқ. Клиентке құрмет, кәсібилік және жауапкершілік бар.",
-      "Егер сіз шетелге шығуға сақтандыру, бизнеске арналған полис немесе логистика саласында серіктес іздесеңіз — біз әрдайым қасыңыздамыз.",
-      "Сенім білдіргеніңіз үшін рақмет. Dionis — сүйенуге болатын сақтандыру.",
+      "Менің атым Денис Боровой, мен Dionis сақтандыру брокерінің директоры және құрылтайшысымын.",
+      "Менің кәсіби жолым көлік саласымен тығыз байланысты: жастайымнан бастап осы салада жұмыс істеп, диспетчерден бастап көлік компаниясы директорынң орынбасарына дейінгі жолдан өттім. Бұл маған тасымалдау процесінің барлық кезеңдерін және ондағы қиындықтарды терең түсінуге мүмкіндік берді.",
+      "Кейін мен сақтандыру нарығын әртүрлі қырынан зерттедім: клиент, агент, брокер және кәсіпкер ретінде. Сондықтан жолға шығатын әр адам үшін не маңызды екенін нақты білемін — ол жеке сапар болсын немесе халықаралық жүк тасымалы болсын.",
+      "Dionis компаниясын біз сізге жай ғана сақтандыру полисін емес, сенімді қорғаныс пен кез келген жағдайда түсінікті әрі қолжетімді қолдау ұсыну үшін құрдық. Біз сенімді серіктестерді таңдаймыз, тарифтердің өзектілігін қадағалаймыз және уақытыңыз бен қаражатыңызды үнемдеуге көмектесеміз.",
+      "Бізде артық бюрократия жоқ. Клиентке деген құрмет, кәсіби біліктілік және жауапкершілік бар.",
+      "Егер сізге жеке мақсаттар немесе бизнес үшін сақтандыру брокері қажет болса — біз әрдайым жаныңыздамыз.",
+      "Сеніміңіз үшін рахмет. Dionis — сенім артуға болатын сақтандыру.",
     ],
+
     signLines: [
       "Құрметпен,",
       "Боровой Денис Федорович",
@@ -508,21 +509,23 @@ const kz: HomeDictionary = {
 
   broker: {
     titlePrefix: "БІЗ — ",
-    titleHighlight: "ЖАҢА БУЫН САҚТАНДЫРУ БРОКЕРІ",
-    titleSuffix: "",
-    lead: "Қазақстанда лицензияланған және халықаралық стандарттарға сай жұмыс істейміз.",
+    titleHighlight: "ҚАЗАҚСТАНДАҒЫ САҚТАНДЫРУ БРОКЕРІ",
+    titleSuffix: " ЖАҢА БУЫН ",
+    lead:
+      "Лицензия негізінде ресми жұмыс істейміз. Кеңес береміз, іріктейміз және сақтандыру шешімдерін толық сүйемелдейміз.",
     paragraph1:
-      "Біз Жасыл карталарға, транзиттік көлік сақтандыруына, туристер мен релоканттарға арналған сақтандыруға маманданамыз. Біздің клиенттер — жылдамдықты, ашықтықты және сенімділікті бағалайтын жеке жүргізушілер, логистикалық компаниялар және тасымалдаушылар.",
+      "Dionis Insurance Broker — Қазақстандағы сақтандыру брокері. Біз клиенттің міндетіне сәйкес сақтандыру бағдарламаларын таңдаймыз, шарттарды қарапайым тілмен түсіндіреміз және өтінімнен бастап құжаттарды алғанға дейін барлық кезеңде сүйемелдейміз.",
     bulletPoints: [
-      "Онлайн сақтандыру",
-      "Ресми, лицензиямен жұмыс істейміз",
-      "Полистер ЕО, Түркия, Иран, Сербия және басқа елдерде жарамды",
-      "Орыс, қазақ және ағылшын тілдерінде сөйлейміз",
+      "Сақтандыру бағдарламаларын іріктеу",
+      "Ресми жұмыс, лицензия негізінде",
+      "Кеңес беру және толық сүйемелдеу",
+      "Орыс, қазақ және ағылшын тілдері",
     ],
     paragraph2:
-      "Біз тек полис рәсімдемейміз — сіздің сапарыңыздың қауіпсіз өтуіне жауапкершілік аламыз. Барлық сақтандыру заңды, тексерілген және шетелде мойындалған. Егер сізге шынайы қорғаныс қажет болса — дұрыс жердесіз.",
+      "Сайтта әрбір сақтандыру өнімі бойынша жеке беттер бар. Егер қай шешім қажет екенін білмесеңіз — бізге жазыңыз: міндетті нақтылап, оңтайлы нұсқаны ұсынамыз.",
     logoAlt: "Dionis Insurance Broker — Қазақстан",
   },
+
 
   contact: {
     sectionTitle: "Бізге хабарлама жазыңыз",
@@ -555,15 +558,16 @@ const kz: HomeDictionary = {
 
 const en: HomeDictionary = {
   hero: {
-    title: "Insurance for international trips\nand freight carriers",
+    title: "Insurance broker in Kazakhstan\nfor individuals and businesses",
     subtitle:
-      "Green Card, Russian OSAGO for non-residents, AutoCASCO, cargo and liability insurance.",
-    greenCardBtn: "Order a Green Card",
-    osagoBtn: "Order Russian OSAGO",
-    otherBtn: "Other insurance",
+      "Licensed insurance broker: we select insurance solutions and provide full client support.",
+    greenCardBtn: "Green Card",
+    osagoBtn: "OSAGO (Russia)",
+    otherBtn: "All services",
     heroAlt:
-      "Dionis Insurance — insurance for international transportation",
+      "Dionis Insurance Broker — insurance broker in Kazakhstan",
   },
+
 
   benefits: {
     title: "Why working with Dionis is convenient",
@@ -593,14 +597,14 @@ const en: HomeDictionary = {
   },
 
   director: {
-    heading: "Dear friends, partners and clients!",
+    heading: "Dear friends, partners, and clients,",
     paragraphs: [
-      "My name is Denis Borovoy, I am the director and founder of Dionis Insurance Broker.",
-      "My story is the story of a person who has worked in transportation since youth: I went from dispatcher to deputy director of a transport company, learning every stage of logistics and all the challenges along the way.",
-      "Later I studied the insurance market from different sides: I was a client, an agent, a broker, an entrepreneur. Now I clearly understand what matters to everyone who goes on the road — whether it’s a personal trip or international freight transportation.",
-      "We created Dionis to give you not just an insurance policy, but reliable protection and simple, clear support in any situation. We choose verified partners, keep tariffs up to date, and help you save time and money.",
-      "We have no unnecessary bureaucracy. What we do have is respect for the client, competence, and responsibility.",
-      "If you are looking for travel insurance, a business policy, or a partner in the field of logistics — we are here for you.",
+      "My name is Denis Borovoy, and I am the Director and Founder of Dionis Insurance Broker.",
+      "My professional background is closely connected with the transport industry. I started my career at a young age and progressed from dispatcher to Deputy Director of a transport company, gaining a deep understanding of every stage of transportation and the challenges involved.",
+      "Later, I studied the insurance market from different perspectives — as a client, an agent, a broker, and an entrepreneur. This experience allows me to clearly understand what matters most to anyone on the road, whether it is a personal trip or an international freight operation.",
+      "We founded Dionis to offer not just an insurance policy, but reliable protection and clear, practical support in any situation. We work with trusted partners, monitor up-to-date tariffs, and help our clients save time and money.",
+      "We avoid unnecessary bureaucracy. What we value instead are respect for the client, professional competence, and responsibility.",
+      "If you are looking for an insurance broker for personal needs or business purposes, we are here to support you.",
       "Thank you for your trust. Dionis — insurance you can rely on.",
     ],
     signLines: [
@@ -722,21 +726,23 @@ const en: HomeDictionary = {
 
   broker: {
     titlePrefix: "WE ARE A ",
-    titleHighlight: "NEXT-GEN INSURANCE BROKER",
+    titleHighlight: "NEXT-GENERATION INSURANCE BROKER IN KAZAKHSTAN",
     titleSuffix: "",
-    lead: "Licensed in Kazakhstan and operating to international standards.",
+    lead:
+      "Licensed and operating officially. We consult, select, and provide full support for insurance solutions.",
     paragraph1:
-      "We specialize in Green Cards for international travel, transit vehicle insurance, tourists, and relocants. Our clients are private drivers, logistics companies, carriers and travelers who value speed, transparency and reliability.",
+      "Dionis Insurance Broker is an insurance broker in Kazakhstan. We select insurance programs based on the client’s specific needs, explain policy terms in clear language, and support clients at every stage — from application to receipt of documents.",
     bulletPoints: [
-      "Online insurance",
-      "Licensed and official work",
-      "Policies valid in the EU, Turkey, Iran, Serbia and other countries",
-      "We speak Russian, Kazakh and English",
+      "Selection of insurance programs",
+      "Licensed and operating officially",
+      "Consulting and full client support",
+      "Russian, Kazakh, and English languages",
     ],
     paragraph2:
-      "We don't just issue policies — we take responsibility to make your trip safe. All insurance is legal, verified, and recognized abroad. If you need real protection without queues and bureaucracy — you are in the right place.",
+      "The website contains dedicated pages for each insurance product. If you are unsure which solution you need, contact us — we will clarify your requirements and propose the optimal option.",
     logoAlt: "Dionis Insurance Broker — Kazakhstan",
   },
+
 
   contact: {
     sectionTitle: "Send us a message",
