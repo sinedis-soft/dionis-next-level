@@ -31,13 +31,20 @@ function normalizeLang(value: unknown): Lang {
   return value === "ru" || value === "kz" || value === "en" ? value : "ru";
 }
 
+function langToOgLocale(lang: Lang): string {
+  return lang === "ru" ? "ru_RU" : lang === "kz" ? "kk_KZ" : "en_US";
+}
+
+function langToIana(lang: Lang): string {
+  return lang === "ru" ? "ru" : lang === "kz" ? "kk-KZ" : "en";
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: { lang: string };
 }): Promise<Metadata> {
   const lang = normalizeLang(params.lang);
-
   const url = `${SITE_URL}/${lang}/green-card`;
 
   const titles: Record<Lang, string> = {
@@ -69,7 +76,7 @@ export async function generateMetadata({
       url,
       title: titles[lang],
       description: descriptions[lang],
-      locale: lang === "ru" ? "ru_RU" : lang === "kz" ? "kk_KZ" : "en_US",
+      locale: langToOgLocale(lang),
       siteName: "Dionis Insurance Broker",
     },
     robots: {
@@ -112,7 +119,7 @@ export default async function GreenCardPage({
           : "International Green Card liability insurance for trips abroad with a vehicle from Kazakhstan.",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#insurance-broker` },
-    inLanguage: lang === "ru" ? "ru" : lang === "kz" ? "kk-KZ" : "en",
+    inLanguage: langToIana(lang),
   };
 
   const osagoLink = `/${lang}/osago-rf`;
@@ -122,6 +129,7 @@ export default async function GreenCardPage({
     <>
       <script
         type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
       />
 
