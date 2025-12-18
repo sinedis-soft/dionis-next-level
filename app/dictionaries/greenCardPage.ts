@@ -71,7 +71,7 @@ const ru: GreenCardPageDictionary = {
   hero: {
     title: "ЗЕЛЕНАЯ КАРТА",
     subtitle:
-      "Полис для поездок в ЕС, Турцию, Молдову, Сербию и другие страны. Электронный вариант, всё официально.",
+      "Международная страховка ответственности для автомобилей, зарегистрированных в Казахстане. Обязательна при въезде в страны ЕС, Турцию и другие государства.",
     ctaOrder: "Заказать Зеленую карту",
     carAlt: "Автомобиль с полисом Зеленой карты",
     policyAlt: "Полис Зеленой карты",
@@ -213,9 +213,9 @@ const ru: GreenCardPageDictionary = {
 
 const en: GreenCardPageDictionary = {
   hero: {
-    title: "GREEN CARD",
-    subtitle:
-      "Liability insurance for trips to the EU, Türkiye, Moldova, Serbia and other countries. Electronic policy, fully official.",
+  title: "GREEN CARD",
+  subtitle:
+    "International motor third-party liability insurance for vehicles registered in Kazakhstan. Required when entering EU countries, Turkey, and other states.",
     ctaOrder: "Order a Green Card",
     carAlt: "Car with Green Card insurance",
     policyAlt: "Green Card policy sample",
@@ -357,9 +357,9 @@ faq: {
 
 const kz: GreenCardPageDictionary = {
   hero: {
-    title: "GREEN CARD САҚТАНДЫРУЫ",
-    subtitle:
-      "ЕО, Түркия, Молдова, Сербия және басқа елдерге сапарлар үшін жауапкершілік сақтандыруы. Электрондық полис, ресми құжат.",
+  title: "GREEN CARD",
+  subtitle:
+    "Қазақстанда тіркелген автокөліктерге арналған азаматтық-құқықтық жауапкершіліктің халықаралық сақтандыруы. Еуропалық Одақ елдеріне, Түркияға және басқа мемлекеттерге кіру кезінде міндетті.",
     ctaOrder: "Green Card рәсімдеу",
     carAlt: "Green Card полисі бар автомобиль",
     policyAlt: "Green Card полисінің үлгісі",

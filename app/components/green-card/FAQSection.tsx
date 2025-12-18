@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Script from "next/script";
 import type { GreenCardPageDictionary } from "@/dictionaries/greenCardPage";
 
 type Props = { dict: GreenCardPageDictionary["faq"] };
@@ -10,6 +11,26 @@ export default function FAQSection({ dict }: Props) {
 
   return (
     <section className="py-12 sm:py-16 bg-white">
+      <Script
+        id="faq-schema"
+        type="application/ld+json"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: dict.items.map((item) => ({
+              "@type": "Question",
+              name: item.question,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: item.answer,
+              },
+            })),
+          }),
+        }}
+      />
+
       <div className="max-w-4xl mx-auto px-4">
         <h2 className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center">
           {dict.title}
