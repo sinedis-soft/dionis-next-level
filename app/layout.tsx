@@ -2,7 +2,6 @@
 import type { ReactNode } from "react";
 import "./globals.css";
 import { Montserrat } from "next/font/google";
-
 import UtmCollector from "@/components/UtmCollector";
 
 const montserrat = Montserrat({
@@ -12,7 +11,7 @@ const montserrat = Montserrat({
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ru">
+    <html>
       <body className={`${montserrat.className} bg-[#F7F7F7] text-[#616161] m-0`}>
         <UtmCollector />
         {children}

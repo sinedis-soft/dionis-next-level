@@ -29,15 +29,11 @@ type Props = {
 
   /**
    * ВАЖНО ДЛЯ PERFORMANCE:
-   * Родитель (HomeClient) должен включать загрузку reCAPTCHA скрипта
+   * Родитель должен включать загрузку reCAPTCHA скрипта
    * только после взаимодействия (focus/submit).
    */
   onNeedRecaptcha?: () => void;
 
-  /**
-   * Можно не передавать — тогда возьмём из env.
-   * Но лучше передавать сверху (чтобы было явно и тестируемо).
-   */
   recaptchaSiteKey?: string;
 };
 
@@ -99,7 +95,10 @@ export default function ContactForm({
   const [formMessage, setFormMessage] = useState<string>("");
 
   const recaptchaSiteKey = useMemo(
-    () => recaptchaSiteKeyProp ?? process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "",
+    () =>
+      recaptchaSiteKeyProp ??
+      process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ??
+      "",
     [recaptchaSiteKeyProp]
   );
 
@@ -110,7 +109,6 @@ export default function ContactForm({
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name } = e.target;
-
       let nextValue: string | boolean;
 
       if (isCheckbox(e.target)) {
@@ -152,11 +150,11 @@ export default function ContactForm({
         let recaptchaToken: string | undefined;
 
         if (recaptchaSiteKey) {
-          // Если скрипт ещё не успел загрузиться — getRecaptchaToken бросит ошибку.
-          // Решение UX: либо показывать "секунду..." и ждать, либо разрешить отправку без токена.
-          // Для безопасности лучше НЕ отправлять без токена.
           try {
-            recaptchaToken = await getRecaptchaToken(recaptchaSiteKey, "contact");
+            recaptchaToken = await getRecaptchaToken(
+              recaptchaSiteKey,
+              "contact"
+            );
           } catch {
             const msg = t.contact.statusError;
             setFormStatus("error");
@@ -209,8 +207,19 @@ export default function ContactForm({
         onResult({ kind: "error", message: t.contact.statusError });
       }
     },
-    [formData, markNeedRecaptcha, onResult, recaptchaSiteKey, t.contact.statusError, t.contact.statusSuccess]
+    [
+      formData,
+      markNeedRecaptcha,
+      onResult,
+      recaptchaSiteKey,
+      t.contact.statusError,
+      t.contact.statusSuccess,
+    ]
   );
+
+  const statusId = "contact-form-status";
+  const hasError = formStatus === "error";
+  const hasSuccess = formStatus === "success";
 
   return (
     <div className="card w-full bg-white shadow-md rounded-2xl px-6 sm:px-8 py-6 sm:py-8">
@@ -221,80 +230,116 @@ export default function ContactForm({
         <p className="mt-1 text-sm text-gray-600">{t.contact.sectionSubtitle}</p>
       </div>
 
-      <form className="space-y-4" onSubmit={handleContactSubmit}>
-        <div className="hidden">
-          <label>
-            {t.contact.honeypotLabel}
-            <input
-              type="text"
-              name="website"
-              value={formData.website}
-              onChange={handleInputChange}
-              autoComplete="off"
-              onFocus={markNeedRecaptcha}
-            />
-          </label>
+      <form
+        className="space-y-4"
+        onSubmit={handleContactSubmit}
+        aria-describedby={formStatus !== "idle" ? statusId : undefined}
+      >
+        {/* Honeypot: скрываем от ассистивных технологий */}
+        <div className="hidden" aria-hidden="true">
+          <label htmlFor="website">{t.contact.honeypotLabel}</label>
+          <input
+            id="website"
+            type="text"
+            name="website"
+            value={formData.website}
+            onChange={handleInputChange}
+            autoComplete="off"
+            tabIndex={-1}
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="firstName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               {t.contact.fields.firstName}{" "}
-              <span className="text-red-500">{t.contact.requiredMark}</span>
+              <span className="text-red-500" aria-hidden="true">
+                {t.contact.requiredMark}
+              </span>
             </label>
             <input
+              id="firstName"
               type="text"
               name="firstName"
               value={formData.firstName}
               onChange={handleInputChange}
               onFocus={markNeedRecaptcha}
+              autoComplete="given-name"
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
               required
+              aria-required="true"
+              aria-invalid={hasError ? true : undefined}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="lastName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               {t.contact.fields.lastName}{" "}
-              <span className="text-red-500">{t.contact.requiredMark}</span>
+              <span className="text-red-500" aria-hidden="true">
+                {t.contact.requiredMark}
+              </span>
             </label>
             <input
+              id="lastName"
               type="text"
               name="lastName"
               value={formData.lastName}
               onChange={handleInputChange}
               onFocus={markNeedRecaptcha}
+              autoComplete="family-name"
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
               required
+              aria-required="true"
+              aria-invalid={hasError ? true : undefined}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             {t.contact.fields.email}{" "}
-            <span className="text-red-500">{t.contact.requiredMark}</span>
+            <span className="text-red-500" aria-hidden="true">
+              {t.contact.requiredMark}
+            </span>
           </label>
           <input
+            id="email"
+            inputMode="email"
+            autoComplete="email"
+            pattern="^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
             type="email"
             name="email"
             value={formData.email}
             onChange={handleInputChange}
             onFocus={markNeedRecaptcha}
-            inputMode="email"
-            autoComplete="email"
-            pattern="^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
             required
+            aria-required="true"
+            aria-invalid={hasError ? true : undefined}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="phone"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             {t.contact.fields.phone}{" "}
-            <span className="text-red-500">{t.contact.requiredMark}</span>
+            <span className="text-red-500" aria-hidden="true">
+              {t.contact.requiredMark}
+            </span>
           </label>
           <input
+            id="phone"
             type="tel"
             name="phone"
             value={formData.phone}
@@ -305,15 +350,23 @@ export default function ContactForm({
             placeholder="+7 777 1234567"
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
             required
+            aria-required="true"
+            aria-invalid={hasError ? true : undefined}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label
+            htmlFor="comment"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
             {t.contact.fields.comment}{" "}
-            <span className="text-red-500">{t.contact.requiredMark}</span>
+            <span className="text-red-500" aria-hidden="true">
+              {t.contact.requiredMark}
+            </span>
           </label>
           <textarea
+            id="comment"
             name="comment"
             rows={4}
             value={formData.comment}
@@ -321,6 +374,8 @@ export default function ContactForm({
             onFocus={markNeedRecaptcha}
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A] resize-y"
             required
+            aria-required="true"
+            aria-invalid={hasError ? true : undefined}
           />
         </div>
 
@@ -333,6 +388,8 @@ export default function ContactForm({
             onChange={handleInputChange}
             className="mt-0.5"
             required
+            aria-required="true"
+            aria-invalid={hasError ? true : undefined}
           />
           <label htmlFor="agree">
             {t.contact.agreePrefix}{" "}
@@ -340,20 +397,26 @@ export default function ContactForm({
               type="button"
               onClick={onOpenAgreement}
               className="text-[#C89F4A] underline underline-offset-2 hover:opacity-80"
+              aria-haspopup="dialog"
+              aria-label={`${t.contact.agreeLink} — ${agreement.title}`}
             >
               {t.contact.agreeLink}
             </button>
             {t.contact.agreeSuffix}
-            <span className="text-red-500"> {t.contact.requiredMark}</span>
+            <span className="text-red-500" aria-hidden="true">
+              {" "}
+              {t.contact.requiredMark}
+            </span>
           </label>
         </div>
 
         {formStatus !== "idle" && (
           <div
+            id={statusId}
+            role="status"
+            aria-live="polite"
             className={
-              formStatus === "success"
-                ? "text-sm text-green-700"
-                : "text-sm text-red-600"
+              hasSuccess ? "text-sm text-green-700" : "text-sm text-red-600"
             }
           >
             {formMessage}
@@ -371,10 +434,6 @@ export default function ContactForm({
               : t.contact.submitDefault}
           </button>
         </div>
-
-        {/* agreement используется в отдельной модалке, тут он не нужен напрямую,
-            но параметр оставляем, чтобы было видно, что словарь реально приходит */}
-        <input type="hidden" value={agreement.title} readOnly />
       </form>
     </div>
   );
