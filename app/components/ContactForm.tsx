@@ -3,12 +3,8 @@
 
 import type { HomeDictionary } from "@/dictionaries/home";
 import type { AgreementDictionary } from "@/dictionaries/agreement";
-import { useState } from "react";
-
-type Grecaptcha = {
-  ready: (cb: () => void) => void;
-  execute: (siteKey: string, options: { action: string }) => Promise<string>;
-};
+import { useCallback, useMemo, useState } from "react";
+import { getRecaptchaToken } from "@/lib/recaptcha";
 
 export type ContactFormResult = {
   kind: "success" | "error";
@@ -23,6 +19,26 @@ type FormData = {
   comment: string;
   agree: boolean;
   website: string; // honeypot
+};
+
+type Props = {
+  t: HomeDictionary;
+  agreement: AgreementDictionary;
+  onOpenAgreement: () => void;
+  onResult: (result: ContactFormResult) => void;
+
+  /**
+   * ВАЖНО ДЛЯ PERFORMANCE:
+   * Родитель (HomeClient) должен включать загрузку reCAPTCHA скрипта
+   * только после взаимодействия (focus/submit).
+   */
+  onNeedRecaptcha?: () => void;
+
+  /**
+   * Можно не передавать — тогда возьмём из env.
+   * Но лучше передавать сверху (чтобы было явно и тестируемо).
+   */
+  recaptchaSiteKey?: string;
 };
 
 const initialFormData: FormData = {
@@ -45,122 +61,156 @@ function formatEmail(raw: string): string {
   return raw.replace(/\s/g, "").replace(/[^a-zA-Z0-9@._\-+]/g, "");
 }
 
+function isCheckbox(
+  el: EventTarget
+): el is HTMLInputElement & { type: "checkbox" } {
+  return el instanceof HTMLInputElement && el.type === "checkbox";
+}
+
+function safeReadUtmFromLocalStorage(): Record<string, string> {
+  try {
+    const raw = localStorage.getItem("utm_data");
+    if (!raw) return {};
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+
+    const out: Record<string, string> = {};
+    for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
+      if (typeof v === "string") out[k] = v;
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
 export default function ContactForm({
   t,
   agreement,
   onOpenAgreement,
   onResult,
-}: {
-  t: HomeDictionary;
-  agreement: AgreementDictionary;
-  onOpenAgreement: () => void;
-  onResult: (result: ContactFormResult) => void;
-}) {
+  onNeedRecaptcha,
+  recaptchaSiteKey: recaptchaSiteKeyProp,
+}: Props) {
   const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [formStatus, setFormStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [formMessage, setFormMessage] = useState("");
+  const [formStatus, setFormStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+  const [formMessage, setFormMessage] = useState<string>("");
 
-  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  const recaptchaSiteKey = useMemo(
+    () => recaptchaSiteKeyProp ?? process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "",
+    [recaptchaSiteKeyProp]
+  );
 
-  function handleInputChange(
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) {
-    const target = e.target;
-    const { name, value } = target;
+  const markNeedRecaptcha = useCallback(() => {
+    onNeedRecaptcha?.();
+  }, [onNeedRecaptcha]);
 
-    let newValue: string | boolean = value;
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const { name } = e.target;
 
-    if (target instanceof HTMLInputElement && target.type === "checkbox") {
-      newValue = target.checked;
-    }
+      let nextValue: string | boolean;
 
-    if (name === "phone") newValue = formatPhone(String(value));
-    if (name === "email") newValue = formatEmail(String(value));
+      if (isCheckbox(e.target)) {
+        nextValue = e.target.checked;
+      } else {
+        nextValue = e.target.value;
+      }
 
-    setFormData((prev) => ({ ...prev, [name]: newValue as never }));
-  }
+      if (typeof nextValue === "string") {
+        if (name === "phone") nextValue = formatPhone(nextValue);
+        if (name === "email") nextValue = formatEmail(nextValue);
+      }
 
-  async function handleContactSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+      setFormData((prev) => ({ ...prev, [name]: nextValue } as FormData));
+    },
+    []
+  );
 
-    setFormStatus("loading");
-    setFormMessage("");
+  const handleContactSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
 
-    try {
-      // honeypot → бот, делаем вид, что всё ОК
-      if (formData.website && formData.website.trim() !== "") {
+      setFormStatus("loading");
+      setFormMessage("");
+
+      try {
+        // honeypot → бот, делаем вид, что всё ОК
+        if (formData.website.trim() !== "") {
+          setFormStatus("success");
+          setFormMessage(t.contact.statusSuccess);
+          setFormData(initialFormData);
+          onResult({ kind: "success", message: t.contact.statusSuccess });
+          return;
+        }
+
+        // Включаем загрузку reCAPTCHA (если она сделана лениво в родителе)
+        markNeedRecaptcha();
+
+        let recaptchaToken: string | undefined;
+
+        if (recaptchaSiteKey) {
+          // Если скрипт ещё не успел загрузиться — getRecaptchaToken бросит ошибку.
+          // Решение UX: либо показывать "секунду..." и ждать, либо разрешить отправку без токена.
+          // Для безопасности лучше НЕ отправлять без токена.
+          try {
+            recaptchaToken = await getRecaptchaToken(recaptchaSiteKey, "contact");
+          } catch {
+            const msg = t.contact.statusError;
+            setFormStatus("error");
+            setFormMessage(msg);
+            onResult({ kind: "error", message: msg });
+            return;
+          }
+        }
+
+        // UTM + адрес страницы
+        let utm: Record<string, string> = {};
+        let pageUrl: string | undefined;
+
+        if (typeof window !== "undefined") {
+          utm = safeReadUtmFromLocalStorage();
+          pageUrl = window.location.href;
+        }
+
+        const res = await fetch("/api/contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...formData,
+            recaptchaToken,
+            context: "site-contact",
+            utm,
+            pageUrl,
+          }),
+        });
+
+        const data: unknown = await res.json().catch(() => null);
+        const ok = Boolean((data as { ok?: boolean } | null)?.ok);
+        const message = (data as { message?: string } | null)?.message;
+
+        if (!res.ok || !ok) {
+          const msg = message || t.contact.statusError;
+          setFormStatus("error");
+          setFormMessage(msg);
+          onResult({ kind: "error", message: msg });
+          return;
+        }
+
         setFormStatus("success");
         setFormMessage(t.contact.statusSuccess);
         setFormData(initialFormData);
         onResult({ kind: "success", message: t.contact.statusSuccess });
-        return;
-      }
-
-      let recaptchaToken: string | undefined;
-
-      if (recaptchaSiteKey && typeof window !== "undefined") {
-        const grecaptcha = (window as Window & { grecaptcha?: Grecaptcha }).grecaptcha;
-
-        if (grecaptcha?.execute && grecaptcha?.ready) {
-          recaptchaToken = await new Promise<string>((resolve, reject) => {
-            grecaptcha.ready(() => {
-              grecaptcha
-                .execute(recaptchaSiteKey, { action: "contact" })
-                .then(resolve)
-                .catch(reject);
-            });
-          });
-        }
-      }
-
-      // UTM + адрес страницы
-      let utm: Record<string, string> = {};
-      let pageUrl: string | undefined;
-
-      if (typeof window !== "undefined") {
-        try {
-          utm = JSON.parse(localStorage.getItem("utm_data") || "{}");
-        } catch {
-          utm = {};
-        }
-        pageUrl = window.location.href;
-      }
-
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          recaptchaToken,
-          context: "site-contact",
-          utm,
-          pageUrl,
-        }),
-      });
-
-      const data: unknown = await res.json().catch(() => null);
-
-      const ok = Boolean((data as { ok?: boolean } | null)?.ok);
-      const message = (data as { message?: string } | null)?.message;
-
-      if (!res.ok || !ok) {
-        const msg = message || t.contact.statusError;
+      } catch {
         setFormStatus("error");
-        setFormMessage(msg);
-        onResult({ kind: "error", message: msg });
-        return;
+        setFormMessage(t.contact.statusError);
+        onResult({ kind: "error", message: t.contact.statusError });
       }
-
-      setFormStatus("success");
-      setFormMessage(t.contact.statusSuccess);
-      setFormData(initialFormData);
-      onResult({ kind: "success", message: t.contact.statusSuccess });
-    } catch {
-      setFormStatus("error");
-      setFormMessage(t.contact.statusError);
-      onResult({ kind: "error", message: t.contact.statusError });
-    }
-  }
+    },
+    [formData, markNeedRecaptcha, onResult, recaptchaSiteKey, t.contact.statusError, t.contact.statusSuccess]
+  );
 
   return (
     <div className="card w-full bg-white shadow-md rounded-2xl px-6 sm:px-8 py-6 sm:py-8">
@@ -181,6 +231,7 @@ export default function ContactForm({
               value={formData.website}
               onChange={handleInputChange}
               autoComplete="off"
+              onFocus={markNeedRecaptcha}
             />
           </label>
         </div>
@@ -196,6 +247,7 @@ export default function ContactForm({
               name="firstName"
               value={formData.firstName}
               onChange={handleInputChange}
+              onFocus={markNeedRecaptcha}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
               required
             />
@@ -211,6 +263,7 @@ export default function ContactForm({
               name="lastName"
               value={formData.lastName}
               onChange={handleInputChange}
+              onFocus={markNeedRecaptcha}
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
               required
             />
@@ -227,9 +280,10 @@ export default function ContactForm({
             name="email"
             value={formData.email}
             onChange={handleInputChange}
+            onFocus={markNeedRecaptcha}
             inputMode="email"
             autoComplete="email"
-            pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
+            pattern="^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
             required
           />
@@ -245,6 +299,7 @@ export default function ContactForm({
             name="phone"
             value={formData.phone}
             onChange={handleInputChange}
+            onFocus={markNeedRecaptcha}
             inputMode="tel"
             autoComplete="tel"
             placeholder="+7 777 1234567"
@@ -263,6 +318,7 @@ export default function ContactForm({
             rows={4}
             value={formData.comment}
             onChange={handleInputChange}
+            onFocus={markNeedRecaptcha}
             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A] resize-y"
             required
           />
@@ -293,19 +349,31 @@ export default function ContactForm({
         </div>
 
         {formStatus !== "idle" && (
-          <div className={formStatus === "success" ? "text-sm text-green-700" : "text-sm text-red-600"}>
+          <div
+            className={
+              formStatus === "success"
+                ? "text-sm text-green-700"
+                : "text-sm text-red-600"
+            }
+          >
             {formMessage}
           </div>
         )}
 
         <div className="pt-2">
-          <button type="submit" className="btn w-full" disabled={formStatus === "loading"}>
-            {formStatus === "loading" ? t.contact.submitLoading : t.contact.submitDefault}
+          <button
+            type="submit"
+            className="btn w-full"
+            disabled={formStatus === "loading"}
+          >
+            {formStatus === "loading"
+              ? t.contact.submitLoading
+              : t.contact.submitDefault}
           </button>
         </div>
 
         {/* agreement используется в отдельной модалке, тут он не нужен напрямую,
-            но параметр я оставил, чтобы было очевидно откуда берется текст */}
+            но параметр оставляем, чтобы было видно, что словарь реально приходит */}
         <input type="hidden" value={agreement.title} readOnly />
       </form>
     </div>

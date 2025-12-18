@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Script from "next/script";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 
 import type { Lang } from "@/dictionaries/header";
 import type { HomeDictionary } from "@/dictionaries/home";
@@ -15,6 +14,7 @@ import StatusModal from "@/components/StatusModal";
 import { BrokerSection } from "@/components/BrokerSection";
 
 import DeferredHydration from "@/components/DeferredHydration";
+import { RecaptchaLazy } from "@/components/RecaptchaLazy";
 
 type Props = {
   lang: Lang;
@@ -23,7 +23,16 @@ type Props = {
 };
 
 export default function HomeClient({ lang, t, agreement }: Props) {
-  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  const recaptchaSiteKey =
+    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "";
+
+  // reCAPTCHA НЕ грузим при заходе на страницу
+  const [recaptchaEnabled, setRecaptchaEnabled] = useState(false);
+
+  const enableRecaptcha = useCallback(() => {
+    // один раз включили — дальше пусть остаётся включённой
+    setRecaptchaEnabled(true);
+  }, []);
 
   const greenCardLink = `/${lang}/green-card`;
   const osagoLink = `/${lang}/osago-rf`;
@@ -53,10 +62,11 @@ export default function HomeClient({ lang, t, agreement }: Props) {
 
   return (
     <>
+      {/* reCAPTCHA скрипт появится ТОЛЬКО после взаимодействия с формой */}
       {recaptchaSiteKey && (
-        <Script
-          src={`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`}
-          strategy="afterInteractive"
+        <RecaptchaLazy
+          siteKey={recaptchaSiteKey}
+          enabled={recaptchaEnabled}
         />
       )}
 
@@ -90,12 +100,13 @@ export default function HomeClient({ lang, t, agreement }: Props) {
 
             <div className="flex justify-center lg:justify-end">
               <Image
-                src="/dionis-crkl.webp"
+                src="/dionis-crkl_2_960x960.webp"
                 alt={t.hero.heroAlt}
                 width={420}
                 height={420}
                 priority
-                sizes="(max-width: 640px) 60vw, (max-width: 1024px) 40vw, 420px"
+                fetchPriority="high"
+                sizes="(max-width: 640px) 224px, (max-width: 1024px) 288px, (max-width: 1280px) 420px, 480px"
                 className="hero-logo w-56 sm:w-72 lg:w-[420px] xl:w-[480px] h-auto drop-shadow-xl"
               />
             </div>
@@ -211,7 +222,10 @@ export default function HomeClient({ lang, t, agreement }: Props) {
           </section>
 
           {/* GREEN CARD STEPS */}
-          <section className="py-12 sm:py-16" aria-labelledby="green-card-steps-heading">
+          <section
+            className="py-12 sm:py-16"
+            aria-labelledby="green-card-steps-heading"
+          >
             <div className="max-w-5xl mx-auto px-4">
               <h2
                 id="green-card-steps-heading"
@@ -249,10 +263,16 @@ export default function HomeClient({ lang, t, agreement }: Props) {
           </section>
 
           {/* SERVICES */}
-          <section className="py-12 sm:py-16 bg-white" aria-labelledby="services-heading">
+          <section
+            className="py-12 sm:py-16 bg-white"
+            aria-labelledby="services-heading"
+          >
             <div className="max-w-6xl mx-auto px-4">
               <div className="mb-8">
-                <h2 id="services-heading" className="text-2xl sm:text-3xl font-bold tracking-tight">
+                <h2
+                  id="services-heading"
+                  className="text-2xl sm:text-3xl font-bold tracking-tight"
+                >
                   <span className="text-[#1A3A5F]">{t.services.titlePart1}</span>
                   <span className="text-[#C89F4A]">{t.services.titlePart2}</span>
                 </h2>
@@ -286,7 +306,9 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                       <span className="font-semibold text-[#FCD671]">
                         {t.services.greenCardCard.price}
                       </span>
-                      <span className="text-gray-300">{t.services.greenCardCard.term}</span>
+                      <span className="text-gray-300">
+                        {t.services.greenCardCard.term}
+                      </span>
                     </div>
                     <div className="mt-5">
                       <a href={greenCardLink} className="btn w-full" role="button">
@@ -322,7 +344,9 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                       <span className="font-semibold text-[#FCD671]">
                         {t.services.osagoCard.price}
                       </span>
-                      <span className="text-gray-300">{t.services.osagoCard.term}</span>
+                      <span className="text-gray-300">
+                        {t.services.osagoCard.term}
+                      </span>
                     </div>
                     <div className="mt-5">
                       <a href={osagoLink} className="btn w-full" role="button">
@@ -342,7 +366,10 @@ export default function HomeClient({ lang, t, agreement }: Props) {
           </section>
 
           {/* BROKER */}
-          <section className="py-12 sm:py-16 bg-[#F4F6FA]" aria-labelledby="about-broker-heading">
+          <section
+            className="py-12 sm:py-16 bg-[#F4F6FA]"
+            aria-labelledby="about-broker-heading"
+          >
             <div className="max-w-6xl mx-auto px-4">
               <BrokerSection broker={t.broker} />
             </div>
@@ -367,6 +394,8 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                   agreement={agreement}
                   onOpenAgreement={() => setIsAgreementOpen(true)}
                   onResult={handleFormResult}
+                  onNeedRecaptcha={enableRecaptcha}
+                  recaptchaSiteKey={recaptchaSiteKey}
                 />
               </div>
             </div>
