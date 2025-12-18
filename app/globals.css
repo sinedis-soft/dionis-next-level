@@ -1,9 +1,21 @@
 @import "tailwindcss";
 
-/* Базовые CSS-переменные */
+/* =========================
+   Базовые CSS-переменные
+   ========================= */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Бренд */
+  --brand-blue: #23376c;
+  --brand-gold: #c89f4a;        /* исходный "золотой" */
+  --brand-gold-ui: #ebca45;     /* золото для кнопок/фонов (у тебя уже используется) */
+  --font-text: var(--font-roboto);
+  --font-accent: var(--font-montserrat);
+
+  /* ВАЖНО: золото для ТЕКСТА на белом (должно быть темнее для контраста) */
+  --brand-gold-text: #8a6a2f;   /* проходит контраст на белом */
 }
 
 /* Тёмная тема */
@@ -26,7 +38,37 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-text), system-ui, -apple-system, sans-serif;
+}
+
+/* ВАЖНАЯ ИНФОРМАЦИЯ — Montserrat */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.btn,
+.gc-btn,
+.card-title,
+.important,
+.accent {
+  font-family: var(--font-accent), system-ui, sans-serif;
+}
+
+/* =========================================================
+   ACCESSIBILITY FIX:
+   text-[#C89F4A] на белом не проходит контраст → переопределяем
+   ========================================================= */
+
+/* Tailwind-класс text-[#C89F4A] превращается в .text-\[\#C89F4A\] */
+.text-\[\#C89F4A\] {
+  color: var(--brand-gold-text) !important;
+}
+
+/* Если где-то есть hover:text-[#C89F4A] — тоже на всякий случай */
+.hover\:text-\[\#C89F4A\]:hover {
+  color: var(--brand-gold-text) !important;
 }
 
 /* =========================
@@ -42,41 +84,33 @@ body {
   font-weight: 600;
   font-size: 0.95rem;
 
-  /* НОВЫЕ ЦВЕТА */
-  background-color: #ebca45;   /* gold */
-  color: #23376c;              /* dark blue */
+  background-color: var(--brand-gold-ui);
+  color: var(--brand-blue);
 
   border: none;
   text-decoration: none;
   cursor: pointer;
-  transition:
-    transform 0.18s ease,
-    background-color 0.18s ease,
-    box-shadow 0.18s ease;
+  transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
 
-/* Hover / focus */
 .btn:hover,
 .btn:focus-visible {
-  background-color: #f0d562; /* gold hover */
+  background-color: #f0d562;
   transform: scale(1.04);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
   outline: none;
 }
 
-/* Active */
 .btn:active {
   transform: scale(1.02);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
 }
 
-/* Focus outline */
 .btn:focus-visible {
   box-shadow: 0 0 0 3px rgba(235, 202, 69, 0.55);
 }
 
-/* Широкая кнопка */
 .btn-wide {
   width: 100%;
 }
@@ -95,164 +129,13 @@ body {
   background-color: #ffffff;
   border-radius: 0.75rem;
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-  transition:
-    box-shadow 0.18s ease,
-    transform 0.18s ease;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
 }
 
 .card:hover,
 .card:focus-within {
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
   transform: translateY(-2px);
-}
-
-/* =========================
-   Анимации HERO / директора
-   ========================= */
-
-/* Логотип HERO */
-.hero-logo {
-  opacity: 0;
-  transform: translateY(10px) scale(0.97);
-  animation: hero-logo-in 0.6s ease-out forwards;
-}
-
-@keyframes hero-logo-in {
-  0% {
-    opacity: 0;
-    transform: translateY(16px) scale(0.95);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Подпись директора */
-.director-signature-wrap {
-  position: relative;
-  margin-top: 1.5rem;
-  min-height: 70px;
-}
-
-.director-signature {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 140px;
-  opacity: 0;
-  transform: translateX(8px) translateY(8px) rotate(-2deg);
-  animation: director-signature-in 0.7s ease-out 0.4s forwards;
-}
-
-@media (min-width: 1024px) {
-  .director-signature {
-    width: 180px;
-  }
-}
-
-@keyframes director-signature-in {
-  0% {
-    opacity: 0;
-    transform: translateX(12px) translateY(12px) rotate(-4deg);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0) translateY(0) rotate(0);
-  }
-}
-
-/* Фото директора */
-.director-photo {
-  border-radius: 1.5rem;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
-  opacity: 0;
-  transform: translateX(-20px) translateY(40px) scale(0.96);
-  animation: director-photo-in 0.7s ease-out 0.2s forwards;
-}
-
-@keyframes director-photo-in {
-  0% {
-    opacity: 0;
-    transform: translateX(-20px) translateY(160px) scale(0.94);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(-20px) translateY(382px) scale(1);
-  }
-}
-
-/* Лого возле директора */
-.director-logo {
-  opacity: 0;
-  transform: translateX(-20px) translateY(40px) scale(0.96);
-  filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.2));
-  animation: director-logo-in 0.6s ease-out 0.1s forwards;
-}
-
-@keyframes director-logo-in {
-  0% {
-    opacity: 0;
-    transform: translateX(-20px) translateY(60px) scale(0.94);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(-120px) translateY(100px) scale(1);
-  }
-}
-
-/* =========================
-   HERO Зеленой карты
-   ========================= */
-
-.gc-hero-visual {
-  position: relative;
-}
-
-.gc-hero-policy {
-  position: absolute;
-  bottom: 0;
-  right: -1.5rem;
-  opacity: 0;
-  transform: translate(40px, 60px) rotate(-10deg) scale(0.9);
-  animation: gc-hero-policy-in 0.8s ease-out 0.25s forwards;
-}
-
-@keyframes gc-hero-policy-in {
-  0% {
-    opacity: 0;
-    transform: translate(80px, 100px) rotate(-16deg) scale(0.86);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(0, 0) rotate(-8deg) scale(1);
-  }
-}
-
-.gc-hero-logo-small {
-  position: absolute;
-  top: -3rem;
-  right: 0;
-  opacity: 0;
-  transform: translateY(10px) scale(0.9);
-  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.25));
-  animation: gc-hero-logo-small-in 0.7s ease-out 0.4s forwards;
-}
-
-@keyframes gc-hero-logo-small-in {
-  0% {
-    opacity: 0;
-    transform: translateY(18px) scale(0.9);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* FAQ */
-.gc-faq-item + .gc-faq-item {
-  border-top: 1px solid #e5e7eb;
 }
 
 /* =========================
@@ -273,13 +156,17 @@ body {
 .gc-calculator h3 {
   font-size: 28px;
   font-weight: 700;
-  color: #23376c;
-  margin: 1rem 3 1rem;
+  color: var(--brand-blue);
+
+  /* ❌ было: margin: 1rem 3 1rem; (невалидно)
+     ✅ стало: */
+  margin: 1rem 0 1rem;
+
   text-align: center;
 }
 
 .gc-calculator p {
-  margin: 0 0 2rem;        
+  margin: 0 0 2rem;
 }
 
 .gc-btn {
@@ -288,8 +175,8 @@ body {
   padding: 16px;
   font-size: 16px;
   font-weight: 700;
-  color: #23376c;
-  background-color: #ebca45;
+  color: var(--brand-blue);
+  background-color: var(--brand-gold-ui);
   border: none;
   border-radius: 6px;
   text-transform: uppercase;
@@ -310,7 +197,7 @@ body {
 
 .gc-row {
   display: grid;
-  grid-template-columns: 220px 1fr; /* Лейбл 220px, поле тянется */
+  grid-template-columns: 220px 1fr;
   align-items: center;
   gap: 12px;
   margin-bottom: 18px;
@@ -318,8 +205,8 @@ body {
 
 .gc-row label {
   font-weight: 600;
-  color: #23376c;
-  text-align: right; /* аккуратное выравнивание */
+  color: var(--brand-blue);
+  text-align: right;
 }
 
 .gc-row select,
@@ -336,6 +223,26 @@ body {
 .gc-row select:focus,
 .gc-row input:focus {
   outline: none;
-  border-color: #c89f4a;
+  border-color: var(--brand-gold);
   box-shadow: 0 0 0 2px rgba(200, 159, 74, 0.3);
+}
+
+/* Фото директора */
+.director-photo {
+  border-radius: 1.5rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  transform: translateX(-20px) translateY(40px) scale(0.96);
+  animation: director-photo-in 0.7s ease-out 0.2s forwards;
+}
+
+@keyframes director-photo-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px) translateY(160px) scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-20px) translateY(40px) scale(1);
+  }
 }

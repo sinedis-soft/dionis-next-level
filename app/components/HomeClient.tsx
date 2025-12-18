@@ -164,15 +164,15 @@ export default function HomeClient({ lang, t, agreement }: Props) {
           >
             <div className="max-w-6xl mx-auto px-4">
               <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-10 items-start relative">
-                <div className="hidden lg:block absolute -top-10 right-0">
+                <div className="hidden lg:block absolute -top-0 right-20">
                   {/* НЕ-LCP → quality=60 + sizes */}
                   <Image
                     src="/dionis-crkl.webp"
                     alt={t.director.logoAlt}
-                    width={220}
-                    height={220}
+                    width={300}
+                    height={300}
                     quality={60}
-                    sizes="220px"
+                    sizes="300px"
                     className="director-logo"
                   />
                 </div>
@@ -215,7 +215,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                   </div>
                 </article>
 
-                <div className="hidden lg:flex justify-center">
+                <div className="hidden lg:flex justify-center lg:mt-70">
                   {/* НЕ-LCP → quality=60 + sizes */}
                   <Image
                     src="/director-borovoy.webp"
