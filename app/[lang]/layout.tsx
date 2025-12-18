@@ -2,23 +2,25 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
-const HREFLANG: Record<Lang, string> = {
-  ru: "ru",
-  kz: "kk-KZ", // ВАЖНО: для SEO
-  en: "en",
-};
-
-const LANG_URL: Record<Lang, string> = {
-  ru: "/ru",
-  kz: "/kz",
-  en: "/en",
-};
-
 
 import Header from "@/components/Header";
 import SiteFooter from "@/components/SiteFooter";
 import CookieConsent from "@/components/CookieConsent";
 import AnalyticsManager from "@/components/AnalyticsManager";
+
+const SITE_URL = "https://dionis-insurance.com";
+
+const HREFLANG: Record<Lang, string> = {
+  ru: "ru",
+  kz: "kk-KZ", // SEO: казахский (Казахстан)
+  en: "en",
+};
+
+const LANG_PATH: Record<Lang, string> = {
+  ru: "/ru",
+  kz: "/kz",
+  en: "/en",
+};
 
 export const dynamicParams = false;
 
@@ -30,8 +32,11 @@ function normalizeLang(value: unknown): Lang {
   return value === "ru" || value === "kz" || value === "en" ? value : "ru";
 }
 
+function abs(path: string) {
+  return `${SITE_URL}${path}`;
+}
+
 function getSeo(lang: Lang) {
-  // Минимально. Потом можешь вынести в словари.
   if (lang === "ru") {
     return {
       title: "Dionis Insurance — страхование онлайн",
@@ -66,18 +71,21 @@ export async function generateMetadata({
   return {
     title: seo.title,
     description: seo.description,
+
+    // ✅ абсолютный canonical
     alternates: {
-      canonical: LANG_URL[lang],
+      canonical: abs(LANG_PATH[lang]),
+
+      // ✅ абсолютные hreflang
       languages: {
-        [HREFLANG.ru]: LANG_URL.ru,
-        [HREFLANG.kz]: LANG_URL.kz,
-        [HREFLANG.en]: LANG_URL.en,
-        "x-default": LANG_URL.ru,
+        [HREFLANG.ru]: abs(LANG_PATH.ru),
+        [HREFLANG.kz]: abs(LANG_PATH.kz),
+        [HREFLANG.en]: abs(LANG_PATH.en),
+        "x-default": abs(LANG_PATH.ru),
       },
     },
   };
 }
-
 
 export default async function LangLayout({
   children,

@@ -1,23 +1,18 @@
+// app/layout.tsx
+import type { ReactNode } from "react";
 import type { Metadata } from "next";
 
-const SITE_URL = "https://dionis-insurance.com";
+export const metadata: Metadata = {
+  title: {
+    default: "Dionis Insurance",
+    template: "%s — Dionis Insurance",
+  },
+};
 
-export function generateMetadata({
-  params,
-}: {
-  params: { lang: "ru" | "en" | "kz" };
-}): Metadata {
-  const { lang } = params;
-
-  return {
-    alternates: {
-      canonical: `${SITE_URL}/${lang}`,
-      languages: {
-        ru: `${SITE_URL}/ru`,
-        en: `${SITE_URL}/en`,
-        kk: `${SITE_URL}/kz`,
-        "x-default": `${SITE_URL}/ru`,
-      },
-    },
-  };
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return (
+    <html>
+      <body>{children}</body>
+    </html>
+  );
 }
