@@ -42,9 +42,10 @@ function langToIana(lang: Lang): string {
 export async function generateMetadata({
   params,
 }: {
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
-  const lang = normalizeLang(params.lang);
+  const { lang: rawLang } = await params; // ✅
+  const lang = normalizeLang(rawLang);
   const url = `${SITE_URL}/${lang}/green-card`;
 
   const titles: Record<Lang, string> = {
@@ -86,12 +87,14 @@ export async function generateMetadata({
   };
 }
 
+
 export default async function GreenCardPage({
   params,
 }: {
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }) {
-  const lang = normalizeLang(params.lang);
+  const { lang: rawLang } = await params; // ✅ ВАЖНО
+  const lang = normalizeLang(rawLang);
 
   const homeDict = getHomeDictionary(lang);
   const agreement = getAgreementDictionary(lang);
@@ -162,25 +165,27 @@ export default async function GreenCardPage({
                     width={620}
                     height={320}
                     sizes="(min-width: 1280px) 620px, (min-width: 1024px) 520px, 0px"
-                    className="absolute bottom-0 left-0 w-full h-auto"
+                    className="absolute bottom-0 left-0 w-full h-auto z-10 gc-anim-car"
                     priority
                   />
+
                   <Image
                     src="/green-card/policy-large_1.webp"
                     alt={gcPageDict.hero.policyAlt}
                     width={160}
                     height={160}
                     sizes="160px"
-                    className="gc-hero-policy"
+                    className="gc-hero-policy gc-anim-policy"
                     loading="lazy"
                   />
+
                   <Image
                     src="/dionis-crkl.webp"
                     alt={gcPageDict.hero.logoAlt}
                     width={110}
                     height={110}
                     sizes="110px"
-                    className="gc-hero-logo-small"
+                    className="gc-hero-logo-small gc-anim-logo"
                     loading="lazy"
                   />
                 </div>

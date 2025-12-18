@@ -246,3 +246,72 @@ h6,
     transform: translateX(-20px) translateY(40px) scale(1);
   }
 }
+
+
+
+/* --- policy: нижний левый угол фиксируем, поворот -28° --- */
+.gc-hero-policy {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  z-index: 20;
+
+  transform-origin: left bottom;
+  transform: rotate(-23deg) translateX(-50px) translateY(-55px);
+}
+
+/* --- logo позиция --- */
+.gc-hero-logo-small{
+  position: absolute;
+  right: 14px;
+  top: 12px;
+  z-index: 30;
+}
+
+/* 1) Машина: въезжает справа налево "из-за экрана" */
+.gc-anim-car{
+  animation: gcCarIn 1700ms cubic-bezier(.2,.8,.2,1) 0ms both;
+  will-change: transform, opacity;
+}
+
+@keyframes gcCarIn{
+  from { transform: translateX(120%); opacity: 1; }
+  to   { transform: translateX(0%);   opacity: 1; }
+}
+
+/* 2) Полис: появляется из центральной точки (fade + scale), но остаётся повернутым */
+.gc-anim-policy{
+  opacity: 0;
+  transform: rotate(-28deg) scale(0.2);
+  animation: gcPolicyPop 420ms cubic-bezier(.2,.9,.2,1) 720ms both;
+  will-change: transform, opacity;
+}
+
+@keyframes gcPolicyPop{
+  from { opacity: 0; transform: rotate(-28deg) scale(0.2); }
+  to   { opacity: 1; transform: rotate(-28deg) scale(1); }
+}
+
+/* 3) Лого: "растёт" (scale up) */
+.gc-anim-logo{
+  opacity: 0;
+  transform: scale(0.2);
+  animation: gcLogoGrow 520ms cubic-bezier(.2,.9,.2,1) 1160ms both;
+  will-change: transform, opacity;
+}
+
+@keyframes gcLogoGrow{
+  from { opacity: 0; transform: scale(0.2); }
+  70%  { opacity: 1; transform: scale(1.08); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Доступность: отключаем анимации при reduce motion */
+@media (prefers-reduced-motion: reduce){
+  .gc-anim-car, .gc-anim-policy, .gc-anim-logo{
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .gc-anim-policy{ transform: rotate(-28deg) !important; }
+}
