@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 
 import type { Lang } from "@/dictionaries/header";
 import type { HomeDictionary } from "@/dictionaries/home";
 import type { AgreementDictionary } from "@/dictionaries/agreement";
 
 import ServicesCarousel from "@/components/ServicesCarousel";
+import YandexPartnersLazy from "@/components/YandexPartnersLazy";
 import ContactForm, { type ContactFormResult } from "@/components/ContactForm";
 import AgreementModal from "@/components/AgreementModal";
 import StatusModal from "@/components/StatusModal";
@@ -22,16 +23,38 @@ type Props = {
   agreement: AgreementDictionary;
 };
 
+type ConsentValue = "accepted" | "rejected";
+const COOKIE_NAME = "dionis_cookie_consent_v1";
+
+function readConsentFromCookie(): ConsentValue | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(
+    new RegExp(`${COOKIE_NAME}=(accepted|rejected)`)
+  );
+  return match ? (match[1] as ConsentValue) : null;
+}
+
 export default function HomeClient({ lang, t, agreement }: Props) {
-  const recaptchaSiteKey =
-    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "";
+  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "";
 
   // reCAPTCHA НЕ грузим при заходе на страницу
   const [recaptchaEnabled, setRecaptchaEnabled] = useState(false);
+  const enableRecaptcha = useCallback(() => setRecaptchaEnabled(true), []);
 
-  const enableRecaptcha = useCallback(() => {
-    // один раз включили — дальше пусть остаётся включённой
-    setRecaptchaEnabled(true);
+  // Yandex scripts: только после consent (accepted)
+  const [adsEnabled, setAdsEnabled] = useState(false);
+
+  useEffect(() => {
+    const sync = () => {
+      const consent = readConsentFromCookie();
+      setAdsEnabled(consent === "accepted");
+    };
+
+    sync();
+
+    const onChange = () => sync();
+    window.addEventListener("cookie-consent-changed", onChange);
+    return () => window.removeEventListener("cookie-consent-changed", onChange);
   }, []);
 
   const greenCardLink = `/${lang}/green-card`;
@@ -63,12 +86,12 @@ export default function HomeClient({ lang, t, agreement }: Props) {
   return (
     <>
       {/* reCAPTCHA скрипт появится ТОЛЬКО после взаимодействия с формой */}
-      {recaptchaSiteKey && (
-        <RecaptchaLazy
-          siteKey={recaptchaSiteKey}
-          enabled={recaptchaEnabled}
-        />
-      )}
+      {recaptchaSiteKey ? (
+        <RecaptchaLazy siteKey={recaptchaSiteKey} enabled={recaptchaEnabled} />
+      ) : null}
+
+      {/* Яндекс Ads/partner-code-bundles: только после cookie consent + после idle */}
+      <YandexPartnersLazy enabled={adsEnabled} afterIdle />
 
       <main className="min-h-screen bg-white">
         {/* HERO (первый экран) — грузится сразу */}

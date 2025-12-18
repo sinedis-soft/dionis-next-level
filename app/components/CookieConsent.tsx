@@ -1,15 +1,16 @@
 "use client";
 
+import Script from "next/script";
 import { useEffect, useState } from "react";
-import type { Lang } from "@/dictionaries/header";
-import { getCookieDictionary } from "@/dictionaries/cookies";
 
-export type ConsentValue = "accepted" | "rejected";
+type ConsentValue = "accepted" | "rejected";
 const COOKIE_NAME = "dionis_cookie_consent_v1";
 
 type Props = {
-  lang: Lang;
+  afterIdle?: boolean;
 };
+
+type IdleHandle = number;
 
 function readConsent(): ConsentValue | null {
   if (typeof document === "undefined") return null;
@@ -19,168 +20,79 @@ function readConsent(): ConsentValue | null {
   return match ? (match[1] as ConsentValue) : null;
 }
 
-function writeConsent(value: ConsentValue) {
-  const maxAge = 60 * 60 * 24 * 365; // 1 год
-  document.cookie = `${COOKIE_NAME}=${value}; path=/; max-age=${maxAge}; SameSite=Lax`;
+function hasScript(id: string): boolean {
+  if (typeof document === "undefined") return false;
+  return document.getElementById(id) !== null;
 }
 
-export default function CookieConsent({ lang }: Props) {
-  const t = getCookieDictionary(lang);
+function runWhenIdle(cb: () => void, timeoutMs = 2500): () => void {
+  if (typeof window === "undefined") return () => {};
 
-  const [consent, setConsent] = useState<ConsentValue | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
-
-  const isAccepted = consent === "accepted";
-  const isRejected = consent === "rejected";
-
-  useEffect(() => {
-    const stored = readConsent();
-    if (!stored) {
-      setIsOpen(true);
-    } else {
-      setConsent(stored);
-    }
-  }, []);
-
-  const handleChoice = (value: ConsentValue) => {
-    writeConsent(value);
-    setConsent(value);
-    setIsOpen(false);
-
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new Event("cookie-consent-changed"));
-    }
+  const w = window as Window & {
+    requestIdleCallback?: (
+      callback: () => void,
+      options?: { timeout: number }
+    ) => IdleHandle;
+    cancelIdleCallback?: (handle: IdleHandle) => void;
   };
 
-  // мини-статус рядом с кнопкой (чтобы consent реально использовался)
-  const statusLabel =
-    consent === "accepted" ? "✓" : consent === "rejected" ? "✕" : "";
+  if (typeof w.requestIdleCallback === "function") {
+    const handle = w.requestIdleCallback(cb, { timeout: timeoutMs });
+    return () => {
+      if (typeof w.cancelIdleCallback === "function") w.cancelIdleCallback(handle);
+    };
+  }
+
+  const t = window.setTimeout(cb, Math.min(timeoutMs, 1500));
+  return () => window.clearTimeout(t);
+}
+
+const YANDEX_BUNDLE_SRC = "PUT_REAL_YANDEX_URL_HERE";
+
+export default function YandexPartnersLazy({ afterIdle = true }: Props) {
+  const [enabled, setEnabled] = useState(false);
+  const [renderScripts, setRenderScripts] = useState(false);
+
+  // 1) читаем consent на старте + слушаем изменения
+  useEffect(() => {
+    const sync = () => setEnabled(readConsent() === "accepted");
+    sync();
+
+    const onChange = () => sync();
+    window.addEventListener("cookie-consent-changed", onChange);
+    return () => window.removeEventListener("cookie-consent-changed", onChange);
+  }, []);
+
+  // 2) после consent → ждём idle → только потом вставляем скрипт
+  useEffect(() => {
+    if (!enabled) {
+      setRenderScripts(false);
+      return;
+    }
+
+    // уже вставляли — не дублируем
+    if (hasScript("yandex-partners-bundle")) {
+      setRenderScripts(false);
+      return;
+    }
+
+    if (!afterIdle) {
+      setRenderScripts(true);
+      return;
+    }
+
+    const cancel = runWhenIdle(() => setRenderScripts(true), 2500);
+    return cancel;
+  }, [enabled, afterIdle]);
+
+  if (!enabled) return null;
+  if (!renderScripts) return null;
 
   return (
-    <>
-      {/* Кнопка «печенька» доступна всегда */}
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 left-4 z-40 rounded-full bg-[#0f2238] text-white text-xs px-4 py-2 shadow-lg hover:bg-[#123056]"
-        aria-label={t.manageBtn}
-      >
-        {t.manageBtn} {statusLabel}
-      </button>
-
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8">
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div>
-                <div className="text-sm font-semibold text-[#1A3A5F]">
-                  {t.modalTitle}
-                </div>
-                <h2 className="text-2xl font-semibold mt-1">{t.introTitle}</h2>
-
-                {/* Показываем текущий выбор (используем consent) */}
-                <div className="mt-2 text-xs text-gray-600">
-                  {consent === "accepted"
-                    ? "Статус: принято"
-                    : consent === "rejected"
-                      ? "Статус: отклонено"
-                      : "Статус: не выбрано"}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className="text-gray-400 hover:text-gray-600"
-                onClick={() => setIsOpen(false)}
-                aria-label="Закрыть"
-              >
-                ✕
-              </button>
-            </div>
-
-            <p className="text-sm text-gray-700 mb-2">{t.introP1}</p>
-            <p className="text-sm text-gray-700 mb-6">{t.introP2}</p>
-
-            <h3 className="text-lg font-semibold text-[#1A3A5F] mb-2">
-              {t.settingsTitle}
-            </h3>
-            <p className="text-sm text-gray-700 mb-4">
-              {t.settingsDescription}
-            </p>
-
-            {/* Аналитика и реклама */}
-            <div className="mt-4">
-              <h4 className="text-base font-semibold text-[#1A3A5F]">
-                {t.analyticsTitle}
-              </h4>
-              <p className="text-sm text-gray-700 mb-2">
-                {t.analyticsDescription}
-              </p>
-
-              <ul className="mt-2 space-y-3 text-sm text-gray-700">
-                {t.analyticsServices.map((s) => (
-                  <li key={s.key}>
-                    <span className="font-semibold">{s.name}.</span>{" "}
-                    {s.description}{" "}
-                    {s.moreHref && s.moreLabel && (
-                      <a
-                        href={s.moreHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#1A3A5F] underline underline-offset-2"
-                      >
-                        {s.moreLabel}
-                      </a>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Технические cookie */}
-            <div className="mt-6">
-              <h4 className="text-base font-semibold text-[#1A3A5F]">
-                {t.technicalTitle}
-              </h4>
-              <p className="text-sm text-gray-700 mb-2">
-                {t.technicalDescription}
-              </p>
-
-              <ul className="mt-2 space-y-3 text-sm text-gray-700">
-                {t.technicalServices.map((s) => (
-                  <li key={s.key}>
-                    <span className="font-semibold">{s.name}.</span>{" "}
-                    {s.description}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Кнопки */}
-            <div className="mt-8 flex flex-col sm:flex-row justify-end gap-2">
-              <button
-                type="button"
-                className="px-4 py-2 rounded-md border text-xs sm:text-sm hover:bg-gray-100 disabled:opacity-60 disabled:hover:bg-transparent"
-                onClick={() => handleChoice("rejected")}
-                disabled={isRejected}
-                aria-disabled={isRejected}
-              >
-                {t.rejectAllBtn}
-              </button>
-
-              <button
-                type="button"
-                className="px-4 py-2 rounded-md bg-[#C89F4A] text-white text-xs sm:text-sm rounded-lg hover:opacity-90 disabled:opacity-60 disabled:hover:opacity-60"
-                onClick={() => handleChoice("accepted")}
-                disabled={isAccepted}
-                aria-disabled={isAccepted}
-              >
-                {t.acceptAllBtn}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+    <Script
+      id="yandex-partners-bundle"
+      src={YANDEX_BUNDLE_SRC}
+      strategy="lazyOnload"
+    />
   );
 }
