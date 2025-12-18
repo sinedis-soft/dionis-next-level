@@ -23,7 +23,6 @@ type Props = {
 };
 
 export default function HomeClient({ lang, t, agreement }: Props) {
-  // reCAPTCHA site key
   const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "";
 
   // reCAPTCHA НЕ грузим при заходе на страницу
@@ -67,8 +66,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
         ВАЖНО:
         Yandex partner-bundle НЕ грузим на главной вообще.
         Даже после consent. Иначе метрики будут плавать.
-        Если нужно — подключай его на конкретных страницах (например /products)
-        или через отдельный флаг.
+        Если нужно — подключай на конкретных страницах.
       */}
 
       <main className="min-h-screen bg-white">
@@ -100,6 +98,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
             </div>
 
             <div className="flex justify-center lg:justify-end">
+              {/* LCP-картинка: quality НЕ занижаем */}
               <Image
                 src="/dionis-crkl_2_960x960.webp"
                 alt={t.hero.heroAlt}
@@ -166,11 +165,14 @@ export default function HomeClient({ lang, t, agreement }: Props) {
             <div className="max-w-6xl mx-auto px-4">
               <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-10 items-start relative">
                 <div className="hidden lg:block absolute -top-10 right-0">
+                  {/* НЕ-LCP → quality=60 + sizes */}
                   <Image
                     src="/dionis-crkl.webp"
                     alt={t.director.logoAlt}
                     width={220}
                     height={220}
+                    quality={60}
+                    sizes="220px"
                     className="director-logo"
                   />
                 </div>
@@ -199,22 +201,30 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                   </div>
 
                   <div className="director-signature-wrap">
+                    {/* НЕ-LCP → quality=60 + sizes */}
                     <Image
                       src="/director-signature.webp"
                       alt={t.director.signatureAlt}
                       width={200}
                       height={120}
+                      quality={60}
+                      loading="lazy"
+                      sizes="(max-width: 640px) 140px, 200px"
                       className="director-signature"
                     />
                   </div>
                 </article>
 
                 <div className="hidden lg:flex justify-center">
+                  {/* НЕ-LCP → quality=60 + sizes */}
                   <Image
                     src="/director-borovoy.webp"
                     alt={t.director.photoAlt}
                     width={360}
                     height={520}
+                    quality={60}
+                    loading="lazy"
+                    sizes="(max-width: 1024px) 0px, 360px"
                     className="director-photo"
                   />
                 </div>
@@ -223,7 +233,10 @@ export default function HomeClient({ lang, t, agreement }: Props) {
           </section>
 
           {/* GREEN CARD STEPS */}
-          <section className="py-12 sm:py-16" aria-labelledby="green-card-steps-heading">
+          <section
+            className="py-12 sm:py-16"
+            aria-labelledby="green-card-steps-heading"
+          >
             <div className="max-w-5xl mx-auto px-4">
               <h2
                 id="green-card-steps-heading"
@@ -261,10 +274,16 @@ export default function HomeClient({ lang, t, agreement }: Props) {
           </section>
 
           {/* SERVICES */}
-          <section className="py-12 sm:py-16 bg-white" aria-labelledby="services-heading">
+          <section
+            className="py-12 sm:py-16 bg-white"
+            aria-labelledby="services-heading"
+          >
             <div className="max-w-6xl mx-auto px-4">
               <div className="mb-8">
-                <h2 id="services-heading" className="text-2xl sm:text-3xl font-bold tracking-tight">
+                <h2
+                  id="services-heading"
+                  className="text-2xl sm:text-3xl font-bold tracking-tight"
+                >
                   <span className="text-[#1A3A5F]">{t.services.titlePart1}</span>
                   <span className="text-[#C89F4A]">{t.services.titlePart2}</span>
                 </h2>
@@ -274,11 +293,15 @@ export default function HomeClient({ lang, t, agreement }: Props) {
               <div className="grid gap-6 lg:grid-cols-2 mb-10">
                 <article className="card overflow-hidden flex flex-col md:flex-row">
                   <div className="md:w-1/2">
+                    {/* НЕ-LCP → quality=60 + sizes */}
                     <Image
                       src="/services/zk_photo.webp"
                       alt={t.services.greenCardCard.imageAlt}
                       width={600}
                       height={400}
+                      quality={60}
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 600px"
                       className="h-56 md:h-full w-full object-cover"
                     />
                   </div>
@@ -310,11 +333,15 @@ export default function HomeClient({ lang, t, agreement }: Props) {
 
                 <article className="card overflow-hidden flex flex-col md:flex-row">
                   <div className="md:w-1/2">
+                    {/* НЕ-LCP → quality=60 + sizes */}
                     <Image
                       src="/services/osago_rf_photo.webp"
                       alt={t.services.osagoCard.imageAlt}
                       width={600}
                       height={400}
+                      quality={60}
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 600px"
                       className="h-56 md:h-full w-full object-cover"
                     />
                   </div>
@@ -354,7 +381,10 @@ export default function HomeClient({ lang, t, agreement }: Props) {
           </section>
 
           {/* BROKER */}
-          <section className="py-12 sm:py-16 bg-[#F4F6FA]" aria-labelledby="about-broker-heading">
+          <section
+            className="py-12 sm:py-16 bg-[#F4F6FA]"
+            aria-labelledby="about-broker-heading"
+          >
             <div className="max-w-6xl mx-auto px-4">
               <BrokerSection broker={t.broker} />
             </div>
@@ -365,11 +395,15 @@ export default function HomeClient({ lang, t, agreement }: Props) {
             <div className="max-w-6xl mx-auto px-4">
               <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-10 items-start">
                 <div className="flex flex-col justify-end items-center lg:items-center h-full">
+                  {/* НЕ-LCP → quality=60 + sizes */}
                   <Image
                     src="/director-borovoy.webp"
                     alt={t.contact.photoAlt}
                     width={500}
                     height={900}
+                    quality={60}
+                    loading="lazy"
+                    sizes="(max-width: 640px) 288px, (max-width: 1024px) 320px, 384px"
                     className="w-72 sm:w-80 lg:w-96 h-auto object-contain"
                   />
                 </div>
