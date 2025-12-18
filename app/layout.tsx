@@ -1,21 +1,23 @@
-// app/layout.tsx
-import type { ReactNode } from "react";
-import "./globals.css";
-import { Montserrat } from "next/font/google";
-import UtmCollector from "@/components/UtmCollector";
+import type { Metadata } from "next";
 
-const montserrat = Montserrat({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600", "700"],
-});
+const SITE_URL = "https://dionis-insurance.com";
 
-export default function RootLayout({ children }: { children: ReactNode }) {
-  return (
-    <html>
-      <body className={`${montserrat.className} bg-[#F7F7F7] text-[#616161] m-0`}>
-        <UtmCollector />
-        {children}
-      </body>
-    </html>
-  );
+export function generateMetadata({
+  params,
+}: {
+  params: { lang: "ru" | "en" | "kz" };
+}): Metadata {
+  const { lang } = params;
+
+  return {
+    alternates: {
+      canonical: `${SITE_URL}/${lang}`,
+      languages: {
+        ru: `${SITE_URL}/ru`,
+        en: `${SITE_URL}/en`,
+        kk: `${SITE_URL}/kz`,
+        "x-default": `${SITE_URL}/ru`,
+      },
+    },
+  };
 }
