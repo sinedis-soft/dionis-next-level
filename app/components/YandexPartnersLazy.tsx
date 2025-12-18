@@ -1,17 +1,21 @@
-// app/components/YandexPartnersLazy.tsx
 "use client";
 
 import Script from "next/script";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Props = {
-  enabled: boolean;          // включаем только после consent
-  afterIdle?: boolean;       // дополнительно ждать idle
+  enabled: boolean;    // только после consent === accepted
+  afterIdle?: boolean; // дополнительно ждать idle
 };
 
 type IdleHandle = number;
 
-function runWhenIdle(cb: () => void, timeoutMs = 2000): () => void {
+function hasScript(id: string): boolean {
+  if (typeof document === "undefined") return false;
+  return document.getElementById(id) !== null;
+}
+
+function runWhenIdle(cb: () => void, timeoutMs = 2500): () => void {
   if (typeof window === "undefined") return () => {};
 
   const w = window as Window & {
@@ -33,46 +37,51 @@ function runWhenIdle(cb: () => void, timeoutMs = 2000): () => void {
   return () => window.clearTimeout(t);
 }
 
-function hasScript(id: string): boolean {
-  if (typeof document === "undefined") return false;
-  return document.getElementById(id) !== null;
-}
+const SCRIPT_ID = "yandex-partners";
+const SCRIPT_SRC = "https://yastatic.net/partner-code-bundles/partner-code-bundles.js";
 
 export default function YandexPartnersLazy({ enabled, afterIdle = true }: Props) {
-  const [renderScripts, setRenderScripts] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  // чтобы не планировать idle дважды
+  const scheduledRef = useRef(false);
 
   useEffect(() => {
-    if (!enabled) return;
-
-    // уже вставляли — не дублируем
-    if (hasScript("yandex-partners")) {
-      setRenderScripts(false);
+    // consent не принят → ничего не грузим и сбрасываем локальное состояние
+    if (!enabled) {
+      scheduledRef.current = false;
+      setShouldRender(false);
       return;
     }
 
+    // если скрипт уже в DOM — мы НЕ рендерим <Script> повторно
+    if (hasScript(SCRIPT_ID)) {
+      scheduledRef.current = true; // считаем “уже сделано”
+      setShouldRender(false);
+      return;
+    }
+
+    // не ждать idle
     if (!afterIdle) {
-      setRenderScripts(true);
+      setShouldRender(true);
       return;
     }
 
-    const cancel = runWhenIdle(() => setRenderScripts(true), 2500);
+    // ждать idle (и не ставить повторно)
+    if (scheduledRef.current) return;
+    scheduledRef.current = true;
+
+    const cancel = runWhenIdle(() => setShouldRender(true), 2500);
     return cancel;
   }, [enabled, afterIdle]);
 
   if (!enabled) return null;
-  if (!renderScripts) return null;
+  if (!shouldRender) return null;
 
   return (
     <>
-      {/* Пример: основной партнёрский бандл / загрузчик */}
-      <Script
-        id="yandex-partners"
-        src="https://yastatic.net/partner-code-bundles/partner-code-bundles.js"
-        strategy="lazyOnload"
-      />
-
-      {/* Если у тебя несколько скриптов — добавляй их сюда отдельными Script с уникальными id */}
-      {/* <Script id="yandex-ads-2" src="..." strategy="lazyOnload" /> */}
+      <Script id={SCRIPT_ID} src={SCRIPT_SRC} strategy="lazyOnload" />
+      {/* добавляй остальные скрипты сюда, если нужно */}
     </>
   );
 }
