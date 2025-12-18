@@ -1,4 +1,6 @@
 // app/[lang]/page.tsx
+export const dynamic = "force-dynamic";
+export const revalidate = 60;
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
 import { getHomeDictionary, type HomeDictionary } from "@/dictionaries/home";
