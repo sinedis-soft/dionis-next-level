@@ -100,16 +100,24 @@ function formatEmail(raw: string): string {
 
 type ContactApiResponse = { ok: boolean; message?: string };
 
-export default function GreenCardQuestionForm({ homeContact, agreement, dict }: Props) {
+export default function GreenCardQuestionForm({
+  homeContact,
+  agreement,
+  dict,
+}: Props) {
   const [formData, setFormData] = useState<ContactFormData>(initialData);
-  const [formStatus, setFormStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [formStatus, setFormStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [formMessage, setFormMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAgreementOpen, setIsAgreementOpen] = useState(false);
 
   const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
-  function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+  function handleChange(
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) {
     const target = e.target;
     const name = target.name as keyof ContactFormData;
 
@@ -147,29 +155,36 @@ export default function GreenCardQuestionForm({ homeContact, agreement, dict }: 
       let recaptchaToken: string | undefined;
       const isProd = process.env.NODE_ENV === "production";
 
-      if (isProd && recaptchaSiteKey) {
+      if (isProd && recaptchaSiteKey && typeof window !== "undefined") {
         const grecaptcha = window.grecaptcha;
         if (grecaptcha?.execute && grecaptcha?.ready) {
           recaptchaToken = await new Promise<string>((resolve, reject) => {
             grecaptcha.ready(() => {
-              grecaptcha.execute(recaptchaSiteKey, { action: "contact" }).then(resolve).catch(reject);
+              grecaptcha
+                .execute(recaptchaSiteKey, { action: "contact" })
+                .then(resolve)
+                .catch(reject);
             });
           });
         }
       }
 
+      // UTM + URL страницы (только в браузере)
       let utm: Record<string, string> = {};
-      let pageUrl: string | undefined;
-
-      try {
-        const raw = localStorage.getItem("utm_data");
-        const parsed = raw ? (JSON.parse(raw) as unknown) : {};
-        if (parsed && typeof parsed === "object") utm = parsed as Record<string, string>;
-      } catch {
-        utm = {};
+      if (typeof window !== "undefined") {
+        try {
+          const raw = localStorage.getItem("utm_data");
+          const parsed = raw ? (JSON.parse(raw) as unknown) : {};
+          if (parsed && typeof parsed === "object") {
+            utm = parsed as Record<string, string>;
+          }
+        } catch {
+          utm = {};
+        }
       }
 
-      pageUrl = window.location.href;
+      const pageUrl =
+        typeof window !== "undefined" ? window.location.href : undefined;
 
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -183,7 +198,9 @@ export default function GreenCardQuestionForm({ homeContact, agreement, dict }: 
         }),
       });
 
-      const data = (await res.json().catch(() => null)) as ContactApiResponse | null;
+      const data = (await res.json().catch(() => null)) as
+        | ContactApiResponse
+        | null;
 
       if (!res.ok || !data?.ok) {
         setFormStatus("error");
@@ -215,7 +232,9 @@ export default function GreenCardQuestionForm({ homeContact, agreement, dict }: 
 
       <div className="card w-full bg-white rounded-2xl px-6 sm:px-8 py-6 sm:py-8">
         <div className="mb-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-[#1A3A5F]">{dict.title}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-[#1A3A5F]">
+            {dict.title}
+          </h2>
           <p className="mt-1 text-sm text-gray-600">{dict.text1}</p>
           <p className="mt-3 text-xs text-gray-500">{dict.text2}</p>
         </div>
@@ -278,7 +297,7 @@ export default function GreenCardQuestionForm({ homeContact, agreement, dict }: 
               onChange={handleChange}
               inputMode="email"
               autoComplete="email"
-              pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+              pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
               className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
               required
             />
@@ -342,14 +361,26 @@ export default function GreenCardQuestionForm({ homeContact, agreement, dict }: 
           </div>
 
           {formStatus !== "idle" && (
-            <div className={formStatus === "success" ? "text-sm text-green-700" : "text-sm text-red-600"}>
+            <div
+              className={
+                formStatus === "success"
+                  ? "text-sm text-green-700"
+                  : "text-sm text-red-600"
+              }
+            >
               {formMessage}
             </div>
           )}
 
           <div className="pt-2">
-            <button type="submit" className="btn w-full" disabled={formStatus === "loading"}>
-              {formStatus === "loading" ? homeContact.submitLoading : homeContact.submitDefault}
+            <button
+              type="submit"
+              className="btn w-full"
+              disabled={formStatus === "loading"}
+            >
+              {formStatus === "loading"
+                ? homeContact.submitLoading
+                : homeContact.submitDefault}
             </button>
           </div>
         </form>
@@ -360,10 +391,16 @@ export default function GreenCardQuestionForm({ homeContact, agreement, dict }: 
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
             <h3 className="text-lg font-semibold text-[#1A3A5F] mb-3">
-              {formStatus === "success" ? homeContact.modalSuccessTitle : homeContact.modalErrorTitle}
+              {formStatus === "success"
+                ? homeContact.modalSuccessTitle
+                : homeContact.modalErrorTitle}
             </h3>
             <p className="text-sm text-gray-700 mb-5">{formMessage}</p>
-            <button type="button" className="btn w-full" onClick={() => setIsModalOpen(false)}>
+            <button
+              type="button"
+              className="btn w-full"
+              onClick={() => setIsModalOpen(false)}
+            >
               {homeContact.modalClose}
             </button>
           </div>
@@ -374,7 +411,9 @@ export default function GreenCardQuestionForm({ homeContact, agreement, dict }: 
       {isAgreementOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full p-6 max-h-[85vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-[#1A3A5F] mb-4">{agreement.title}</h3>
+            <h3 className="text-lg font-bold text-[#1A3A5F] mb-4">
+              {agreement.title}
+            </h3>
 
             <div className="text-sm text-gray-700 space-y-4">
               <p>{agreement.intro1}</p>
@@ -399,7 +438,9 @@ export default function GreenCardQuestionForm({ homeContact, agreement, dict }: 
 
               <p>{agreement.consentText}</p>
 
-              <h4 className="font-semibold text-[#1A3A5F] mt-4">{agreement.contactsTitle}</h4>
+              <h4 className="font-semibold text-[#1A3A5F] mt-4">
+                {agreement.contactsTitle}
+              </h4>
               <ul className="list-disc pl-6 space-y-1">
                 {agreement.contactsList.map((item) => (
                   <li key={item}>{item}</li>
