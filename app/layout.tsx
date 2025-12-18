@@ -1,4 +1,5 @@
 // app/layout.tsx
+import "./globals.css";
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
 
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html>
+    <html lang="ru">
       <body>{children}</body>
     </html>
   );
