@@ -1,14 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState, useCallback, useEffect } from "react";
+import { useMemo, useState, useCallback } from "react";
 
 import type { Lang } from "@/dictionaries/header";
 import type { HomeDictionary } from "@/dictionaries/home";
 import type { AgreementDictionary } from "@/dictionaries/agreement";
 
 import ServicesCarousel from "@/components/ServicesCarousel";
-import YandexPartnersLazy from "@/components/YandexPartnersLazy";
 import ContactForm, { type ContactFormResult } from "@/components/ContactForm";
 import AgreementModal from "@/components/AgreementModal";
 import StatusModal from "@/components/StatusModal";
@@ -23,39 +22,13 @@ type Props = {
   agreement: AgreementDictionary;
 };
 
-type ConsentValue = "accepted" | "rejected";
-const COOKIE_NAME = "dionis_cookie_consent_v1";
-
-function readConsentFromCookie(): ConsentValue | null {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(
-    new RegExp(`${COOKIE_NAME}=(accepted|rejected)`)
-  );
-  return match ? (match[1] as ConsentValue) : null;
-}
-
 export default function HomeClient({ lang, t, agreement }: Props) {
+  // reCAPTCHA site key
   const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "";
 
   // reCAPTCHA НЕ грузим при заходе на страницу
   const [recaptchaEnabled, setRecaptchaEnabled] = useState(false);
   const enableRecaptcha = useCallback(() => setRecaptchaEnabled(true), []);
-
-  // Yandex scripts: только после consent (accepted)
-  const [adsEnabled, setAdsEnabled] = useState(false);
-
-  useEffect(() => {
-    const sync = () => {
-      const consent = readConsentFromCookie();
-      setAdsEnabled(consent === "accepted");
-    };
-
-    sync();
-
-    const onChange = () => sync();
-    window.addEventListener("cookie-consent-changed", onChange);
-    return () => window.removeEventListener("cookie-consent-changed", onChange);
-  }, []);
 
   const greenCardLink = `/${lang}/green-card`;
   const osagoLink = `/${lang}/osago-rf`;
@@ -90,8 +63,13 @@ export default function HomeClient({ lang, t, agreement }: Props) {
         <RecaptchaLazy siteKey={recaptchaSiteKey} enabled={recaptchaEnabled} />
       ) : null}
 
-      {/* Яндекс Ads/partner-code-bundles: только после cookie consent + после idle */}
-      <YandexPartnersLazy enabled={adsEnabled} afterIdle />
+      {/*
+        ВАЖНО:
+        Yandex partner-bundle НЕ грузим на главной вообще.
+        Даже после consent. Иначе метрики будут плавать.
+        Если нужно — подключай его на конкретных страницах (например /products)
+        или через отдельный флаг.
+      */}
 
       <main className="min-h-screen bg-white">
         {/* HERO (первый экран) — грузится сразу */}
@@ -245,10 +223,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
           </section>
 
           {/* GREEN CARD STEPS */}
-          <section
-            className="py-12 sm:py-16"
-            aria-labelledby="green-card-steps-heading"
-          >
+          <section className="py-12 sm:py-16" aria-labelledby="green-card-steps-heading">
             <div className="max-w-5xl mx-auto px-4">
               <h2
                 id="green-card-steps-heading"
@@ -286,16 +261,10 @@ export default function HomeClient({ lang, t, agreement }: Props) {
           </section>
 
           {/* SERVICES */}
-          <section
-            className="py-12 sm:py-16 bg-white"
-            aria-labelledby="services-heading"
-          >
+          <section className="py-12 sm:py-16 bg-white" aria-labelledby="services-heading">
             <div className="max-w-6xl mx-auto px-4">
               <div className="mb-8">
-                <h2
-                  id="services-heading"
-                  className="text-2xl sm:text-3xl font-bold tracking-tight"
-                >
+                <h2 id="services-heading" className="text-2xl sm:text-3xl font-bold tracking-tight">
                   <span className="text-[#1A3A5F]">{t.services.titlePart1}</span>
                   <span className="text-[#C89F4A]">{t.services.titlePart2}</span>
                 </h2>
@@ -329,9 +298,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                       <span className="font-semibold text-[#FCD671]">
                         {t.services.greenCardCard.price}
                       </span>
-                      <span className="text-gray-300">
-                        {t.services.greenCardCard.term}
-                      </span>
+                      <span className="text-gray-300">{t.services.greenCardCard.term}</span>
                     </div>
                     <div className="mt-5">
                       <a href={greenCardLink} className="btn w-full" role="button">
@@ -367,9 +334,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                       <span className="font-semibold text-[#FCD671]">
                         {t.services.osagoCard.price}
                       </span>
-                      <span className="text-gray-300">
-                        {t.services.osagoCard.term}
-                      </span>
+                      <span className="text-gray-300">{t.services.osagoCard.term}</span>
                     </div>
                     <div className="mt-5">
                       <a href={osagoLink} className="btn w-full" role="button">
@@ -389,10 +354,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
           </section>
 
           {/* BROKER */}
-          <section
-            className="py-12 sm:py-16 bg-[#F4F6FA]"
-            aria-labelledby="about-broker-heading"
-          >
+          <section className="py-12 sm:py-16 bg-[#F4F6FA]" aria-labelledby="about-broker-heading">
             <div className="max-w-6xl mx-auto px-4">
               <BrokerSection broker={t.broker} />
             </div>
