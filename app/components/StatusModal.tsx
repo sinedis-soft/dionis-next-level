@@ -1,6 +1,8 @@
 // app/components/StatusModal.tsx
 "use client";
 
+import ModalShell from "@/components/ModalShell";
+
 export default function StatusModal({
   open,
   kind,
@@ -18,21 +20,27 @@ export default function StatusModal({
   closeText: string;
   onClose: () => void;
 }) {
-  if (!open) return null;
+  const title = kind === "success" ? titleSuccess : titleError;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
-        <h3 className="text-lg font-semibold text-[#1A3A5F] mb-3">
-          {kind === "success" ? titleSuccess : titleError}
-        </h3>
-
+    <ModalShell
+      open={open}
+      onClose={onClose}
+      title={title}
+      // делаем подложку как у тебя: bg-black/40
+      overlayClassName="bg-black/40"
+      // делаем панель как у тебя: белая карточка, max-w-sm, центр
+      panelClassName="max-w-sm bg-white rounded-2xl shadow-xl"
+      // чтобы не было лишней шапки с крестиком (у тебя её нет)
+      showClose={false}
+    >
+      <div className="text-center">
         <p className="text-sm text-gray-700 mb-5">{message}</p>
 
         <button type="button" className="btn w-full" onClick={onClose}>
           {closeText}
         </button>
       </div>
-    </div>
+    </ModalShell>
   );
 }

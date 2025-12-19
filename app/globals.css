@@ -56,6 +56,28 @@ h6,
   font-family: var(--font-accent), system-ui, sans-serif;
 }
 
+.btn { will-change: transform; }
+@media (hover: none) {
+  .btn:hover { transform: none; }
+}
+
+/* =========================
+   NAV: серый текст + белая обводка (тонкая)
+   ========================= */
+.nav-outline {
+  color: #0f1112; /* slate-300 */
+ /* -webkit-text-stroke: 0.6px rgba(255, 255, 255, 0.85);*/
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.667);
+}
+
+/* активный пункт (золото + обводка) */
+.nav-outline-active {
+  color: var(--brand-gold-ui);
+ /* -webkit-text-stroke: 0.6px rgba(255, 255, 255, 0.75);*/
+  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+}
+
+
 /* =========================================================
    ACCESSIBILITY FIX:
    text-[#C89F4A] на белом не проходит контраст → переопределяем

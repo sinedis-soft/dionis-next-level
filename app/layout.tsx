@@ -1,11 +1,13 @@
 // app/layout.tsx
 import "./globals.css";
 import type { ReactNode } from "react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Roboto, Montserrat } from "next/font/google";
 
 const SITE_URL = "https://dionis-insurance.kz";
+
+/* ---------- Fonts ---------- */
 
 const roboto = Roboto({
   subsets: ["latin", "cyrillic"],
@@ -21,6 +23,21 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
+/* ---------- Viewport ---------- */
+/**
+ * Эквивалент:
+ * <meta name="viewport"
+ *   content="width=device-width, initial-scale=1, maximum-scale=2.0, user-scalable=yes">
+ */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 2,
+  userScalable: true,
+};
+
+/* ---------- Metadata ---------- */
+
 export const metadata: Metadata = {
   title: {
     default: "Dionis Insurance Broker",
@@ -28,18 +45,18 @@ export const metadata: Metadata = {
   },
 };
 
+/* ---------- Root layout ---------- */
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
-      // 1) Организация (юридическое лицо / бренд)
       {
         "@type": "Organization",
         "@id": `${SITE_URL}/#organization`,
         name: "Dionis Insurance Broker, LLP",
-        // можно оставить и так, но лучше явно указать юр. наименование (RU/KZ) если оно используется на сайте:
         legalName:
-          'Товарищество с ограниченной ответственностью «Страховой брокер Дионис»',
+          "Товарищество с ограниченной ответственностью «Страховой брокер Дионис»",
         url: SITE_URL,
         logo: `${SITE_URL}/logo.webp`,
         image: `${SITE_URL}/logo.webp`,
@@ -53,8 +70,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           postalCode: "050009",
         },
       },
-
-      // 2) Вебсайт
       {
         "@type": "WebSite",
         "@id": `${SITE_URL}/#website`,
@@ -63,21 +78,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         publisher: { "@id": `${SITE_URL}/#organization` },
         inLanguage: ["ru", "kk", "en"],
       },
-
-      // 3) Страховой посредник (технический тип), но по смыслу — брокер
       {
-        "@type": "InsuranceAgency", // технический тип (в Schema.org нет InsuranceBroker)
+        "@type": "InsuranceAgency",
         "@id": `${SITE_URL}/#insurance-broker`,
         name: "Dionis Insurance Broker",
         url: SITE_URL,
         parentOrganization: { "@id": `${SITE_URL}/#organization` },
-
         description:
           "Licensed insurance broker providing independent insurance brokerage services.",
-
         areaServed: ["KZ"],
         knowsLanguage: ["ru", "kk", "en"],
-
         knowsAbout: [
           "Insurance brokerage",
           "Insurance consulting",
