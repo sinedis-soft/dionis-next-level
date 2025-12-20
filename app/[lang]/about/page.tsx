@@ -45,7 +45,7 @@ export default async function Page({
     <AboutPage
       lang={lang}
       t={t}
-      services={home.services}
+
       contact={home.contact}
       agreement={agreement}
     />
