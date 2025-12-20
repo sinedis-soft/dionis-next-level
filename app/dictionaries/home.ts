@@ -262,7 +262,6 @@ const ru: HomeDictionary = {
           "Зелёная карта",
           "ОСАГО нерезидентов",
           "КАСКО",
-          "Ассистанc",
         ],
       },
       {
@@ -496,7 +495,7 @@ const kz: HomeDictionary = {
         title: "Автосақтандыру",
         image: "/services/autoinsur.png",
         linkSuffix: "/products#auto",
-        items: ["Жасыл карта", "ОСАГО (резидент еместер)", "КАСКО", "Ассистанс"],
+        items: ["Жасыл карта", "ОСАГО (резидент еместер)", "КАСКО"],
       },
       {
         key: "property",
@@ -724,7 +723,7 @@ const en: HomeDictionary = {
         title: "Motor Insurance",
         image: "/services/autoinsur.png",
         linkSuffix: "/products#auto",
-        items: ["Green Card", "OSAGO for non-residents", "CASCO", "Assistance"],
+        items: ["Green Card", "OSAGO for non-residents", "CASCO"],
       },
       {
         key: "property",

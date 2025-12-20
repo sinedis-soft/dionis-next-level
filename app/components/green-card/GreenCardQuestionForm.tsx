@@ -375,7 +375,7 @@ export default function GreenCardQuestionForm({
           <div className="pt-2">
             <button
               type="submit"
-              className="btn w-full"
+              className="btn btn-secondary w-full"
               disabled={formStatus === "loading"}
             >
               {formStatus === "loading"

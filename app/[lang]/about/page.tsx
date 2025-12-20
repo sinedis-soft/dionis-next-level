@@ -6,6 +6,7 @@ import type { Lang } from "@/dictionaries/header";
 
 import { getAboutDictionary, type AboutDictionary } from "@/dictionaries/about";
 import { getHomeDictionary } from "@/dictionaries/home";
+import { getAgreementDictionary } from "@/dictionaries/agreement";
 
 import AboutPage from "@/components/AboutPage";
 
@@ -38,6 +39,15 @@ export default async function Page({
 
   const t: AboutDictionary = getAboutDictionary(lang);
   const home = getHomeDictionary(lang);
+  const agreement = getAgreementDictionary(lang);
 
-  return <AboutPage lang={lang} t={t} services={home.services} />;
+  return (
+    <AboutPage
+      lang={lang}
+      t={t}
+      services={home.services}
+      contact={home.contact}
+      agreement={agreement}
+    />
+  );
 }

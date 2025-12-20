@@ -1,15 +1,18 @@
 // app/components/ContactForm.tsx
 "use client";
 
-import type { HomeDictionary } from "@/dictionaries/home";
-import type { AgreementDictionary } from "@/dictionaries/agreement";
 import { useCallback, useMemo, useState } from "react";
+import type { AgreementDictionary } from "@/dictionaries/agreement";
+import type { HomeDictionary } from "@/dictionaries/home";
 import { getRecaptchaToken } from "@/lib/recaptcha";
 
 export type ContactFormResult = {
   kind: "success" | "error";
   message: string;
 };
+
+// ✅ Тип контактного блока (вырезка из HomeDictionary)
+export type ContactBlock = HomeDictionary["contact"];
 
 type FormData = {
   firstName: string;
@@ -22,19 +25,25 @@ type FormData = {
 };
 
 type Props = {
-  t: HomeDictionary;
+  // ✅ передаём только contact-блок
+  t: ContactBlock;
+
   agreement: AgreementDictionary;
   onOpenAgreement: () => void;
   onResult: (result: ContactFormResult) => void;
 
-  /**
-   * ВАЖНО ДЛЯ PERFORMANCE:
-   * Родитель должен включать загрузку reCAPTCHA скрипта
-   * только после взаимодействия (focus/submit).
-   */
+  // PERFORMANCE: включить загрузку reCAPTCHA по фокусу/сабмиту
   onNeedRecaptcha?: () => void;
-
   recaptchaSiteKey?: string;
+
+  // ✅ откуда пришла форма (для аналитики/сегментации)
+  context?: string;
+
+  // ✅ можно менять endpoint (если захочешь)
+  submitUrl?: string;
+
+  // ✅ action для reCAPTCHA v3
+  recaptchaAction?: string;
 };
 
 const initialFormData: FormData = {
@@ -87,6 +96,9 @@ export default function ContactForm({
   onResult,
   onNeedRecaptcha,
   recaptchaSiteKey: recaptchaSiteKeyProp,
+  context = "site-contact",
+  submitUrl = "/api/contact",
+  recaptchaAction = "contact",
 }: Props) {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [formStatus, setFormStatus] = useState<
@@ -138,13 +150,13 @@ export default function ContactForm({
         // honeypot → бот, делаем вид, что всё ОК
         if (formData.website.trim() !== "") {
           setFormStatus("success");
-          setFormMessage(t.contact.statusSuccess);
+          setFormMessage(t.statusSuccess);
           setFormData(initialFormData);
-          onResult({ kind: "success", message: t.contact.statusSuccess });
+          onResult({ kind: "success", message: t.statusSuccess });
           return;
         }
 
-        // Включаем загрузку reCAPTCHA (если она сделана лениво в родителе)
+        // включаем загрузку reCAPTCHA в родителе (если сделано лениво)
         markNeedRecaptcha();
 
         let recaptchaToken: string | undefined;
@@ -153,10 +165,10 @@ export default function ContactForm({
           try {
             recaptchaToken = await getRecaptchaToken(
               recaptchaSiteKey,
-              "contact"
+              recaptchaAction
             );
           } catch {
-            const msg = t.contact.statusError;
+            const msg = t.statusError;
             setFormStatus("error");
             setFormMessage(msg);
             onResult({ kind: "error", message: msg });
@@ -173,13 +185,13 @@ export default function ContactForm({
           pageUrl = window.location.href;
         }
 
-        const res = await fetch("/api/contact", {
+        const res = await fetch(submitUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             ...formData,
             recaptchaToken,
-            context: "site-contact",
+            context,
             utm,
             pageUrl,
           }),
@@ -190,7 +202,7 @@ export default function ContactForm({
         const message = (data as { message?: string } | null)?.message;
 
         if (!res.ok || !ok) {
-          const msg = message || t.contact.statusError;
+          const msg = message || t.statusError;
           setFormStatus("error");
           setFormMessage(msg);
           onResult({ kind: "error", message: msg });
@@ -198,13 +210,13 @@ export default function ContactForm({
         }
 
         setFormStatus("success");
-        setFormMessage(t.contact.statusSuccess);
+        setFormMessage(t.statusSuccess);
         setFormData(initialFormData);
-        onResult({ kind: "success", message: t.contact.statusSuccess });
+        onResult({ kind: "success", message: t.statusSuccess });
       } catch {
         setFormStatus("error");
-        setFormMessage(t.contact.statusError);
-        onResult({ kind: "error", message: t.contact.statusError });
+        setFormMessage(t.statusError);
+        onResult({ kind: "error", message: t.statusError });
       }
     },
     [
@@ -212,8 +224,11 @@ export default function ContactForm({
       markNeedRecaptcha,
       onResult,
       recaptchaSiteKey,
-      t.contact.statusError,
-      t.contact.statusSuccess,
+      t.statusError,
+      t.statusSuccess,
+      context,
+      submitUrl,
+      recaptchaAction,
     ]
   );
 
@@ -225,9 +240,9 @@ export default function ContactForm({
     <div className="card w-full bg-white px-6 sm:px-8 py-6 sm:py-8">
       <div className="mb-6 text-center">
         <h2 className="text-xl sm:text-2xl font-bold text-[#1A3A5F]">
-          {t.contact.sectionTitle}
+          {t.sectionTitle}
         </h2>
-        <p className="mt-1 text-sm text-gray-600">{t.contact.sectionSubtitle}</p>
+        <p className="mt-1 text-sm text-gray-600">{t.sectionSubtitle}</p>
       </div>
 
       <form
@@ -235,9 +250,9 @@ export default function ContactForm({
         onSubmit={handleContactSubmit}
         aria-describedby={formStatus !== "idle" ? statusId : undefined}
       >
-        {/* Honeypot: скрываем от ассистивных технологий */}
+        {/* Honeypot */}
         <div className="hidden" aria-hidden="true">
-          <label htmlFor="website">{t.contact.honeypotLabel}</label>
+          <label htmlFor="website">{t.honeypotLabel}</label>
           <input
             id="website"
             type="text"
@@ -255,9 +270,9 @@ export default function ContactForm({
               htmlFor="firstName"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              {t.contact.fields.firstName}{" "}
+              {t.fields.firstName}{" "}
               <span className="text-red-500" aria-hidden="true">
-                {t.contact.requiredMark}
+                {t.requiredMark}
               </span>
             </label>
             <input
@@ -280,9 +295,9 @@ export default function ContactForm({
               htmlFor="lastName"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              {t.contact.fields.lastName}{" "}
+              {t.fields.lastName}{" "}
               <span className="text-red-500" aria-hidden="true">
-                {t.contact.requiredMark}
+                {t.requiredMark}
               </span>
             </label>
             <input
@@ -306,9 +321,9 @@ export default function ContactForm({
             htmlFor="email"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            {t.contact.fields.email}{" "}
+            {t.fields.email}{" "}
             <span className="text-red-500" aria-hidden="true">
-              {t.contact.requiredMark}
+              {t.requiredMark}
             </span>
           </label>
           <input
@@ -333,9 +348,9 @@ export default function ContactForm({
             htmlFor="phone"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            {t.contact.fields.phone}{" "}
+            {t.fields.phone}{" "}
             <span className="text-red-500" aria-hidden="true">
-              {t.contact.requiredMark}
+              {t.requiredMark}
             </span>
           </label>
           <input
@@ -360,9 +375,9 @@ export default function ContactForm({
             htmlFor="comment"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            {t.contact.fields.comment}{" "}
+            {t.fields.comment}{" "}
             <span className="text-red-500" aria-hidden="true">
-              {t.contact.requiredMark}
+              {t.requiredMark}
             </span>
           </label>
           <textarea
@@ -392,20 +407,20 @@ export default function ContactForm({
             aria-invalid={hasError ? true : undefined}
           />
           <label htmlFor="agree">
-            {t.contact.agreePrefix}{" "}
+            {t.agreePrefix}{" "}
             <button
               type="button"
               onClick={onOpenAgreement}
               className="text-[#23376c] underline underline-offset-2 hover:opacity-80"
               aria-haspopup="dialog"
-              aria-label={`${t.contact.agreeLink} — ${agreement.title}`}
+              aria-label={`${t.agreeLink} — ${agreement.title}`}
             >
-              {t.contact.agreeLink}
+              {t.agreeLink}
             </button>
-            {t.contact.agreeSuffix}
+            {t.agreeSuffix}
             <span className="text-red-500" aria-hidden="true">
               {" "}
-              {t.contact.requiredMark}
+              {t.requiredMark}
             </span>
           </label>
         </div>
@@ -429,9 +444,7 @@ export default function ContactForm({
             className="btn btn-secondary w-full"
             disabled={formStatus === "loading"}
           >
-            {formStatus === "loading"
-              ? t.contact.submitLoading
-              : t.contact.submitDefault}
+            {formStatus === "loading" ? t.submitLoading : t.submitDefault}
           </button>
         </div>
       </form>

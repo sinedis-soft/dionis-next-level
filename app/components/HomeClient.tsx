@@ -190,7 +190,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
             className="border-t border-gray-200 bg-[#F7F7F7] py-12 sm:py-16"
             aria-labelledby="benefits-heading"
           >
-            <div className="max-w-5xl mx-auto px-4">
+            <div className="max-w-6xl mx-auto px-4">
               <h2
                 id="benefits-heading"
                 className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center"
@@ -489,7 +489,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                 </div>
 
                 <ContactForm
-                  t={t}
+                  t={t.contact}
                   agreement={agreement}
                   onOpenAgreement={() => setIsAgreementOpen(true)}
                   onResult={handleFormResult}

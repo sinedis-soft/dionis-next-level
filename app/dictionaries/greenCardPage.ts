@@ -15,6 +15,23 @@ export type GreenCardPageDictionary = {
     text1: string;
     text2: string;
   };
+  howItWorks: {
+      title: string;
+      subtitle: string;
+      steps: Array<{
+        title: string;
+        text: string;
+      }>;
+    };
+
+    coverage: {
+      title: string;
+      items: Array<{
+        title: string;
+        text: string;
+      }>;
+      imageAlt: string;
+    };
   calculator: {
     title: string;
     subtitle: string;
@@ -80,9 +97,9 @@ const ru: GreenCardPageDictionary = {
   questionBlock: {
     title: "Есть вопросы по Зеленой карте?",
     text1:
-      "Напишите нам — мы ответим и подберём оптимальный вариант страхования под ваш маршрут.",
+      "Напишите нам — и мы подберём оптимальный вариант страхования под ваш маршрут.",
     text2:
-      "Для заказа самой Зеленой карты заполните заявку ниже по странице.",
+      "Для заказа самой Зеленой карты заполните заявку выше.",
   },
   calculator: {
     title: "Расчёт стоимости Green Card",
@@ -119,6 +136,56 @@ const ru: GreenCardPageDictionary = {
     errorInvalidRate: "⚠️ Введите корректный курс тенге.",
     resultPrefix: "Стоимость полиса:",
     resultApprox: "≈",
+  },
+  howItWorks: {
+    title: "Как это работает",
+    subtitle: "Простой процесс получения полиса онлайн",
+    steps: [
+      {
+        title: "Оставляете заявку",
+        text: "Заполняете короткую форму на сайте или пишете менеджеру.",
+      },
+      {
+        title: "Проверяем данные",
+        text: "Уточняем детали и подбираем оптимальный тариф под ваш маршрут.",
+      },
+      {
+        title: "Оплачиваете",
+        text: "Оплата картой или по счёту — подходит и для физических, и для юридических лиц.",
+      },
+      {
+        title: "Получаете полис",
+        text: "Отправляем готовый документ на e-mail. Обычно — в течение 15 минут после оплаты.",
+      },
+    ],
+  },
+
+  coverage: {
+    title: "Зона покрытия и условия",
+    items: [
+      {
+        title: "Территория действия",
+        text:
+          "Полис действует в странах системы «Зелёная карта»:\n\n" +
+          "Австрия, Албания, Андорра, Бельгия, Болгария, Босния и Герцеговина, " +
+          "Великобритания, Греция, Дания, Эстония, Ирландия, Исландия, Испания, Италия, " +
+          "Кипр, Литва, Латвия, Люксембург, Мальта, Марокко, Молдова, Нидерланды, Германия, " +
+          "Норвегия, Северная Македония, Польша, Португалия, Румыния, Сербия, Словакия, " +
+          "Словения, Тунис, Турция, Венгрия, Украина, Финляндия, Франция, Хорватия, " +
+          "Чешская Республика, Черногория, Швейцария, Швеция.\n\n" +
+          "ВАЖНО: «Зелёная карта» выдаётся страховой компанией Азербайджана, " +
+          "поэтому на территории Азербайджана она НЕ действует."
+},
+      {
+        title: "Типы транспортных средств",
+        text: "Легковые автомобили, мотоциклы, грузовой транспорт, прицепы, автобусы.",
+      },
+      {
+        title: "Срок действия",
+        text: "Минимальный срок — 1 месяц. Максимальный — 1 год.",
+      },
+    ],
+    imageAlt: "Зона покрытия и условия Green Card",
   },
   advantages: {
     title: "«ДИОНИС» ПРЕДЛАГАЕТ СЛЕДУЮЩИЕ ПРЕИМУЩЕСТВА:",
@@ -209,6 +276,7 @@ const ru: GreenCardPageDictionary = {
       },
     ],
   },
+  
 };
 
 const en: GreenCardPageDictionary = {
@@ -225,7 +293,7 @@ const en: GreenCardPageDictionary = {
     title: "Questions about the Green Card?",
     text1:
       "Write to us — we will answer and select the optimal insurance solution for your route.",
-    text2: "To order a Green Card itself, fill in the application below.",
+    text2: "To order the Green Card itself, please fill out the application form above.",
   },
   calculator: {
     title: "Green Card price calculator",
@@ -263,6 +331,57 @@ const en: GreenCardPageDictionary = {
     resultPrefix: "Policy price:",
     resultApprox: "≈",
   },
+  howItWorks: {
+  title: "Бұл қалай жұмыс істейді",
+  subtitle: "Полисті онлайн алудың қарапайым процесі",
+  steps: [
+    {
+      title: "Өтінім қалдырасыз",
+      text: "Сайтта қысқа форманы толтырасыз немесе менеджерге жазасыз.",
+    },
+    {
+      title: "Деректерді тексереміз",
+      text: "Мәліметтерді нақтылап, маршрутыңызға сәйкес оңтайлы тарифті таңдаймыз.",
+    },
+    {
+      title: "Төлем жасайсыз",
+      text: "Картамен немесе шот арқылы төлеу мүмкін — жеке және заңды тұлғалар үшін қолайлы.",
+    },
+    {
+      title: "Полисті аласыз",
+      text: "Дайын құжатты e-mail арқылы жібереміз. Әдетте төлемнен кейін 15 минут ішінде.",
+    },
+  ],
+},
+
+coverage: {
+  title: "Қамту аймағы мен шарттары",
+  items: [
+    {
+      title: "Қолданылу аумағы",
+      text:
+        "Полис «Жасыл карта» жүйесіне кіретін елдерде қолданылады:\n\n" +
+        "Австрия, Албания, Андорра, Бельгия, Болгария, Босния және Герцеговина, " +
+        "Ұлыбритания, Греция, Дания, Эстония, Ирландия, Исландия, Испания, Италия, " +
+        "Кипр, Литва, Латвия, Люксембург, Мальта, Марокко, Молдова, Нидерланды, Германия, " +
+        "Норвегия, Солтүстік Македония, Польша, Португалия, Румыния, Сербия, Словакия, " +
+        "Словения, Тунис, Түркия, Венгрия, Украина, Финляндия, Франция, Хорватия, " +
+        "Чех Республикасы, Черногория, Швейцария, Швеция.\n\n" +
+        "МАҢЫЗДЫ: «Жасыл карта» Әзірбайжанның сақтандыру компаниясы арқылы рәсімделеді, " +
+        "сондықтан Әзірбайжан аумағында жарамсыз.",
+    },
+    {
+      title: "Көлік құралдарының түрлері",
+      text: "Жеңіл автомобильдер, мотоциклдер, жүк көліктері, тіркемелер, автобустар.",
+    },
+    {
+      title: "Жарамдылық мерзімі",
+      text: "Ең аз мерзім — 1 ай. Ең көп мерзім — 1 жыл.",
+    },
+  ],
+  imageAlt: "Green Card қамту аймағы мен шарттары",
+},
+
   advantages: {
     title: "DIONIS OFFERS THE FOLLOWING BENEFITS:",
     items: [
@@ -370,7 +489,7 @@ const kz: GreenCardPageDictionary = {
     text1:
       "Бізге жазыңыз — маршрутыңызға сәйкес ең тиімді сақтандыру нұсқасын ұсынамыз.",
     text2:
-      "Green Card полисін рәсімдеу үшін төмендегі өтінім формасын толтырыңыз.",
+      "Жасыл картаның өзіне тапсырыс беру үшін жоғарыдағы өтінімді толтырыңыз.",
   },
   calculator: {
     title: "Green Card құнын есептеу",
@@ -408,6 +527,57 @@ const kz: GreenCardPageDictionary = {
     resultPrefix: "Полис құны:",
     resultApprox: "≈",
   },
+  howItWorks: {
+  title: "How it works",
+  subtitle: "A simple process to obtain your policy online",
+  steps: [
+    {
+      title: "Submit a request",
+      text: "Fill in a short form on the website or contact our manager.",
+    },
+    {
+      title: "We verify the details",
+      text: "We уточняем details and select the most suitable tariff for your route.",
+    },
+    {
+      title: "Make a payment",
+      text: "Payment by card or bank transfer — suitable for both individuals and legal entities.",
+    },
+    {
+      title: "Receive your policy",
+      text: "We send the completed document by e-mail, usually within 15 minutes after payment.",
+    },
+  ],
+},
+
+coverage: {
+  title: "Coverage area and terms",
+  items: [
+    {
+      title: "Territorial coverage",
+      text:
+        "The policy is valid in the countries of the Green Card system:\n\n" +
+        "Austria, Albania, Andorra, Belgium, Bulgaria, Bosnia and Herzegovina, " +
+        "United Kingdom, Greece, Denmark, Estonia, Ireland, Iceland, Spain, Italy, " +
+        "Cyprus, Lithuania, Latvia, Luxembourg, Malta, Morocco, Moldova, Netherlands, Germany, " +
+        "Norway, North Macedonia, Poland, Portugal, Romania, Serbia, Slovakia, " +
+        "Slovenia, Tunisia, Türkiye, Hungary, Ukraine, Finland, France, Croatia, " +
+        "Czech Republic, Montenegro, Switzerland, Sweden.\n\n" +
+        "IMPORTANT: The Green Card policy is issued by an insurance company in Azerbaijan; " +
+        "therefore, it is NOT valid within the territory of Azerbaijan.",
+    },
+    {
+      title: "Types of vehicles",
+      text: "Passenger cars, motorcycles, trucks, trailers, and buses.",
+    },
+    {
+      title: "Policy validity period",
+      text: "Minimum period — 1 month. Maximum period — 1 year.",
+    },
+  ],
+  imageAlt: "Green Card coverage area and terms",
+},
+
   advantages: {
     title: "«DIONIS» МЫНАДАЙ АРТЫҚШЫЛЫҚТАР ҰСЫНАДЫ:",
     items: [
