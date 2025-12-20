@@ -266,7 +266,7 @@ export default async function GreenCardPage({
           </div>
         </section>
 
-        <GreenCardInfoBlocks dict={gcPageDict} coverageImageSrc="/green-card/coverage.webp" />
+        <GreenCardInfoBlocks dict={gcPageDict}  />
 
 
         
