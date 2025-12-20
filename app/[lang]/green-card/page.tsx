@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
 import Image from "next/image";
 import GreenCardInfoBlocks from "@/components/green-card/GreenCardInfoBlocks";
+import Script from "next/script";
 
 import { getHomeDictionary } from "@/dictionaries/home";
 import { getAgreementDictionary } from "@/dictionaries/agreement";
@@ -202,9 +203,10 @@ export default async function GreenCardPage({
 
   return (
     <>
-      <script
+      <Script
+        id="webpage-jsonld"
         type="application/ld+json"
-        
+        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
       />
 
@@ -294,12 +296,7 @@ export default async function GreenCardPage({
                     {/* icon */}
                     <div className="mb-3">
                       <div className="h-9 w-9 rounded-lg bg-[#EBCA45]/15 flex items-center justify-center">
-                        {/* Вариант A: emoji */}
-                        {/* <span className="text-lg leading-none" aria-hidden="true">
-                          {item.icon}
-                        </span> */}
-
-                        {/* Вариант B: SVG (единый стиль) */}
+                        
                         <AdvantageIcon index={idx} />
                       </div>
                     </div>
@@ -356,6 +353,10 @@ export default async function GreenCardPage({
             </article>
           </div>
         </section>
+        
+
+        <FAQSection dict={gcPageDict.faq} />
+        <BrokerSection broker={homeDict.broker} />
         <section className="py-12 sm:py-16 bg-[#F4F6FA]">
           <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-10 items-start">
             <div className="flex justify-center lg:justify-start">
@@ -377,9 +378,6 @@ export default async function GreenCardPage({
             />
           </div>
         </section>
-
-        <FAQSection dict={gcPageDict.faq} />
-        <BrokerSection broker={homeDict.broker} />
       </main>
     </>
   );

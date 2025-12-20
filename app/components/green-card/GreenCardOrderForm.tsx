@@ -780,12 +780,12 @@ export function GreenCardOrderForm({ dict }: Props) {
                         <select
                           name={`vehicles[${idx}][country]`}
                           className={fieldClass}
-                          defaultValue=""
+                          defaultValue="385"
                           required
                         >
                           <option value="">{dict.notSelected}</option>
                           <option value="385">{dict.vehicles.countryKZ}</option>
-                          <option value="523">{dict.vehicles.countryGE}</option>
+                          {/*<option value="523">{dict.vehicles.countryGE}</option>*/}
                         </select>
                       </div>
 
