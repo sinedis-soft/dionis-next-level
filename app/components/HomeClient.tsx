@@ -7,7 +7,7 @@ import type { Lang } from "@/dictionaries/header";
 import type { HomeDictionary } from "@/dictionaries/home";
 import type { AgreementDictionary } from "@/dictionaries/agreement";
 
-import ServicesCarousel from "@/components/ServicesCarousel";
+import ServicesGrid from "@/components/ServicesGrid";
 import ContactForm, { type ContactFormResult } from "@/components/ContactForm";
 import AgreementModal from "@/components/AgreementModal";
 import StatusModal from "@/components/StatusModal";
@@ -55,6 +55,77 @@ export default function HomeClient({ lang, t, agreement }: Props) {
     setStatusOpen(true);
   }
 
+  /* ---- local helper (put in same file, above component return) ---- */
+        function BenefitIcon({ index }: { index: number }) {
+          const common = "h-5 w-5 text-[#C89F4A]";
+          switch (index) {
+            case 0: // часы
+              return (
+                <svg viewBox="0 0 24 24" className={common} fill="none" aria-hidden="true">
+                  <path
+                    d="M12 8v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              );
+            case 1: // папка/документ
+              return (
+                <svg viewBox="0 0 24 24" className={common} fill="none" aria-hidden="true">
+                  <path
+                    d="M4 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M8 13h8M8 17h6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              );
+            case 2: // глобус
+              return (
+                <svg viewBox="0 0 24 24" className={common} fill="none" aria-hidden="true">
+                  <path
+                    d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M3 12h18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              );
+            default: // 24/7 / молния
+              return (
+                <svg viewBox="0 0 24 24" className={common} fill="none" aria-hidden="true">
+                  <path
+                    d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              );
+          }
+        }
+
   return (
     <>
       {/* reCAPTCHA скрипт появится ТОЛЬКО после взаимодействия с формой */}
@@ -85,13 +156,13 @@ export default function HomeClient({ lang, t, agreement }: Props) {
               </p>
 
               <div className="mt-8 flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
-                <a href={greenCardLink} role="button" className="btn btn-wide">
+                <a href={greenCardLink} role="button" className="btn btn-primary btn-wide">
                   {t.hero.greenCardBtn}
                 </a>
-                <a href={osagoLink} role="button" className="btn btn-wide">
+                <a href={osagoLink} role="button" className="btn btn-secondary btn-wide">
                   {t.hero.osagoBtn}
                 </a>
-                <a href={productsLink} role="button" className="btn btn-wide">
+                <a href={productsLink} role="button" className="btn btn-secondary btn-wide">
                   {t.hero.otherBtn}
                 </a>
               </div>
@@ -100,22 +171,21 @@ export default function HomeClient({ lang, t, agreement }: Props) {
             <div className="flex justify-center lg:justify-end">
               {/* LCP-картинка: quality НЕ занижаем */}
               <Image
-                src="/dionis-crkl_2_960x960.webp"
+                src="/hero.png"
                 alt={t.hero.heroAlt}
-                width={420}
-                height={420}
+                width={510}
+                height={510}
                 priority
                 fetchPriority="high"
                 sizes="(max-width: 640px) 224px, (max-width: 1024px) 288px, (max-width: 1280px) 420px, 480px"
-                className="hero-logo w-56 sm:w-72 lg:w-[420px] xl:w-[480px] h-auto drop-shadow-xl"
+                className="hero-logo w-56 sm:w-72 lg:w-[420px] xl:w-[480px] h-auto"
               />
             </div>
           </div>
         </section>
 
-        {/* Всё ниже — откладываем */}
+        {/* BENEFITS */}
         <DeferredHydration rootMargin="800px" minDelayMs={150}>
-          {/* BENEFITS */}
           <section
             className="border-t border-gray-200 bg-[#F7F7F7] py-12 sm:py-16"
             aria-labelledby="benefits-heading"
@@ -132,23 +202,32 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                 {t.benefits.subtitle}
               </p>
 
-              <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 text-center">
+              {/* cards */}
+              <div className="mt-10 grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 {t.benefits.cards.map((card, idx) => (
                   <article
                     key={idx}
-                    className="card flex flex-col items-center px-5 py-5 sm:py-6"
+                    className="rounded-xl border border-gray-200 bg-white shadow-sm p-4 sm:p-5 text-left"
                   >
-                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
-                      <span className="text-[#C89F4A] font-bold">{idx + 1}</span>
+                    {/* icon */}
+                    <div className="mb-3">
+                      <div className="h-9 w-9 rounded-lg bg-[#EBCA45]/15 flex items-center justify-center">
+                        <BenefitIcon index={idx} />
+                      </div>
                     </div>
 
-                    <div className="text-2xl font-extrabold text-[#1A3A5F]">
+                    {/* value */}
+                    <div className="text-xl sm:text-2xl font-extrabold text-[#1A3A5F] leading-none">
                       {card.value}
                     </div>
-                    <div className="mt-1 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+
+                    {/* label */}
+                    <div className="mt-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">
                       {card.label}
                     </div>
-                    <p className="mt-3 text-sm text-gray-600 text-center">
+
+                    {/* text */}
+                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">
                       {card.text}
                     </p>
                   </article>
@@ -159,82 +238,74 @@ export default function HomeClient({ lang, t, agreement }: Props) {
 
           {/* DIRECTOR */}
           <section
-            className="py-12 sm:py-16 bg-[#F4F6FA]"
+            className="py-12 sm:py-16 bg-white"
             aria-labelledby="director-message-heading"
           >
             <div className="max-w-6xl mx-auto px-4">
-              <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-10 items-start relative">
-                <div className="hidden lg:block absolute -top-0 right-20">
-                  {/* НЕ-LCP → quality=60 + sizes */}
-                  <Image
-                    src="/dionis-crkl.webp"
-                    alt={t.director.logoAlt}
-                    width={300}
-                    height={300}
-                    quality={60}
-                    sizes="300px"
-                    className="director-logo"
-                  />
-                </div>
+              {/* Top centered title */}
+              <h2
+                id="director-message-heading"
+                className="text-2xl sm:text-4xl font-extrabold text-[#1A3A5F] text-center tracking-tight"
+              >
+                {t.director.heading}
+              </h2>
 
-                <article className="relative bg-white rounded-2xl shadow-md px-6 sm:px-8 py-8 sm:py-10">
-                  <h2
-                    id="director-message-heading"
-                    className="text-xl sm:text-2xl font-bold text-[#1A3A5F] mb-4"
-                  >
-                    {t.director.heading}
-                  </h2>
+              {/* Card */}
+              <div className="mt-8 sm:mt-10 rounded-2xl border border-gray-100 bg-white shadow-sm p-6 sm:p-10">
+                <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_240px] gap-10 items-start">
+                  {/* Left: letter text */}
+                  <article className="relative text-gray-700">
+                    <div className="space-y-4 text-sm sm:text-base leading-relaxed text-justify">
+                      {t.director.paragraphs.map((p, i) => (
+                        <p key={i}>{p}</p>
+                      ))}
+                    </div>
 
-                  <div className="space-y-3 text-sm sm:text-base text-gray-700 text-justify">
-                    {t.director.paragraphs.map((p, i) => (
-                      <p key={i} className="leading-relaxed">
-                        {p}
-                      </p>
-                    ))}
-                  </div>
+                    {/* Sign lines + signature like handbook (bottom-left) */}
+                    <div className="mt-8 text-sm sm:text-base text-gray-700">
+                      {t.director.signLines.map((line, index) => (
+                        <div key={index}>{line}</div>
+                      ))}
+                    </div>
 
-                  <div className="mt-6 text-sm text-gray-700">
-                    {t.director.signLines.map((line, index) => (
-                      <span key={index}>
-                        {line}
-                        <br />
-                      </span>
-                    ))}
-                  </div>
+                    <div className="absolute right-0 bottom-0 -translate-y-6">
+                      <Image
+                        src="/director-signature.webp"
+                        alt={t.director.signatureAlt}
+                        width={180}
+                        height={110}
+                        quality={60}
+                        loading="lazy"
+                        sizes="(max-width: 640px) 150px, 180px"
+                        className="opacity-90"
+                      />
+                    </div>
 
-                  <div className="director-signature-wrap flex justify-end -mt-20">
-                    <Image
-                      src="/director-signature.webp"
-                      alt={t.director.signatureAlt}
-                      width={200}
-                      height={120}
-                      quality={60}
-                      loading="lazy"
-                      sizes="(max-width: 640px) 140px, 200px"
-                      className="director-signature"
-                    />
-                  </div>
-                </article>
 
-                <div className="hidden lg:flex justify-center lg:mt-77">
-                  {/* НЕ-LCP → quality=60 + sizes */}
-                  <Image
-                    src="/director-borovoy.webp"
-                    alt={t.director.photoAlt}
-                    width={360}
-                    height={520}
-                    quality={60}
-                    loading="lazy"
-                    sizes="(max-width: 1024px) 0px, 360px"
-                    className="director-photo"
-                  />
+                  </article>
+
+                  {/* Right: circular director photo (smaller) */}
+                  <aside className="flex justify-center lg:justify-end">
+                    <div className="w-[140px] h-[140px] sm:w-[170px] sm:h-[170px] rounded-full overflow-hidden ring-1 ring-gray-200 bg-gray-50">
+                      <Image
+                        src="/Фон.png"
+                        alt={t.director.logoAlt}
+                        width={340}
+                        height={340}
+                        quality={700}
+                        sizes="(max-width: 1024px) 170px, 170px"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </aside>
                 </div>
               </div>
             </div>
           </section>
 
+
           {/* GREEN CARD STEPS */}
-          <section
+          {/*<section
             className="py-12 sm:py-16"
             aria-labelledby="green-card-steps-heading"
           >
@@ -267,12 +338,12 @@ export default function HomeClient({ lang, t, agreement }: Props) {
               </div>
 
               <div className="mt-10 flex justify-center">
-                <a href={greenCardLink} role="button" className="btn">
+                <a href={greenCardLink} role="button" className="btn btn-primary">
                   {t.greenCardSteps.cta}
                 </a>
               </div>
             </div>
-          </section>
+          </section>*/}
 
           {/* SERVICES */}
           <section
@@ -325,7 +396,11 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                       <span className="text-gray-300">{t.services.greenCardCard.term}</span>
                     </div>
                     <div className="mt-5">
-                      <a href={greenCardLink} className="btn w-full" role="button">
+                      <a
+                        href={greenCardLink}
+                        className="btn btn-primary w-full"
+                        role="button"
+                      >
                         {t.services.greenCardCard.cta}
                       </a>
                     </div>
@@ -365,7 +440,11 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                       <span className="text-gray-300">{t.services.osagoCard.term}</span>
                     </div>
                     <div className="mt-5">
-                      <a href={osagoLink} className="btn w-full" role="button">
+                      <a
+                        href={osagoLink}
+                        className="btn btn-primary w-full"
+                        role="button"
+                      >
                         {t.services.osagoCard.cta}
                       </a>
                     </div>
@@ -373,7 +452,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                 </article>
               </div>
 
-              <ServicesCarousel
+              <ServicesGrid
                 heading={t.services.otherHeading}
                 moreBtnText={t.services.moreBtn}
                 items={otherServices}
@@ -398,7 +477,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                 <div className="flex flex-col justify-end items-center lg:items-center h-full">
                   {/* НЕ-LCP → quality=60 + sizes */}
                   <Image
-                    src="/director-borovoy.webp"
+                    src="/laiter(1).png"
                     alt={t.contact.photoAlt}
                     width={500}
                     height={900}

@@ -94,45 +94,130 @@ h6,
 }
 
 /* =========================
-   Кнопки DIONIS
+   Кнопки DIONIS — современный «мягкий» стиль
+   - Primary (accent): gold #EBCA45 + текст #23376C
+   - Secondary: blue #23376C + текст white
+   - Больше «воздуха», мягкие кривые, микро-градиенты, уточнённые тени
    ========================= */
 
+:root {
+  --brand-blue: #23376c;
+  --brand-gold: #ebca45;
+
+  /* микро-градиенты (очень деликатные) */
+  --gold-grad: linear-gradient(180deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 55%);
+  --blue-grad: linear-gradient(180deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,0) 60%);
+
+  /* «мягкая» глубина: несколько слоёв как мягкий свет в 3D-иконках */
+  --shadow-soft:
+    0 10px 28px rgba(15, 23, 42, 0.12),
+    0 4px 10px rgba(15, 23, 42, 0.10),
+    0 1px 0 rgba(255, 255, 255, 0.55) inset;
+
+  --shadow-soft-hover:
+    0 16px 40px rgba(15, 23, 42, 0.16),
+    0 6px 14px rgba(15, 23, 42, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset;
+
+  /* «дорогая» динамика */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* геометрия макета */
+  --radius-12: 12px;
+}
+
+/* Базовая кнопка */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.75rem;
-  border-radius: 0.5rem;
+  gap: 0.55rem;
+
+  padding: 0.85rem 1.85rem; /* больше воздуха */
+  border-radius: var(--radius-12);
+
   font-weight: 600;
   font-size: 0.95rem;
+  line-height: 1;
+  letter-spacing: 0.01em;
 
-  background-color: var(--brand-gold-ui);
-  color: var(--brand-blue);
-
-  border: none;
+  border: 1px solid transparent;
   text-decoration: none;
   cursor: pointer;
-  transition: transform 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  transform: translateZ(0); /* более плавная анимация */
+  transition:
+    transform 220ms var(--ease-spring),
+    box-shadow 220ms var(--ease-spring),
+    background-color 220ms var(--ease-spring),
+    border-color 220ms var(--ease-spring),
+    filter 220ms var(--ease-spring);
 }
 
-.btn:hover,
-.btn:focus-visible {
-  background-color: #f0d562;
-  transform: scale(1.04);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-  outline: none;
+/* Primary / Accent (золото) */
+.btn-primary,
+.btn {
+  background-color: var(--brand-gold);
+  background-image: var(--gold-grad);
+  color: var(--brand-blue); /* важно: читаемость */
+  box-shadow: var(--shadow-soft);
+}
+
+/* Secondary (тёмно-синяя) */
+.btn-secondary {
+  background-color: var(--brand-blue);
+  background-image: var(--blue-grad);
+  color: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+/* Hover / Focus */
+.btn:hover {
+  transform: translateY(-1px) scale(1.015);
+  box-shadow: var(--shadow-soft-hover);
+  filter: saturate(1.02);
+}
+
+.btn-secondary:hover {
+  filter: brightness(1.02) saturate(1.05);
 }
 
 .btn:active {
-  transform: scale(1.02);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+  transform: translateY(0) scale(1.005);
+  box-shadow:
+    0 10px 26px rgba(15, 23, 42, 0.14),
+    0 4px 10px rgba(15, 23, 42, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.50) inset;
 }
 
+/* Доступность: красивый, но аккуратный focus-ring */
 .btn:focus-visible {
-  box-shadow: 0 0 0 3px rgba(235, 202, 69, 0.55);
+  outline: none;
+  box-shadow:
+    var(--shadow-soft-hover),
+    0 0 0 3px rgba(235, 202, 69, 0.45); /* для gold */
 }
 
+.btn-secondary:focus-visible {
+  box-shadow:
+    var(--shadow-soft-hover),
+    0 0 0 3px rgba(35, 55, 108, 0.35),
+    0 0 0 6px rgba(235, 202, 69, 0.30); /* лёгкий брендовый «ореол» */
+}
+
+/* Disabled */
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+  box-shadow: none;
+}
+
+/* Wide */
 .btn-wide {
   width: 100%;
 }
@@ -143,22 +228,94 @@ h6,
   }
 }
 
+
 /* =========================
-   Карточки
+   Карточки — мягкая Fintech-анимация + glass highlight
    ========================= */
 
-.card {
-  background-color: #ffffff;
-  border-radius: 0.75rem;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.18s ease, transform 0.18s ease;
+:root {
+  /* «дорогая» динамика */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* слоистые тени (воздушность) */
+  --card-shadow-rest:
+    0 6px 18px rgba(15, 23, 42, 0.08),   /* широкая, мягкая */
+    0 2px 6px rgba(15, 23, 42, 0.06);    /* ближняя, чёткая */
+
+  --card-shadow-hover:
+    0 18px 42px rgba(15, 23, 42, 0.14),
+    0 6px 14px rgba(15, 23, 42, 0.10);
 }
 
+/* Базовая карточка */
+.card {
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden; /* обязательно для «стеклянного» блика */
+
+  box-shadow: var(--card-shadow-rest);
+  transform: translateZ(0);
+
+  transition:
+    box-shadow 280ms var(--ease-spring),
+    transform 280ms var(--ease-spring);
+}
+
+/* «Стеклянный блеск» */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: -40% -60%;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.35) 45%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 60%
+  );
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+
+/* Hover / Focus */
 .card:hover,
 .card:focus-within {
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
-  transform: translateY(-2px);
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2px) scale(1.01);
 }
+
+/* Запуск «блеска» */
+.card:hover::before,
+.card:focus-within::before {
+  transition: transform 900ms var(--ease-spring);
+  transform: translateX(100%);
+}
+
+/* Уважение к prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card::before {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Информационные карточки (без hover-движения) */
+.card-static {
+  cursor: default;
+}
+
+.card-static:hover,
+.card-static:focus-within {
+  transform: none;
+  box-shadow: var(--card-shadow-rest);
+}
+
+.card-static::before {
+  display: none; /* без стеклянного блика */
+}
+
 
 /* =========================
    Калькулятор Green Card

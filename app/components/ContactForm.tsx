@@ -222,7 +222,7 @@ export default function ContactForm({
   const hasSuccess = formStatus === "success";
 
   return (
-    <div className="card w-full bg-white shadow-md rounded-2xl px-6 sm:px-8 py-6 sm:py-8">
+    <div className="card w-full bg-white px-6 sm:px-8 py-6 sm:py-8">
       <div className="mb-6 text-center">
         <h2 className="text-xl sm:text-2xl font-bold text-[#1A3A5F]">
           {t.contact.sectionTitle}
@@ -396,7 +396,7 @@ export default function ContactForm({
             <button
               type="button"
               onClick={onOpenAgreement}
-              className="text-[#C89F4A] underline underline-offset-2 hover:opacity-80"
+              className="text-[#23376c] underline underline-offset-2 hover:opacity-80"
               aria-haspopup="dialog"
               aria-label={`${t.contact.agreeLink} — ${agreement.title}`}
             >
@@ -426,7 +426,7 @@ export default function ContactForm({
         <div className="pt-2">
           <button
             type="submit"
-            className="btn w-full"
+            className="btn btn-secondary w-full"
             disabled={formStatus === "loading"}
           >
             {formStatus === "loading"

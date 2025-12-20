@@ -9,6 +9,15 @@ export type ServiceConfig = {
   items: string[];
 };
 
+export type BenefitIcon = "shield" | "time" | "experience" | "support";
+
+export type BenefitCard = {
+  icon: BenefitIcon;
+  value: string;
+  label: string;
+  text: string;
+};
+
 export type HomeDictionary = {
   hero: {
     title: string;
@@ -22,11 +31,7 @@ export type HomeDictionary = {
   benefits: {
     title: string;
     subtitle: string;
-    cards: {
-      value: string;
-      label: string;
-      text: string;
-    }[];
+    cards: BenefitCard[];
   };
 
   director: {
@@ -124,37 +129,45 @@ const ru: HomeDictionary = {
   hero: {
     title: "Страховой брокер в Казахстане\nдля частных лиц и бизнеса",
     subtitle:
-          "Подбор страховых программ, консультации и сопровождение. Работаем официально, по лицензии. Алматы, связь по телефону и в мессенджерах.",    
+      "Подбор страховых программ, консультации и сопровождение. Работаем официально, по лицензии. Алматы, связь по телефону и в мессенджерах.",
     greenCardBtn: "Зелёная карта",
     osagoBtn: "ОСАГО РФ",
     otherBtn: "Все услуги",
-    heroAlt:
-      "Dionis Insurance Broker — страховой брокер в Казахстане",
+    heroAlt: "Dionis Insurance Broker — страховой брокер в Казахстане",
   },
 
   benefits: {
     title: "Почему с Dionis удобно работать",
-    subtitle: "Официальный страховой брокер: подбираем решения и сопровождаем клиентов",
+    subtitle:
+      "Официальный страховой брокер: подбираем решения и сопровождаем клиентов",
     cards: [
       {
+        icon: "shield",
         value: "100%",
         label: "Надёжность",
-        text: "Все полисы оформляются через лицензированных страховщиков. Никаких «серых» схем — только легальные программы страхования.",
+        text:
+          "Все полисы оформляются через лицензированных страховщиков. Никаких «серых» схем — только легальные программы страхования.",
       },
       {
+        icon: "time",
         value: "15 минут",
         label: "Скорость",
-        text: "Онлайн-заявка занимает несколько минут. В рабочее время полис обычно готов в течение одного часа.",
+        text:
+          "Онлайн-заявка занимает несколько минут. В рабочее время полис обычно готов в течение одного часа.",
       },
       {
+        icon: "experience",
         value: "12+ лет",
         label: "Опыт",
-        text: "Более 12 лет в международных перевозках. Понимаем требования по страхованию на коридорах ЕС, ЕАЭС, Кавказ, Турция, Китай.",
+        text:
+          "Более 12 лет в международных перевозках. Понимаем требования по страхованию на коридорах ЕС, ЕАЭС, Кавказ, Турция, Китай.",
       },
       {
+        icon: "support",
         value: "24/7",
         label: "На связи",
-        text: "Принимаем заявки онлайн, через WhatsApp и Telegram. Реагируем на срочные запросы и помогаем, когда у клиента вопрос «здесь и сейчас».",
+        text:
+          "Принимаем заявки онлайн, через WhatsApp и Telegram. Реагируем на срочные запросы и помогаем, когда у клиента вопрос «здесь и сейчас».",
       },
     ],
   },
@@ -243,7 +256,7 @@ const ru: HomeDictionary = {
       {
         key: "auto",
         title: "Автострахование",
-        image: "/services/auto1.webp",
+        image: "/services/autoinsur.png",
         linkSuffix: "/products#auto",
         items: [
           "Зелёная карта",
@@ -255,7 +268,7 @@ const ru: HomeDictionary = {
       {
         key: "property",
         title: "Имущественное страхование",
-        image: "/services/property.webp",
+        image: "/services/engininsur.png",
         linkSuffix: "/products#property",
         items: [
           "Движимое имущество",
@@ -266,7 +279,7 @@ const ru: HomeDictionary = {
       {
         key: "cargo",
         title: "Страхование грузов",
-        image: "/services/cargo1.webp",
+        image: "/services/cargo.png",
         linkSuffix: "/products#cargo",
         items: [
           "Ответственность экспедитора",
@@ -277,7 +290,7 @@ const ru: HomeDictionary = {
       {
         key: "liability",
         title: "Страхование ответственности",
-        image: "/services/liability.webp",
+        image: "/services/liability.png",
         linkSuffix: "/products#liability",
         items: [
           "Профессиональная ответственность",
@@ -288,9 +301,19 @@ const ru: HomeDictionary = {
       {
         key: "live",
         title: "Страхование жизни",
-        image: "/services/live.webp",
+        image: "/services/live.png",
         linkSuffix: "/products#live",
         items: ["Страхование жизни", "Накопительное страхование"],
+      },
+      {
+        key: "vhi",
+        title: "Медицинское страхование",
+        image: "/services/vhi.png",
+        linkSuffix: "/products#vhi",
+        items: ["Добровольное Медицинское Страхование", 
+          "Страхование от несчастных случаев",
+          "Страхование выезжающих за рубеж"
+        ],
       },
     ],
     moreBtn: "Подробнее",
@@ -360,21 +383,25 @@ const kz: HomeDictionary = {
     subtitle: "Ресми сақтандыру брокері: шешімдерді іріктейміз және клиенттерді толық сүйемелдейміз",
     cards: [
       {
+        icon: "shield",
         value: "100%",
         label: "Сенімділік",
         text: "Барлық полистер лицензияланған сақтандыру компаниялары арқылы рәсімделеді. Ешқандай “көлеңкелі” схемалар жоқ — тек заңды бағдарламалар.",
       },
       {
+        icon: "time",
         value: "15 минут",
         label: "Жылдамдық",
         text: "Онлайн өтінім бірнеше минут алады. Жұмыс уақытында полис әдетте 1 сағат ішінде дайын болады.",
       },
       {
+        icon: "experience",
         value: "12+ жыл",
         label: "Тәжірибе",
         text: "12 жылдан астам халықаралық тасымалдау саласында. ЕО, ЕАЭО, Кавказ, Түркия, Қытай бағыттарындағы сақтандыру талаптарын жақсы білеміз.",
       },
       {
+        icon: "support",
         value: "24/7",
         label: "Қол жетімділік",
         text: "Өтінімдерді онлайн, WhatsApp және Telegram арқылы қабылдаймыз. Шұғыл сұрақтарға жедел жауап береміз.",
@@ -467,28 +494,28 @@ const kz: HomeDictionary = {
       {
         key: "auto",
         title: "Автосақтандыру",
-        image: "/services/auto1.webp",
+        image: "/services/autoinsur.png",
         linkSuffix: "/products#auto",
         items: ["Жасыл карта", "ОСАГО (резидент еместер)", "КАСКО", "Ассистанс"],
       },
       {
         key: "property",
         title: "Мүлікті сақтандыру",
-        image: "/services/property.webp",
+        image: "/services/engininsur.png",
         linkSuffix: "/products#property",
         items: ["Жылжымалы мүлік", "Жылжымайтын мүлік", "Инженерлік объектілер"],
       },
       {
         key: "cargo",
         title: "Жүкті сақтандыру",
-        image: "/services/cargo1.webp",
+        image: "/services/cargo.png",
         linkSuffix: "/products#cargo",
         items: ["Экспедитор жауапкершілігі", "Жүктер", "Халықаралық тасымал"],
       },
       {
         key: "liability",
         title: "Жауапкершілікті сақтандыру",
-        image: "/services/liability.webp",
+        image: "/services/liability.png",
         linkSuffix: "/products#liability",
         items: [
           "Кәсіби жауапкершілік",
@@ -499,9 +526,20 @@ const kz: HomeDictionary = {
       {
         key: "live",
         title: "Өмірді сақтандыру",
-        image: "/services/live.webp",
+        image: "/services/live.png",
         linkSuffix: "/products#live",
         items: ["Өмірді сақтандыру", "Жинақтаушы сақтандыру"],
+      },
+      {
+        key: "vhi",
+        title: "Медициналық сақтандыру",
+        image: "/services/vhi.png",
+        linkSuffix: "/products#vhi",
+        items: [
+          "Ерікті медициналық сақтандыру", 
+          "Жазатайым оқиғалардан сақтандыру",
+          "Шетелге шығатындарды сақтандыру"
+        ],
       },
     ],
     moreBtn: "Толығырақ",
@@ -574,21 +612,25 @@ const en: HomeDictionary = {
     subtitle: "We issue insurance for entry into Russia and Europe",
     cards: [
       {
+        icon: "shield",
         value: "100%",
         label: "Reliability",
         text: "All policies are issued through licensed insurers. No 'grey' schemes — only legitimate insurance programs.",
       },
       {
+        icon: "time",
         value: "15 minutes",
         label: "Speed",
         text: "The online application takes only a few minutes. During working hours, a policy is usually ready within one hour.",
       },
       {
+        icon: "experience",
         value: "12+ years",
         label: "Experience",
         text: "More than 12 years in international transportation. We understand insurance requirements along EU, EAEU, Caucasus, Turkey, and China corridors.",
       },
       {
+        icon: "support",
         value: "24/7",
         label: "Always in touch",
         text: "We accept requests online, via WhatsApp and Telegram. We respond to urgent inquiries and help when the client needs answers immediately.",
@@ -680,21 +722,21 @@ const en: HomeDictionary = {
       {
         key: "auto",
         title: "Motor Insurance",
-        image: "/services/auto1.webp",
+        image: "/services/autoinsur.png",
         linkSuffix: "/products#auto",
         items: ["Green Card", "OSAGO for non-residents", "CASCO", "Assistance"],
       },
       {
         key: "property",
         title: "Property Insurance",
-        image: "/services/property.webp",
+        image: "/services/engininsur.png",
         linkSuffix: "/products#property",
         items: ["Movable property", "Real estate", "Engineering structures"],
       },
       {
         key: "cargo",
         title: "Cargo Insurance",
-        image: "/services/cargo1.webp",
+        image: "/services/cargo.png",
         linkSuffix: "/products#cargo",
         items: [
           "Forwarder's liability",
@@ -705,7 +747,7 @@ const en: HomeDictionary = {
       {
         key: "liability",
         title: "Liability Insurance",
-        image: "/services/liability.webp",
+        image: "/services/liability.png",
         linkSuffix: "/products#liability",
         items: [
           "Professional liability",
@@ -716,9 +758,20 @@ const en: HomeDictionary = {
       {
         key: "live",
         title: "Life Insurance",
-        image: "/services/live.webp",
+        image: "/services/live.png",
         linkSuffix: "/products#live",
         items: ["Life insurance", "Savings insurance"],
+      },
+      {
+        key: "vhi",
+        title: "Health Insurance",
+        image: "/services/vhi.png",
+        linkSuffix: "/products#vhi",
+        items: [
+          "Voluntary Health Insurance", 
+          "Accident Insurance",
+          "Travel Insurance"
+        ],
       },
     ],
     moreBtn: "More details",
