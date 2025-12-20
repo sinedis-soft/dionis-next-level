@@ -55,7 +55,22 @@ type FormStatus = "idle" | "loading" | "success" | "error";
 
 function prefersReducedMotion(): boolean {
   if (typeof window === "undefined") return false;
-  return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+  return (
+    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false
+  );
+}
+
+/**
+ * ✅ Важно: компонент вынесен ИЗ рендера GreenCardOrderForm
+ * (иначе react-hooks/static-components ругается "Cannot create components during render")
+ */
+function RequiredMark() {
+  return (
+    <span className="text-red-500" aria-hidden="true">
+      {" "}
+      *
+    </span>
+  );
 }
 
 export function GreenCardOrderForm({ dict }: Props) {
@@ -127,14 +142,6 @@ export function GreenCardOrderForm({ dict }: Props) {
       "w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white " +
       "focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]",
     []
-  );
-
-  // Мелкий хелпер “*”
-  const RequiredMark = () => (
-    <span className="text-red-500" aria-hidden="true">
-      {" "}
-      *
-    </span>
   );
 
   function validateStep(stepToValidate: 1 | 2 | 3 | 4): boolean {
@@ -341,7 +348,9 @@ export function GreenCardOrderForm({ dict }: Props) {
                     type="tel"
                     name="contact_phone"
                     value={contactPhone}
-                    onChange={(e) => setContactPhone(formatPhone(e.target.value))}
+                    onChange={(e) =>
+                      setContactPhone(formatPhone(e.target.value))
+                    }
                     className={fieldClass}
                     required
                   />
@@ -407,7 +416,12 @@ export function GreenCardOrderForm({ dict }: Props) {
                       {dict.company.bin}
                       <RequiredMark />
                     </label>
-                    <input type="text" name="company_bin" className={fieldClass} required />
+                    <input
+                      type="text"
+                      name="company_bin"
+                      className={fieldClass}
+                      required
+                    />
                   </div>
 
                   <div>
@@ -415,7 +429,12 @@ export function GreenCardOrderForm({ dict }: Props) {
                       {dict.company.email}
                       <RequiredMark />
                     </label>
-                    <input type="email" name="company_email" className={fieldClass} required />
+                    <input
+                      type="email"
+                      name="company_email"
+                      className={fieldClass}
+                      required
+                    />
                   </div>
                 </div>
               ) : (
@@ -425,7 +444,11 @@ export function GreenCardOrderForm({ dict }: Props) {
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         {dict.person.middleName}
                       </label>
-                      <input type="text" name="person_middleName" className={fieldClass} />
+                      <input
+                        type="text"
+                        name="person_middleName"
+                        className={fieldClass}
+                      />
                     </div>
 
                     <div>
@@ -487,7 +510,12 @@ export function GreenCardOrderForm({ dict }: Props) {
                         {dict.person.address}
                         <RequiredMark />
                       </label>
-                      <input type="text" name="person_address" className={fieldClass} required />
+                      <input
+                        type="text"
+                        name="person_address"
+                        className={fieldClass}
+                        required
+                      />
                     </div>
                   </div>
 
@@ -514,7 +542,12 @@ export function GreenCardOrderForm({ dict }: Props) {
                         {dict.person.passportIssuer}
                         <RequiredMark />
                       </label>
-                      <input type="text" name="person_passportIssuer" className={fieldClass} required />
+                      <input
+                        type="text"
+                        name="person_passportIssuer"
+                        className={fieldClass}
+                        required
+                      />
                     </div>
 
                     <div>
@@ -632,7 +665,9 @@ export function GreenCardOrderForm({ dict }: Props) {
               </div>
 
               <div className="flex justify-between items-center gap-4">
-                <p className="text-xs text-gray-600">{dict.vehicles.description}</p>
+                <p className="text-xs text-gray-600">
+                  {dict.vehicles.description}
+                </p>
 
                 <button
                   type="button"
@@ -646,7 +681,10 @@ export function GreenCardOrderForm({ dict }: Props) {
 
               <div className="mt-4 space-y-6">
                 {vehicleBlocks.map((id, idx) => (
-                  <div key={id} className="rounded-xl border border-gray-200 bg-white p-4">
+                  <div
+                    key={id}
+                    className="rounded-xl border border-gray-200 bg-white p-4"
+                  >
                     <div className="flex justify-between items-center mb-3">
                       <p className="text-xs font-semibold text-gray-500">
                         {dict.vehicles.blockTitle} #{idx + 1}
@@ -673,9 +711,12 @@ export function GreenCardOrderForm({ dict }: Props) {
                         <input
                           type="text"
                           name={`vehicles[${idx}][plate]`}
-                          onChange={(e) =>
-                            (e.target.value = formatLatinAlnum(e.target.value, 12))
-                          }
+                          onChange={(e) => {
+                            e.target.value = formatLatinAlnum(
+                              e.target.value,
+                              12
+                            );
+                          }}
                           className={fieldClass}
                           required
                         />
@@ -689,9 +730,12 @@ export function GreenCardOrderForm({ dict }: Props) {
                         <input
                           type="text"
                           name={`vehicles[${idx}][techPassportNumber]`}
-                          onChange={(e) =>
-                            (e.target.value = formatLatinAlnum(e.target.value, 20))
-                          }
+                          onChange={(e) => {
+                            e.target.value = formatLatinAlnum(
+                              e.target.value,
+                              20
+                            );
+                          }}
                           className={fieldClass}
                           required
                         />
@@ -709,12 +753,22 @@ export function GreenCardOrderForm({ dict }: Props) {
                           required
                         >
                           <option value="">{dict.notSelected}</option>
-                          <option value="127">{dict.vehicles.vehicleTypePassenger}</option>
+                          <option value="127">
+                            {dict.vehicles.vehicleTypePassenger}
+                          </option>
                           <option value="131">{dict.vehicles.vehicleTypeBus}</option>
-                          <option value="453">{dict.vehicles.vehicleTypeTruck}</option>
-                          <option value="251">{dict.vehicles.vehicleTypeTrailer}</option>
-                          <option value="217">{dict.vehicles.vehicleTypeMotorcycle}</option>
-                          <option value="457">{dict.vehicles.vehicleTypeSpecial}</option>
+                          <option value="453">
+                            {dict.vehicles.vehicleTypeTruck}
+                          </option>
+                          <option value="251">
+                            {dict.vehicles.vehicleTypeTrailer}
+                          </option>
+                          <option value="217">
+                            {dict.vehicles.vehicleTypeMotorcycle}
+                          </option>
+                          <option value="457">
+                            {dict.vehicles.vehicleTypeSpecial}
+                          </option>
                         </select>
                       </div>
 
@@ -782,7 +836,8 @@ export function GreenCardOrderForm({ dict }: Props) {
                         onChange={(e) => {
                           if (!e.target.files) return;
                           const validFiles = validateFiles(e.target.files);
-                          if (validFiles.length !== e.target.files.length) e.target.value = "";
+                          if (validFiles.length !== e.target.files.length)
+                            e.target.value = "";
                         }}
                         accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                         className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border file:border-gray-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50"
@@ -802,8 +857,8 @@ export function GreenCardOrderForm({ dict }: Props) {
                     hasSuccess
                       ? "text-sm text-green-700"
                       : hasError
-                        ? "text-sm text-red-600"
-                        : "text-sm text-gray-600"
+                      ? "text-sm text-red-600"
+                      : "text-sm text-gray-600"
                   }
                 >
                   {formStatus === "loading" ? "Отправка..." : formMessage}

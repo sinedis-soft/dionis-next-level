@@ -14,7 +14,7 @@ import StatusModal from "@/components/StatusModal";
 import DeferredHydration from "@/components/DeferredHydration";
 
 export default function ContactIsland({
-  lang,
+  lang: _lang,
   t,
   agreement,
 }: {
@@ -60,7 +60,7 @@ export default function ContactIsland({
 
         <DeferredHydration rootMargin="900px" minDelayMs={150}>
           <ContactForm
-            t={t}
+            t={t.contact}
             agreement={agreement}
             onOpenAgreement={() => setIsAgreementOpen(true)}
             onResult={handleFormResult}

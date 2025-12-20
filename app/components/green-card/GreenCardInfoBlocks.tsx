@@ -5,7 +5,7 @@ import DeferredHydration from "@/components/DeferredHydration";
 
 export default function GreenCardInfoBlocks({
   dict,
-  coverageImageSrc = "/green-card/coverage.webp", // поставь свой путь (можно пока заглушку)
+  coverageImageSrc = "/green-card/map2.png", // поставь свой путь (можно пока заглушку)
 }: {
   dict: Pick<GreenCardPageDictionary, "howItWorks" | "coverage">;
   coverageImageSrc?: string;
@@ -108,7 +108,7 @@ export default function GreenCardInfoBlocks({
                 <div className="p-6 sm:p-10 flex items-center justify-center">
                     <div className="w-full max-w-md aspect-[4/3] bg-white/5 flex items-center justify-center relative">
                         <Image
-                        src="/green-card/map2.png"
+                        src={coverageImageSrc}
                         alt={dict.coverage.imageAlt}
                         fill
                         className="object-cover opacity-90"

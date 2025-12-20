@@ -2,23 +2,18 @@
 import Image from "next/image";
 import type { AboutDictionary } from "@/dictionaries/about";
 import type { AgreementDictionary } from "@/dictionaries/agreement";
-import type { HomeDictionary, ServiceConfig } from "@/dictionaries/home";
+import type { HomeDictionary } from "@/dictionaries/home";
 import type { Lang } from "@/dictionaries/header";
 
-import ServicesCarousel from "@/components/ServicesCarousel"; // проверь путь/экспорт
+
 import ContactSection from "@/components/ContactSection";
 
 type Props = {
   lang: Lang;
   t: AboutDictionary;
-  services: HomeDictionary["services"];
-
-  // ✅ добавили для контактной секции
   contact: HomeDictionary["contact"];
   agreement: AgreementDictionary;
 };
-
-type CarouselItem = ServiceConfig & { link: string };
 
 function FeatureCard({ title, text }: { title: string; text: string }) {
   return (
@@ -33,15 +28,7 @@ function FeatureCard({ title, text }: { title: string; text: string }) {
   );
 }
 
-export default function AboutPage({ t, lang, services, contact, agreement }: Props) {
-  const greenCardLink = `/${lang}/green-card`;
-  const osagoLink = `/${lang}/osago-rf`;
-
-  const otherServices: CarouselItem[] = services.otherServices.map((s) => ({
-    ...s,
-    link: `/${lang}${s.linkSuffix}`,
-  }));
-
+export default function AboutPage({ t, lang, contact, agreement }: Props) {
   return (
     <>
       <section className="py-10 sm:py-14 bg-gray-50">
