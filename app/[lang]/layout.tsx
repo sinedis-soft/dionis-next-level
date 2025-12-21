@@ -8,14 +8,13 @@ import SiteFooter from "@/components/SiteFooter";
 import CookieConsent from "@/components/CookieConsent";
 import AnalyticsManager from "@/components/AnalyticsManager";
 
-// ✅ PROD домен + можно переопределять через env
 const SITE_URL =
-  (process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") as string | undefined) ??
-  "https://dionis-insurance.kz";
+  (process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ??
+    "https://dionis-insurance.kz") as string;
 
 const HREFLANG: Record<Lang, string> = {
   ru: "ru",
-  kz: "kk-KZ", // SEO: казахский (Казахстан)
+  kz: "kk-KZ",
   en: "en",
 };
 
@@ -35,12 +34,6 @@ function normalizeLang(value: unknown): Lang {
   return value === "ru" || value === "kz" || value === "en" ? value : "ru";
 }
 
-function abs(path: string) {
-  return `${SITE_URL}${path}`;
-}
-
-// ✅ Главная /ru — брендовая (без продуктового интента)
-// Продукты — на отдельных страницах
 function getSeo(lang: Lang) {
   if (lang === "ru") {
     return {
@@ -61,7 +54,8 @@ function getSeo(lang: Lang) {
   }
 
   return {
-    title: "Dionis Insurance Broker — insurance broker in Kazakhstan (Almaty) | Official",
+    title:
+      "Dionis Insurance Broker — insurance broker in Kazakhstan (Almaty) | Official",
     description:
       "Insurance broker in Kazakhstan: program selection, consulting and support. Officially licensed. Almaty, phone and messengers.",
   };
@@ -72,30 +66,31 @@ export async function generateMetadata({
 }: {
   params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
-  const { lang: rawLang } = await params;
+  const { lang: rawLang } = await params; // ✅ важно
   const lang = normalizeLang(rawLang);
-
   const seo = getSeo(lang);
 
   return {
+    metadataBase: new URL(SITE_URL),
     title: seo.title,
     description: seo.description,
-
-    // ✅ абсолютный canonical
     alternates: {
-      canonical: abs(LANG_PATH[lang]),
-
-      // ✅ абсолютные hreflang
+      canonical: LANG_PATH[lang],
       languages: {
-        [HREFLANG.ru]: abs(LANG_PATH.ru),
-        [HREFLANG.kz]: abs(LANG_PATH.kz),
-        [HREFLANG.en]: abs(LANG_PATH.en),
-        "x-default": abs(LANG_PATH.ru),
+        [HREFLANG.ru]: LANG_PATH.ru,
+        [HREFLANG.kz]: LANG_PATH.kz,
+        [HREFLANG.en]: LANG_PATH.en,
+        "x-default": LANG_PATH.ru,
+      },
+      types: {
+        "application/rss+xml": [
+          {
+            url: `/${lang}/rss.xml`,
+            title: `Dionis Blog RSS (${lang.toUpperCase()})`,
+          },
+        ],
       },
     },
-
-    // (не обязательно, но полезно)
-    metadataBase: new URL(SITE_URL),
   };
 }
 
@@ -106,7 +101,7 @@ export default async function LangLayout({
   children: ReactNode;
   params: Promise<{ lang: string }>;
 }) {
-  const { lang: rawLang } = await params;
+  const { lang: rawLang } = await params; // ✅ важно
   const lang = normalizeLang(rawLang);
 
   return (

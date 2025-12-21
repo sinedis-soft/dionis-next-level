@@ -42,16 +42,6 @@ export default function FAQSection({ dict }: Props) {
         <div className="mt-8">
           <FAQAccordion items={dict.items} />
         </div>
-
-        {/* ✅ Страховка: весь текст точно присутствует в HTML */}
-        <div className="sr-only">
-          {dict.items.map((it) => (
-            <div key={it.id}>
-              <p>{it.question}</p>
-              <p>{it.answer}</p>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   );

@@ -1,49 +1,23 @@
-// app/[lang]/blog/page.tsx
-import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
+import { getAllArticles } from "@/lib/blog";
+import BlogGrid from "@/components/blog/BlogGrid";
 
-export const dynamic = "force-static";
-
-type Props = {
-  params: { lang: Lang };
-};
-
-const titles: Record<Lang, string> = {
-  ru: "Блог",
-  kz: "Блог",
-  en: "Blog",
-};
-
-const descriptions: Record<Lang, string> = {
-  ru: "Новости и статьи Dionis Insurance.",
-  kz: "Dionis Insurance жаңалықтары мен мақалалары.",
-  en: "News and articles from Dionis Insurance.",
-};
-
-export function generateMetadata({ params }: Props): Metadata {
-  const lang = params.lang;
-  return {
-    title: titles[lang],
-    description: descriptions[lang],
-  };
-}
-
-export default function BlogPage({ params }: Props) {
-  const lang = params.lang;
+export default async function BlogIndexPage(
+  props: { params: Promise<{ lang: Lang }> }
+) {
+  const { lang } = await props.params;
+  const articles = await getAllArticles(lang);
 
   return (
-    <section className="py-10 sm:py-14">
-      <div className="max-w-5xl mx-auto px-4">
-        <h1 className="text-3xl sm:text-4xl font-bold text-[#1A3A5F]">
-          {titles[lang]}
-        </h1>
-
-        <p className="mt-4 text-gray-700">
-          {lang === "ru" && "Публикации скоро появятся."}
-          {lang === "kz" && "Жарияланымдар жақында шығады."}
-          {lang === "en" && "Posts are coming soon."}
+    <main className="bg-white">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-[#1A3A5F]">Блог</h1>
+        <p className="mt-2 text-gray-600">
+          Разбор страховых ситуаций, лайфхаки, изменения правил и практические кейсы.
         </p>
+
+        <BlogGrid lang={lang} articles={articles} />
       </div>
-    </section>
+    </main>
   );
 }
