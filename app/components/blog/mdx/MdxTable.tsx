@@ -1,64 +1,65 @@
-import type { HTMLAttributes, ThHTMLAttributes, TdHTMLAttributes } from "react";
+// components/blog/mdx/MdxTable.tsx
+import React from "react";
 
-export function MdxTable(props: HTMLAttributes<HTMLTableElement>) {
+/**
+ * Обёртка таблицы:
+ * - горизонтальный скролл на мобильных
+ * - аккуратная рамка
+ */
+export function MdxTable(
+  props: React.TableHTMLAttributes<HTMLTableElement>
+) {
   return (
-    <div className="not-prose my-8 overflow-x-auto">
+    <div className="my-6 w-full overflow-x-auto rounded-xl border border-gray-200">
       <table
         {...props}
-        className={[
-          "w-full border-collapse overflow-hidden rounded-xl border",
-          props.className ?? "",
-        ].join(" ")}
+        className={`min-w-max w-full border-collapse text-sm ${props.className ?? ""}`.trim()}
       />
     </div>
   );
 }
 
-export function MdxThead(props: HTMLAttributes<HTMLTableSectionElement>) {
-  return (
-    <thead
-      {...props}
-      className={["bg-gray-50", props.className ?? ""].join(" ")}
-    />
-  );
+export function MdxThead(
+  props: React.HTMLAttributes<HTMLTableSectionElement>
+) {
+  return <thead {...props} />;
 }
 
-export function MdxTbody(props: HTMLAttributes<HTMLTableSectionElement>) {
-  return <tbody {...props} className={props.className ?? ""} />;
+export function MdxTbody(
+  props: React.HTMLAttributes<HTMLTableSectionElement>
+) {
+  return <tbody {...props} />;
 }
 
-export function MdxTr(props: HTMLAttributes<HTMLTableRowElement>) {
+export function MdxTr(
+  props: React.HTMLAttributes<HTMLTableRowElement>
+) {
   return (
     <tr
       {...props}
-      className={[
-        "odd:bg-white even:bg-gray-50",
-        props.className ?? "",
-      ].join(" ")}
+      className={`border-b border-gray-200 ${props.className ?? ""}`.trim()}
     />
   );
 }
 
-export function MdxTh(props: ThHTMLAttributes<HTMLTableCellElement>) {
+export function MdxTh(
+  props: React.ThHTMLAttributes<HTMLTableCellElement>
+) {
   return (
     <th
       {...props}
-      className={[
-        "border-b px-4 py-3 text-left text-sm font-semibold text-gray-900",
-        props.className ?? "",
-      ].join(" ")}
+      className={`bg-gray-50 px-3 py-2 text-left font-semibold text-gray-900 ${props.className ?? ""}`.trim()}
     />
   );
 }
 
-export function MdxTd(props: TdHTMLAttributes<HTMLTableCellElement>) {
+export function MdxTd(
+  props: React.TdHTMLAttributes<HTMLTableCellElement>
+) {
   return (
     <td
       {...props}
-      className={[
-        "border-b px-4 py-3 text-sm text-gray-800 align-top",
-        props.className ?? "",
-      ].join(" ")}
+      className={`px-3 py-2 align-top text-gray-800 ${props.className ?? ""}`.trim()}
     />
   );
 }

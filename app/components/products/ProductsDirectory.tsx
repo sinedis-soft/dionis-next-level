@@ -25,28 +25,55 @@ type Props = {
 };
 
 export default function ProductsDirectory({ categories, lang, base, ui }: Props) {
-  const safe = Array.isArray(categories) ? categories : [];
+  // ✅ memo, чтобы deps useMemo/useEffect не "прыгали" на каждом рендере
+  const safe = useMemo<Category[]>(
+    () => (Array.isArray(categories) ? categories : []),
+    [categories]
+  );
 
-  const keys = useMemo(() => safe.map((c) => c.key), [safe]);
+  const keys = useMemo<Array<Category["key"]>>(
+    () => safe.map((c) => c.key),
+    [safe]
+  );
+
+  const keysSet = useMemo<Set<Category["key"]>>(
+    () => new Set(keys),
+    [keys]
+  );
+
+  const coerceKey = (raw: string): Category["key"] => {
+    // Если ключи есть — выбираем из набора, иначе дефолт
+    const candidate = raw as Category["key"];
+    if (keysSet.has(candidate)) return candidate;
+    return keys[0] ?? "auto";
+  };
 
   const [active, setActive] = useState<Category["key"]>(keys[0] ?? "auto");
+
+  // ✅ если categories/keys поменялись и active стал невалидным — исправляем
+  useEffect(() => {
+    if (!keysSet.has(active)) {
+      setActive(keys[0] ?? "auto");
+    }
+  }, [active, keys, keysSet]);
 
   // открыть по hash при загрузке + реагировать на смену hash
   useEffect(() => {
     const applyHash = () => {
       const raw = window.location.hash?.replace("#", "") || "";
-      if (raw && (keys as string[]).includes(raw)) {
-        setActive(raw as any);
-      }
+      if (!raw) return;
+
+      const nextKey = raw as Category["key"];
+      if (keysSet.has(nextKey)) setActive(nextKey);
     };
+
     applyHash();
     window.addEventListener("hashchange", applyHash);
     return () => window.removeEventListener("hashchange", applyHash);
-  }, [keys]);
+  }, [keysSet]);
 
   const onPick = (key: Category["key"]) => {
     setActive(key);
-    // фиксируем hash, чтобы была навигация/шаринг
     if (typeof window !== "undefined") {
       window.history.replaceState(null, "", `#${key}`);
     }
@@ -67,9 +94,10 @@ export default function ProductsDirectory({ categories, lang, base, ui }: Props)
           <label className="block text-sm font-medium text-gray-700 mb-2">
             {mobileLabel}
           </label>
+
           <select
             value={active}
-            onChange={(e) => onPick(e.target.value as any)}
+            onChange={(e) => onPick(coerceKey(e.target.value))}
             className="w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm"
           >
             {safe.map((c) => (
@@ -134,7 +162,6 @@ export default function ProductsDirectory({ categories, lang, base, ui }: Props)
                     isOpen ? "shadow-sm" : ""
                   )}
                 >
-                  {/* “описание” секции — кликабельное */}
                   <button
                     type="button"
                     onClick={() => onPick(c.key)}
@@ -148,9 +175,7 @@ export default function ProductsDirectory({ categories, lang, base, ui }: Props)
                       <div className="text-base sm:text-lg font-bold text-[#0f2238]">
                         {c.title[lang]}
                       </div>
-                      <p className="mt-2 text-sm text-gray-700">
-                        {c.lead[lang]}
-                      </p>
+                      <p className="mt-2 text-sm text-gray-700">{c.lead[lang]}</p>
 
                       <div className="mt-3 text-sm text-gray-700">
                         {(c.bullets?.[lang] ?? []).join(" • ")}
@@ -164,7 +189,6 @@ export default function ProductsDirectory({ categories, lang, base, ui }: Props)
                     </div>
                   </button>
 
-                  {/* раскрывающийся блок */}
                   {isOpen ? (
                     <div className="px-5 sm:px-6 pb-6">
                       {c.key === "auto" ? (

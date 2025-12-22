@@ -1,15 +1,21 @@
-// lib/blog.ts
+// lib/blog.tsx
 import path from "path";
 import fs from "fs/promises";
 import matter from "gray-matter";
 import type { ReactNode } from "react";
+import { cache } from "react";
+
 import type { Lang } from "@/dictionaries/header";
 import { compileMDX } from "next-mdx-remote/rsc";
-import { cache } from "react";
+import remarkGfm from "remark-gfm";
+
 import Callout from "@/components/blog/mdx/Callout";
 import Cta from "@/components/blog/mdx/Cta";
 import Table from "@/components/blog/mdx/Table";
-import remarkGfm from "remark-gfm";
+
+import type { BlogContentType } from "@/lib/blogContentType";
+import { isBlogContentType } from "@/lib/blogContentType";
+
 import {
   MdxTable,
   MdxThead,
@@ -19,13 +25,30 @@ import {
   MdxTd,
 } from "@/components/blog/mdx/MdxTable";
 
+import { mdxHeadingComponents } from "@/components/blog/mdx/mdxHeadingComponents";
+import { slugifyHeading, normalizeHeadingText } from "@/lib/slugifyHeading";
+
+// ✅ новые блоки
+import Lead from "@/components/blog/mdx/blocks/Lead";
+import KeyTakeaway from "@/components/blog/mdx/blocks/KeyTakeaway";
+import Divider from "@/components/blog/mdx/blocks/Divider";
+import ScopeNote from "@/components/blog/mdx/blocks/ScopeNote";
+import FromPractice from "@/components/blog/mdx/blocks/FromPractice";
+import UpdateNotice from "@/components/blog/mdx/blocks/UpdateNotice";
+import ContentStatus from "@/components/blog/mdx/blocks/ContentStatus";
+import InlineCta from "@/components/blog/mdx/InlineCta";
+
+// ✅ AUTHORS вынесли в отдельный файл данных (без циклов)
+import { AUTHORS } from "@/data/blog/authors";
 
 export type BlogFAQItem = { q: string; a: string };
 
+// ✅ тип автора оставляем здесь (в данных AUTHORS он должен использовать совместимый shape)
 export type ArticleAuthor = {
   slug: string;
   name: string;
   title?: string;
+  shortBio?: string;
   bio?: string;
   photo?: string;
   linkedin?: string;
@@ -40,6 +63,9 @@ export type TocItem = {
 export type BlogFrontmatter = {
   slug: string;
   lang: Lang;
+
+  // ✅ новый тип контента
+  contentType: BlogContentType;
 
   title: string;
   seoTitle?: string;
@@ -56,18 +82,33 @@ export type BlogFrontmatter = {
   authorSlug?: string;
 
   faq?: BlogFAQItem[];
+
+  // ✅ явные связи статей (управляются редактором)
+  nextSlugs?: string[];
+  requiredSlugs?: string[];
+
+  // ✅ масштабирование: version + changes
+  // version лучше строкой ("1.2", "1.10")
+  version?: string;
+  changes?: string[];
 };
 
 export type BlogArticle = BlogFrontmatter & {
-  content: ReactNode; // compiled MDX content
-  raw: string;        // MDX без frontmatter
-  toc: TocItem[];     // оглавление (H2/H3)
+  content: ReactNode;
+  raw: string;
+  toc: TocItem[];
+
+  // ✅ резолвнутые связи (готовые карточки)
+  nextSteps?: BlogArticleCard[];
+  requiredReading?: BlogArticleCard[];
 };
 
+// ✅ ВАЖНО: добавили authorSlug, чтобы можно было строить страницу автора
 export type BlogArticleCard = Pick<
   BlogFrontmatter,
   | "slug"
   | "lang"
+  | "contentType"
   | "title"
   | "seoDescription"
   | "publishedAt"
@@ -75,20 +116,10 @@ export type BlogArticleCard = Pick<
   | "image"
   | "imageAlt"
   | "tags"
+  | "authorSlug"
 > & { excerpt: string };
 
 const CONTENT_DIR = path.join(process.cwd(), "content", "blog");
-
-// ---- Авторы (пока можно держать в коде/JSON, это не контент статей)
-const AUTHORS: ArticleAuthor[] = [
-  {
-    slug: "denis-borovoy",
-    name: "Денис Боровой",
-    title: "Исполнительный директор, страховой брокер",
-    bio: "Практика в страховании и урегулировании убытков. Специализация — авто, ответственность, логистика.",
-    photo: "/director-photo.webp",
-  },
-];
 
 function normalizeLang(lang: string): Lang {
   if (lang === "ru" || lang === "kz" || lang === "en") return lang;
@@ -99,18 +130,20 @@ function safeExcerpt(seoDescription: string) {
   return (seoDescription || "").trim();
 }
 
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, "-")
-    .replace(/^-+|-+$/g, "");
+function toDateMs(iso: string): number {
+  const ms = +new Date(iso);
+  return Number.isFinite(ms) ? ms : 0;
 }
 
-// Парсим оглавление из сырого MDX (без frontmatter)
-// Поддержка:
-//   ## Заголовок {#id}
-//   ### Подзаголовок {#id}
-// Если {#id} нет — генерим slugify()
+function toStringArray(v: unknown): string[] | undefined {
+  if (!Array.isArray(v)) return undefined;
+  const out = v
+    .map((x) => String(x ?? "").trim())
+    .filter((s) => s.length > 0);
+  return out.length ? out : undefined;
+}
+
+// TOC из сырого MDX (до компиляции)
 function extractTocFromMdx(rawMdx: string): TocItem[] {
   const lines = rawMdx.split("\n");
   const toc: TocItem[] = [];
@@ -118,22 +151,22 @@ function extractTocFromMdx(rawMdx: string): TocItem[] {
   for (const line of lines) {
     const h2 = line.match(/^##\s+(.+?)(?:\s+\{#([a-zA-Z0-9_-]+)\})?\s*$/);
     if (h2) {
-      const text = h2[1].trim();
+      const text = normalizeHeadingText(h2[1]);
       toc.push({
         level: 2,
         text,
-        id: h2[2] || slugify(text),
+        id: h2[2] || slugifyHeading(text),
       });
       continue;
     }
 
     const h3 = line.match(/^###\s+(.+?)(?:\s+\{#([a-zA-Z0-9_-]+)\})?\s*$/);
     if (h3) {
-      const text = h3[1].trim();
+      const text = normalizeHeadingText(h3[1]);
       toc.push({
         level: 3,
         text,
-        id: h3[2] || slugify(text),
+        id: h3[2] || slugifyHeading(text),
       });
     }
   }
@@ -174,12 +207,16 @@ function parseFrontmatter(rawFile: string): BlogFrontmatter {
     );
   }
 
+  // ✅ contentType (с валидацией + дефолтом)
+  const rawContentType = (data as Record<string, unknown>).contentType;
+  const contentType: BlogContentType = isBlogContentType(rawContentType)
+    ? rawContentType
+    : "guide";
+
   const tags = Array.isArray(data.tags) ? data.tags.map(String) : [];
 
-  // без any — используем unknown
   const faq: BlogFAQItem[] | undefined = Array.isArray(data.faq)
     ? (data.faq as unknown[])
-
         .map((item) => {
           if (!item || typeof item !== "object") return null;
           const o = item as Record<string, unknown>;
@@ -191,9 +228,27 @@ function parseFrontmatter(rawFile: string): BlogFrontmatter {
         .filter((x): x is BlogFAQItem => Boolean(x))
     : undefined;
 
+  // ✅ явные связи
+  const nextSlugs = toStringArray((data as Record<string, unknown>).nextSlugs);
+  const requiredSlugs = toStringArray(
+    (data as Record<string, unknown>).requiredSlugs
+  );
+
+  // ✅ version + changes
+  const versionRaw = (data as Record<string, unknown>).version;
+  const version =
+    typeof versionRaw === "string" && versionRaw.trim().length > 0
+      ? versionRaw.trim()
+      : typeof versionRaw === "number"
+        ? String(versionRaw)
+        : undefined;
+
+  const changes = toStringArray((data as Record<string, unknown>).changes);
+
   return {
     slug,
     lang,
+    contentType,
     title,
     seoTitle: data.seoTitle ? String(data.seoTitle) : undefined,
     seoDescription,
@@ -205,10 +260,63 @@ function parseFrontmatter(rawFile: string): BlogFrontmatter {
     tags,
     authorSlug: data.authorSlug ? String(data.authorSlug) : undefined,
     faq,
+    nextSlugs,
+    requiredSlugs,
+
+    // ✅ versioning
+    version,
+    changes,
   };
 }
 
-// Кэшируем на уровне RSC (ускоряет dev и билд)
+function frontmatterToCard(fm: BlogFrontmatter): BlogArticleCard {
+  return {
+    slug: fm.slug,
+    lang: fm.lang,
+    contentType: fm.contentType,
+    title: fm.title,
+    seoDescription: fm.seoDescription,
+    excerpt: safeExcerpt(fm.seoDescription),
+    publishedAt: fm.publishedAt,
+    readingTime: fm.readingTime,
+    image: fm.image,
+    imageAlt: fm.imageAlt,
+    tags: fm.tags,
+    authorSlug: fm.authorSlug,
+  };
+}
+
+async function getCardBySlug(
+  lang: Lang,
+  slug: string
+): Promise<BlogArticleCard | null> {
+  const raw = await readMdxFile(lang, slug);
+  if (!raw) return null;
+  const fm = parseFrontmatter(raw);
+  return frontmatterToCard(fm);
+}
+
+// ✅ сохраняем порядок как в frontmatter (и исключаем саму статью)
+async function resolveLinkedCards(
+  lang: Lang,
+  currentSlug: string,
+  slugs?: string[]
+): Promise<BlogArticleCard[]> {
+  if (!slugs?.length) return [];
+
+  const unique = Array.from(
+    new Set(
+      slugs
+        .map((s) => String(s ?? "").trim())
+        .filter((s) => s && s !== currentSlug)
+    )
+  );
+
+  const cards = await Promise.all(unique.map((s) => getCardBySlug(lang, s)));
+  return cards.filter(Boolean) as BlogArticleCard[];
+}
+
+// ✅ slugs для generateStaticParams / sitemap
 export const getAllArticleSlugs = cache(
   async (): Promise<Array<{ lang: Lang; slug: string }>> => {
     const langs: Lang[] = ["ru", "kz", "en"];
@@ -220,40 +328,43 @@ export const getAllArticleSlugs = cache(
         all.push({ lang, slug: f.replace(/\.mdx$/, "") });
       }
     }
+
     return all;
   }
 );
 
+// ✅ карточки для /[lang]/blog
 export const getAllArticles = cache(
   async (lang: Lang): Promise<BlogArticleCard[]> => {
     const files = await listMdxFilesForLang(lang);
 
     const cards: BlogArticleCard[] = [];
     for (const f of files) {
-      const slug = f.replace(/\.mdx$/, "");
-      const raw = await readMdxFile(lang, slug);
+      const fileSlug = f.replace(/\.mdx$/, "");
+      const raw = await readMdxFile(lang, fileSlug);
       if (!raw) continue;
 
       const fm = parseFrontmatter(raw);
-      cards.push({
-        slug: fm.slug,
-        lang: fm.lang,
-        title: fm.title,
-        seoDescription: fm.seoDescription,
-        excerpt: safeExcerpt(fm.seoDescription),
-        publishedAt: fm.publishedAt,
-        readingTime: fm.readingTime,
-        image: fm.image,
-        imageAlt: fm.imageAlt,
-        tags: fm.tags,
-      });
+      cards.push(frontmatterToCard(fm));
     }
 
-    cards.sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1));
+    // надёжная сортировка по дате
+    cards.sort((a, b) => toDateMs(b.publishedAt) - toDateMs(a.publishedAt));
     return cards;
   }
 );
 
+// ✅ статьи автора (для страницы автора)
+export const getArticlesByAuthor = cache(
+  async (lang: Lang, authorSlug: string): Promise<BlogArticleCard[]> => {
+    const cards = await getAllArticles(lang);
+    return cards
+      .filter((c) => c.authorSlug === authorSlug)
+      .sort((a, b) => toDateMs(b.publishedAt) - toDateMs(a.publishedAt));
+  }
+);
+
+// ✅ статья /[lang]/blog/[slug]
 export const getArticleBySlug = cache(
   async (lang: Lang, slug: string): Promise<BlogArticle | null> => {
     const rawFile = await readMdxFile(lang, slug);
@@ -261,50 +372,87 @@ export const getArticleBySlug = cache(
 
     const parsed = matter(rawFile);
     const fm = parseFrontmatter(rawFile);
-
     const toc = extractTocFromMdx(parsed.content);
 
-    // MDX -> ReactNode (server)
-const compiled = await compileMDX({
-  source: parsed.content,
-  options: {
-    parseFrontmatter: false,
-    mdxOptions: {
-      remarkPlugins: [remarkGfm],
-    },
-  },
-  components: {
-    Callout,
-    Cta,
-    Table,
+    // ✅ резолвим явные связи в карточки (без компиляции MDX у связных статей)
+    const [requiredReading, nextSteps] = await Promise.all([
+      resolveLinkedCards(lang, fm.slug, fm.requiredSlugs),
+      resolveLinkedCards(lang, fm.slug, fm.nextSlugs),
+    ]);
 
-    // Markdown tables styling (заработает после remark-gfm)
-    table: MdxTable,
-    thead: MdxThead,
-    tbody: MdxTbody,
-    tr: MdxTr,
-    th: MdxTh,
-    td: MdxTd,
-  },
-});
+    const compiled = await compileMDX({
+      source: parsed.content,
+      options: {
+        parseFrontmatter: false,
+        mdxOptions: {
+          remarkPlugins: [remarkGfm],
+        },
+      },
+      components: {
+        Callout,
+        Cta,
+        Table,
 
+        // ✅ новые “инструменты оформления”
+        Lead,
+        KeyTakeaway,
+        Divider,
+        ScopeNote,
+        FromPractice,
+        UpdateNotice,
+        ContentStatus,
+        InlineCta,
+
+        // ✅ headings + списки + чекбоксы
+        ...mdxHeadingComponents,
+
+        // ✅ markdown-таблицы
+        table: MdxTable,
+        thead: MdxThead,
+        tbody: MdxTbody,
+        tr: MdxTr,
+        th: MdxTh,
+        td: MdxTd,
+      },
+    });
 
     return {
       ...fm,
       content: compiled.content,
       raw: parsed.content,
       toc,
+
+      // ✅ новые поля для “системы обучения”
+      requiredReading,
+      nextSteps,
     };
   }
 );
 
+// ✅ автор
 export async function getAuthorBySlug(
-  slug?: string
+  slug?: string,
+  lang: Lang = "ru"
 ): Promise<ArticleAuthor | null> {
   if (!slug) return null;
-  return AUTHORS.find((a) => a.slug === slug) ?? null;
+
+  const record = AUTHORS.find((a) => a.slug === slug);
+  if (!record) return null;
+
+  const loc = record.i18n[lang] ?? record.i18n.ru;
+
+  return {
+    slug: record.slug,
+    name: loc.name,
+    title: loc.title,
+    shortBio: loc.shortBio,
+    bio: loc.bio,
+    photo: record.photo,
+    linkedin: record.linkedin,
+  };
 }
 
+// ✅ похожие статьи (по тегам) — оставляем как fallback/доп. блок
 export async function getRelatedArticles(
   article: BlogFrontmatter,
   limit = 6
@@ -323,7 +471,7 @@ export async function getRelatedArticles(
     }))
     .sort((x, y) => {
       if (y.score !== x.score) return y.score - x.score;
-      return x.c.publishedAt < y.c.publishedAt ? 1 : -1;
+      return toDateMs(y.c.publishedAt) - toDateMs(x.c.publishedAt);
     })
     .slice(0, limit)
     .map((x) => x.c);
