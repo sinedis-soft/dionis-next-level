@@ -1,9 +1,14 @@
+// app/[lang]/rss.xml/route.ts
 import type { Lang } from "@/dictionaries/header";
 import { getAllArticles } from "@/lib/blog";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
   "https://dionis-insurance.com";
+
+function normalizeLang(value: string): Lang {
+  return value === "ru" || value === "kz" || value === "en" ? value : "ru";
+}
 
 function escapeXml(s: string) {
   return s
@@ -16,13 +21,19 @@ function escapeXml(s: string) {
 
 export async function GET(
   _req: Request,
-  { params }: { params: { lang: Lang } }
+  { params }: { params: Promise<{ lang: string }> }
 ) {
-  const lang = params.lang;
+  const { lang: rawLang } = await params;
+  const lang = normalizeLang(rawLang);
+
   const items = await getAllArticles(lang);
 
   const channelTitle =
-    lang === "ru" ? "Dionis — Блог" : lang === "kz" ? "Dionis — Blog (KZ)" : "Dionis — Blog (EN)";
+    lang === "ru"
+      ? "Dionis — Блог"
+      : lang === "kz"
+      ? "Dionis — Blog (KZ)"
+      : "Dionis — Blog (EN)";
 
   const channelLink = `${SITE_URL}/${lang}/blog`;
 
@@ -31,7 +42,9 @@ export async function GET(
   <channel>
     <title>${escapeXml(channelTitle)}</title>
     <link>${escapeXml(channelLink)}</link>
-    <description>${escapeXml("Статьи о страховании: авто, грузы, кейсы и практические разборы.")}</description>
+    <description>${escapeXml(
+      "Статьи о страховании: авто, грузы, кейсы и практические разборы."
+    )}</description>
     <language>${escapeXml(lang)}</language>
     ${items
       .slice(0, 50)
@@ -41,7 +54,7 @@ export async function GET(
     <item>
       <title>${escapeXml(a.title)}</title>
       <link>${escapeXml(link)}</link>
-      <guid>${escapeXml(link)}</guid>
+      <guid isPermaLink="true">${escapeXml(link)}</guid>
       <pubDate>${escapeXml(new Date(a.publishedAt).toUTCString())}</pubDate>
       <description>${escapeXml(a.excerpt)}</description>
     </item>`;
