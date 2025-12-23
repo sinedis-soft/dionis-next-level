@@ -17,78 +17,7 @@ import { OsagoOrderForm } from "@/components/osago-rf/OsagoOrderForm";
 import FAQSection from "@/components/osago-rf/FAQSection";
 import OsagoRfQuestionForm from "@/components/osago-rf/OsagoRfQuestionForm";
 import DeferredHydration from "@/components/DeferredHydration";
-
-function OsagoInfoBlocks({
-  dict,
-}: {
-  dict: Pick<OsagoRfPageDictionary, "howItWorks">;
-}) {
-  return (
-    <DeferredHydration rootMargin="800px" minDelayMs={150}>
-      <section
-        className="py-12 sm:py-16 bg-white [overflow-anchor:none]"
-        aria-labelledby="how-it-works-heading"
-      >
-        <div className="max-w-6xl mx-auto px-4">
-          <h2
-            id="how-it-works-heading"
-            className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center"
-          >
-            {dict.howItWorks.title}
-          </h2>
-
-          <p className="mt-2 text-center text-gray-600">
-            {dict.howItWorks.subtitle}
-          </p>
-
-          <div className="mt-10">
-            <div className="hidden md:block relative">
-              <div className="absolute left-0 right-0 top-[18px] h-px bg-gray-200" />
-              <div className="grid grid-cols-4 gap-6">
-                {dict.howItWorks.steps.map((s, idx) => (
-                  <div key={idx} className="text-center">
-                    <div className="mx-auto h-9 w-9 rounded-full bg-[#0F2742] text-white flex items-center justify-center text-sm font-semibold">
-                      {idx + 1}
-                    </div>
-                    <div className="mt-3 text-sm font-extrabold text-[#1A3A5F]">
-                      {s.title}
-                    </div>
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-                      {s.text}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="md:hidden grid gap-4">
-              {dict.howItWorks.steps.map((s, idx) => (
-                <article
-                  key={idx}
-                  className="card bg-white border border-gray-200 shadow-sm p-5"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="shrink-0 h-9 w-9 rounded-full bg-[#0F2742] text-white flex items-center justify-center text-sm font-semibold">
-                      {idx + 1}
-                    </div>
-                    <div>
-                      <div className="text-sm font-extrabold text-[#1A3A5F]">
-                        {s.title}
-                      </div>
-                      <p className="mt-1 text-sm text-gray-600 leading-relaxed">
-                        {s.text}
-                      </p>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-    </DeferredHydration>
-  );
-}
+import ContactSection from "@/components/ContactSection";
 
 export const dynamicParams = false;
 
@@ -110,6 +39,205 @@ function langToOgLocale(lang: Lang): string {
 
 function langToIana(lang: Lang): string {
   return lang === "ru" ? "ru" : lang === "kz" ? "kk-KZ" : "en";
+}
+
+/* ---- local helper ---- */
+function AdvantageIcon({ index }: { index: number }) {
+  const common = "h-5 w-5 text-[#C89F4A]";
+  switch (index) {
+    case 0:
+      return (
+        <svg viewBox="0 0 24 24" className={common} fill="none" aria-hidden="true">
+          <path
+            d="M12 8v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      );
+    case 1:
+      return (
+        <svg viewBox="0 0 24 24" className={common} fill="none" aria-hidden="true">
+          <path
+            d="M4 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M8 13h8M8 17h6"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      );
+    case 2:
+      return (
+        <svg viewBox="0 0 24 24" className={common} fill="none" aria-hidden="true">
+          <path
+            d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            stroke="currentColor"
+            strokeWidth="2"
+          />
+          <path
+            d="M3 12h18"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+        </svg>
+      );
+    default:
+      return (
+        <svg viewBox="0 0 24 24" className={common} fill="none" aria-hidden="true">
+          <path
+            d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+        </svg>
+      );
+  }
+}
+
+function OsagoInfoBlocks({
+  dict,
+}: {
+  dict: Pick<OsagoRfPageDictionary, "howItWorks" | "benefits">;
+}) {
+  return (
+    <>
+      {/* HOW IT WORKS */}
+      <DeferredHydration rootMargin="800px" minDelayMs={150}>
+        <section
+          className="py-12 sm:py-16 bg-white [overflow-anchor:none]"
+          aria-labelledby="how-it-works-heading"
+        >
+          <div className="max-w-6xl mx-auto px-4">
+            <h2
+              id="how-it-works-heading"
+              className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center"
+            >
+              {dict.howItWorks.title}
+            </h2>
+
+            <p className="mt-2 text-center text-gray-600">
+              {dict.howItWorks.subtitle}
+            </p>
+
+            <div className="mt-10">
+              <div className="hidden md:block relative">
+                <div className="absolute left-0 right-0 top-[18px] h-px bg-gray-200" />
+                <div className="grid grid-cols-4 gap-6">
+                  {dict.howItWorks.steps.map((s, idx) => (
+                    <div key={idx} className="text-center">
+                      <div className="mx-auto h-9 w-9 rounded-full bg-[#0F2742] text-white flex items-center justify-center text-sm font-semibold">
+                        {idx + 1}
+                      </div>
+                      <div className="mt-3 text-sm font-extrabold text-[#1A3A5F]">
+                        {s.title}
+                      </div>
+                      <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+                        {s.text}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="md:hidden grid gap-4">
+                {dict.howItWorks.steps.map((s, idx) => (
+                  <article
+                    key={idx}
+                    className="card bg-white border border-gray-200 shadow-sm p-5"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="shrink-0 h-9 w-9 rounded-full bg-[#0F2742] text-white flex items-center justify-center text-sm font-semibold">
+                        {idx + 1}
+                      </div>
+                      <div>
+                        <div className="text-sm font-extrabold text-[#1A3A5F]">
+                          {s.title}
+                        </div>
+                        <p className="mt-1 text-sm text-gray-600 leading-relaxed">
+                          {s.text}
+                        </p>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      </DeferredHydration>
+
+      {/* BENEFITS (COVERAGE) */}
+      <DeferredHydration rootMargin="800px" minDelayMs={150}>
+        <section
+          className="py-12 sm:py-16 bg-white [overflow-anchor:none]"
+          aria-labelledby="benefits-heading"
+        >
+          <div className="max-w-6xl mx-auto px-4">
+            <article className="rounded-2xl bg-[#0f2238] text-white overflow-hidden shadow-sm">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-stretch">
+                <div className="p-6 sm:p-10">
+                  <h2
+                    id="benefits-heading"
+                    className="text-2xl sm:text-3xl font-semibold"
+                  >
+                    {dict.benefits.title}
+                  </h2>
+
+                  <div className="mt-8 space-y-6">
+                    {dict.benefits.items.map((it, idx) => (
+                      <div key={idx} className="flex gap-3">
+                        <div className="mt-1 h-8 w-8 shrink-0 rounded-lg bg-white/10 flex items-center justify-center">
+                          <span className="block h-2 w-2 rounded-full bg-[#EBCA45]" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-extrabold">{it.title}</div>
+                          <p className="mt-1 text-sm text-white/80 leading-relaxed">
+                            {it.text}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-6 sm:p-10 flex items-center justify-center">
+                  <div className="w-full max-w-md aspect-[4/3] bg-white/5 flex items-center justify-center relative overflow-hidden rounded-xl">
+                    <Image
+                      src="/osago-rf/Виды_субъектов_России_на_политической_карте.png"
+                      alt={dict.benefits.imageAlt}
+                      fill
+                      className="object-cover opacity-90"
+                      sizes="(min-width: 1024px) 520px, 90vw"
+                      priority={false}
+                    />
+                    <div className="absolute inset-0 bg-black/10" />
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+      </DeferredHydration>
+    </>
+  );
 }
 
 export async function generateMetadata({
@@ -267,54 +395,41 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
-        <OsagoInfoBlocks  dict={osagoPageDict}  />
+        <OsagoInfoBlocks dict={osagoPageDict} />
 
-
-        {/* QUESTION BLOCK (client) */}
-        <section className="py-12 sm:py-16 bg-[#F4F6FA]">
-          <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-10 items-start">
-            <div className="flex justify-center lg:justify-start">
-              <Image
-                src="/osago-rf/policy-large.webp"
-                alt={osagoPageDict.hero.policyAlt}
-                width={520}
-                height={360}
-                sizes="(min-width: 1024px) 520px, 90vw"
-                className="w-full max-w-md lg:max-w-lg h-auto rounded-2xl shadow-lg"
-                loading="lazy"
-              />
-            </div>
-
-            <OsagoRfQuestionForm
-              homeContact={homeDict.contact}
-              agreement={agreement}
-              dict={osagoPageDict.questionBlock}
-              context="osago-rf-question"
-            />
-          </div>
-        </section>
+        
 
         {/* ADVANTAGES */}
         <DeferredHydration rootMargin="800px" minDelayMs={150}>
-          <section className="border-t border-gray-200 bg-[#F7F7F7] py-12 sm:py-16">
-            <div className="max-w-5xl mx-auto px-4">
-              <h2 className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center">
+          <section
+            className="border-t border-gray-200 bg-[#FFFFFF] py-12 sm:py-16"
+            aria-labelledby="advantages-heading"
+          >
+            <div className="max-w-6xl mx-auto px-4">
+              <h2
+                id="advantages-heading"
+                className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center"
+              >
                 {osagoPageDict.advantages.title}
               </h2>
 
-              <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4 text-center">
-                {osagoPageDict.advantages.items.map((item) => (
+              <div className="mt-10 grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {osagoPageDict.advantages.items.map((item, idx) => (
                   <article
-                    key={item.title}
-                    className="card flex flex-col items-center px-5 py-5 sm:py-6"
+                    key={`${item.title}-${idx}`}
+                    className="rounded-xl border border-gray-200 bg-white shadow-sm p-4 sm:p-5 text-left"
                   >
-                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#F7F7F7]">
-                      <span className="text-3xl">{item.icon}</span>
+                    <div className="mb-3">
+                      <div className="h-9 w-9 rounded-lg bg-[#EBCA45]/15 flex items-center justify-center">
+                        <AdvantageIcon index={idx} />
+                      </div>
                     </div>
-                    <div className="text-sm font-extrabold text-[#1A3A5F] uppercase">
+
+                    <div className="text-xs font-semibold tracking-wide text-gray-500 uppercase">
                       {item.title}
                     </div>
-                    <p className="mt-3 text-sm text-gray-600 text-center">
+
+                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">
                       {item.text}
                     </p>
                   </article>
@@ -324,34 +439,8 @@ export default async function OsagoRfPage({
           </section>
         </DeferredHydration>
 
-        {/* INFO */}
-        <section className="py-10 sm:py-12 bg-white">
-          <div className="max-w-4xl mx-auto px-4 space-y-4 text-sm sm:text-base text-gray-700">
-            <h2 className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center mb-4">
-              {osagoPageDict.info.title}
-            </h2>
-            {osagoPageDict.info.paragraphs.map((p, idx) => (
-              <p key={idx}>{p}</p>
-            ))}
-          </div>
-        </section>
-
-        {/* BENEFITS */}
-        <section className="py-10 sm:py-12 bg-[#F5F7FA]">
-          <div className="max-w-4xl mx-auto px-4">
-            <h2 className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center mb-4">
-              {osagoPageDict.benefits.title}
-            </h2>
-            <ul className="list-disc pl-6 space-y-3 text-sm sm:text-base text-gray-700">
-              {osagoPageDict.benefits.items.map((item) => (
-                <li key={item.title}>
-                  <strong className="block text-[#1A3A5F]">{item.title}</strong>
-                  <span>{item.text}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
+        {/* ORDER FORM */}
+        <OsagoOrderForm dict={osagoFormDict} />
 
         {/* UPSALE GREEN CARD */}
         <section className="py-10 sm:py-12 bg-[#F5F7FA]">
@@ -390,14 +479,35 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
-        {/* FAQ (client accordion + JSON-LD in SSR) */}
+        {/* FAQ */}
         <FAQSection dict={osagoPageDict.faq} />
-
-        {/* ORDER FORM (client, multi-step; без калькулятора) */}
-        <OsagoOrderForm dict={osagoFormDict} />
 
         {/* BROKER */}
         <BrokerSection broker={homeDict.broker} />
+
+        {/* QUESTION BLOCK */}
+        <section className="py-12 sm:py-16 bg-[#F4F6FA]">
+          <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-10 items-start">
+            <div className="flex justify-center lg:justify-start">
+              <Image
+                src="/osago-rf/policy-large.webp"
+                alt={osagoPageDict.hero.policyAlt}
+                width={520}
+                height={360}
+                sizes="(min-width: 1024px) 520px, 90vw"
+                className="w-full max-w-md lg:max-w-lg h-auto rounded-2xl shadow-lg"
+                loading="lazy"
+              />
+            </div>
+
+            <OsagoRfQuestionForm
+              homeContact={homeDict.contact}
+              agreement={agreement}
+              dict={osagoPageDict.questionBlock}
+              context="osago-rf-question"
+            />
+          </div>
+        </section>
       </main>
     </>
   );
