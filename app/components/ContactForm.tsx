@@ -237,7 +237,7 @@ export default function ContactForm({
   const hasSuccess = formStatus === "success";
 
   return (
-    <div className="card w-full bg-white px-6 sm:px-8 py-6 sm:py-8">
+    <div className="w-full">
       <div className="mb-6 text-center">
         <h2 className="text-xl sm:text-2xl font-bold text-[#1A3A5F]">
           {t.sectionTitle}

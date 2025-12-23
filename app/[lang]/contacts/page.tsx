@@ -2,6 +2,11 @@
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
 
+import { getHomeDictionary } from "@/dictionaries/home";
+import { getAgreementDictionary } from "@/dictionaries/agreement";
+
+import ContactSection from "@/components/ContactSection";
+
 export const dynamicParams = false;
 
 type Params = { lang: string };
@@ -72,6 +77,11 @@ export default async function ContactsPage({
   const p = await params;
   const lang = getLangSafe(p?.lang);
 
+  // ✅ ВАЖНО: берём contact и agreement из словарей
+  const home = getHomeDictionary(lang);
+  const agreement = getAgreementDictionary(lang);
+  const contact = home.contact;
+
   return (
     <section className="py-10 sm:py-14">
       <div className="max-w-5xl mx-auto px-4">
@@ -109,6 +119,14 @@ export default async function ContactsPage({
           </ul>
         </div>
       </div>
+
+      {/* ✅ CONTACT (форма внизу страницы) */}
+      <ContactSection
+        contact={contact}
+        agreement={agreement}
+        imageSrc="/laiter(1).png"
+        context={`contacts-${lang}`}
+      />
     </section>
   );
 }

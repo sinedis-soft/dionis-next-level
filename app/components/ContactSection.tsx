@@ -1,127 +1,104 @@
 // components/ContactSection.tsx
 "use client";
 
+import { useCallback, useMemo, useState } from "react";
 import Image from "next/image";
-import { useCallback, useState } from "react";
+import Script from "next/script";
 
-import type { AgreementDictionary } from "@/dictionaries/agreement";
 import ContactForm, {
-  type ContactFormResult,
   type ContactBlock,
+  type ContactFormResult,
 } from "@/components/ContactForm";
 import AgreementModal from "@/components/AgreementModal";
-import StatusModal from "@/components/StatusModal";
-import { RecaptchaLazy } from "@/components/RecaptchaLazy";
+import type { AgreementDictionary } from "@/dictionaries/agreement";
 
 type Props = {
   contact: ContactBlock;
   agreement: AgreementDictionary;
 
-  // ✅ картинка слева
   imageSrc?: string;
-  imageAlt?: string;
-
-  // ✅ разный endpoint и контекст
-  submitUrl?: string;
   context?: string;
 
-  // ✅ если захочешь разные action
+  submitUrl?: string;
   recaptchaAction?: string;
-
-  // ✅ можно отключить левую картинку вообще
-  showImage?: boolean;
-
-  // ✅ стили секции (если вдруг на разных страницах нужен другой фон/отступы)
-  sectionClassName?: string;
 };
 
 export default function ContactSection({
   contact,
   agreement,
-  imageSrc = "/laiter(1).png",
-  imageAlt,
+  imageSrc,
+  context = "contacts",
   submitUrl = "/api/contact",
-  context = "site-contact",
   recaptchaAction = "contact",
-  showImage = true,
-  sectionClassName = "py-12 sm:py-16 bg-[#F4F6FA]",
 }: Props) {
-  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "";
+  const [agreementOpen, setAgreementOpen] = useState(false);
+  const [needRecaptcha, setNeedRecaptcha] = useState(false);
 
-  const [recaptchaEnabled, setRecaptchaEnabled] = useState(false);
-  const enableRecaptcha = useCallback(() => setRecaptchaEnabled(true), []);
+  const recaptchaSiteKey = useMemo(
+    () => process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "",
+    []
+  );
 
-  const [isAgreementOpen, setIsAgreementOpen] = useState(false);
-  const [statusOpen, setStatusOpen] = useState(false);
-  const [statusKind, setStatusKind] = useState<"success" | "error">("success");
-  const [statusMessage, setStatusMessage] = useState("");
+  const openAgreement = useCallback(() => setAgreementOpen(true), []);
+  const closeAgreement = useCallback(() => setAgreementOpen(false), []);
 
-  function handleFormResult(result: ContactFormResult) {
-    setStatusKind(result.kind);
-    setStatusMessage(result.message);
-    setStatusOpen(true);
-  }
+  const handleNeedRecaptcha = useCallback(() => {
+    if (recaptchaSiteKey) setNeedRecaptcha(true);
+  }, [recaptchaSiteKey]);
+
+  const handleResult = useCallback((_r: ContactFormResult) => {
+    // сюда при желании можно повесить аналитику
+  }, []);
 
   return (
-    <>
-      {recaptchaSiteKey ? (
-        <RecaptchaLazy siteKey={recaptchaSiteKey} enabled={recaptchaEnabled} />
+    <section className="mt-12 sm:mt-16 border-t border-gray-200 bg-[#F7F7F7] py-12 sm:py-16">
+      {/* ✅ reCAPTCHA v3 подгружаем только когда реально нужна */}
+      {needRecaptcha && recaptchaSiteKey ? (
+        <Script
+          id="recaptcha-v3"
+          src={`https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(
+            recaptchaSiteKey
+          )}`}
+          strategy="afterInteractive"
+        />
       ) : null}
 
-      <section className={sectionClassName}>
-        <div className="max-w-6xl mx-auto px-4">
-          <div
-            className={
-              showImage
-                ? "grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-10 items-start"
-                : "grid grid-cols-1 gap-10 items-start"
-            }
-          >
-            {showImage ? (
-              <div className="flex flex-col justify-end items-center lg:items-center h-full">
-                <Image
-                  src={imageSrc}
-                  alt={imageAlt ?? contact.photoAlt}
-                  width={500}
-                  height={900}
-                  quality={60}
-                  loading="lazy"
-                  sizes="(max-width: 640px) 288px, (max-width: 1024px) 320px, 384px"
-                  className="w-72 sm:w-80 lg:w-96 h-auto object-contain"
-                />
-              </div>
-            ) : null}
+      <div className="max-w-6xl mx-auto px-4">
+  <div className="grid gap-8 lg:grid-cols-2 items-stretch">
+    {/* LEFT: только картинка, без card и без фона */}
+    <div className="h-full flex items-center justify-center">
+      {imageSrc ? (
+        <Image
+          src={imageSrc}
+          alt=""
+          width={1200}
+          height={800}
+          className="max-h-full w-full object-contain"
+          priority={false}
+        />
+      ) : null}
+    </div>
 
-            <ContactForm
-              t={contact}
-              agreement={agreement}
-              onOpenAgreement={() => setIsAgreementOpen(true)}
-              onResult={handleFormResult}
-              onNeedRecaptcha={enableRecaptcha}
-              recaptchaSiteKey={recaptchaSiteKey}
-              submitUrl={submitUrl}
-              context={context}
-              recaptchaAction={recaptchaAction}
-            />
-          </div>
-        </div>
-      </section>
-
-      <StatusModal
-        open={statusOpen}
-        kind={statusKind}
-        titleSuccess={contact.modalSuccessTitle}
-        titleError={contact.modalErrorTitle}
-        closeText={contact.modalClose}
-        message={statusMessage}
-        onClose={() => setStatusOpen(false)}
-      />
-
-      <AgreementModal
-        open={isAgreementOpen}
+    {/* RIGHT: единственная карточка */}
+    <div className="card bg-white p-6 sm:p-8 h-full flex flex-col">
+      <ContactForm
+        t={contact}
         agreement={agreement}
-        onClose={() => setIsAgreementOpen(false)}
+        onOpenAgreement={openAgreement}
+        onResult={handleResult}
+        onNeedRecaptcha={handleNeedRecaptcha}
+        recaptchaSiteKey={recaptchaSiteKey}
+        context={context}
+        submitUrl={submitUrl}
+        recaptchaAction={recaptchaAction}
       />
-    </>
+    </div>
+  </div>
+</div>
+
+
+      {/* ✅ единая модалка соглашения (без дублирования) */}
+      <AgreementModal open={agreementOpen} agreement={agreement} onClose={closeAgreement} />
+    </section>
   );
 }
