@@ -74,7 +74,7 @@ export default function Header({ lang }: { lang: Lang }) {
         <div className="h-16 xl:h-20 grid grid-cols-[auto_1fr_auto] items-center gap-4">
           {/* LOGO */}
           <Link href={base} className="flex items-center gap-2">
-            <Image src="/logo.webp" alt="Dionis Insurance" width={56} height={56} priority />
+            <Image src="/logo_1.webp" alt="Dionis Insurance" width={56} height={56} priority />
           </Link>
 
           {/* DESKTOP NAV (только xl) */}

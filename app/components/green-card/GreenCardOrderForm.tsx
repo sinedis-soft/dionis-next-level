@@ -499,11 +499,28 @@ export function GreenCardOrderForm({ dict }: Props) {
                       />
                     </div>
 
-                    <CountrySelect
-                      name="person_country"
-                      label={dict.person.countryLabel}
-                      required={true}
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {dict.person.countryLabel}
+                        <RequiredMark />
+                      </label>
+
+                      <select
+                        name="person_country"
+                        className={fieldClass}
+                        defaultValue=""
+                        required
+                      >
+                        <option value="">{dict.notSelected}</option>
+
+                        {Object.entries(dict.person.countries).map(([id, label]) => (
+                          <option key={id} value={id}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -753,22 +770,12 @@ export function GreenCardOrderForm({ dict }: Props) {
                           required
                         >
                           <option value="">{dict.notSelected}</option>
-                          <option value="127">
-                            {dict.vehicles.vehicleTypePassenger}
-                          </option>
+                          <option value="127">{dict.vehicles.vehicleTypePassenger}</option>
                           <option value="131">{dict.vehicles.vehicleTypeBus}</option>
-                          <option value="453">
-                            {dict.vehicles.vehicleTypeTruck}
-                          </option>
-                          <option value="251">
-                            {dict.vehicles.vehicleTypeTrailer}
-                          </option>
-                          <option value="217">
-                            {dict.vehicles.vehicleTypeMotorcycle}
-                          </option>
-                          <option value="457">
-                            {dict.vehicles.vehicleTypeSpecial}
-                          </option>
+                          <option value="453">{dict.vehicles.vehicleTypeTruck}</option>
+                          <option value="251">{dict.vehicles.vehicleTypeTrailer}</option>
+                          <option value="217">{dict.vehicles.vehicleTypeMotorcycle}</option>
+                          <option value="457">{dict.vehicles.vehicleTypeSpecial}</option>
                         </select>
                       </div>
 
@@ -785,7 +792,7 @@ export function GreenCardOrderForm({ dict }: Props) {
                         >
                           <option value="">{dict.notSelected}</option>
                           <option value="385">{dict.vehicles.countryKZ}</option>
-                          {/*<option value="523">{dict.vehicles.countryGE}</option>*/}
+
                         </select>
                       </div>
 

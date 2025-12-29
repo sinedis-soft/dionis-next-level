@@ -1,4 +1,4 @@
-// app/api/green-card-order/route.ts
+// app/api/osago-rf-order/route.ts
 import { Buffer } from "buffer";
 import nodemailer from "nodemailer";
 
@@ -38,7 +38,6 @@ async function bitrix<T = unknown>(
   // обязательная пауза (Bitrix иначе режет соединение)
   await sleep(1500);
 
-  // тайм-аут на сам запрос (иногда Bitrix молчит 20+ секунд)
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 15000);
 
@@ -78,7 +77,6 @@ async function bitrix<T = unknown>(
         `Bitrix ${method} failed on attempt ${attempt}, retrying...`,
         getErrorMessage(err)
       );
-
       await sleep(1500 * attempt);
       return bitrix<T>(method, payload, attempt + 1);
     }
@@ -103,7 +101,6 @@ function parseDateISO(dateStr: string | null): string | null {
   return s;
 }
 
-// конвертация File → [filename, base64] для fileData
 async function fileToBitrixFileData(file: File): Promise<[string, string]> {
   const arrayBuffer = await file.arrayBuffer();
   const base64 = Buffer.from(arrayBuffer).toString("base64");
@@ -112,13 +109,52 @@ async function fileToBitrixFileData(file: File): Promise<[string, string]> {
 
 type VehicleInput = {
   plate?: string;
-  techPassportNumber?: string;
-  type?: string;
-  country?: string;
+  type?: string; // select value
+  country?: string; // select value
   startDate?: string | null; // DD.MM.YYYY (для сделки)
-  period?: string;
+  period?: string; // select value
   techPassportFiles: File[];
 };
+
+/**
+ * ✅ Настрой здесь UF-поля для ОСАГО РФ.
+ * Если какие-то поля не нужны — оставь undefined и они не будут отправляться.
+ */
+const UF = {
+  // CONTACT
+  CONTACT_ID_NUMBER: "UF_CRM_1694347707628",
+  CONTACT_GENDER: "UF_CRM_1686138296718",
+  CONTACT_COUNTRY: "UF_CRM_1686138527330",
+  CONTACT_PASSPORT_NUMBER: "UF_CRM_CONTACT_1686145698592",
+  CONTACT_PASSPORT_ISSUER: "UF_CRM_1694347754648",
+  CONTACT_PASSPORT_ISSUED_AT: "UF_CRM_1694347737519",
+  CONTACT_PASSPORT_VALID_TO: "UF_CRM_1696422396430",
+
+  // COMPANY
+  COMPANY_INN_FIELD: "UF_CRM_COMPANY_1692911328252",
+
+  // DEAL (ОСАГО РФ)
+  DEAL_TYP_INSURANCE: "UF_CRM_1690539097",
+  DEAL_INSURANCE_TERRITORY: "UF_CRM_1700656576088",
+  DEAL_AGRIGATION: "UF_CRM_1693578066803",
+  DEAL_AGENT: "UF_CRM_1686682902533",
+  DEAL_VEHICLE_COUNTRY: "UF_CRM_1686152306664",
+  DEAL_VEHICLE_PLATE: "UF_CRM_1686152485641",
+  DEAL_VEHICLE_TYPE: "UF_CRM_1686152567597",
+  DEAL_START_DATE: "UF_CRM_1686152149204",
+  DEAL_PERIOD: "UF_CRM_1686152209741",
+  DEAL_FILES: "UF_CRM_1686154280439",
+} as const;
+
+function setIfValue(
+  obj: Record<string, unknown>,
+  key: string | undefined,
+  value: unknown
+) {
+  if (!key) return;
+  if (value === undefined || value === null || value === "") return;
+  obj[key] = value;
+}
 
 function safeJsonStringify(v: unknown): string {
   try {
@@ -126,6 +162,10 @@ function safeJsonStringify(v: unknown): string {
   } catch {
     return String(v);
   }
+}
+
+function nl2br(s: string): string {
+  return s.replace(/\n/g, "<br>");
 }
 
 function escapeHtml(s: string): string {
@@ -138,7 +178,7 @@ function escapeHtml(s: string): string {
 }
 
 type Mailer = {
-  send: (args: {
+  sendVehicleMail: (args: {
     to: string;
     from: string;
     subject: string;
@@ -164,7 +204,7 @@ function buildMailer(): Mailer | null {
   });
 
   return {
-    async send({ to, from, subject, text, html }) {
+    async sendVehicleMail({ to, from, subject, text, html }) {
       await transporter.sendMail({ from, to, subject, text, html });
     },
   };
@@ -173,40 +213,37 @@ function buildMailer(): Mailer | null {
 async function verifyRecaptchaIfNeeded(opts: {
   isProd: boolean;
   token: string | null;
-}): Promise<{ ok: boolean }> {
+}): Promise<{ ok: boolean; reason?: string }> {
   const { isProd, token } = opts;
   const secret = process.env.RECAPTCHA_SECRET_KEY;
 
   if (!isProd) return { ok: true };
-  if (!secret) return { ok: true };
-  if (!token) return { ok: true };
+  if (!secret) return { ok: true }; // если секрет не задан — не блокируем
+  if (!token) return { ok: true }; // токена нет — тоже не блокируем (как в твоём примере)
 
   try {
-    const verifyRes = await fetch(
-      "https://www.google.com/recaptcha/api/siteverify",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body:
-          `secret=${encodeURIComponent(secret)}` +
-          `&response=${encodeURIComponent(token)}`,
-      }
-    );
+    const verifyRes = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body:
+        `secret=${encodeURIComponent(secret)}` +
+        `&response=${encodeURIComponent(token)}`,
+    });
 
     const verifyData = (await verifyRes.json()) as {
       success?: boolean;
       score?: number;
     };
 
-    if (!verifyData.success) return { ok: false };
+    if (!verifyData.success) return { ok: false, reason: "recaptcha_not_success" };
     if (typeof verifyData.score === "number" && verifyData.score < 0.3) {
-      return { ok: false };
+      return { ok: false, reason: `low_score_${verifyData.score}` };
     }
 
     return { ok: true };
   } catch (e) {
     console.error("reCAPTCHA verification error:", e);
-    return { ok: true }; // при ошибке — пропускаем, как у тебя
+    return { ok: true }; // при ошибке — пропускаем
   }
 }
 
@@ -214,7 +251,7 @@ export async function POST(req: Request): Promise<Response> {
   try {
     const formData = await req.formData();
 
-    // --- anti-bot honeypot ---
+    // --- антибот (honeypot) ---
     const website = String(formData.get("website") || "").trim();
     if (website) {
       return Response.json({ ok: true }, { status: 200 });
@@ -222,12 +259,8 @@ export async function POST(req: Request): Promise<Response> {
 
     // --- reCAPTCHA ---
     const isProd = process.env.NODE_ENV === "production";
-    const recaptchaToken =
-      String(formData.get("recaptchaToken") || "").trim() || null;
-    const recaptcha = await verifyRecaptchaIfNeeded({
-      isProd,
-      token: recaptchaToken,
-    });
+    const recaptchaToken = String(formData.get("recaptchaToken") || "").trim() || null;
+    const recaptcha = await verifyRecaptchaIfNeeded({ isProd, token: recaptchaToken });
     if (!recaptcha.ok) {
       return Response.json(
         { ok: false, message: "Подтвердите, что вы не робот." },
@@ -237,58 +270,40 @@ export async function POST(req: Request): Promise<Response> {
 
     // --- 1. Контакты и базовые данные ---
     const contact_email = String(formData.get("contact_email") || "").trim();
-    const contact_firstNameLat = String(
-      formData.get("contact_firstNameLat") || ""
-    ).trim();
-    const contact_lastNameLat = String(
-      formData.get("contact_lastNameLat") || ""
-    ).trim();
+    const contact_firstNameLat = String(formData.get("contact_firstNameLat") || "").trim();
+    const contact_lastNameLat = String(formData.get("contact_lastNameLat") || "").trim();
     const contact_phone = String(formData.get("contact_phone") || "").trim();
 
-    if (!contact_email || !contact_firstNameLat || !contact_lastNameLat) {
+    if (!contact_email || !contact_firstNameLat || !contact_lastNameLat || !contact_phone) {
       return Response.json(
         { ok: false, message: "Не заполнены обязательные контактные данные" },
         { status: 400 }
       );
     }
 
-    const order_isCompany =
-      String(formData.get("order-isCompany") || "") === "on";
+    const order_isCompany = String(formData.get("order-isCompany") || "") === "on";
 
-    const company_bin = String(formData.get("company_bin") || "").trim();
+    // В форме: company_inn, company_email
+    const company_inn = String(formData.get("company_inn") || "").trim();
     const company_email = String(formData.get("company_email") || "").trim();
 
-    const insurance_territory = String(
-      formData.get("insurance_territory") || ""
-    ).trim();
-
-    // --- 1b. Данные физлица (для обновления контакта) ---
-    const person_middleName = String(
-      formData.get("person_middleName") || ""
-    ).trim();
+    // --- 1b. Данные физлица ---
+    const person_middleName = String(formData.get("person_middleName") || "").trim();
 
     const person_gender_raw = String(formData.get("person_gender") || "").trim();
     const person_gender =
-      person_gender_raw === "male"
-        ? "45"
-        : person_gender_raw === "female"
-        ? "47"
-        : person_gender_raw; // если уже ID
+      person_gender_raw === "male" ? "45" : person_gender_raw === "female" ? "47" : person_gender_raw;
 
     const person_birthDate = parseDateISO(
       String(formData.get("person_birthDate") || "") || null
     );
 
     const person_idNumber = String(formData.get("person_idNumber") || "").trim();
-    const person_country = String(formData.get("person_country") || "").trim(); // enum ID
+    const person_country = String(formData.get("person_country") || "").trim();
     const person_address = String(formData.get("person_address") || "").trim();
 
-    const person_passportNumber = String(
-      formData.get("person_passportNumber") || ""
-    ).trim();
-    const person_passportIssuer = String(
-      formData.get("person_passportIssuer") || ""
-    ).trim();
+    const person_passportNumber = String(formData.get("person_passportNumber") || "").trim();
+    const person_passportIssuer = String(formData.get("person_passportIssuer") || "").trim();
     const person_passportIssuedAt = parseDateISO(
       String(formData.get("person_passportIssuedAt") || "") || null
     );
@@ -296,7 +311,7 @@ export async function POST(req: Request): Promise<Response> {
       String(formData.get("person_passportValidTo") || "") || null
     );
 
-    // UTM и URL страницы (если переданы)
+    // UTM и URL страницы
     const pageUrlRaw = String(formData.get("pageUrl") || "").trim();
     const pageUrl = pageUrlRaw || undefined;
 
@@ -310,7 +325,7 @@ export async function POST(req: Request): Promise<Response> {
       }
     }
 
-    // meta (IP / UA)
+    // --- meta (IP / UA) ---
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     const userAgent = req.headers.get("user-agent") || "unknown";
@@ -332,9 +347,7 @@ export async function POST(req: Request): Promise<Response> {
       const v = vehiclesMap.get(index)!;
 
       if (field === "techPassportFiles") {
-        if (value instanceof File && value.size > 0) {
-          v.techPassportFiles.push(value);
-        }
+        if (value instanceof File && value.size > 0) v.techPassportFiles.push(value);
       } else if (field === "startDate") {
         v.startDate = parseDateToDDMMYYYY(String(value));
       } else {
@@ -356,14 +369,11 @@ export async function POST(req: Request): Promise<Response> {
     // --- 3. Контакт: поиск по EMAIL, либо создание ---
     let contactId: number | null = null;
 
-    const foundContacts = await bitrix<Array<{ ID: string }>>(
-      "crm.contact.list",
-      {
-        filter: { EMAIL: contact_email },
-        select: ["ID"],
-        start: 0,
-      }
-    );
+    const foundContacts = await bitrix<Array<{ ID: string }>>("crm.contact.list", {
+      filter: { EMAIL: contact_email },
+      select: ["ID"],
+      start: 0,
+    });
 
     if (Array.isArray(foundContacts) && foundContacts.length > 0) {
       contactId = Number(foundContacts[0].ID);
@@ -372,9 +382,7 @@ export async function POST(req: Request): Promise<Response> {
         fields: {
           NAME: contact_firstNameLat,
           LAST_NAME: contact_lastNameLat,
-          PHONE: contact_phone
-            ? [{ VALUE: contact_phone, VALUE_TYPE: "WORK" }]
-            : [],
+          PHONE: contact_phone ? [{ VALUE: contact_phone, VALUE_TYPE: "WORK" }] : [],
           EMAIL: [{ VALUE: contact_email, VALUE_TYPE: "WORK" }],
         },
       });
@@ -385,35 +393,21 @@ export async function POST(req: Request): Promise<Response> {
       throw new Error("Не удалось определить ID контакта (search/add)");
     }
 
-    // --- 3b. Обновление контакта (физлицо) ---
+    // --- 3b. Обновление контакта (если физлицо) ---
     if (!order_isCompany) {
       const contactUpdateFields: Record<string, unknown> = {};
 
       if (person_middleName) contactUpdateFields.SECOND_NAME = person_middleName;
       if (person_birthDate) contactUpdateFields.BIRTHDATE = person_birthDate;
-
-      if (person_idNumber)
-        contactUpdateFields.UF_CRM_1694347707628 = person_idNumber;
-
-      if (person_gender)
-        contactUpdateFields.UF_CRM_1686138296718 = person_gender;
-
-      if (person_country)
-        contactUpdateFields.UF_CRM_1686138527330 = person_country;
-
       if (person_address) contactUpdateFields.ADDRESS = person_address;
 
-      if (person_passportNumber)
-        contactUpdateFields.UF_CRM_CONTACT_1686145698592 = person_passportNumber;
-
-      if (person_passportIssuer)
-        contactUpdateFields.UF_CRM_1694347754648 = person_passportIssuer;
-
-      if (person_passportIssuedAt)
-        contactUpdateFields.UF_CRM_1694347737519 = person_passportIssuedAt;
-
-      if (person_passportValidTo)
-        contactUpdateFields.UF_CRM_1696422396430 = person_passportValidTo;
+      setIfValue(contactUpdateFields, UF.CONTACT_ID_NUMBER, person_idNumber);
+      setIfValue(contactUpdateFields, UF.CONTACT_GENDER, person_gender);
+      setIfValue(contactUpdateFields, UF.CONTACT_COUNTRY, person_country);
+      setIfValue(contactUpdateFields, UF.CONTACT_PASSPORT_NUMBER, person_passportNumber);
+      setIfValue(contactUpdateFields, UF.CONTACT_PASSPORT_ISSUER, person_passportIssuer);
+      setIfValue(contactUpdateFields, UF.CONTACT_PASSPORT_ISSUED_AT, person_passportIssuedAt);
+      setIfValue(contactUpdateFields, UF.CONTACT_PASSPORT_VALID_TO, person_passportValidTo);
 
       if (Object.keys(contactUpdateFields).length > 0) {
         await bitrix<boolean>("crm.contact.update", {
@@ -423,73 +417,68 @@ export async function POST(req: Request): Promise<Response> {
       }
     }
 
-    // --- 4. Компания: либо по UF_CRM_COMPANY_1692911328252, либо фикс ID=1817 ---
+    // --- 4. Компания ---
     let companyId: number;
 
     if (order_isCompany) {
-      if (!company_bin) {
+      if (!company_inn) {
         return Response.json(
-          {
-            ok: false,
-            message:
-              "Отмечено 'договор на юрлицо', но не указан БИН компании.",
-          },
+          { ok: false, message: "Отмечено 'договор на юрлицо', но не указан ИНН компании." },
           { status: 400 }
         );
       }
 
-      const foundCompanies = await bitrix<Array<{ ID: string }>>(
-        "crm.company.list",
-        {
-          filter: { UF_CRM_COMPANY_1692911328252: company_bin },
-          select: ["ID"],
-          start: 0,
-        }
-      );
+      // поиск
+      const filter: Record<string, unknown> = {};
+      if (UF.COMPANY_INN_FIELD) filter[UF.COMPANY_INN_FIELD] = company_inn;
+
+      const foundCompanies = await bitrix<Array<{ ID: string }>>("crm.company.list", {
+        filter,
+        select: ["ID"],
+        start: 0,
+      });
 
       if (Array.isArray(foundCompanies) && foundCompanies.length > 0) {
         companyId = Number(foundCompanies[0].ID);
       } else {
-        const newCompanyId = await bitrix<string>("crm.company.add", {
-          fields: {
-            TITLE: company_bin,
-            UF_CRM_COMPANY_1692911328252: company_bin,
-            EMAIL: company_email
-              ? [{ VALUE: company_email, VALUE_TYPE: "WORK" }]
-              : [],
-          },
-        });
+        const fields: Record<string, unknown> = {
+          TITLE: company_inn,
+          EMAIL: company_email ? [{ VALUE: company_email, VALUE_TYPE: "WORK" }] : [],
+        };
+        setIfValue(fields, UF.COMPANY_INN_FIELD, company_inn);
+
+        const newCompanyId = await bitrix<string>("crm.company.add", { fields });
         companyId = Number(newCompanyId);
       }
     } else {
+      // дефолтная компания для физлиц
       companyId = 1817;
 
+      // привязка контакта к компании
       await bitrix<boolean>("crm.contact.update", {
         id: contactId,
         fields: { COMPANY_ID: companyId },
       });
     }
 
-    // --- 5. Письмо: готовим один transporter на весь запрос ---
+    // --- 5. Подготовка почты (один transporter на весь запрос) ---
     const mailer = buildMailer();
     const mailTo = process.env.MAIL_TO || "info@ibb.expert";
-    const mailFrom =
-      process.env.MAIL_FROM || process.env.MAIL_USER || "no-reply@localhost";
+    const mailFrom = process.env.MAIL_FROM || process.env.MAIL_USER || "no-reply@localhost";
 
     // --- 6. Сделки по каждому авто + письмо по каждому авто ---
     const createdDeals: number[] = [];
 
     const commonCommentParts: string[] = [];
     if (pageUrl) commonCommentParts.push(`Страница: ${pageUrl}`);
-    if (utm !== undefined)
-      commonCommentParts.push(`UTM: ${safeJsonStringify(utm)}`);
+    if (utm !== undefined) commonCommentParts.push(`UTM: ${safeJsonStringify(utm)}`);
     commonCommentParts.push(
       `Контакт: ${contact_firstNameLat} ${contact_lastNameLat} <${contact_email}>`
     );
-    if (contact_phone) commonCommentParts.push(`Телефон: ${contact_phone}`);
+    commonCommentParts.push(`Телефон: ${contact_phone}`);
     commonCommentParts.push(
       order_isCompany
-        ? `Договор на юрлицо, БИН: ${company_bin}`
+        ? `Договор на юрлицо, ИНН: ${company_inn}`
         : `Договор на физлицо (компания ID=1817)`
     );
 
@@ -499,35 +488,27 @@ export async function POST(req: Request): Promise<Response> {
       const vehicle = vehicles[i];
 
       const dealFields: Record<string, unknown> = {
-        TITLE: `Заявка Green Card: ${vehicle.plate || "ТС"}`,
+        TITLE: `Заявка ОСАГО РФ: ${vehicle.plate || "ТС"}`,
         CONTACT_ID: contactId,
         COMPANY_ID: companyId,
-
-        // vehicle fields
-        UF_CRM_1686152306664: vehicle.country || null,
-        UF_CRM_1686152485641: vehicle.plate || null,
-        UF_CRM_1686152429219: vehicle.techPassportNumber || null,
-        UF_CRM_1686152567597: vehicle.type || null,
-        UF_CRM_1686152209741: vehicle.period || null,
-        UF_CRM_1686152149204: vehicle.startDate || null,
-
-        // common deal fields (green card)
-        UF_CRM_1690539097: 429,
-        UF_CRM_1700656576088: insurance_territory || null,
-        UF_CRM_1693578066803: 1169,
-        UF_CRM_1686682902533: 3907,
-
         COMMENTS: commonComment,
       };
 
-      if (vehicle.techPassportFiles.length > 0) {
+      setIfValue(dealFields, UF.DEAL_TYP_INSURANCE, 425);
+      setIfValue(dealFields, UF.DEAL_INSURANCE_TERRITORY, 1097);
+      setIfValue(dealFields, UF.DEAL_AGRIGATION, 1169);
+      setIfValue(dealFields, UF.DEAL_AGENT, 3907);
+      setIfValue(dealFields, UF.DEAL_VEHICLE_COUNTRY, vehicle.country || null);
+      setIfValue(dealFields, UF.DEAL_VEHICLE_PLATE, vehicle.plate || null);
+      setIfValue(dealFields, UF.DEAL_VEHICLE_TYPE, vehicle.type || null);
+      setIfValue(dealFields, UF.DEAL_START_DATE, vehicle.startDate || null);
+      setIfValue(dealFields, UF.DEAL_PERIOD, vehicle.period || null);
+
+      if (UF.DEAL_FILES && vehicle.techPassportFiles.length > 0) {
         const filesData = await Promise.all(
           vehicle.techPassportFiles.map((f) => fileToBitrixFileData(f))
         );
-
-        dealFields.UF_CRM_1686154280439 = filesData.map((fd) => ({
-          fileData: fd,
-        }));
+        dealFields[UF.DEAL_FILES] = filesData.map((fd) => ({ fileData: fd }));
       }
 
       const dealIdStr = await bitrix<string>("crm.deal.add", { fields: dealFields });
@@ -536,9 +517,14 @@ export async function POST(req: Request): Promise<Response> {
 
       // --- ПИСЬМО: по каждому авто отдельно ---
       if (mailer) {
-        const subject = `Зеленая карта - ДИОНИС - новая заявка (сделка #${dealId}) - ${
-          vehicle.plate || "ТС"
-        }`;
+        const subject = `ОСАГО РФ нерезов - ДИОНИС - новая заявка (сделка #${dealId}) - ${vehicle.plate || "ТС"}`;
+
+        const metaText =
+          "\n\n---\n" +
+          `Страница: ${pageUrl || "unknown"}\n` +
+          `UTM: ${utm ? safeJsonStringify(utm) : "none"}\n` +
+          `IP: ${ip}\n` +
+          `User-Agent: ${userAgent}\n`;
 
         const text = [
           `Сделка: #${dealId}`,
@@ -546,34 +532,26 @@ export async function POST(req: Request): Promise<Response> {
           "",
           `Контакт: ${contact_firstNameLat} ${contact_lastNameLat}`,
           `Email: ${contact_email}`,
-          contact_phone ? `Телефон: ${contact_phone}` : `Телефон: -`,
-          order_isCompany ? `Юрлицо (БИН): ${company_bin}` : `Физлицо (компания ID=1817)`,
-          `Contact ID: ${contactId}`,
+          `Телефон: ${contact_phone}`,
+          order_isCompany ? `Юрлицо (ИНН): ${company_inn}` : `Физлицо (компания ID=1817)`,
           `Company ID: ${companyId}`,
-          "",
-          "Параметры страхования:",
-          `- Территория: ${insurance_territory || "-"}`,
+          `Contact ID: ${contactId}`,
           "",
           "Данные авто:",
           `- Номер: ${vehicle.plate || "-"}`,
-          `- Техпаспорт №: ${vehicle.techPassportNumber || "-"}`,
           `- Тип: ${vehicle.type || "-"}`,
           `- Страна (значение справочника): ${vehicle.country || "-"}`,
           `- Дата начала: ${vehicle.startDate || "-"}`,
           `- Период: ${vehicle.period || "-"}`,
           `- Файлов техпаспорта: ${vehicle.techPassportFiles.length}`,
-          "",
-          "---",
-          `Страница: ${pageUrl || "unknown"}`,
-          `UTM: ${utm ? safeJsonStringify(utm) : "none"}`,
-          `IP: ${ip}`,
-          `User-Agent: ${userAgent}`,
+          metaText,
         ].join("\n");
 
         const html = `
+          
           <div style="max-width: 600px; margin: 0 auto; background-color: #FFFFFF; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
             <Image src="/logo_1.webp" alt="Dionis Insurance" width={56} height={56} priority />
-            <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">Новая заявка на ЗЕЛЕНУЮ КАРТУ с сайта DIONIS Insurance</h2>
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">Новая заявка на ОСАГО РФ нерезов с сайта DIONIS Insurance</h2>
             <p style="font-size: 14px; line-height: 1.6; color: #707070; margin: 0 0 20px;">
           	  <strong>Сделка:</strong> #${escapeHtml(String(dealId))}<br>
               <strong>Авто:</strong> ${escapeHtml(String(i + 1))} из ${escapeHtml(String(vehicles.length))}
@@ -584,20 +562,10 @@ export async function POST(req: Request): Promise<Response> {
               <div style="font-size: 13px; color: #333;">
                 <strong>${escapeHtml(contact_firstNameLat)} ${escapeHtml(contact_lastNameLat)}</strong><br>
                 Email: ${escapeHtml(contact_email)}<br>
-                Телефон: ${escapeHtml(contact_phone || "-")}<br>
-                ${
-                  order_isCompany
-                    ? `БИН: <strong>${escapeHtml(company_bin)}</strong><br>`
-                    : `Договор на физлицо (компания ID=1817)<br>`
-                }
+                Телефон: ${escapeHtml(contact_phone)}<br>
+                ${order_isCompany ? `ИНН: <strong>${escapeHtml(company_inn)}</strong><br>` : `Договор на физлицо (компания ID=1817)<br>`}
                 Contact ID: ${escapeHtml(String(contactId))}<br>
                 Company ID: ${escapeHtml(String(companyId))}
-              </div>
-            </div>
-            <div style="margin-top: 12px; padding: 12px; border: 1px solid #eee; border-radius: 8px;">
-              <h3 style="margin: 0 0 8px; font-size: 14px;">Параметры страхования</h3>
-              <div style="font-size: 13px; color: #333;">
-                Территория: <strong>${escapeHtml(insurance_territory || "-")}</strong>
               </div>
             </div>
 
@@ -605,7 +573,6 @@ export async function POST(req: Request): Promise<Response> {
               <h3 style="margin: 0 0 8px; font-size: 14px;">Данные авто</h3>
               <div style="font-size: 13px; color: #333;">
                 Номер: <strong>${escapeHtml(vehicle.plate || "-")}</strong><br>
-                Техпаспорт №: ${escapeHtml(vehicle.techPassportNumber || "-")}<br>
                 Тип: ${escapeHtml(vehicle.type || "-")}<br>
                 Страна (значение справочника): ${escapeHtml(vehicle.country || "-")}<br>
                 Дата начала: ${escapeHtml(vehicle.startDate || "-")}<br>
@@ -614,7 +581,7 @@ export async function POST(req: Request): Promise<Response> {
               </div>
             </div>
 
-            <div style="font-size: 14px; line-height: 1.6; color: #707070; margin: 0 0 20px;">
+            <div style="margin-top: 12px; font-size: 12px; color: #666; white-space: normal;">
               <h3 style="margin: 0 0 8px; font-size: 14px; color: #111;">Мета</h3>
               Страница: ${escapeHtml(pageUrl || "unknown")}<br>
               UTM: ${escapeHtml(utm ? safeJsonStringify(utm) : "none")}<br>
@@ -651,7 +618,7 @@ export async function POST(req: Request): Promise<Response> {
         `;
 
         try {
-          await mailer.send({
+          await mailer.sendVehicleMail({
             from: mailFrom,
             to: mailTo,
             subject,
@@ -659,12 +626,12 @@ export async function POST(req: Request): Promise<Response> {
             html,
           });
         } catch (e) {
+          // письмо не должно валить заявку
           console.error("Mail send error:", e);
         }
       } else {
-        console.error(
-          "Mail env vars are not fully set (MAIL_HOST/MAIL_USER/MAIL_PASS/MAIL_FROM)"
-        );
+        // чтобы было видно в логах, почему не шлём
+        console.error("Mail env vars are not fully set (MAIL_HOST/MAIL_USER/MAIL_PASS/MAIL_FROM)");
       }
     }
 
@@ -673,11 +640,11 @@ export async function POST(req: Request): Promise<Response> {
       { status: 200 }
     );
   } catch (e) {
-    console.error("GREEN CARD ORDER API ERROR:", e);
+    console.error("OSAGO RF ORDER API ERROR:", e);
     return Response.json(
       {
         ok: false,
-        message: "Ошибка при обработке заявки Green Card",
+        message: "Ошибка при обработке заявки ОСАГО РФ",
         error: getErrorMessage(e),
       },
       { status: 500 }

@@ -445,11 +445,28 @@ export function OsagoOrderForm({ dict }: Props) {
                       />
                     </div>
 
-                    <CountrySelect
-                      name="person_country"
-                      label={dict.person.countryLabel}
-                      required={true}
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {dict.person.countryLabel}
+                        <RequiredMark />
+                      </label>
+
+                      <select
+                        name="person_country"
+                        className={fieldClass}
+                        defaultValue=""
+                        required
+                      >
+                        <option value="">{dict.notSelected}</option>
+
+                        {Object.entries(dict.person.countries).map(([id, label]) => (
+                          <option key={id} value={id}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -621,7 +638,7 @@ export function OsagoOrderForm({ dict }: Props) {
                         >
                           <option value="">{dict.notSelected}</option>
                           <option value="385">{dict.vehicles.countryKZ}</option>
-                          <option value="523">{dict.vehicles.countryGE}</option>
+
                         </select>
                       </div>
 
@@ -651,6 +668,7 @@ export function OsagoOrderForm({ dict }: Props) {
                           required
                         >
                           <option value="">{dict.notSelected}</option>
+                          <option value="115">{dict.vehicles.period15d}</option>
                           <option value="115">{dict.vehicles.period1m}</option>
                           <option value="117">{dict.vehicles.period3m}</option>
                           <option value="119">{dict.vehicles.period6m}</option>

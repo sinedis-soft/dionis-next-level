@@ -37,6 +37,7 @@ export type OsagoRfFormDictionary = {
     passportIssuer: string;
     passportIssuedAt: string;
     passportValidTo: string;
+    countries: Record<string, string>;
   };
 
   vehicles: {
@@ -60,6 +61,7 @@ export type OsagoRfFormDictionary = {
     countryGE: string;
     startDate: string;
     periodLabel: string;
+    period15d: string;
     period1m: string;
     period3m: string;
     period6m: string;
@@ -106,6 +108,29 @@ const ru: OsagoRfFormDictionary = {
     passportIssuer: "Кем выдан паспорт",
     passportIssuedAt: "Когда выдан паспорт",
     passportValidTo: "Срок действия паспорта",
+    countries: {
+      "49": "Армения",
+      "51": "Азербайджан",
+      "255": "Беларусь",
+      "533": "Эстония",
+      "535": "Грузия",
+      "3019": "Великобритания",
+      "537": "Казахстан",
+      "539": "Кыргызстан",
+      "541": "Латвия",
+      "543": "Литва",
+      "545": "Молдова",
+      "547": "Монголия",
+      "3029": "КНР",
+      "549": "Польша",
+      "551": "Россия",
+      "3023": "Испания",
+      "553": "Украина",
+      "555": "Узбекистан",
+      "4021": "Кипр",
+      "557": "Другая страна",
+    },
+
   },
 
   vehicles: {
@@ -130,6 +155,7 @@ const ru: OsagoRfFormDictionary = {
     countryGE: "Грузия",
     startDate: "Начало действия страховки",
     periodLabel: "Срок страхования",
+    period15d: "15 дней",
     period1m: "1 месяц",
     period3m: "3 месяца",
     period6m: "6 месяцев",
@@ -176,6 +202,29 @@ const en: OsagoRfFormDictionary = {
     passportIssuer: "Passport issuing authority",
     passportIssuedAt: "Passport issue date",
     passportValidTo: "Passport expiry date",
+    countries: {
+      "49": "Armenia",
+      "51": "Azerbaijan",
+      "255": "Belarus",
+      "533": "Estonia",
+      "535": "Georgia",
+      "3019": "Great Britain",
+      "537": "Kazakhstan",
+      "539": "Kyrgyzstan",
+      "541": "Latvia",
+      "543": "Lithuania",
+      "545": "Moldova",
+      "547": "Mongolia",
+      "3029": "People's Republic of China",
+      "549": "Poland",
+      "551": "Russia",
+      "3023": "Spain",
+      "553": "Ukraine",
+      "555": "Uzbekistan",
+      "4021": "Cyprus",
+      "557": "Other country",
+    },
+
   },
 
   vehicles: {
@@ -200,6 +249,7 @@ const en: OsagoRfFormDictionary = {
     countryGE: "Georgia",
     startDate: "Policy start date",
     periodLabel: "Insurance period",
+    period15d: "15 days",
     period1m: "1 month",
     period3m: "3 months",
     period6m: "6 months",
@@ -246,6 +296,29 @@ const kz: OsagoRfFormDictionary = {
     passportIssuer: "Паспортты берген орган",
     passportIssuedAt: "Паспорт берілген күні",
     passportValidTo: "Паспорттың жарамдылық мерзімі",
+    countries: {
+      "49": "Армения",
+      "51": "Әзербайжан",
+      "255": "Беларусь",
+      "533": "Эстония",
+      "535": "Грузия",
+      "3019": "Ұлыбритания",
+      "537": "Қазақстан",
+      "539": "Қырғызстан",
+      "541": "Латвия",
+      "543": "Литва",
+      "545": "Молдова",
+      "547": "Моңғолия",
+      "3029": "Қытай Халық Республикасы",
+      "549": "Польша",
+      "551": "Ресей",
+      "3023": "Испания",
+      "553": "Украина",
+      "555": "Өзбекстан",
+      "4021": "Кипр",
+      "557": "Басқа ел",
+    },
+
   },
 
   vehicles: {
@@ -270,6 +343,7 @@ const kz: OsagoRfFormDictionary = {
     countryGE: "Грузия",
     startDate: "Сақтандырудың басталу күні",
     periodLabel: "Сақтандыру мерзімі",
+    period15d: "15 күн",
     period1m: "1 ай",
     period3m: "3 ай",
     period6m: "6 ай",
