@@ -146,7 +146,7 @@ const ru: HomeDictionary = {
         value: "100%",
         label: "Надёжность",
         text:
-          "Все полисы оформляются через лицензированных страховщиков. Никаких «серых» схем — только легальные программы страхования.",
+          "Все полисы оформляются через лицензированных страховщиков.",
       },
       {
         icon: "time",
@@ -157,17 +157,17 @@ const ru: HomeDictionary = {
       },
       {
         icon: "experience",
-        value: "12+ лет",
+        value: "20+ лет",
         label: "Опыт",
         text:
-          "Более 12 лет в международных перевозках. Понимаем требования по страхованию на коридорах ЕС, ЕАЭС, Кавказ, Турция, Китай.",
+          "Более 20 лет в международных перевозках. Понимаем требования по страхованию на коридорах ЕС, ЕАЭС, Кавказ, Турция, Китай.",
       },
       {
         icon: "support",
         value: "24/7",
         label: "На связи",
         text:
-          "Принимаем заявки онлайн, через WhatsApp и Telegram. Реагируем на срочные запросы и помогаем, когда у клиента вопрос «здесь и сейчас».",
+          "Принимаем заявки онлайн, через WhatsApp и Telegram. Реагируем на срочные запросы и оперативно помогаем решить все вопросы.",
       },
     ],
   },
@@ -176,10 +176,10 @@ const ru: HomeDictionary = {
     heading: "Дорогие друзья, партнёры и клиенты!",
     paragraphs: [
       "Меня зовут Денис Боровой, я — директор и учредитель страхового брокера Dionis.",
-      "Моя история — это история человека, который с юности работал в сфере транспорта: я прошёл путь от диспетчера до заместителя директора транспортной компании, чтобы понимать каждый этап перевозок и все сложности на этом пути.",
+      "Моя история — это история человека, который с юности работал в сфере транспорта: я прошёл путь от диспетчера до директора транспортной компании, чтобы понимать каждый этап перевозок и все сложности на этом пути.",
       "Позже я изучал страховой рынок с разных сторон: был клиентом, агентом, брокером, предпринимателем. И теперь я точно знаю, что важно для каждого, кто выходит на дорогу — будь то личная поездка или международная грузоперевозка.",
       "Мы создали Dionis, чтобы дать вам не просто страховой полис, а надёжную защиту и простую, понятную поддержку в любой ситуации. Мы выбираем проверенных партнёров, следим за актуальностью тарифов, помогаем экономить время и деньги.",
-      "У нас нет лишней бюрократии. Есть уважение к клиенту, компетентность и ответственность.",
+      "Мы ценим время клиента и строим работу на компетентности, ответственности и уважении.",
       "Если вам нужен страховой брокер для личных задач или бизнеса — мы рядом.",
       "Спасибо за ваше доверие. Dionis — страхование, на которое можно опереться.",
     ],
@@ -378,57 +378,63 @@ const kz: HomeDictionary = {
   },
 
   benefits: {
-    title: "Dionis-пен жұмыс істеудің артықшылықтары",
-    subtitle: "Ресми сақтандыру брокері: шешімдерді іріктейміз және клиенттерді толық сүйемелдейміз",
-    cards: [
-      {
-        icon: "shield",
-        value: "100%",
-        label: "Сенімділік",
-        text: "Барлық полистер лицензияланған сақтандыру компаниялары арқылы рәсімделеді. Ешқандай “көлеңкелі” схемалар жоқ — тек заңды бағдарламалар.",
-      },
-      {
-        icon: "time",
-        value: "15 минут",
-        label: "Жылдамдық",
-        text: "Онлайн өтінім бірнеше минут алады. Жұмыс уақытында полис әдетте 1 сағат ішінде дайын болады.",
-      },
-      {
-        icon: "experience",
-        value: "12+ жыл",
-        label: "Тәжірибе",
-        text: "12 жылдан астам халықаралық тасымалдау саласында. ЕО, ЕАЭО, Кавказ, Түркия, Қытай бағыттарындағы сақтандыру талаптарын жақсы білеміз.",
-      },
-      {
-        icon: "support",
-        value: "24/7",
-        label: "Қол жетімділік",
-        text: "Өтінімдерді онлайн, WhatsApp және Telegram арқылы қабылдаймыз. Шұғыл сұрақтарға жедел жауап береміз.",
-      },
-    ],
-  },
+  title: "Неліктен Dionis-пен жұмыс істеу ыңғайлы",
+  subtitle:
+    "Ресми сақтандыру брокері: шешімдерді таңдап, клиенттерді толық сүйемелдейміз",
+  cards: [
+    {
+      icon: "shield",
+      value: "100%",
+      label: "Сенімділік",
+      text:
+        "Барлық полистер лицензияланған сақтандыру компаниялары арқылы рәсімделеді.",
+    },
+    {
+      icon: "time",
+      value: "15 минут",
+      label: "Жылдамдық",
+      text:
+        "Онлайн өтінім бірнеше минутта толтырылады. Жұмыс уақытында полис әдетте бір сағат ішінде дайын болады.",
+    },
+    {
+      icon: "experience",
+      value: "20+ жыл",
+      label: "Тәжірибе",
+      text:
+        "Халықаралық тасымалдауда 20 жылдан астам тәжірибе. ЕО, ЕАЭО, Кавказ, Түркия және Қытай бағыттарындағы сақтандыру талаптарын жақсы білеміз.",
+    },
+    {
+      icon: "support",
+      value: "24/7",
+      label: "Әрқашан байланыстамыз",
+      text:
+        "Өтінімдерді онлайн, WhatsApp және Telegram арқылы қабылдаймыз. Шұғыл сұраныстарға жедел жауап беріп, барлық мәселелерді тез шешуге көмектесеміз.",
+    },
+  ],
+},
 
-  director: {
-    heading: "Құрметті достар, серіктестер және клиенттер!",
-    paragraphs: [
-      "Менің атым Денис Боровой, мен Dionis сақтандыру брокерінің директоры және құрылтайшысымын.",
-      "Менің кәсіби жолым көлік саласымен тығыз байланысты: жастайымнан бастап осы салада жұмыс істеп, диспетчерден бастап көлік компаниясы директорынң орынбасарына дейінгі жолдан өттім. Бұл маған тасымалдау процесінің барлық кезеңдерін және ондағы қиындықтарды терең түсінуге мүмкіндік берді.",
-      "Кейін мен сақтандыру нарығын әртүрлі қырынан зерттедім: клиент, агент, брокер және кәсіпкер ретінде. Сондықтан жолға шығатын әр адам үшін не маңызды екенін нақты білемін — ол жеке сапар болсын немесе халықаралық жүк тасымалы болсын.",
-      "Dionis компаниясын біз сізге жай ғана сақтандыру полисін емес, сенімді қорғаныс пен кез келген жағдайда түсінікті әрі қолжетімді қолдау ұсыну үшін құрдық. Біз сенімді серіктестерді таңдаймыз, тарифтердің өзектілігін қадағалаймыз және уақытыңыз бен қаражатыңызды үнемдеуге көмектесеміз.",
-      "Бізде артық бюрократия жоқ. Клиентке деген құрмет, кәсіби біліктілік және жауапкершілік бар.",
-      "Егер сізге жеке мақсаттар немесе бизнес үшін сақтандыру брокері қажет болса — біз әрдайым жаныңыздамыз.",
-      "Сеніміңіз үшін рахмет. Dionis — сенім артуға болатын сақтандыру.",
-    ],
+director: {
+  heading: "Құрметті достар, серіктестер және клиенттер!",
+  paragraphs: [
+    "Менің атым Денис Боровой, мен Dionis сақтандыру брокерінің директоры және құрылтайшысымын.",
+    "Менің кәсіби жолым көлік саласында басталды: тасымалдаудың әр кезеңін және осы саладағы барлық күрделілікті түсіну үшін диспетчерден бастап көлік компаниясының директорына дейінгі жолдан өттім.",
+    "Кейінірек сақтандыру нарығын әр қырынан зерттедім — клиент, агент, брокер және кәсіпкер ретінде. Бүгінде жолға шығатын әр адам үшін не маңызды екенін нақты білемін — ол жеке сапар болсын немесе халықаралық жүк тасымалы болсын.",
+    "Біз Dionis компаниясын сізге жай ғана сақтандыру полисін емес, сенімді қорғаныс пен кез келген жағдайда түсінікті әрі қолжетімді қолдау көрсету үшін құрдық. Біз тексерілген серіктестерді таңдаймыз, тарифтердің өзектілігін қадағалаймыз және клиенттеріміздің уақытын әрі қаражатын үнемдеуге көмектесеміз.",
+    "Біз клиенттің уақытын бағалаймыз және жұмысымызды құзыреттілікке, жауапкершілікке және құрметке негіздейміз.",
+    "Егер сізге жеке мәселелер немесе бизнес үшін сақтандыру брокері қажет болса — біз әрқашан жаныңыздамыз.",
+    "Сеніміңіз үшін рахмет. Dionis — арқа сүйеуге болатын сақтандыру.",
+  ],
+  signLines: [
+    "Құрметпен,",
+    "Боровой Денис Фёдорович",
+    "Директор және құрылтайшы",
+  ],
+  logoAlt: "Dionis Insurance Broker",
+  signatureAlt: "Денис Боровойдың қолтаңбасы",
+  photoAlt: "Денис Боровой, Dionis сақтандыру брокерінің директоры",
+},
 
-    signLines: [
-      "Құрметпен,",
-      "Боровой Денис Федорович",
-      "Директор және негізін қалаушы",
-    ],
-    logoAlt: "Dionis Insurance Broker",
-    signatureAlt: "Денис Боровойдың қолтаңбасы",
-    photoAlt: "Dionis сақтандыру брокерінің директоры Денис Боровой",
-  },
+
 
   greenCardSteps: {
     title: "Жасыл картаны бірнеше қарапайым қадаммен рәсімдеңіз",
@@ -607,56 +613,63 @@ const en: HomeDictionary = {
 
 
   benefits: {
-    title: "Why working with Dionis is convenient",
-    subtitle: "We issue insurance for entry into Russia and Europe",
-    cards: [
-      {
-        icon: "shield",
-        value: "100%",
-        label: "Reliability",
-        text: "All policies are issued through licensed insurers. No 'grey' schemes — only legitimate insurance programs.",
-      },
-      {
-        icon: "time",
-        value: "15 minutes",
-        label: "Speed",
-        text: "The online application takes only a few minutes. During working hours, a policy is usually ready within one hour.",
-      },
-      {
-        icon: "experience",
-        value: "12+ years",
-        label: "Experience",
-        text: "More than 12 years in international transportation. We understand insurance requirements along EU, EAEU, Caucasus, Turkey, and China corridors.",
-      },
-      {
-        icon: "support",
-        value: "24/7",
-        label: "Always in touch",
-        text: "We accept requests online, via WhatsApp and Telegram. We respond to urgent inquiries and help when the client needs answers immediately.",
-      },
-    ],
-  },
+  title: "Why working with Dionis is convenient",
+  subtitle:
+    "A licensed insurance broker: we select solutions and support our clients",
+  cards: [
+    {
+      icon: "shield",
+      value: "100%",
+      label: "Reliability",
+      text:
+        "All policies are issued through licensed insurance companies.",
+    },
+    {
+      icon: "time",
+      value: "15 minutes",
+      label: "Speed",
+      text:
+        "The online application takes just a few minutes. During business hours, the policy is usually issued within one hour.",
+    },
+    {
+      icon: "experience",
+      value: "20+ years",
+      label: "Experience",
+      text:
+        "Over 20 years in international transport. We understand insurance requirements across EU, EAEU, Caucasus, Türkiye, and China corridors.",
+    },
+    {
+      icon: "support",
+      value: "24/7",
+      label: "Availability",
+      text:
+        "We accept requests online, via WhatsApp and Telegram. We respond promptly to urgent inquiries and help resolve issues efficiently.",
+    },
+  ],
+},
 
-  director: {
-    heading: "Dear friends, partners, and clients,",
-    paragraphs: [
-      "My name is Denis Borovoy, and I am the Director and Founder of Dionis Insurance Broker.",
-      "My professional background is closely connected with the transport industry. I started my career at a young age and progressed from dispatcher to Deputy Director of a transport company, gaining a deep understanding of every stage of transportation and the challenges involved.",
-      "Later, I studied the insurance market from different perspectives — as a client, an agent, a broker, and an entrepreneur. This experience allows me to clearly understand what matters most to anyone on the road, whether it is a personal trip or an international freight operation.",
-      "We founded Dionis to offer not just an insurance policy, but reliable protection and clear, practical support in any situation. We work with trusted partners, monitor up-to-date tariffs, and help our clients save time and money.",
-      "We avoid unnecessary bureaucracy. What we value instead are respect for the client, professional competence, and responsibility.",
-      "If you are looking for an insurance broker for personal needs or business purposes, we are here to support you.",
-      "Thank you for your trust. Dionis — insurance you can rely on.",
-    ],
-    signLines: [
-      "With respect,",
-      "Denis Borovoy",
-      "Director and Founder",
-    ],
-    logoAlt: "Dionis Insurance Broker",
-    signatureAlt: "Signature of Denis Borovoy",
-    photoAlt: "Denis Borovoy, director of Dionis Insurance Broker",
-  },
+director: {
+  heading: "Dear friends, partners, and clients!",
+  paragraphs: [
+    "My name is Denis Borovoy. I am the Director and Founder of the insurance broker Dionis.",
+    "My professional journey began in the transport industry at a young age: I progressed from dispatcher to director of a transport company, which allowed me to understand every stage of transportation and the challenges involved.",
+    "Later, I explored the insurance market from multiple perspectives — as a client, agent, broker, and entrepreneur. Today, I clearly understand what matters to everyone who takes to the road, whether for a personal trip or international freight transportation.",
+    "We created Dionis to offer more than just an insurance policy — we provide reliable protection and clear, practical support in any situation. We work with trusted partners, keep tariffs up to date, and help our clients save time and money.",
+    "We value our clients’ time and build our work on competence, responsibility, and respect.",
+    "If you need an insurance broker for personal matters or business needs — we are always here for you.",
+    "Thank you for your trust. Dionis — insurance you can rely on.",
+  ],
+  signLines: [
+    "Sincerely,",
+    "Denis Borovoy",
+    "Director & Founder",
+  ],
+  logoAlt: "Dionis Insurance Broker",
+  signatureAlt: "Denis Borovoy’s signature",
+  photoAlt: "Denis Borovoy, Director of Dionis Insurance Broker",
+},
+
+
 
   greenCardSteps: {
     title: "A Green Card in just a few simple steps",

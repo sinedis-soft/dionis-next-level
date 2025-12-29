@@ -550,7 +550,13 @@ export async function POST(req: Request): Promise<Response> {
         const html = `
           
           <div style="max-width: 600px; margin: 0 auto; background-color: #FFFFFF; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-            <Image src="/logo_1.webp" alt="Dionis Insurance" width={56} height={56} priority />
+            <img
+                src="https://dionis-insurance.com/logo_1.webp"
+                width="56"
+                height="56"
+                alt="Dionis Insurance"
+                style="display:block; border:0; outline:none; text-decoration:none;"
+            >
             <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">Новая заявка на ОСАГО РФ нерезов с сайта DIONIS Insurance</h2>
             <p style="font-size: 14px; line-height: 1.6; color: #707070; margin: 0 0 20px;">
           	  <strong>Сделка:</strong> #${escapeHtml(String(dealId))}<br>
@@ -598,7 +604,13 @@ export async function POST(req: Request): Promise<Response> {
               <tbody>
                 <tr>
                   <td style="padding: 10px; text-align: left; border-bottom: 1px solid #F2F2F2;">
-                    <Image src="/logo_1.webp" alt="Dionis Insurance" width={56} height={56} priority display: block; />
+                    <img
+                        src="https://dionis-insurance.com/logo_1.webp"
+                        width="200"
+                        height="200"
+                        alt="Dionis Insurance"
+                        style="display:block; border:0; outline:none; text-decoration:none;"
+                    >
                   </td>
                   <td style="padding: 10px; text-align: left; border-bottom: 1px solid #F2F2F2;">
                     <a href="mailto:info@dionis-insurance.kz" style="color: #C19A6B; text-decoration: none;">info@dionis-insurance.kz</a><br>

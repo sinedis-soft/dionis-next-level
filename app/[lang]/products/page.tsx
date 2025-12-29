@@ -144,9 +144,6 @@ export default async function ProductsPage({
       {active === "life" ? <LifeProductsSection lang={lang} base={base} ui={ui} /> : null}
       {active === "vhi" ? <MedicalProductsSection lang={lang} base={base} ui={ui} /> : null}
 
-      {/* TODO: остальные секции позже:
-          cargo / liability / life / vhi */}
-
       {/* REQUEST BOX */}
       <section className="py-10 sm:py-14">
         <div className="max-w-6xl mx-auto px-4">
