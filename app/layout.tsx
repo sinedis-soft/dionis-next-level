@@ -2,10 +2,16 @@
 import "./globals.css";
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { Roboto, Montserrat } from "next/font/google";
 
-const SITE_URL = "https://dionis-insurance.kz";
+import AnalyticsScripts from "@/components/AnalyticsScripts";
+import AnalyticsManager from "@/components/AnalyticsManager";
+
+const SITE_URL =
+  (process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.kz").replace(
+    /\/$/,
+    ""
+  );
 
 /* ---------- Fonts ---------- */
 
@@ -24,11 +30,7 @@ const montserrat = Montserrat({
 });
 
 /* ---------- Viewport ---------- */
-/**
- * Эквивалент:
- * <meta name="viewport"
- *   content="width=device-width, initial-scale=1, maximum-scale=2.0, user-scalable=yes">
- */
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -39,6 +41,7 @@ export const viewport: Viewport = {
 /* ---------- Metadata ---------- */
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Dionis Insurance Broker",
     template: "%s — Dionis Insurance Broker",
@@ -104,13 +107,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
   return (
     <html lang="ru" className={`${roboto.variable} ${montserrat.variable}`}>
-      <body className="min-h-screen flex flex-col">
-        <Script
-          id="structured-data"
+      <head>
+        <script
           type="application/ld+json"
-          strategy="afterInteractive"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+      </head>
+      <body className="min-h-screen flex flex-col">
+        {/* ✅ Аналитика грузится ТОЛЬКО после cookie-consent=accepted */}
+        <AnalyticsScripts />
+
+        {/* ✅ Pageview/events (если используешь GTM dataLayer) */}
+        <AnalyticsManager />
+
         {children}
       </body>
     </html>

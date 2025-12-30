@@ -332,54 +332,54 @@ const en: GreenCardPageDictionary = {
     resultApprox: "≈",
   },
   howItWorks: {
-  title: "Бұл қалай жұмыс істейді",
-  subtitle: "Полисті онлайн алудың қарапайым процесі",
+  title: "How it works",
+  subtitle: "A simple process to obtain your policy online",
   steps: [
     {
-      title: "Өтінім қалдырасыз",
-      text: "Сайтта қысқа форманы толтырасыз немесе менеджерге жазасыз.",
+      title: "Submit a request",
+      text: "Fill in a short form on the website or contact our manager.",
     },
     {
-      title: "Деректерді тексереміз",
-      text: "Мәліметтерді нақтылап, маршрутыңызға сәйкес оңтайлы тарифті таңдаймыз.",
+      title: "We verify the details",
+      text: "We уточняем details and select the most suitable tariff for your route.",
     },
     {
-      title: "Төлем жасайсыз",
-      text: "Картамен немесе шот арқылы төлеу мүмкін — жеке және заңды тұлғалар үшін қолайлы.",
+      title: "Make a payment",
+      text: "Payment by card or bank transfer — suitable for both individuals and legal entities.",
     },
     {
-      title: "Полисті аласыз",
-      text: "Дайын құжатты e-mail арқылы жібереміз. Әдетте төлемнен кейін 15 минут ішінде.",
+      title: "Receive your policy",
+      text: "We send the completed document by e-mail, usually within 15 minutes after payment.",
     },
   ],
 },
 
 coverage: {
-  title: "Қамту аймағы мен шарттары",
+  title: "Coverage area and terms",
   items: [
     {
-      title: "Қолданылу аумағы",
+      title: "Territorial coverage",
       text:
-        "Полис «Жасыл карта» жүйесіне кіретін елдерде қолданылады:\n\n" +
-        "Австрия, Албания, Андорра, Бельгия, Болгария, Босния және Герцеговина, " +
-        "Ұлыбритания, Греция, Дания, Эстония, Ирландия, Исландия, Испания, Италия, " +
-        "Кипр, Литва, Латвия, Люксембург, Мальта, Марокко, Молдова, Нидерланды, Германия, " +
-        "Норвегия, Солтүстік Македония, Польша, Португалия, Румыния, Сербия, Словакия, " +
-        "Словения, Тунис, Түркия, Венгрия, Украина, Финляндия, Франция, Хорватия, " +
-        "Чех Республикасы, Черногория, Швейцария, Швеция.\n\n" +
-        "МАҢЫЗДЫ: «Жасыл карта» Әзірбайжанның сақтандыру компаниясы арқылы рәсімделеді, " +
-        "сондықтан Әзірбайжан аумағында жарамсыз.",
+        "The policy is valid in the countries of the Green Card system:\n\n" +
+        "Austria, Albania, Andorra, Belgium, Bulgaria, Bosnia and Herzegovina, " +
+        "United Kingdom, Greece, Denmark, Estonia, Ireland, Iceland, Spain, Italy, " +
+        "Cyprus, Lithuania, Latvia, Luxembourg, Malta, Morocco, Moldova, Netherlands, Germany, " +
+        "Norway, North Macedonia, Poland, Portugal, Romania, Serbia, Slovakia, " +
+        "Slovenia, Tunisia, Türkiye, Hungary, Ukraine, Finland, France, Croatia, " +
+        "Czech Republic, Montenegro, Switzerland, Sweden.\n\n" +
+        "IMPORTANT: The Green Card policy is issued by an insurance company in Azerbaijan; " +
+        "therefore, it is NOT valid within the territory of Azerbaijan.",
     },
     {
-      title: "Көлік құралдарының түрлері",
-      text: "Жеңіл автомобильдер, мотоциклдер, жүк көліктері, тіркемелер, автобустар.",
+      title: "Types of vehicles",
+      text: "Passenger cars, motorcycles, trucks, trailers, and buses.",
     },
     {
-      title: "Жарамдылық мерзімі",
-      text: "Ең аз мерзім — 1 ай. Ең көп мерзім — 1 жыл.",
+      title: "Policy validity period",
+      text: "Minimum period — 1 month. Maximum period — 1 year.",
     },
   ],
-  imageAlt: "Green Card қамту аймағы мен шарттары",
+  imageAlt: "Green Card coverage area and terms",
 },
 
   advantages: {
@@ -528,55 +528,56 @@ const kz: GreenCardPageDictionary = {
     resultApprox: "≈",
   },
   howItWorks: {
-  title: "How it works",
-  subtitle: "A simple process to obtain your policy online",
+  title: "Бұл қалай жұмыс істейді",
+  subtitle: "Полисті онлайн алудың қарапайым процесі",
   steps: [
     {
-      title: "Submit a request",
-      text: "Fill in a short form on the website or contact our manager.",
+      title: "Өтінім қалдырасыз",
+      text: "Сайтта қысқа форманы толтырасыз немесе менеджерге жазасыз.",
     },
     {
-      title: "We verify the details",
-      text: "We уточняем details and select the most suitable tariff for your route.",
+      title: "Деректерді тексереміз",
+      text: "Мәліметтерді нақтылап, маршрутыңызға сәйкес оңтайлы тарифті таңдаймыз.",
     },
     {
-      title: "Make a payment",
-      text: "Payment by card or bank transfer — suitable for both individuals and legal entities.",
+      title: "Төлем жасайсыз",
+      text: "Картамен немесе шот арқылы төлеу мүмкін — жеке және заңды тұлғалар үшін қолайлы.",
     },
     {
-      title: "Receive your policy",
-      text: "We send the completed document by e-mail, usually within 15 minutes after payment.",
+      title: "Полисті аласыз",
+      text: "Дайын құжатты e-mail арқылы жібереміз. Әдетте төлемнен кейін 15 минут ішінде.",
     },
   ],
 },
 
 coverage: {
-  title: "Coverage area and terms",
+  title: "Қамту аймағы мен шарттары",
   items: [
     {
-      title: "Territorial coverage",
+      title: "Қолданылу аумағы",
       text:
-        "The policy is valid in the countries of the Green Card system:\n\n" +
-        "Austria, Albania, Andorra, Belgium, Bulgaria, Bosnia and Herzegovina, " +
-        "United Kingdom, Greece, Denmark, Estonia, Ireland, Iceland, Spain, Italy, " +
-        "Cyprus, Lithuania, Latvia, Luxembourg, Malta, Morocco, Moldova, Netherlands, Germany, " +
-        "Norway, North Macedonia, Poland, Portugal, Romania, Serbia, Slovakia, " +
-        "Slovenia, Tunisia, Türkiye, Hungary, Ukraine, Finland, France, Croatia, " +
-        "Czech Republic, Montenegro, Switzerland, Sweden.\n\n" +
-        "IMPORTANT: The Green Card policy is issued by an insurance company in Azerbaijan; " +
-        "therefore, it is NOT valid within the territory of Azerbaijan.",
+        "Полис «Жасыл карта» жүйесіне кіретін елдерде қолданылады:\n\n" +
+        "Австрия, Албания, Андорра, Бельгия, Болгария, Босния және Герцеговина, " +
+        "Ұлыбритания, Греция, Дания, Эстония, Ирландия, Исландия, Испания, Италия, " +
+        "Кипр, Литва, Латвия, Люксембург, Мальта, Марокко, Молдова, Нидерланды, Германия, " +
+        "Норвегия, Солтүстік Македония, Польша, Португалия, Румыния, Сербия, Словакия, " +
+        "Словения, Тунис, Түркия, Венгрия, Украина, Финляндия, Франция, Хорватия, " +
+        "Чех Республикасы, Черногория, Швейцария, Швеция.\n\n" +
+        "МАҢЫЗДЫ: «Жасыл карта» Әзірбайжанның сақтандыру компаниясы арқылы рәсімделеді, " +
+        "сондықтан Әзірбайжан аумағында жарамсыз.",
     },
     {
-      title: "Types of vehicles",
-      text: "Passenger cars, motorcycles, trucks, trailers, and buses.",
+      title: "Көлік құралдарының түрлері",
+      text: "Жеңіл автомобильдер, мотоциклдер, жүк көліктері, тіркемелер, автобустар.",
     },
     {
-      title: "Policy validity period",
-      text: "Minimum period — 1 month. Maximum period — 1 year.",
+      title: "Жарамдылық мерзімі",
+      text: "Ең аз мерзім — 1 ай. Ең көп мерзім — 1 жыл.",
     },
   ],
-  imageAlt: "Green Card coverage area and terms",
+  imageAlt: "Green Card қамту аймағы мен шарттары",
 },
+  
 
   advantages: {
     title: "«DIONIS» МЫНАДАЙ АРТЫҚШЫЛЫҚТАР ҰСЫНАДЫ:",

@@ -1,102 +1,105 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Script from "next/script";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 
-type ConsentValue = "accepted" | "rejected" | null;
-const COOKIE_NAME = "dionis_cookie_consent_v1";
+type UTMData = Record<string, string>;
 
-function readConsent(): ConsentValue {
-  if (typeof document === "undefined") return null;
-  const match = document.cookie.match(
-    new RegExp(`${COOKIE_NAME}=(accepted|rejected)`)
-  );
-  return match ? (match[1] as ConsentValue) : null;
+declare global {
+  interface Window {
+    dataLayer?: Array<Record<string, unknown>>;
+  }
+}
+
+function parseUtmFromSearch(search: string): UTMData {
+  const out: UTMData = {};
+  const params = new URLSearchParams(search);
+
+  const keys = [
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_term",
+    "utm_content",
+    "gclid",
+    "yclid",
+    "fbclid",
+  ];
+
+  for (const k of keys) {
+    const v = params.get(k);
+    if (v) out[k] = v;
+  }
+
+  return out;
+}
+
+function safeJsonParse(raw: string | null): unknown {
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function pushDataLayer(event: Record<string, unknown>) {
+  if (typeof window === "undefined") return;
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push(event);
 }
 
 export default function AnalyticsManager() {
-  const [enabled, setEnabled] = useState(false);
+  const pathname = usePathname() || "/";
+  const [search, setSearch] = useState<string>("");
 
+  // ✅ берём query-string ТОЛЬКО на клиенте
   useEffect(() => {
-    const stored = readConsent();
-    if (stored === "accepted") setEnabled(true);
+    if (typeof window === "undefined") return;
+    setSearch(window.location.search || "");
+  }, [pathname]);
 
-    const handler = () => {
-      const current = readConsent();
-      setEnabled(current === "accepted");
-    };
+  const pageUrl = useMemo(() => {
+    if (typeof window === "undefined") return pathname;
+    const origin = window.location.origin || "";
+    return `${origin}${pathname}${search}`;
+  }, [pathname, search]);
 
-    window.addEventListener("cookie-consent-changed", handler);
-    return () => window.removeEventListener("cookie-consent-changed", handler);
-  }, []);
+  // ✅ сохраняем UTM в localStorage (чтобы потом отправлять с формами/лидами)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
 
-  if (!enabled) return null;
+    const utm = parseUtmFromSearch(search);
+    if (Object.keys(utm).length === 0) return;
 
-  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-  const ymId = process.env.NEXT_PUBLIC_YM_ID;
+    try {
+      localStorage.setItem("utm_data", JSON.stringify(utm));
+    } catch {
+      // ignore
+    }
+  }, [search]);
 
-  return (
-    <>
-      {/* Google Analytics 4 */}
-      {gaId && (
-        <>
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
-            strategy="afterInteractive"
-          />
-          <Script id="ga4-init" strategy="afterInteractive">
-            {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', '${gaId}', { anonymize_ip: true });
-            `}
-          </Script>
-        </>
-      )}
+  // ✅ отправка page_view (если используешь GTM dataLayer)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
 
-      {/* Yandex Metrica */}
-      {ymId && (
-        <Script id="ym-init" strategy="afterInteractive">
-          {`
-            (function(m,e,t,r,i,k,a){
-              m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-              m[i].l=1*new Date();
-              for (var j = 0; j < document.scripts.length; j++) {
-                if (document.scripts[j].src === r) { return; }
-              }
-              k=e.createElement(t),
-              a=e.getElementsByTagName(t)[0],
-              k.async=1,
-              k.src=r,
-              a.parentNode.insertBefore(k,a)
-            })(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+    // Если у тебя аналитика включается только после consent — можешь
+    // добавить проверку по cookie/событию здесь, но это обычно делает AnalyticsScripts.
 
-            ym(${ymId}, "init", {
-              clickmap:true,
-              trackLinks:true,
-              accurateTrackBounce:true,
-              webvisor:true
-            });
-          `}
-        </Script>
-      )}
+    const utmStored = safeJsonParse(
+      typeof window !== "undefined" ? localStorage.getItem("utm_data") : null
+    );
+    const utm =
+      utmStored && typeof utmStored === "object" ? (utmStored as UTMData) : {};
 
-      {/* Яндекс Реклама / контекст */}
-      <Script id="ya-ads-init" strategy="afterInteractive">
-        {`
-          (function(w,d,s,src){
-            w.yaContextCb = w.yaContextCb || [];
-            if (d.getElementById('ya-context-js')) return;
-            var s1 = d.createElement(s);
-            s1.async = true;
-            s1.id = 'ya-context-js';
-            s1.src = 'https://yandex.ru/ads/system/context.js';
-            var s0 = d.getElementsByTagName(s)[0];
-            s0.parentNode.insertBefore(s1,s0);
-          })(window, document, 'script');
-        `}
-      </Script>
-    </>
-  );
+    pushDataLayer({
+      event: "page_view",
+      page_path: pathname,
+      page_location: pageUrl,
+      page_title: typeof document !== "undefined" ? document.title : "",
+      utm,
+    });
+  }, [pathname, pageUrl]);
+
+  return null;
 }

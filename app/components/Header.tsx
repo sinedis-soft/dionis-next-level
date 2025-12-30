@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -16,6 +16,11 @@ const INK = "text-[#0f2238]";
 const INK_HOVER = "hover:text-[#23376C]";
 const PANEL = "bg-white/30 backdrop-blur-md border border-black/10";
 
+// ✅ считаем, что статья блога — это /{lang}/blog/{slug}
+function isBlogArticlePath(pathname: string) {
+  return /^\/(ru|kz|en)\/blog\/[^\/]+\/?$/.test(pathname);
+}
+
 export default function Header({ lang }: { lang: Lang }) {
   const pathname = usePathname() || "/";
   const t = HEADER_DICTIONARY[lang];
@@ -25,10 +30,34 @@ export default function Header({ lang }: { lang: Lang }) {
   const [insuranceDesktopOpen, setInsuranceDesktopOpen] = useState(false);
   const [insuranceMobileOpen, setInsuranceMobileOpen] = useState(false);
 
+  // ✅ вместо useSearchParams(): берем query-string из window.location.search
+  const [qs, setQs] = useState("");
+
+  useEffect(() => {
+    // initial + on pathname change
+    if (typeof window === "undefined") return;
+
+    const update = () => setQs(window.location.search || "");
+    update();
+
+    // на случай popstate / возврата назад, когда меняется query
+    window.addEventListener("popstate", update);
+    return () => window.removeEventListener("popstate", update);
+  }, [pathname]);
+
+  // ✅ сборка URL для языка:
+  // - на blog/[slug] -> /{targetLang}/blog (без query/hash)
+  // - в остальных местах -> тот же pathname (с заменой lang) + query
   const buildLangUrl = (targetLang: Lang) => {
+    if (isBlogArticlePath(pathname)) {
+      return `/${targetLang}/blog`;
+    }
+
     const parts = pathname.split("/");
     if (parts.length > 1) parts[1] = targetLang;
-    return parts.join("/").replace(/\/+$/, "") || "/";
+
+    const nextPath = parts.join("/").replace(/\/+$/, "") || "/";
+    return `${nextPath}${qs}`;
   };
 
   const isActive = (target: string) => {
@@ -74,17 +103,32 @@ export default function Header({ lang }: { lang: Lang }) {
         <div className="h-16 xl:h-20 grid grid-cols-[auto_1fr_auto] items-center gap-4">
           {/* LOGO */}
           <Link href={base} className="flex items-center gap-2">
-            <Image src="/logo_1.webp" alt="Dionis Insurance" width={56} height={56} priority />
+            <Image
+              src="/logo_1.webp"
+              alt="Dionis Insurance"
+              width={56}
+              height={56}
+              priority
+            />
           </Link>
 
           {/* DESKTOP NAV (только xl) */}
           <nav className="hidden xl:flex justify-center">
             <div className="flex items-center gap-2 text-sm">
-              <Link href={base} className={cx(navLinkClass(base), "min-w-[92px] text-center")}>
+              <Link
+                href={base}
+                className={cx(navLinkClass(base), "min-w-[92px] text-center")}
+              >
                 {t.home}
               </Link>
 
-              <Link href={`${base}/about`} className={cx(navLinkClass(`${base}/about`), "min-w-[92px] text-center")}>
+              <Link
+                href={`${base}/about`}
+                className={cx(
+                  navLinkClass(`${base}/about`),
+                  "min-w-[92px] text-center"
+                )}
+              >
                 {t.about}
               </Link>
 
@@ -109,10 +153,22 @@ export default function Header({ lang }: { lang: Lang }) {
                 </button>
 
                 {insuranceDesktopOpen && (
-                  <div className={cx("absolute left-0 mt-3 rounded-2xl overflow-hidden min-w-[260px] z-50", PANEL, "shadow-2xl")}>
+                  <div
+                    className={cx(
+                      "absolute left-0 mt-3 rounded-2xl overflow-hidden min-w-[260px] z-50",
+                      PANEL,
+                      "shadow-2xl"
+                    )}
+                  >
                     <Link
                       href={`${base}/green-card`}
-                      className={cx("block px-4 py-3", INK, "hover:bg-white/40", isActive(`${base}/green-card`) && "font-extrabold bg-white/40")}
+                      className={cx(
+                        "block px-4 py-3",
+                        INK,
+                        "hover:bg-white/40",
+                        isActive(`${base}/green-card`) &&
+                          "font-extrabold bg-white/40"
+                      )}
                       onClick={() => setInsuranceDesktopOpen(false)}
                     >
                       {t.greenCard}
@@ -120,7 +176,13 @@ export default function Header({ lang }: { lang: Lang }) {
 
                     <Link
                       href={`${base}/osago-rf`}
-                      className={cx("block px-4 py-3", INK, "hover:bg-white/40", isActive(`${base}/osago-rf`) && "font-extrabold bg-white/40")}
+                      className={cx(
+                        "block px-4 py-3",
+                        INK,
+                        "hover:bg-white/40",
+                        isActive(`${base}/osago-rf`) &&
+                          "font-extrabold bg-white/40"
+                      )}
                       onClick={() => setInsuranceDesktopOpen(false)}
                     >
                       {t.osagoRu}
@@ -128,7 +190,13 @@ export default function Header({ lang }: { lang: Lang }) {
 
                     <Link
                       href={`${base}/products`}
-                      className={cx("block px-4 py-3", INK, "hover:bg-white/40", isActive(`${base}/products`) && "font-extrabold bg-white/40")}
+                      className={cx(
+                        "block px-4 py-3",
+                        INK,
+                        "hover:bg-white/40",
+                        isActive(`${base}/products`) &&
+                          "font-extrabold bg-white/40"
+                      )}
                       onClick={() => setInsuranceDesktopOpen(false)}
                     >
                       {t.allProducts}
@@ -137,11 +205,23 @@ export default function Header({ lang }: { lang: Lang }) {
                 )}
               </div>
 
-              <Link href={`${base}/blog`} className={cx(navLinkClass(`${base}/blog`), "min-w-[92px] text-center")}>
+              <Link
+                href={`${base}/blog`}
+                className={cx(
+                  navLinkClass(`${base}/blog`),
+                  "min-w-[92px] text-center"
+                )}
+              >
                 {t.blog}
               </Link>
 
-              <Link href={`${base}/contacts`} className={cx(navLinkClass(`${base}/contacts`), "min-w-[92px] text-center")}>
+              <Link
+                href={`${base}/contacts`}
+                className={cx(
+                  navLinkClass(`${base}/contacts`),
+                  "min-w-[92px] text-center"
+                )}
+              >
                 {t.contacts}
               </Link>
             </div>
@@ -149,22 +229,50 @@ export default function Header({ lang }: { lang: Lang }) {
 
           {/* RIGHT (desktop) — xl */}
           <div className="hidden xl:flex flex-col items-end gap-2">
-            <a href="tel:+77273573030" className={cx("font-extrabold text-base leading-tight", INK, INK_HOVER)}>
+            <a
+              href="tel:+77273573030"
+              className={cx(
+                "font-extrabold text-base leading-tight",
+                INK,
+                INK_HOVER
+              )}
+            >
               +7 (727) 357-30-30
             </a>
 
             <div className="flex items-center gap-3">
-              <a href="https://wa.me/77273573030" target="_blank" rel="noopener noreferrer" className="inline-flex">
+              <a
+                href="https://wa.me/77273573030"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex"
+              >
                 <Image src="/wa.webp" alt="WhatsApp" width={26} height={26} />
               </a>
-              <a href="https://t.me/Dionis_insurance_broker_bot" target="_blank" rel="noopener noreferrer" className="inline-flex">
+              <a
+                href="https://t.me/Dionis_insurance_broker_bot"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex"
+              >
                 <Image src="/tg.webp" alt="Telegram" width={22} height={22} />
               </a>
 
-              <div className={cx("ml-2 rounded-full px-2 py-1 flex gap-2", "bg-white/35 border border-black/10")}>
-                <Link href={buildLangUrl("ru")} className={langLinkClass("ru")}>RU</Link>
-                <Link href={buildLangUrl("kz")} className={langLinkClass("kz")}>KZ</Link>
-                <Link href={buildLangUrl("en")} className={langLinkClass("en")}>EN</Link>
+              <div
+                className={cx(
+                  "ml-2 rounded-full px-2 py-1 flex gap-2",
+                  "bg-white/35 border border-black/10"
+                )}
+              >
+                <Link href={buildLangUrl("ru")} className={langLinkClass("ru")}>
+                  RU
+                </Link>
+                <Link href={buildLangUrl("kz")} className={langLinkClass("kz")}>
+                  KZ
+                </Link>
+                <Link href={buildLangUrl("en")} className={langLinkClass("en")}>
+                  EN
+                </Link>
               </div>
             </div>
           </div>
@@ -191,14 +299,12 @@ export default function Header({ lang }: { lang: Lang }) {
       {/* MOBILE MENU OVERLAY */}
       {menuOpen && (
         <div className="xl:hidden fixed inset-0 z-[999]">
-          {/* ✅ backdrop: закрытие по клику снаружи */}
           <button
             aria-label="Close menu"
             className="absolute inset-0 bg-black/20"
             onClick={() => setMenuOpen(false)}
           />
 
-          {/* ✅ панель: НЕ закрываем по клику на контейнер */}
           <div
             className={cx(
               "absolute right-0 top-0 w-[86%] max-w-sm shadow-2xl",
@@ -206,7 +312,6 @@ export default function Header({ lang }: { lang: Lang }) {
               "bg-white/30 backdrop-blur-md border-l border-black/10"
             )}
           >
-            {/* шапка панели */}
             <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-black/10 bg-white/40 backdrop-blur-md">
               <span className={cx("font-extrabold", INK)}>Dionis Insurance</span>
 
@@ -225,7 +330,12 @@ export default function Header({ lang }: { lang: Lang }) {
                 <nav className="flex flex-col gap-2 text-base">
                   <Link
                     href={base}
-                    className={cx("block w-full rounded-xl px-4 py-3", INK, "hover:bg-white/40", isActive(base) && "bg-white/40 font-extrabold")}
+                    className={cx(
+                      "block w-full rounded-xl px-4 py-3",
+                      INK,
+                      "hover:bg-white/40",
+                      isActive(base) && "bg-white/40 font-extrabold"
+                    )}
                     onClick={() => setMenuOpen(false)}
                   >
                     {t.home}
@@ -233,7 +343,12 @@ export default function Header({ lang }: { lang: Lang }) {
 
                   <Link
                     href={`${base}/about`}
-                    className={cx("block w-full rounded-xl px-4 py-3", INK, "hover:bg-white/40", isActive(`${base}/about`) && "bg-white/40 font-extrabold")}
+                    className={cx(
+                      "block w-full rounded-xl px-4 py-3",
+                      INK,
+                      "hover:bg-white/40",
+                      isActive(`${base}/about`) && "bg-white/40 font-extrabold"
+                    )}
                     onClick={() => setMenuOpen(false)}
                   >
                     {t.about}
@@ -243,17 +358,32 @@ export default function Header({ lang }: { lang: Lang }) {
                     <button
                       type="button"
                       onClick={() => setInsuranceMobileOpen((p) => !p)}
-                      className={cx("w-full px-4 py-3 flex items-center justify-between", INK, "hover:bg-white/40")}
+                      className={cx(
+                        "w-full px-4 py-3 flex items-center justify-between",
+                        INK,
+                        "hover:bg-white/40"
+                      )}
                     >
                       <span className="font-extrabold">{t.insurances}</span>
-                      <span className={cx("transition-transform", insuranceMobileOpen && "rotate-180")}>▾</span>
+                      <span
+                        className={cx(
+                          "transition-transform",
+                          insuranceMobileOpen && "rotate-180"
+                        )}
+                      >
+                        ▾
+                      </span>
                     </button>
 
                     {insuranceMobileOpen && (
                       <div className="px-2 pb-2 pt-1 bg-white/30">
                         <Link
                           href={`${base}/green-card`}
-                          className={cx("block w-full rounded-lg px-3 py-2", INK, "hover:bg-white/40")}
+                          className={cx(
+                            "block w-full rounded-lg px-3 py-2",
+                            INK,
+                            "hover:bg-white/40"
+                          )}
                           onClick={() => setMenuOpen(false)}
                         >
                           {t.greenCard}
@@ -261,7 +391,11 @@ export default function Header({ lang }: { lang: Lang }) {
 
                         <Link
                           href={`${base}/osago-rf`}
-                          className={cx("block w-full rounded-lg px-3 py-2", INK, "hover:bg-white/40")}
+                          className={cx(
+                            "block w-full rounded-lg px-3 py-2",
+                            INK,
+                            "hover:bg-white/40"
+                          )}
                           onClick={() => setMenuOpen(false)}
                         >
                           {t.osagoRu}
@@ -269,7 +403,11 @@ export default function Header({ lang }: { lang: Lang }) {
 
                         <Link
                           href={`${base}/products`}
-                          className={cx("block w-full rounded-lg px-3 py-2", INK, "hover:bg-white/40")}
+                          className={cx(
+                            "block w-full rounded-lg px-3 py-2",
+                            INK,
+                            "hover:bg-white/40"
+                          )}
                           onClick={() => setMenuOpen(false)}
                         >
                           {t.allProducts}
@@ -280,7 +418,11 @@ export default function Header({ lang }: { lang: Lang }) {
 
                   <Link
                     href={`${base}/blog`}
-                    className={cx("block w-full rounded-xl px-4 py-3", INK, "hover:bg-white/40")}
+                    className={cx(
+                      "block w-full rounded-xl px-4 py-3",
+                      INK,
+                      "hover:bg-white/40"
+                    )}
                     onClick={() => setMenuOpen(false)}
                   >
                     {t.blog}
@@ -288,38 +430,78 @@ export default function Header({ lang }: { lang: Lang }) {
 
                   <Link
                     href={`${base}/contacts`}
-                    className={cx("block w-full rounded-xl px-4 py-3", INK, "hover:bg-white/40")}
+                    className={cx(
+                      "block w-full rounded-xl px-4 py-3",
+                      INK,
+                      "hover:bg-white/40"
+                    )}
                     onClick={() => setMenuOpen(false)}
                   >
                     {t.contacts}
                   </Link>
                 </nav>
 
-                {/* контакты + языки */}
                 <div className="mt-5 rounded-2xl bg-white/25 border border-black/10 p-4 text-sm">
-                  <a href="tel:+77273573030" className={cx("block font-extrabold text-lg", INK)}>
+                  <a
+                    href="tel:+77273573030"
+                    className={cx("block font-extrabold text-lg", INK)}
+                  >
                     +7 (727) 357-30-30
                   </a>
 
                   <div className="mt-3 flex gap-3 items-center">
-                    <a href="https://wa.me/77273573030" target="_blank" rel="noopener noreferrer">
+                    <a
+                      href="https://wa.me/77273573030"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <Image src="/wa.webp" width={28} height={28} alt="WhatsApp" />
                     </a>
-                    <a href="https://t.me/Dionis_insurance_broker_bot" target="_blank" rel="noopener noreferrer">
+                    <a
+                      href="https://t.me/Dionis_insurance_broker_bot"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <Image src="/tg.webp" width={28} height={28} alt="Telegram" />
                     </a>
 
                     <div className="ml-auto inline-flex items-center gap-2 rounded-full bg-white/35 border border-black/10 px-3 py-1">
-                      <Link href={buildLangUrl("ru")} className={cx("text-xs font-extrabold", lang === "ru" ? "text-[#B58A2C]" : INK)} onClick={() => setMenuOpen(false)}>RU</Link>
-                      <Link href={buildLangUrl("kz")} className={cx("text-xs font-extrabold", lang === "kz" ? "text-[#B58A2C]" : INK)} onClick={() => setMenuOpen(false)}>KZ</Link>
-                      <Link href={buildLangUrl("en")} className={cx("text-xs font-extrabold", lang === "en" ? "text-[#B58A2C]" : INK)} onClick={() => setMenuOpen(false)}>EN</Link>
+                      <Link
+                        href={buildLangUrl("ru")}
+                        className={cx(
+                          "text-xs font-extrabold",
+                          lang === "ru" ? "text-[#B58A2C]" : INK
+                        )}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        RU
+                      </Link>
+                      <Link
+                        href={buildLangUrl("kz")}
+                        className={cx(
+                          "text-xs font-extrabold",
+                          lang === "kz" ? "text-[#B58A2C]" : INK
+                        )}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        KZ
+                      </Link>
+                      <Link
+                        href={buildLangUrl("en")}
+                        className={cx(
+                          "text-xs font-extrabold",
+                          lang === "en" ? "text-[#B58A2C]" : INK
+                        )}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        EN
+                      </Link>
                     </div>
                   </div>
                 </div>
-
+                {/* /контакты + языки */}
               </div>
             </div>
-
           </div>
         </div>
       )}
