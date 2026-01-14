@@ -118,7 +118,17 @@ export default function SiteFooter({ lang }: SiteFooterProps) {
 
           <ul className="space-y-2">
             <li>
-              <a href="#" className="hover:text-[#FCD671]">
+              <a href={`${base}/privacy/cookies`} className="hover:text-[#FCD671]">
+                {t.cookiePolicy}
+              </a>
+            </li>
+            <li>
+              <a href={`${base}/privacy/regulation`} className="hover:text-[#FCD671]">
+                {t.servicesRegulations}
+              </a>
+            </li>
+            <li>
+              <a href="https://law.gov.kz/client/#!/doc/7832/rus" className="hover:text-[#FCD671]">
                 {t.lawInsurance}
               </a>
             </li>

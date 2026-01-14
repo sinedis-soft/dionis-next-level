@@ -1,255 +1,167 @@
 import type { Lang } from "@/dictionaries/header";
 
-export type CookieService = {
-  key: string;
-  name: string;
+export type CookieCategoryKey = "necessary" | "functional" | "marketing";
+
+export type CookieCategory = {
+  key: CookieCategoryKey;
+  title: string;
   description: string;
+  locked?: boolean; // для необходимых
   moreLabel?: string;
   moreHref?: string;
 };
 
 export type CookieDictionary = {
-  // Баннер / кнопка
   bannerTitle: string;
   bannerText: string;
 
   manageBtn: string;
+
+  modalTitle: string;
+  modalText: string;
+
+  categoriesTitle: string;
+  categories: CookieCategory[];
+
+  policyText: string;
+  policyLabel: string;
+  policyHref: string;
+
+  backBtn: string;
+  saveBtn: string;
   acceptAllBtn: string;
   rejectAllBtn: string;
-
-  // Модалка
-  modalTitle: string;
-  introTitle: string;
-  introP1: string;
-  introP2: string;
-
-  settingsTitle: string;
-  settingsDescription: string;
-
-  analyticsTitle: string;
-  analyticsDescription: string;
-  analyticsServices: CookieService[];
-
-  technicalTitle: string;
-  technicalDescription: string;
-  technicalServices: CookieService[];
 };
 
 export const COOKIE_DICTIONARY: Record<Lang, CookieDictionary> = {
   ru: {
-    bannerTitle: "Cookie-файлы",
+    bannerTitle: "Cookies",
     bannerText:
-      "Мы используем cookie-файлы для работы сайта, аналитики и измерения эффективности рекламы. Вы можете принять или отклонить использование аналитических и маркетинговых cookie в любой момент.",
+      "Мы используем cookie для работы сайта, улучшения сервиса и рекламы. Настройте согласие в один клик.",
 
-    manageBtn: "Настройки cookie",
-    acceptAllBtn: "Принять все",
-    rejectAllBtn: "Отказаться от всех",
+    manageBtn: "Cookie",
 
-    modalTitle: "Cookie-файлы",
-    introTitle: "Cookies",
-    introP1:
-      "Cookie-файлы — это небольшие текстовые файлы, которые веб-сайты отправляют в ваш браузер и которые сохраняются в его каталоге. Когда вы посещаете сайт dionis-insurance.kz, мы можем использовать cookie для запоминания выбранного языка, параметров отображения, а также для сбора статистики использования сайта.",
-    introP2:
-      "Вы можете согласиться на использование cookie при первом посещении сайта. В любой момент вы можете изменить или отозвать своё согласие, нажав на кнопку «Настройки cookie» внизу страницы. Если вы откажетесь от cookie или отзовёте согласие позже, некоторые функции и разделы сайта могут работать ограниченно.",
+    modalTitle: "Настройки cookie",
+    modalText:
+      "Выберите, какие cookie можно использовать. Необходимые — всегда включены.",
 
-    settingsTitle: "Настройка cookie-файлов",
-    settingsDescription:
-      "Ниже приведена информация о целях обработки данных и поставщиках, чьи инструменты мы используем на сайте Dionis Insurance Broker.",
-
-    analyticsTitle: "Аналитические и рекламные cookie-файлы",
-    analyticsDescription:
-      "Эти файлы помогают нам понимать, как используется сайт, улучшать его работу и оценивать эффективность рекламных кампаний. Данные носят обезличенный характер, мы не используем cookie для прямой идентификации личности.",
-
-    analyticsServices: [
+    categoriesTitle: "Категории",
+    categories: [
       {
-        key: "ga4",
-        name: "Google Analytics 4",
-        description:
-          "Позволяет собирать и анализировать обезличенную статистику о том, как вы взаимодействуете с нашим сайтом: посещаемые страницы, время на сайте, источники трафика.",
-        moreLabel: "Подробнее о cookie Google",
-        moreHref: "https://policies.google.com/technologies/cookies",
+        key: "necessary",
+        title: "Необходимые",
+        description: "Нужны для работы сайта и безопасности. Отключить нельзя.",
+        locked: true,
       },
       {
-        key: "ym",
-        name: "Яндекс Метрика",
+        key: "functional",
+        title: "Функциональные",
         description:
-          "Сервис веб-аналитики Яндекса, который помогает нам анализировать посещаемость, поведение пользователей и выявлять ошибки в работе сайта.",
-        moreLabel: "Подробнее о Яндекс Метрике",
-        moreHref: "https://yandex.ru/legal/metrica_termsofuse",
+          "Запоминают настройки интерфейса и помогают корректной работе отдельных функций.",
       },
       {
-        key: "yaads",
-        name: "Реклама Яндекса (Яндекс Реклама)",
+        key: "marketing",
+        title: "Аналитические",
         description:
-          "Рекламные технологии Яндекса, которые используют cookie для показа более релевантной рекламы и оценки эффективности рекламных кампаний Dionis.",
-        moreLabel: "Подробнее о cookie Яндекс Рекламы",
-        moreHref: "https://yandex.ru/legal/confidential/",
+          "Помогают через ананимную статистику улучшать удобство использования сайта, совершенствовать продукты и услуги, предоставлять более релевантную информацию для пользователей.",
       },
     ],
 
-    technicalTitle: "Технические cookie-файлы",
-    technicalDescription:
-      "Эти cookie необходимы для корректной работы сайта и не могут быть отключены в наших системах. Обычно они устанавливаются только в ответ на ваши действия, например выбор языка интерфейса, заполнение форм или настройка согласия на cookie.",
+    policyText: "Подробнее — в",
+    policyLabel: "политике cookie",
+    policyHref: "/privacy/cookies", // поставь свой роут
 
-    technicalServices: [
-      {
-        key: "lang",
-        name: "Языковые и интерфейсные настройки",
-        description:
-          "Запоминают выбранный язык сайта и базовые параметры отображения, чтобы при следующем визите не приходилось выбирать их заново.",
-      },
-      {
-        key: "consent",
-        name: "Cookie согласия",
-        description:
-          "Сохраняют вашу выбранную настройку согласия на использование cookie, чтобы баннер не показывался каждый раз.",
-      },
-      {
-        key: "security",
-        name: "Безопасность и защита от спама",
-        description:
-          "Технические файлы, связанные с защитой форм и стабильной работой сайта.",
-      },
-    ],
+    backBtn: "Назад",
+    saveBtn: "Сохранить",
+    acceptAllBtn: "Принять",
+    rejectAllBtn: "Отклонить",
   },
 
   kz: {
-    // заглушки — переведёшь позже
-    bannerTitle: "Cookie файлдары",
+    bannerTitle: "Cookies",
     bannerText:
-      "Біз сайттың жұмысын қамтамасыз ету, талдау және жарнаманың тиімділігін өлшеу үшін cookie файлдарын пайдаланамыз.",
+      "Біз cookie файлдарын сайт жұмысы, сервисті жақсарту және жарнама үшін қолданамыз. Бір рет басып баптаңыз.",
 
-    manageBtn: "Cookie баптаулары",
-    acceptAllBtn: "Барлығына келісу",
-    rejectAllBtn: "Барлығынан бас тарту",
+    manageBtn: "Cookie",
 
-    modalTitle: "Cookie файлдары",
-    introTitle: "Cookies",
-    introP1:
-      "Cookie файлдары — сайт сіздің браузеріңізге жіберетін және онда сақталатын шағын мәтіндік файлдар.",
-    introP2:
-      "Сіз cookie файлдарын пайдалануға алғашқы кіру кезінде келісім бере аласыз немесе кез келген уақытта келісімді кері қайтара аласыз.",
+    modalTitle: "Cookie баптаулары",
+    modalText:
+      "Қандай cookie қолдануға болатынын таңдаңыз. Міндетті cookie әрқашан қосулы.",
 
-    settingsTitle: "Cookie файлдарын баптау",
-    settingsDescription:
-      "Төменде Dionis Insurance Broker сайтында қолданылатын деректерді өңдеу мақсаттары мен провайдерлер туралы ақпарат берілген.",
-
-    analyticsTitle: "Аналитикалық және жарнамалық cookie файлдары",
-    analyticsDescription:
-      "Бұл файлдар сайтты қалай пайдаланатыныңызды түсінуге және жарнаманың тиімділігін бағалауға көмектеседі.",
-
-    analyticsServices: [
+    categoriesTitle: "Санаттар",
+    categories: [
       {
-        key: "ga4",
-        name: "Google Analytics 4",
-        description: "Сайтты пайдалану статистикасын жинайды.",
+        key: "necessary",
+        title: "Міндетті",
+        description:
+          "Сайттың жұмысы мен қауіпсіздігі үшін қажет. Өшіруге болмайды.",
+        locked: true,
       },
       {
-        key: "ym",
-        name: "Yandex Metrica",
-        description: "Қатысу мен мінез-құлықты талдауға көмектеседі.",
+        key: "functional",
+        title: "Функционалдық",
+        description:
+          "Интерфейс параметрлерін сақтайды және кейбір функциялардың дұрыс жұмысын қамтамасыз етеді.",
       },
       {
-        key: "yaads",
-        name: "Yandex Reklama",
-        description: "Яндекс жарнамасын көрсету және өлшеу үшін cookie файлдары.",
+        key: "marketing",
+        title: "Аналитикалық",
+        description:
+          "Анонимді статистика арқылы сайтты пайдаланудың ыңғайлылығын жақсартуға, өнімдер мен қызметтерді жетілдіруге және пайдаланушыларға неғұрлым өзекті ақпарат ұсынуға көмектеседі.",
       },
     ],
 
-    technicalTitle: "Техникалық cookie файлдары",
-    technicalDescription:
-      "Сайттың дұрыс жұмыс істеуі үшін қажет cookie файлдары.",
-    technicalServices: [
-      {
-        key: "lang",
-        name: "Тіл параметрлері",
-        description: "Таңдалған тілді есте сақтайды.",
-      },
-      {
-        key: "consent",
-        name: "Келісім cookie",
-        description: "Cookie келісім параметрлерін сақтайды.",
-      },
-      {
-        key: "security",
-        name: "Қауіпсіздік",
-        description: "Формаларды қорғауға және тұрақты жұмысқа арналған.",
-      },
-    ],
-  } as CookieDictionary,
+    policyText: "Толығырақ —",
+    policyLabel: "cookie саясаты",
+    policyHref: "/privacy/cookies",
+
+    backBtn: "Артқа",
+    saveBtn: "Сақтау",
+    acceptAllBtn: "Қабылдау",
+    rejectAllBtn: "Бас тарту",
+  },
 
   en: {
     bannerTitle: "Cookies",
     bannerText:
-      "We use cookies to operate this website, analyse traffic and measure advertising performance. You can accept or reject analytics and marketing cookies at any time.",
+      "We use cookies to run the site, improve the service and support advertising. Set your preferences in one click.",
 
-    manageBtn: "Cookie settings",
-    acceptAllBtn: "Accept all",
-    rejectAllBtn: "Reject all",
+    manageBtn: "Cookies",
 
-    modalTitle: "Cookie files",
-    introTitle: "Cookies",
-    introP1:
-      "Cookies are small text files that websites send to your browser and that are stored in its directory. When you visit dionis-insurance.kz, we may use cookies to remember your language, display preferences and collect usage statistics.",
-    introP2:
-      "You can consent to the use of cookies on your first visit. You may change or withdraw your consent at any time by clicking the “Cookie settings” button at the bottom of the page. If you refuse cookies, some parts of the site may not function properly.",
+    modalTitle: "Cookie settings",
+    modalText:
+      "Choose which cookies we may use. Necessary cookies are always enabled.",
 
-    settingsTitle: "Cookie settings",
-    settingsDescription:
-      "Below you can find information about the purposes of data processing and the providers whose tools we use on the Dionis Insurance Broker website.",
-
-    analyticsTitle: "Analytics and advertising cookies",
-    analyticsDescription:
-      "These cookies help us understand how the site is used and to measure the effectiveness of advertising campaigns. The data is anonymised and is not used to directly identify you.",
-
-    analyticsServices: [
+    categoriesTitle: "Categories",
+    categories: [
       {
-        key: "ga4",
-        name: "Google Analytics 4",
-        description:
-          "Collects anonymised statistics about your interaction with the website.",
-        moreLabel: "More about Google cookies",
-        moreHref: "https://policies.google.com/technologies/cookies",
+        key: "necessary",
+        title: "Necessary",
+        description: "Required for the website and security. Cannot be disabled.",
+        locked: true,
       },
       {
-        key: "ym",
-        name: "Yandex Metrica",
-        description:
-          "A web analytics service that helps us analyse traffic and user behaviour.",
-        moreLabel: "More about Yandex Metrica",
-        moreHref: "https://yandex.com/legal/metrica_termsofuse",
+        key: "functional",
+        title: "Functional",
+        description: "Remember preferences and support key site features.",
       },
       {
-        key: "yaads",
-        name: "Yandex Ads",
+        key: "marketing",
+        title: "Analytics",
         description:
-          "Advertising technologies that use cookies to show more relevant ads and measure their effectiveness.",
-        moreLabel: "More about Yandex cookies",
-        moreHref: "https://yandex.com/legal/confidential/",
+          "Help improve website usability through anonymous statistics, enhance products and services, and provide more relevant information to users.",
       },
+
     ],
 
-    technicalTitle: "Technical cookies",
-    technicalDescription:
-      "These cookies are necessary for the proper functioning of the website and cannot be switched off in our systems.",
-    technicalServices: [
-      {
-        key: "lang",
-        name: "Language and interface",
-        description: "Stores your language choice and display preferences.",
-      },
-      {
-        key: "consent",
-        name: "Consent cookies",
-        description: "Stores your cookie consent settings.",
-      },
-      {
-        key: "security",
-        name: "Security",
-        description:
-          "Technical cookies related to forms protection and stable operation.",
-      },
-    ],
+    policyText: "More details in our",
+    policyLabel: "cookie policy",
+    policyHref: "/privacy/cookies",
+
+    backBtn: "Back",
+    saveBtn: "Save",
+    acceptAllBtn: "Accept",
+    rejectAllBtn: "Decline",
   },
 };
 

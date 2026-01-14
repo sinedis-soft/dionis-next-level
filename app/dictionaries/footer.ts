@@ -16,6 +16,8 @@ export const FOOTER_DICTIONARY: Record<
 
     telegramLabel: string;
     lawInsurance: string;
+    servicesRegulations: string;
+    cookiePolicy: string;
     copyright: string;
 
     homeLabel: string;
@@ -29,7 +31,7 @@ export const FOOTER_DICTIONARY: Record<
     contactsTitle: "Наши контакты",
     categoriesTitle: "Категории",
     supportTitle: "Поддержка клиентов",
-    lawTitle: "Ссылки на законодательство",
+    lawTitle: "Важные ссылки",
 
     addressLine1: "Адрес: Казахстан, г. Алматы,",
     addressLine2: "ул. Ауэзова, дом 14А.",
@@ -38,6 +40,8 @@ export const FOOTER_DICTIONARY: Record<
 
     telegramLabel: "Наш телеграм",
     lawInsurance: "Закон о страховании",
+    cookiePolicy: "Политика использования cookie-файлов",
+    servicesRegulations: "Регламент оказания услуг",
     copyright: "© 2025 DIONIS Insurance. Все права защищены.",
 
     homeLabel: "Главная страница",
@@ -50,7 +54,7 @@ export const FOOTER_DICTIONARY: Record<
     contactsTitle: "Біздің байланыстар",
     categoriesTitle: "Санаттар",
     supportTitle: "Клиенттерді қолдау",
-    lawTitle: "Заңнамаға сілтемелер",
+    lawTitle: "Маңызды сілтемелер",
 
     addressLine1: "Мекенжайы: Қазақстан, Алматы қ.,",
     addressLine2: "Әуезов к-сі, 14А үй.",
@@ -59,6 +63,8 @@ export const FOOTER_DICTIONARY: Record<
 
     telegramLabel: "Біздің Telegram",
     lawInsurance: "Сақтандыру туралы заң",
+    cookiePolicy: "Cookie файлдарын пайдалану саясаты",
+    servicesRegulations: "Қызмет көрсету регламенті",
     copyright: "© 2025 DIONIS Insurance. Барлық құқықтар қорғалған.",
 
     homeLabel: "Басты бет",
@@ -71,7 +77,7 @@ export const FOOTER_DICTIONARY: Record<
     contactsTitle: "Our contacts",
     categoriesTitle: "Categories",
     supportTitle: "Customer support",
-    lawTitle: "Legal references",
+    lawTitle: "Important links",
 
     addressLine1: "Address: Kazakhstan, Almaty,",
     addressLine2: "Auezov str., 14A.",
@@ -80,6 +86,8 @@ export const FOOTER_DICTIONARY: Record<
 
     telegramLabel: "Our Telegram",
     lawInsurance: "Insurance law",
+    cookiePolicy: "Cookie Policy",
+    servicesRegulations: "Service Regulations",
     copyright: "© 2025 DIONIS Insurance. All rights reserved.",
 
     homeLabel: "Home",
