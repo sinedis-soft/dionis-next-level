@@ -50,4 +50,42 @@ export const AUTHORS: AuthorRecord[] = [
       },
     },
   },
+  {
+    slug: "sergey-anatska",
+    photo: "/sergey-anatska.png",
+    i18n: {
+      ru: {
+        name: "Сергей Анацко",
+        title: "Заместитель директора · COO / CCO · технический специалист",
+        shortBio:
+          "Руководитель с 12+ летним опытом в продажах, страховании и автоматизации бизнес-процессов. Специализация — корпоративное страхование, ответственность перевозчиков, международные рынки и цифровизация.",
+        bio:
+          "Заместитель директора с опытом управления продажами, операционной деятельностью и развитием бизнеса в Беларуси, Польше, России, Казахстане и Грузии. Руководит коммерческими и операционными процессами, разрабатывает стратегии продаж, выстраивает и оптимизирует бизнес-процессы, внедряет CRM и IT-решения (Bitrix24, API-интеграции).\n\n"
+          + "Практикующий специалист в корпоративном страховании: СГО грузоперевозчиков, пограничное страхование, ДМС, перестрахование. Работает с экспедиторами и транспортными компаниями, сопровождает сложные кейсы, включая урегулирование убытков, анализ исключений, франшиз и страховых рисков.\n\n"
+          + "Имеет опыт управления международной партнерской сетью, лицензирования страховой деятельности, соблюдения требований по защите персональных данных. Объединяет управленческую, коммерческую и техническую экспертизу с фокусом на эффективность, прозрачность условий и защиту интересов клиента."
+      },
+
+      kz: {
+        name: "Сергей Анацко",
+        title: "Директордың орынбасары · COO / CCO · техникалық маман",
+        shortBio:
+          "Сатулар, сақтандыру және бизнес-процестерді автоматтандыру саласында 12+ жылдық тәжірибесі бар басшы. Мамандануы — корпоративтік сақтандыру, тасымалдаушылардың жауапкершілігі, халықаралық нарықтар және цифрландыру.",
+        bio:
+          "Беларусь, Польша, Ресей, Қазақстан және Грузияда сату, операциялық қызмет және бизнесті дамыту саласында басқару тәжірибесі бар директордың орынбасары. Коммерциялық және операциялық процестерді басқарады, сату стратегияларын әзірлейді, бизнес-процестерді құрады және оңтайландырады, CRM және IT-шешімдерді (Bitrix24, API-интеграциялар) енгізеді.\n\n"
+          + "Корпоративтік сақтандыру саласындағы практик маман: жүк тасымалдаушылардың азаматтық-құқықтық жауапкершілігін сақтандыру (СГО), шекаралық сақтандыру, ерікті медициналық сақтандыру (ДМС), қайта сақтандыру. Экспедиторлармен және көлік компанияларымен жұмыс істейді, сақтандыру жағдайларын реттеу, ерекшеліктерді, франшизаларды және сақтандыру тәуекелдерін талдау сияқты күрделі кейстерді сүйемелдейді.\n\n"
+          + "Халықаралық серіктестік желіні басқару, сақтандыру қызметін лицензиялау және дербес деректерді қорғау талаптарын сақтау бойынша тәжірибесі бар. Басқарушылық, коммерциялық және техникалық құзыреттерді біріктіре отырып, тиімділікке, шарттардың ашықтығына және клиент мүдделерін қорғауға басымдық береді."
+      },
+
+      en: {
+        name: "Sergey Anatska",
+        title: "Deputy Director · COO / CCO · Technical Specialist",
+        shortBio:
+          "Executive with 12+ years of experience in sales, insurance, and business process automation. Specialization includes corporate insurance, carrier liability, international markets, and digital transformation.",
+        bio:
+          "Deputy Director with experience in managing sales, operations, and business development across Belarus, Poland, Russia, Kazakhstan, and Georgia. Oversees commercial and operational processes, develops sales strategies, designs and optimizes business processes, and implements CRM and IT solutions (Bitrix24, API integrations).\n\n"
+          + "Practicing specialist in corporate insurance, including carrier liability insurance, border insurance, voluntary health insurance (VHI), and reinsurance. Works with freight forwarders and transport companies, supporting complex cases involving claims handling, analysis of exclusions, deductibles, and insurance risks.\n\n"
+          + "Has experience in managing an international partner network, insurance licensing, and compliance with personal data protection requirements. Combines managerial, commercial, and technical expertise with a focus on efficiency, transparency of terms, and protection of client interests."
+      },
+    },
+  },
 ];

@@ -192,7 +192,7 @@ export default async function BlogArticlePage({
               <TableOfContents toc={article.toc} className="mb-8" />
             </div>
 
-            <ArticleBody>
+            <ArticleBody lang={lang}>
               {article.content}
 
               {/* ✅ “система обучения”: required + next */}
