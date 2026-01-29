@@ -4,26 +4,50 @@
 import Script from "next/script";
 import { useEffect, useState } from "react";
 
-type ConsentValue = "accepted" | "rejected" | null;
-const COOKIE_NAME = "dionis_cookie_consent_v1";
+type ConsentState = {
+  necessary: boolean;
+  functional: boolean;
+  marketing: boolean;
+};
 
-function readConsent(): ConsentValue {
+const COOKIE_NAME = "dionis_cookie_consent_v2";
+
+function readCookieValue(name: string): string | null {
   if (typeof document === "undefined") return null;
-  const match = document.cookie.match(new RegExp(`${COOKIE_NAME}=(accepted|rejected)`));
-  return match ? (match[1] as ConsentValue) : null;
+  const m = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return m ? m[1] : null;
+}
+
+function safeParseConsent(raw: string | null): ConsentState | null {
+  if (!raw) return null;
+  try {
+    const decoded = decodeURIComponent(raw);
+    const obj = JSON.parse(decoded) as Partial<ConsentState>;
+    return {
+      necessary: true,
+      functional: Boolean(obj.functional),
+      marketing: Boolean(obj.marketing),
+    };
+  } catch {
+    return null;
+  }
 }
 
 export default function AnalyticsScripts() {
   const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    const sync = () => setEnabled(readConsent() === "accepted");
+    const sync = () => {
+      const stored = safeParseConsent(readCookieValue(COOKIE_NAME));
+      // Включаем аналитику только если пользователь разрешил marketing
+      setEnabled(Boolean(stored?.marketing));
+    };
+
     sync();
 
     const handler = () => sync();
     window.addEventListener("cookie-consent-changed", handler);
 
-    // на случай, если cookie меняется без события
     const t = window.setInterval(sync, 1200);
 
     return () => {
@@ -34,13 +58,13 @@ export default function AnalyticsScripts() {
 
   if (!enabled) return null;
 
-  const gtmId = (process.env.NEXT_PUBLIC_GTM_ID || "").trim(); // GTM-XXXXXXX
-  const ymIdRaw = process.env.NEXT_PUBLIC_YM_ID || "102201440";
+  const gtmId = (process.env.NEXT_PUBLIC_GTM_ID || "").trim(); // GTM-XXXX
+  const ymIdRaw = (process.env.NEXT_PUBLIC_YM_ID || "102201440").trim();
   const ymId = Number(ymIdRaw);
 
   return (
     <>
-      {/* Google Tag Manager (после consent) */}
+      {/* Google Tag Manager */}
       {gtmId ? (
         <Script id="gtm" strategy="afterInteractive">{`
           (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -51,7 +75,7 @@ export default function AnalyticsScripts() {
         `}</Script>
       ) : null}
 
-      {/* Yandex.Metrika (после consent) */}
+      {/* Yandex.Metrika */}
       {Number.isFinite(ymId) && ymId > 0 ? (
         <Script id="yandex-metrika" strategy="afterInteractive">{`
           (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
