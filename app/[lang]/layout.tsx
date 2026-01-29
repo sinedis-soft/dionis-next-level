@@ -7,7 +7,9 @@ import type { Lang } from "@/dictionaries/header";
 import Header from "@/components/Header";
 import SiteFooter from "@/components/SiteFooter";
 import CookieConsent from "@/components/CookieConsent";
-// ❌ AnalyticsManager УДАЛЁН
+import AnalyticsScripts from "@/components/AnalyticsScripts";
+import AnalyticsManager from "@/components/AnalyticsManager";
+
 
 const SITE_URL =
   (process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ??
@@ -115,7 +117,8 @@ export default async function LangLayout({
       <main className="flex-1">{children}</main>
       <SiteFooter lang={lang} />
       <CookieConsent lang={lang} />
-      {/* ❌ AnalyticsManager УДАЛЁН */}
+      <AnalyticsScripts />
+      <AnalyticsManager />
     </>
   );
 }
