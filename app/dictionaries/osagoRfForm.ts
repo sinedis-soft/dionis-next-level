@@ -68,6 +68,9 @@ export type OsagoRfFormDictionary = {
     period6m: string;
     period12m: string;
     techPassportFilesLabel: string;
+    driversLimitedLabel: string;
+    driverLicenseFilesLabel: string;
+    driverLicenseHint: string;
   };
 };
 
@@ -163,6 +166,11 @@ const ru: OsagoRfFormDictionary = {
     period6m: "6 месяцев",
     period12m: "12 месяцев",
     techPassportFilesLabel: "Фото техпаспорта (две стороны)",
+    driversLimitedLabel:
+  "Ограничить список водителей, допущенных к управлению ТС (может снизить стоимость полиса; страхование не действует, если ТС управляет лицо, не указанное в полисе)",
+    driverLicenseFilesLabel: "Фото водительских удостоверений допущенных водителей",
+    driverLicenseHint: "Загрузите фото/сканы ВУ (поддерживаются те же форматы, что и для техпаспорта).",
+
   },
 };
 
@@ -258,6 +266,12 @@ const en: OsagoRfFormDictionary = {
     period6m: "6 months",
     period12m: "12 months",
     techPassportFilesLabel: "Registration certificate photos (both sides)",
+    driversLimitedLabel:
+  "Limit the list of drivers allowed to drive the vehicle (may reduce the premium; coverage does not apply if the vehicle is driven by a person not included in the policy)",
+    driverLicenseFilesLabel: "Driver’s license photos of authorized drivers",
+    driverLicenseHint: "Upload driver’s license photos/scans (same file formats as for the registration certificate).",
+
+    
   },
 };
 
@@ -353,6 +367,11 @@ const kz: OsagoRfFormDictionary = {
     period6m: "6 ай",
     period12m: "12 ай",
     techPassportFilesLabel: "Техпаспорт фотолары (екі жағы)",
+    driversLimitedLabel:
+  "Көлікті басқаруға рұқсат етілген жүргізушілер тізімін шектеу (полис құнын төмендетуі мүмкін; полисте көрсетілмеген адам басқарса, сақтандыру қолданылмайды)",
+    driverLicenseFilesLabel: "Рұқсат етілген жүргізушілердің жүргізуші куәліктерінің фотосы",
+    driverLicenseHint: "Жүргізуші куәліктерінің фото/скандарын жүктеңіз (техпаспорттағыдай файл форматтары).",
+
   },
 };
 

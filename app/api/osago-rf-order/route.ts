@@ -114,6 +114,8 @@ type VehicleInput = {
   startDate?: string | null; // DD.MM.YYYY (для сделки)
   period?: string; // select value
   techPassportFiles: File[];
+  driversLimited?: boolean;
+  driverLicenseFiles: File[];
 };
 
 /**
@@ -122,13 +124,13 @@ type VehicleInput = {
  */
 const UF = {
   // CONTACT
-  CONTACT_ID_NUMBER: "UF_CRM_1694347707628",
+
   CONTACT_GENDER: "UF_CRM_1686138296718",
   CONTACT_COUNTRY: "UF_CRM_1686138527330",
   CONTACT_PASSPORT_NUMBER: "UF_CRM_CONTACT_1686145698592",
   CONTACT_PASSPORT_ISSUER: "UF_CRM_1694347754648",
   CONTACT_PASSPORT_ISSUED_AT: "UF_CRM_1694347737519",
-  CONTACT_PASSPORT_VALID_TO: "UF_CRM_1696422396430",
+
 
   // COMPANY
   COMPANY_INN_FIELD: "UF_CRM_COMPANY_1692911328252",
@@ -144,6 +146,8 @@ const UF = {
   DEAL_START_DATE: "UF_CRM_1686152149204",
   DEAL_PERIOD: "UF_CRM_1686152209741",
   DEAL_FILES: "UF_CRM_1686154280439",
+  DEAL_DRIVER_LICENSE_FILES: "UF_CRM_1770367692339",
+
 } as const;
 
 function setIfValue(
@@ -298,7 +302,7 @@ export async function POST(req: Request): Promise<Response> {
       String(formData.get("person_birthDate") || "") || null
     );
 
-    const person_idNumber = String(formData.get("person_idNumber") || "").trim();
+   
     const person_country = String(formData.get("person_country") || "").trim();
     const person_address = String(formData.get("person_address") || "").trim();
 
@@ -307,9 +311,7 @@ export async function POST(req: Request): Promise<Response> {
     const person_passportIssuedAt = parseDateISO(
       String(formData.get("person_passportIssuedAt") || "") || null
     );
-    const person_passportValidTo = parseDateISO(
-      String(formData.get("person_passportValidTo") || "") || null
-    );
+    
 
     // UTM и URL страницы
     const pageUrlRaw = String(formData.get("pageUrl") || "").trim();
@@ -341,18 +343,25 @@ export async function POST(req: Request): Promise<Response> {
       const field = m[2] as keyof VehicleInput;
 
       if (!vehiclesMap.has(index)) {
-        vehiclesMap.set(index, { techPassportFiles: [] });
+        vehiclesMap.set(index, { techPassportFiles: [], driverLicenseFiles: [] });
+
       }
 
       const v = vehiclesMap.get(index)!;
 
-      if (field === "techPassportFiles") {
+            if (field === "techPassportFiles") {
         if (value instanceof File && value.size > 0) v.techPassportFiles.push(value);
+      } else if (field === "driverLicenseFiles") {
+        if (value instanceof File && value.size > 0) v.driverLicenseFiles.push(value);
+      } else if (field === "driversLimited") {
+        // чекбокс отдаёт "on"
+        v.driversLimited = String(value) === "on";
       } else if (field === "startDate") {
         v.startDate = parseDateToDDMMYYYY(String(value));
       } else {
         (v as Record<string, unknown>)[field] = String(value);
       }
+
     }
 
     const vehicles = Array.from(vehiclesMap.entries())
@@ -364,6 +373,19 @@ export async function POST(req: Request): Promise<Response> {
         { ok: false, message: "Не указано ни одного транспортного средства" },
         { status: 400 }
       );
+    }
+    for (let i = 0; i < vehicles.length; i++) {
+      const v = vehicles[i];
+
+      if (v.driversLimited && v.driverLicenseFiles.length === 0) {
+        return Response.json(
+          {
+            ok: false,
+            message: `Авто #${i + 1}: при ограничении списка водителей нужно загрузить фото водительских удостоверений.`,
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // --- 3. Контакт: поиск по EMAIL, либо создание ---
@@ -401,13 +423,13 @@ export async function POST(req: Request): Promise<Response> {
       if (person_birthDate) contactUpdateFields.BIRTHDATE = person_birthDate;
       if (person_address) contactUpdateFields.ADDRESS = person_address;
 
-      setIfValue(contactUpdateFields, UF.CONTACT_ID_NUMBER, person_idNumber);
+      
       setIfValue(contactUpdateFields, UF.CONTACT_GENDER, person_gender);
       setIfValue(contactUpdateFields, UF.CONTACT_COUNTRY, person_country);
       setIfValue(contactUpdateFields, UF.CONTACT_PASSPORT_NUMBER, person_passportNumber);
       setIfValue(contactUpdateFields, UF.CONTACT_PASSPORT_ISSUER, person_passportIssuer);
       setIfValue(contactUpdateFields, UF.CONTACT_PASSPORT_ISSUED_AT, person_passportIssuedAt);
-      setIfValue(contactUpdateFields, UF.CONTACT_PASSPORT_VALID_TO, person_passportValidTo);
+
 
       if (Object.keys(contactUpdateFields).length > 0) {
         await bitrix<boolean>("crm.contact.update", {
@@ -510,6 +532,19 @@ export async function POST(req: Request): Promise<Response> {
         );
         dealFields[UF.DEAL_FILES] = filesData.map((fd) => ({ fileData: fd }));
       }
+      if (
+        UF.DEAL_DRIVER_LICENSE_FILES &&
+        vehicle.driversLimited &&
+        vehicle.driverLicenseFiles.length > 0
+      ) {
+        const dlFilesData = await Promise.all(
+          vehicle.driverLicenseFiles.map((f) => fileToBitrixFileData(f))
+        );
+        dealFields[UF.DEAL_DRIVER_LICENSE_FILES] = dlFilesData.map((fd) => ({
+          fileData: fd,
+        }));
+      }
+
 
       const dealIdStr = await bitrix<string>("crm.deal.add", { fields: dealFields });
       const dealId = Number(dealIdStr);
