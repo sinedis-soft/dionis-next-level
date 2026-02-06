@@ -2,13 +2,14 @@
 "use client";
 
 import React, { useMemo, useRef, useState } from "react";
-import { CountrySelect } from "@/data/CountrySelect";
+
 import type { OsagoRfFormDictionary } from "@/dictionaries/osagoRfForm";
 
-// Маска: только латиница, пробел, дефис, апостроф
-function formatLatinName(raw: string): string {
-  return raw.replace(/[^A-Za-z\s'-]/g, "");
+// Имя/фамилия/отчество: кириллица + латиница, пробел, дефис, апостроф
+function formatPersonName(raw: string): string {
+  return raw.replace(/[^A-Za-z\u0400-\u04FF\s'-]/g, "");
 }
+
 
 // Маска телефона: только цифры, с плюсом в начале
 function formatPhone(raw: string): string {
@@ -29,15 +30,6 @@ function formatEmail(raw: string): string {
   }
   if (value.length > 50) value = value.slice(0, 50);
   return value.toLowerCase();
-}
-
-// Маска для "Индивидуальный номер (ИИН и т.п.)"
-function formatIdNumber(raw: string): string {
-  return raw
-    .replace(/\s/g, "")
-    .replace(/[^A-Za-z0-9]/g, "")
-    .toUpperCase()
-    .slice(0, 20);
 }
 
 function formatLatinAlnum(raw: string, maxLength = 20): string {
@@ -74,7 +66,8 @@ export function OsagoOrderForm({ dict }: Props) {
   const [contactLastNameLat, setContactLastNameLat] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [contactEmail, setContactEmail] = useState("");
-  const [personIdNumber, setPersonIdNumber] = useState("");
+
+  const [personMiddleName, setPersonMiddleName] = useState("");
   const [passportNumber, setPassportNumber] = useState("");
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -101,6 +94,28 @@ export function OsagoOrderForm({ dict }: Props) {
       });
     });
   }
+
+  function toLocalDateString(date: Date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  const todayLocal = new Date();
+
+  const maxBirthDate = toLocalDateString(
+    new Date(
+      todayLocal.getFullYear() - 18,
+      todayLocal.getMonth(),
+      todayLocal.getDate()
+    )
+  );
+
+  const maxPassDate = toLocalDateString(todayLocal);
+
+ 
+
 
   function goToStep(next: 1 | 2 | 3) {
     setStep(next);
@@ -220,7 +235,7 @@ export function OsagoOrderForm({ dict }: Props) {
 
       if (!res.ok || !ok) {
         setFormStatus("error");
-        setFormMessage(message || "Ошибка при отправке заявки на ОСАГО РФ");
+        setFormMessage(message || "Ошибка при отправке заявки на ОСАГО РФ | РФ ОСАҒО-ға өтінімді жіберу кезінде қате орын алды | Error while submitting the OSAGO RF application");
         return;
       }
 
@@ -233,7 +248,7 @@ export function OsagoOrderForm({ dict }: Props) {
       setContactLastNameLat("");
       setContactPhone("");
       setContactEmail("");
-      setPersonIdNumber("");
+      setPersonMiddleName("");
       setPassportNumber("");
       setVehicleBlocks([0]);
       setIsCompany(false);
@@ -241,7 +256,7 @@ export function OsagoOrderForm({ dict }: Props) {
     } catch (err) {
       console.error("OSAGO RF ORDER ERROR:", err);
       setFormStatus("error");
-      setFormMessage("Ошибка на сервере при отправке заявки на ОСАГО РФ");
+      setFormMessage("Ошибка на сервере при отправке заявки на ОСАГО РФ | РФ ОСАҒО-ға өтінімді жіберу кезінде серверлік қате орын алды | Server error while submitting the OSAGO RF application");
     }
   }
 
@@ -287,7 +302,7 @@ export function OsagoOrderForm({ dict }: Props) {
                     name="contact_firstNameLat"
                     value={contactFirstNameLat}
                     onChange={(e) =>
-                      setContactFirstNameLat(formatLatinName(e.target.value))
+                      setContactFirstNameLat(formatPersonName(e.target.value))
                     }
                     className={fieldClass}
                     required
@@ -304,7 +319,7 @@ export function OsagoOrderForm({ dict }: Props) {
                     name="contact_lastNameLat"
                     value={contactLastNameLat}
                     onChange={(e) =>
-                      setContactLastNameLat(formatLatinName(e.target.value))
+                      setContactLastNameLat(formatPersonName(e.target.value))
                     }
                     className={fieldClass}
                     required
@@ -402,7 +417,13 @@ export function OsagoOrderForm({ dict }: Props) {
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         {dict.person.middleName}
                       </label>
-                      <input type="text" name="person_middleName" className={fieldClass} />
+                      <input
+                        type="text"
+                        name="person_middleName"
+                        value={personMiddleName}
+                        onChange={(e) => setPersonMiddleName(formatPersonName(e.target.value))}
+                        className={fieldClass}
+                      />
                     </div>
 
                     <div>
@@ -427,19 +448,10 @@ export function OsagoOrderForm({ dict }: Props) {
                         {dict.person.birthDate}
                         <RequiredMark />
                       </label>
-                      <input type="date" name="person_birthDate" className={fieldClass} required />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.idNumber}
-                        <RequiredMark />
-                      </label>
                       <input
-                        type="text"
-                        name="person_idNumber"
-                        value={personIdNumber}
-                        onChange={(e) => setPersonIdNumber(formatIdNumber(e.target.value))}
+                        type="date"
+                        name="person_birthDate"
+                        max={maxBirthDate}
                         className={fieldClass}
                         required
                       />
@@ -467,13 +479,17 @@ export function OsagoOrderForm({ dict }: Props) {
                       </select>
                     </div>
 
-
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         {dict.person.address}
                         <RequiredMark />
                       </label>
-                      <input type="text" name="person_address" className={fieldClass} required />
+                      <input type="text" 
+                        name="person_address" 
+                        
+                        className={fieldClass} 
+                        required 
+                      />
                     </div>
                   </div>
 
@@ -508,15 +524,7 @@ export function OsagoOrderForm({ dict }: Props) {
                         {dict.person.passportIssuedAt}
                         <RequiredMark />
                       </label>
-                      <input type="date" name="person_passportIssuedAt" className={fieldClass} required />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.passportValidTo}
-                        <RequiredMark />
-                      </label>
-                      <input type="date" name="person_passportValidTo" className={fieldClass} required />
+                      <input type="date" name="person_passportIssuedAt" max={maxPassDate} className={fieldClass} required />
                     </div>
                   </div>
                 </>
@@ -638,7 +646,6 @@ export function OsagoOrderForm({ dict }: Props) {
                         >
                           <option value="">{dict.notSelected}</option>
                           <option value="385">{dict.vehicles.countryKZ}</option>
-
                         </select>
                       </div>
 
@@ -668,8 +675,9 @@ export function OsagoOrderForm({ dict }: Props) {
                           required
                         >
                           <option value="">{dict.notSelected}</option>
-                          <option value="115">{dict.vehicles.period15d}</option>
+                          <option value="585">{dict.vehicles.period15d}</option>
                           <option value="115">{dict.vehicles.period1m}</option>
+                          <option value="287">{dict.vehicles.period2m}</option>
                           <option value="117">{dict.vehicles.period3m}</option>
                           <option value="119">{dict.vehicles.period6m}</option>
                           <option value="121">{dict.vehicles.period12m}</option>
@@ -714,7 +722,7 @@ export function OsagoOrderForm({ dict }: Props) {
                         : "text-sm text-gray-600"
                   }
                 >
-                  {formStatus === "loading" ? "Отправка..." : formMessage}
+                  {formStatus === "loading" ? "Отправка... | Жіберілуде... | Sending..." : formMessage}
                 </div>
               )}
 
@@ -733,7 +741,7 @@ export function OsagoOrderForm({ dict }: Props) {
                   className="btn w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
                   disabled={formStatus === "loading"}
                 >
-                  {formStatus === "loading" ? "Отправка..." : dict.submit}
+                  {formStatus === "loading" ? "Отправка... | Жіберілуде... | Sending..." : dict.submit}
                 </button>
               </div>
             </div>

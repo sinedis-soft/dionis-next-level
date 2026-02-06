@@ -63,6 +63,7 @@ export type OsagoRfFormDictionary = {
     periodLabel: string;
     period15d: string;
     period1m: string;
+    period2m: string;
     period3m: string;
     period6m: string;
     period12m: string;
@@ -81,8 +82,8 @@ const ru: OsagoRfFormDictionary = {
 
   contact: {
     legend: "Контактные данные (для связи с вами)",
-    firstName: "Имя (латиницей)",
-    lastName: "Фамилия (латиницей)",
+    firstName: "Имя",
+    lastName: "Фамилия",
     phone: "Телефон",
     email: "E-mail",
     isCompanyLabel: "Договор оформляется на юридическое лицо",
@@ -103,7 +104,7 @@ const ru: OsagoRfFormDictionary = {
     birthDate: "Дата рождения",
     idNumber: "Индивидуальный номер (ИИН и т.п.)",
     countryLabel: "Страна проживания",
-    address: "Адрес проживания с индексом",
+    address: "Адрес проживания",
     passportNumber: "Серия и номер паспорта (латиницей)",
     passportIssuer: "Кем выдан паспорт",
     passportIssuedAt: "Когда выдан паспорт",
@@ -157,6 +158,7 @@ const ru: OsagoRfFormDictionary = {
     periodLabel: "Срок страхования",
     period15d: "15 дней",
     period1m: "1 месяц",
+    period2m: "2 месяц",
     period3m: "3 месяца",
     period6m: "6 месяцев",
     period12m: "12 месяцев",
@@ -175,8 +177,8 @@ const en: OsagoRfFormDictionary = {
 
   contact: {
     legend: "Contact details",
-    firstName: "First name (Latin letters)",
-    lastName: "Last name (Latin letters)",
+    firstName: "First name",
+    lastName: "Last name",
     phone: "Phone number",
     email: "E-mail",
     isCompanyLabel: "Policy is issued to a legal entity",
@@ -197,7 +199,7 @@ const en: OsagoRfFormDictionary = {
     birthDate: "Date of birth",
     idNumber: "Personal ID number",
     countryLabel: "Country of residence",
-    address: "Address with postal code",
+    address: "Address",
     passportNumber: "Passport series and number (Latin)",
     passportIssuer: "Passport issuing authority",
     passportIssuedAt: "Passport issue date",
@@ -251,6 +253,7 @@ const en: OsagoRfFormDictionary = {
     periodLabel: "Insurance period",
     period15d: "15 days",
     period1m: "1 month",
+    period2m: "2 months",
     period3m: "3 months",
     period6m: "6 months",
     period12m: "12 months",
@@ -269,8 +272,8 @@ const kz: OsagoRfFormDictionary = {
 
   contact: {
     legend: "Байланыс деректері",
-    firstName: "Аты (латын әріптерімен)",
-    lastName: "Тегі (латын әріптерімен)",
+    firstName: "Аты",
+    lastName: "Тегі",
     phone: "Телефон нөмірі",
     email: "E-mail",
     isCompanyLabel: "Шарт заңды тұлға атына жасалады",
@@ -291,7 +294,7 @@ const kz: OsagoRfFormDictionary = {
     birthDate: "Туған күні",
     idNumber: "Жеке сәйкестендіру нөмірі (ЖСН және т.б.)",
     countryLabel: "Тұратын елі",
-    address: "Мекенжайы (индексімен)",
+    address: "Мекенжайы",
     passportNumber: "Паспорт сериясы мен нөмірі (латын)",
     passportIssuer: "Паспортты берген орган",
     passportIssuedAt: "Паспорт берілген күні",
@@ -345,6 +348,7 @@ const kz: OsagoRfFormDictionary = {
     periodLabel: "Сақтандыру мерзімі",
     period15d: "15 күн",
     period1m: "1 ай",
+    period2m: "2 ай",
     period3m: "3 ай",
     period6m: "6 ай",
     period12m: "12 ай",
