@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useMemo, useRef, useState } from "react";
-import { CountrySelect } from "@/data/CountrySelect";
 import type { GreenCardFormDictionary } from "@/dictionaries/greenCardForm";
 
 // Маска: только латиница, пробел, дефис, апостроф
@@ -55,9 +54,7 @@ type FormStatus = "idle" | "loading" | "success" | "error";
 
 function prefersReducedMotion(): boolean {
   if (typeof window === "undefined") return false;
-  return (
-    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false
-  );
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 }
 
 /**
@@ -75,6 +72,10 @@ function RequiredMark() {
 
 export function GreenCardOrderForm({ dict }: Props) {
   const [isCompany, setIsCompany] = useState(false);
+
+  // ✅ по умолчанию: НЕ ручной ввод → просим фото паспорта
+  const [manualEntry, setManualEntry] = useState(false);
+
   const [vehicleBlocks, setVehicleBlocks] = useState<number[]>([0]);
 
   const [contactFirstNameLat, setContactFirstNameLat] = useState("");
@@ -106,7 +107,6 @@ export function GreenCardOrderForm({ dict }: Props) {
 
     const behavior: ScrollBehavior = prefersReducedMotion() ? "auto" : "smooth";
 
-    // двойной RAF стабильнее на mobile Safari / при динамической высоте контента
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         const top = el.getBoundingClientRect().top + window.scrollY;
@@ -209,12 +209,7 @@ export function GreenCardOrderForm({ dict }: Props) {
     setFormStatus("idle");
     setFormMessage("");
 
-    if (
-      !validateStep(1) ||
-      !validateStep(2) ||
-      !validateStep(3) ||
-      !validateStep(4)
-    ) {
+    if (!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4)) {
       return;
     }
 
@@ -263,6 +258,7 @@ export function GreenCardOrderForm({ dict }: Props) {
       setPassportNumber("");
       setVehicleBlocks([0]);
       setIsCompany(false);
+      setManualEntry(false); // ✅ важно
       setStep(1);
     } catch (err) {
       console.error("GREEN CARD ORDER ERROR:", err);
@@ -314,9 +310,7 @@ export function GreenCardOrderForm({ dict }: Props) {
                     type="text"
                     name="contact_firstNameLat"
                     value={contactFirstNameLat}
-                    onChange={(e) =>
-                      setContactFirstNameLat(formatLatinName(e.target.value))
-                    }
+                    onChange={(e) => setContactFirstNameLat(formatLatinName(e.target.value))}
                     className={fieldClass}
                     required
                   />
@@ -331,9 +325,7 @@ export function GreenCardOrderForm({ dict }: Props) {
                     type="text"
                     name="contact_lastNameLat"
                     value={contactLastNameLat}
-                    onChange={(e) =>
-                      setContactLastNameLat(formatLatinName(e.target.value))
-                    }
+                    onChange={(e) => setContactLastNameLat(formatLatinName(e.target.value))}
                     className={fieldClass}
                     required
                   />
@@ -348,9 +340,7 @@ export function GreenCardOrderForm({ dict }: Props) {
                     type="tel"
                     name="contact_phone"
                     value={contactPhone}
-                    onChange={(e) =>
-                      setContactPhone(formatPhone(e.target.value))
-                    }
+                    onChange={(e) => setContactPhone(formatPhone(e.target.value))}
                     className={fieldClass}
                     required
                   />
@@ -372,16 +362,23 @@ export function GreenCardOrderForm({ dict }: Props) {
                 </div>
               </div>
 
-              <div className="mt-4 flex items-start gap-2 text-xs text-gray-600">
+              {/* ✅ Сделал текст жирным + поправил text-xs (у тебя было text-x) */}
+              <div className="mt-4 flex items-start gap-2 text-xs text-gray-700">
                 <input
                   id="order-isCompany"
                   name="order-isCompany"
                   type="checkbox"
                   className="mt-0.5"
                   checked={isCompany}
-                  onChange={(e) => setIsCompany(e.target.checked)}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setIsCompany(checked);
+
+                    // если переключились на юрлицо — режим паспорта физлица не нужен
+                    if (checked) setManualEntry(false);
+                  }}
                 />
-                <label htmlFor="order-isCompany">
+                <label htmlFor="order-isCompany" className="font-bold">
                   {dict.contact.isCompanyLabel}
                 </label>
               </div>
@@ -416,12 +413,7 @@ export function GreenCardOrderForm({ dict }: Props) {
                       {dict.company.bin}
                       <RequiredMark />
                     </label>
-                    <input
-                      type="text"
-                      name="company_bin"
-                      className={fieldClass}
-                      required
-                    />
+                    <input type="text" name="company_bin" className={fieldClass} required />
                   </div>
 
                   <div>
@@ -429,172 +421,211 @@ export function GreenCardOrderForm({ dict }: Props) {
                       {dict.company.email}
                       <RequiredMark />
                     </label>
-                    <input
-                      type="email"
-                      name="company_email"
-                      className={fieldClass}
-                      required
-                    />
+                    <input type="email" name="company_email" className={fieldClass} required />
                   </div>
                 </div>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.middleName}
-                      </label>
-                      <input
-                        type="text"
-                        name="person_middleName"
-                        className={fieldClass}
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.gender}
-                        <RequiredMark />
-                      </label>
-                      <select
-                        name="person_gender"
-                        className={fieldClass}
-                        defaultValue=""
-                        required
-                      >
-                        <option value="">{dict.notSelected}</option>
-                        <option value="male">{dict.person.genderMale}</option>
-                        <option value="female">{dict.person.genderFemale}</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.birthDate}
-                        <RequiredMark />
-                      </label>
-                      <input
-                        type="date"
-                        name="person_birthDate"
-                        max={maxBirthDate}
-                        className={fieldClass}
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.idNumber}
-                        <RequiredMark />
-                      </label>
-                      <input
-                        type="text"
-                        name="person_idNumber"
-                        value={personIdNumber}
-                        onChange={(e) =>
-                          setPersonIdNumber(formatIdNumber(e.target.value))
-                        }
-                        className={fieldClass}
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.countryLabel}
-                        <RequiredMark />
-                      </label>
-
-                      <select
-                        name="person_country"
-                        className={fieldClass}
-                        defaultValue=""
-                        required
-                      >
-                        <option value="">{dict.notSelected}</option>
-
-                        {Object.entries(dict.person.countries).map(([id, label]) => (
-                          <option key={id} value={id}>
-                            {label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.address}
-                        <RequiredMark />
-                      </label>
-                      <input
-                        type="text"
-                        name="person_address"
-                        className={fieldClass}
-                        required
-                      />
-                    </div>
+                  {/* ✅ Чекбокс перед "Отчество" */}
+                  <div className="mb-3 flex items-start gap-2 text-xs text-gray-600">
+                    <input
+                      id="person-manualEntry"
+                      name="person_manualEntry"
+                      type="checkbox"
+                      className="mt-0.5"
+                      checked={manualEntry}
+                      onChange={(e) => setManualEntry(e.target.checked)}
+                    />
+                    <label htmlFor="person-manualEntry" className="font-bold">
+                      {dict.manualEntryLabel}
+                    </label>
                   </div>
 
-                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.passportNumber}
-                        <RequiredMark />
-                      </label>
-                      <input
-                        type="text"
-                        name="person_passportNumber"
-                        value={passportNumber}
-                        onChange={(e) =>
-                          setPassportNumber(formatLatinAlnum(e.target.value, 20))
-                        }
-                        className={fieldClass}
-                        required
-                      />
-                    </div>
+                  {/* ✅ Режим: НЕ ручной ввод → минимум полей + фото паспорта */}
+                  {!manualEntry ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {dict.person.gender}
+                          <RequiredMark />
+                        </label>
+                        <select
+                          name="person_gender"
+                          className={fieldClass}
+                          defaultValue=""
+                          required
+                        >
+                          <option value="">{dict.notSelected}</option>
+                          <option value="male">{dict.person.genderMale}</option>
+                          <option value="female">{dict.person.genderFemale}</option>
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.passportIssuer}
-                        <RequiredMark />
-                      </label>
-                      <input
-                        type="text"
-                        name="person_passportIssuer"
-                        className={fieldClass}
-                        required
-                      />
-                    </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {dict.person.address}
+                          <RequiredMark />
+                        </label>
+                        <input type="text" name="person_address" className={fieldClass} required />
+                      </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.passportIssuedAt}
-                        <RequiredMark />
-                      </label>
-                      <input
-                        type="date"
-                        name="person_passportIssuedAt"
-                        max={maxIssuedDate}
-                        className={fieldClass}
-                        required
-                      />
+                      <div className="sm:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {dict.passportFilesLabel}
+                          <RequiredMark />
+                        </label>
+                        <input
+                          type="file"
+                          name="person_passportFiles"
+                          multiple
+                          onChange={(e) => {
+                            if (!e.target.files) return;
+                            const validFiles = validateFiles(e.target.files);
+                            if (validFiles.length !== e.target.files.length) e.target.value = "";
+                          }}
+                          accept="image/*,application/pdf"
+                          className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border file:border-gray-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50"
+                          required
+                        />
+                      </div>
                     </div>
+                  ) : (
+                    /* ✅ Режим: ручной ввод → полный набор полей как раньше */
+                    <>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {dict.person.middleName}
+                          </label>
+                          <input type="text" name="person_middleName" className={fieldClass} />
+                        </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.passportValidTo}
-                        <RequiredMark />
-                      </label>
-                      <input
-                        type="date"
-                        name="person_passportValidTo"
-                        min={minStartDate}
-                        className={fieldClass}
-                        required
-                      />
-                    </div>
-                  </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {dict.person.gender}
+                            <RequiredMark />
+                          </label>
+                          <select
+                            name="person_gender"
+                            className={fieldClass}
+                            defaultValue=""
+                            required
+                          >
+                            <option value="">{dict.notSelected}</option>
+                            <option value="male">{dict.person.genderMale}</option>
+                            <option value="female">{dict.person.genderFemale}</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {dict.person.birthDate}
+                            <RequiredMark />
+                          </label>
+                          <input
+                            type="date"
+                            name="person_birthDate"
+                            max={maxBirthDate}
+                            className={fieldClass}
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {dict.person.idNumber}
+                            <RequiredMark />
+                          </label>
+                          <input
+                            type="text"
+                            name="person_idNumber"
+                            value={personIdNumber}
+                            onChange={(e) => setPersonIdNumber(formatIdNumber(e.target.value))}
+                            className={fieldClass}
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {dict.person.countryLabel}
+                            <RequiredMark />
+                          </label>
+                          <select name="person_country" className={fieldClass} defaultValue="" required>
+                            <option value="">{dict.notSelected}</option>
+                            {Object.entries(dict.person.countries).map(([id, label]) => (
+                              <option key={id} value={id}>
+                                {label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {dict.person.address}
+                            <RequiredMark />
+                          </label>
+                          <input type="text" name="person_address" className={fieldClass} required />
+                        </div>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {dict.person.passportNumber}
+                            <RequiredMark />
+                          </label>
+                          <input
+                            type="text"
+                            name="person_passportNumber"
+                            value={passportNumber}
+                            onChange={(e) =>
+                              setPassportNumber(formatLatinAlnum(e.target.value, 20))
+                            }
+                            className={fieldClass}
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {dict.person.passportIssuer}
+                            <RequiredMark />
+                          </label>
+                          <input type="text" name="person_passportIssuer" className={fieldClass} required />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {dict.person.passportIssuedAt}
+                            <RequiredMark />
+                          </label>
+                          <input
+                            type="date"
+                            name="person_passportIssuedAt"
+                            max={maxIssuedDate}
+                            className={fieldClass}
+                            required
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            {dict.person.passportValidTo}
+                            <RequiredMark />
+                          </label>
+                          <input
+                            type="date"
+                            name="person_passportValidTo"
+                            min={minStartDate}
+                            className={fieldClass}
+                            required
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </>
               )}
 
@@ -636,18 +667,30 @@ export function GreenCardOrderForm({ dict }: Props) {
                     {dict.insurance.territoryLabel}
                     <RequiredMark />
                   </label>
-                  <select
-                    name="insurance_territory"
-                    className={fieldClass}
-                    defaultValue=""
-                    required
-                  >
+                  <select name="insurance_territory" className={fieldClass} defaultValue="" required>
                     <option value="">{dict.notSelected}</option>
                     <option value="1155">{dict.insurance.territoryAll}</option>
                     <option value="1267">{dict.insurance.territoryTMU}</option>
                   </select>
                 </div>
-              </div>
+              
+
+              <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {dict.vehicles.countryLabel}
+                          <RequiredMark />
+                        </label>
+                        <select
+                          name={`vehicles][country]`}
+                          className={fieldClass}
+                          defaultValue="385"
+                          required
+                        >
+                          <option value="">{dict.notSelected}</option>
+                          <option value="385">{dict.vehicles.countryKZ}</option>
+                        </select>
+                      </div>
+                    </div>
 
               <div className="pt-2 flex justify-between gap-3">
                 <button
@@ -682,9 +725,7 @@ export function GreenCardOrderForm({ dict }: Props) {
               </div>
 
               <div className="flex justify-between items-center gap-4">
-                <p className="text-xs text-gray-600">
-                  {dict.vehicles.description}
-                </p>
+                <p className="text-xs text-gray-600">{dict.vehicles.description}</p>
 
                 <button
                   type="button"
@@ -698,10 +739,7 @@ export function GreenCardOrderForm({ dict }: Props) {
 
               <div className="mt-4 space-y-6">
                 {vehicleBlocks.map((id, idx) => (
-                  <div
-                    key={id}
-                    className="rounded-xl border border-gray-200 bg-white p-4"
-                  >
+                  <div key={id} className="rounded-xl border border-gray-200 bg-white p-4">
                     <div className="flex justify-between items-center mb-3">
                       <p className="text-xs font-semibold text-gray-500">
                         {dict.vehicles.blockTitle} #{idx + 1}
@@ -729,34 +767,14 @@ export function GreenCardOrderForm({ dict }: Props) {
                           type="text"
                           name={`vehicles[${idx}][plate]`}
                           onChange={(e) => {
-                            e.target.value = formatLatinAlnum(
-                              e.target.value,
-                              12
-                            );
+                            e.target.value = formatLatinAlnum(e.target.value, 12);
                           }}
                           className={fieldClass}
                           required
                         />
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {dict.vehicles.techPassportNumber}
-                          <RequiredMark />
-                        </label>
-                        <input
-                          type="text"
-                          name={`vehicles[${idx}][techPassportNumber]`}
-                          onChange={(e) => {
-                            e.target.value = formatLatinAlnum(
-                              e.target.value,
-                              20
-                            );
-                          }}
-                          className={fieldClass}
-                          required
-                        />
-                      </div>
+                      
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -779,22 +797,7 @@ export function GreenCardOrderForm({ dict }: Props) {
                         </select>
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {dict.vehicles.countryLabel}
-                          <RequiredMark />
-                        </label>
-                        <select
-                          name={`vehicles[${idx}][country]`}
-                          className={fieldClass}
-                          defaultValue="385"
-                          required
-                        >
-                          <option value="">{dict.notSelected}</option>
-                          <option value="385">{dict.vehicles.countryKZ}</option>
-
-                        </select>
-                      </div>
+                      
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -843,8 +846,7 @@ export function GreenCardOrderForm({ dict }: Props) {
                         onChange={(e) => {
                           if (!e.target.files) return;
                           const validFiles = validateFiles(e.target.files);
-                          if (validFiles.length !== e.target.files.length)
-                            e.target.value = "";
+                          if (validFiles.length !== e.target.files.length) e.target.value = "";
                         }}
                         accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                         className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border file:border-gray-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50"
@@ -872,14 +874,23 @@ export function GreenCardOrderForm({ dict }: Props) {
                 </div>
               )}
 
-              <div className="pt-2 flex justify-between gap-3">
+              <div className="pt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <button
                   type="button"
-                  className="btn btn-secondary w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="btn btn-secondary w-full sm:w-auto"
                   onClick={() => goToStep(3)}
                   disabled={formStatus === "loading"}
                 >
                   {dict.prevStep ?? "Назад"}
+                </button>
+
+                <button
+                  type="button"
+                  className="btn btn-secondary w-full sm:w-auto"
+                  onClick={handleAddVehicle}
+                  disabled={formStatus === "loading"}
+                >
+                  {dict.vehicles.addButton}
                 </button>
 
                 <button

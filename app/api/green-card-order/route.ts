@@ -112,7 +112,6 @@ async function fileToBitrixFileData(file: File): Promise<[string, string]> {
 
 type VehicleInput = {
   plate?: string;
-  techPassportNumber?: string;
   type?: string;
   country?: string;
   startDate?: string | null; // DD.MM.YYYY (для сделки)
@@ -353,6 +352,28 @@ export async function POST(req: Request): Promise<Response> {
       );
     }
 
+    // Минимальная серверная проверка (чтобы не прилетали пустые ТС)
+    for (const [idx, v] of vehicles.entries()) {
+      const missing =
+        !v.plate ||
+        !v.type ||
+        !v.country ||
+        !v.startDate ||
+        !v.period ||
+        !v.techPassportFiles ||
+        v.techPassportFiles.length === 0;
+
+      if (missing) {
+        return Response.json(
+          {
+            ok: false,
+            message: `ТС #${idx + 1}: заполните Госномер, Тип, Дату начала, Срок и прикрепите фото техпаспорта.`,
+          },
+          { status: 400 }
+        );
+      }
+    }
+
     // --- 3. Контакт: поиск по EMAIL, либо создание ---
     let contactId: number | null = null;
 
@@ -431,8 +452,7 @@ export async function POST(req: Request): Promise<Response> {
         return Response.json(
           {
             ok: false,
-            message:
-              "Отмечено 'договор на юрлицо', но не указан БИН компании.",
+            message: "Отмечено 'договор на юрлицо', но не указан БИН компании.",
           },
           { status: 400 }
         );
@@ -481,8 +501,7 @@ export async function POST(req: Request): Promise<Response> {
 
     const commonCommentParts: string[] = [];
     if (pageUrl) commonCommentParts.push(`Страница: ${pageUrl}`);
-    if (utm !== undefined)
-      commonCommentParts.push(`UTM: ${safeJsonStringify(utm)}`);
+    if (utm !== undefined) commonCommentParts.push(`UTM: ${safeJsonStringify(utm)}`);
     commonCommentParts.push(
       `Контакт: ${contact_firstNameLat} ${contact_lastNameLat} <${contact_email}>`
     );
@@ -506,7 +525,6 @@ export async function POST(req: Request): Promise<Response> {
         // vehicle fields
         UF_CRM_1686152306664: vehicle.country || null,
         UF_CRM_1686152485641: vehicle.plate || null,
-        UF_CRM_1686152429219: vehicle.techPassportNumber || null,
         UF_CRM_1686152567597: vehicle.type || null,
         UF_CRM_1686152209741: vehicle.period || null,
         UF_CRM_1686152149204: vehicle.startDate || null,
@@ -547,7 +565,9 @@ export async function POST(req: Request): Promise<Response> {
           `Контакт: ${contact_firstNameLat} ${contact_lastNameLat}`,
           `Email: ${contact_email}`,
           contact_phone ? `Телефон: ${contact_phone}` : `Телефон: -`,
-          order_isCompany ? `Юрлицо (БИН): ${company_bin}` : `Физлицо (компания ID=1817)`,
+          order_isCompany
+            ? `Юрлицо (БИН): ${company_bin}`
+            : `Физлицо (компания ID=1817)`,
           `Contact ID: ${contactId}`,
           `Company ID: ${companyId}`,
           "",
@@ -556,9 +576,7 @@ export async function POST(req: Request): Promise<Response> {
           "",
           "Данные авто:",
           `- Номер: ${vehicle.plate || "-"}`,
-          `- Техпаспорт №: ${vehicle.techPassportNumber || "-"}`,
           `- Тип: ${vehicle.type || "-"}`,
-          `- Страна (значение справочника): ${vehicle.country || "-"}`,
           `- Дата начала: ${vehicle.startDate || "-"}`,
           `- Период: ${vehicle.period || "-"}`,
           `- Файлов техпаспорта: ${vehicle.techPassportFiles.length}`,
@@ -573,22 +591,28 @@ export async function POST(req: Request): Promise<Response> {
         const html = `
           <div style="max-width: 600px; margin: 0 auto; background-color: #FFFFFF; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
             <img
-                src="https://dionis-insurance.com/logo_1.webp"
-                width="56"
-                height="56"
-                alt="Dionis Insurance"
-                style="display:block; border:0; outline:none; text-decoration:none;"
+              src="https://dionis-insurance.com/logo_1.webp"
+              width="56"
+              height="56"
+              alt="Dionis Insurance"
+              style="display:block; border:0; outline:none; text-decoration:none;"
             >
-            <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">Новая заявка на ЗЕЛЕНУЮ КАРТУ с сайта DIONIS Insurance</h2>
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">
+              Новая заявка на ЗЕЛЕНУЮ КАРТУ с сайта DIONIS Insurance
+            </h2>
             <p style="font-size: 14px; line-height: 1.6; color: #707070; margin: 0 0 20px;">
-          	  <strong>Сделка:</strong> #${escapeHtml(String(dealId))}<br>
-              <strong>Авто:</strong> ${escapeHtml(String(i + 1))} из ${escapeHtml(String(vehicles.length))}
+              <strong>Сделка:</strong> #${escapeHtml(String(dealId))}<br>
+              <strong>Авто:</strong> ${escapeHtml(String(i + 1))} из ${escapeHtml(
+                String(vehicles.length)
+              )}
             </p>
-          
+
             <div style="margin-top: 12px; padding: 12px; border: 1px solid #eee; border-radius: 8px;">
               <h3 style="margin: 0 0 8px; font-size: 14px;">Контакт</h3>
               <div style="font-size: 13px; color: #333;">
-                <strong>${escapeHtml(contact_firstNameLat)} ${escapeHtml(contact_lastNameLat)}</strong><br>
+                <strong>${escapeHtml(contact_firstNameLat)} ${escapeHtml(
+          contact_lastNameLat
+        )}</strong><br>
                 Email: ${escapeHtml(contact_email)}<br>
                 Телефон: ${escapeHtml(contact_phone || "-")}<br>
                 ${
@@ -600,6 +624,7 @@ export async function POST(req: Request): Promise<Response> {
                 Company ID: ${escapeHtml(String(companyId))}
               </div>
             </div>
+
             <div style="margin-top: 12px; padding: 12px; border: 1px solid #eee; border-radius: 8px;">
               <h3 style="margin: 0 0 8px; font-size: 14px;">Параметры страхования</h3>
               <div style="font-size: 13px; color: #333;">
@@ -611,12 +636,12 @@ export async function POST(req: Request): Promise<Response> {
               <h3 style="margin: 0 0 8px; font-size: 14px;">Данные авто</h3>
               <div style="font-size: 13px; color: #333;">
                 Номер: <strong>${escapeHtml(vehicle.plate || "-")}</strong><br>
-                Техпаспорт №: ${escapeHtml(vehicle.techPassportNumber || "-")}<br>
                 Тип: ${escapeHtml(vehicle.type || "-")}<br>
-                Страна (значение справочника): ${escapeHtml(vehicle.country || "-")}<br>
                 Дата начала: ${escapeHtml(vehicle.startDate || "-")}<br>
                 Период: ${escapeHtml(vehicle.period || "-")}<br>
-                Файлов техпаспорта: ${escapeHtml(String(vehicle.techPassportFiles.length))}
+                Файлов техпаспорта: ${escapeHtml(
+                  String(vehicle.techPassportFiles.length)
+                )}
               </div>
             </div>
 
@@ -627,38 +652,15 @@ export async function POST(req: Request): Promise<Response> {
               IP: ${escapeHtml(ip)}<br>
               User-Agent: ${escapeHtml(userAgent)}
             </div>
-     
-			      <p></p>
 
-            <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">С уважением, Денис БОРОВОЙ</h2>
+            <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">
+              С уважением, Денис БОРОВОЙ
+            </h2>
             <span style="color: #707070;">директор<br>
-            <a href="http://dionis-insurance.kz" target="_blank" style="color: #C19A6B; text-decoration: none;">ТОО страховой брокер ДИОНИС</a> </span>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-              <tbody>
-                <tr>
-                  <td style="padding: 10px; text-align: left; border-bottom: 1px solid #F2F2F2;">
-                    <img
-                        src="https://dionis-insurance.com/logo_1.webp"
-                        width="200"
-                        height="200"
-                        alt="Dionis Insurance"
-                        style="display:block; border:0; outline:none; text-decoration:none;"
-                    >
-                  </td>
-                  <td style="padding: 10px; text-align: left; border-bottom: 1px solid #F2F2F2;">
-                    <a href="mailto:info@dionis-insurance.kz" style="color: #C19A6B; text-decoration: none;">info@dionis-insurance.kz</a><br>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div style="max-width: 600px; margin: 20px auto; background-color: #FFFFFF; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); font-size: 12px; color: #707070;">
-            <p style="margin: 0;">
-              Информация, содержащаяся в данном сообщении, является конфиденциальной и предназначена исключительно для указанных получателей.<br>
-              Несанкционированный доступ, распространение, копирование или дистрибуция этого сообщения или любых его вложений строго запрещены и могут быть незаконными.<br>
-              Если вы не являетесь предполагаемым получателем, или если вы получили это сообщение по ошибке, пожалуйста, немедленно уведомите отправителя, ответив на это электронное письмо, а затем удалите его из вашей системы.<br>
-              Мы ценим ваше сотрудничество.
-            </p>
+              <a href="http://dionis-insurance.kz" target="_blank" style="color: #C19A6B; text-decoration: none;">
+                ТОО страховой брокер ДИОНИС
+              </a>
+            </span>
           </div>
         `;
 

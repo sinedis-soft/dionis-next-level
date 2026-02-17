@@ -10,6 +10,8 @@ export type GreenCardFormDictionary = {
   fileForbidden: string;
   nextStep: string;
   prevStep: string;
+  manualEntryLabel: string;
+  passportFilesLabel: string;
 
   contact: {
     legend: string;
@@ -88,6 +90,8 @@ const ru: GreenCardFormDictionary = {
   fileForbidden: "недопустим (архив, аудио или видео).",
   nextStep: "Далее",
   prevStep: "Назад",
+  manualEntryLabel: "Ввести данные вручную (не хочу отправлять фото паспорта)",
+  passportFilesLabel: "Фото паспорта",
 
   contact: {
     legend: "Контактные данные (для связи с вами)",
@@ -189,6 +193,8 @@ const en: GreenCardFormDictionary = {
   fileForbidden: "is not allowed (archive, audio or video).",
   nextStep: "Next",
   prevStep: "Back",
+  manualEntryLabel: "Enter details manually (I don't want to upload passport photo)",
+  passportFilesLabel: "Passport photo",
 
   contact: {
     legend: "Contact details",
@@ -290,6 +296,8 @@ const kz: GreenCardFormDictionary = {
   fileForbidden: "рұқсат етілмейді (мұрағат, аудио немесе бейне).",
   nextStep: "Келесі",
   prevStep: "Артқа",
+  manualEntryLabel: "Деректерді қолмен енгізу (паспорт фотосын жібергім келмейді)",
+  passportFilesLabel: "Паспорттың фотосы",
 
   contact: {
     legend: "Байланыс деректері",

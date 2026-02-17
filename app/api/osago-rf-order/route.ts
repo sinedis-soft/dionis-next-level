@@ -107,6 +107,12 @@ async function fileToBitrixFileData(file: File): Promise<[string, string]> {
   return [file.name, base64];
 }
 
+type DriverInput = {
+  fullName?: string;
+  experienceYears?: string; // из formData
+  licenseFiles: File[];
+};
+
 type VehicleInput = {
   plate?: string;
   type?: string; // select value
@@ -115,7 +121,12 @@ type VehicleInput = {
   period?: string; // select value
   techPassportFiles: File[];
   driversLimited?: boolean;
+
+  // оставлено для совместимости (если вдруг где-то ещё шлёте старое поле)
   driverLicenseFiles: File[];
+
+  // ✅ новое: динамические водители
+  drivers: DriverInput[];
 };
 
 /**
@@ -124,13 +135,11 @@ type VehicleInput = {
  */
 const UF = {
   // CONTACT
-
   CONTACT_GENDER: "UF_CRM_1686138296718",
   CONTACT_COUNTRY: "UF_CRM_1686138527330",
   CONTACT_PASSPORT_NUMBER: "UF_CRM_CONTACT_1686145698592",
   CONTACT_PASSPORT_ISSUER: "UF_CRM_1694347754648",
   CONTACT_PASSPORT_ISSUED_AT: "UF_CRM_1694347737519",
-
 
   // COMPANY
   COMPANY_INN_FIELD: "UF_CRM_COMPANY_1692911328252",
@@ -147,7 +156,6 @@ const UF = {
   DEAL_PERIOD: "UF_CRM_1686152209741",
   DEAL_FILES: "UF_CRM_1686154280439",
   DEAL_DRIVER_LICENSE_FILES: "UF_CRM_1770367692339",
-
 } as const;
 
 function setIfValue(
@@ -166,10 +174,6 @@ function safeJsonStringify(v: unknown): string {
   } catch {
     return String(v);
   }
-}
-
-function nl2br(s: string): string {
-  return s.replace(/\n/g, "<br>");
 }
 
 function escapeHtml(s: string): string {
@@ -226,13 +230,16 @@ async function verifyRecaptchaIfNeeded(opts: {
   if (!token) return { ok: true }; // токена нет — тоже не блокируем (как в твоём примере)
 
   try {
-    const verifyRes = await fetch("https://www.google.com/recaptcha/api/siteverify", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body:
-        `secret=${encodeURIComponent(secret)}` +
-        `&response=${encodeURIComponent(token)}`,
-    });
+    const verifyRes = await fetch(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body:
+          `secret=${encodeURIComponent(secret)}` +
+          `&response=${encodeURIComponent(token)}`,
+      }
+    );
 
     const verifyData = (await verifyRes.json()) as {
       success?: boolean;
@@ -263,8 +270,12 @@ export async function POST(req: Request): Promise<Response> {
 
     // --- reCAPTCHA ---
     const isProd = process.env.NODE_ENV === "production";
-    const recaptchaToken = String(formData.get("recaptchaToken") || "").trim() || null;
-    const recaptcha = await verifyRecaptchaIfNeeded({ isProd, token: recaptchaToken });
+    const recaptchaToken =
+      String(formData.get("recaptchaToken") || "").trim() || null;
+    const recaptcha = await verifyRecaptchaIfNeeded({
+      isProd,
+      token: recaptchaToken,
+    });
     if (!recaptcha.ok) {
       return Response.json(
         { ok: false, message: "Подтвердите, что вы не робот." },
@@ -274,11 +285,20 @@ export async function POST(req: Request): Promise<Response> {
 
     // --- 1. Контакты и базовые данные ---
     const contact_email = String(formData.get("contact_email") || "").trim();
-    const contact_firstNameLat = String(formData.get("contact_firstNameLat") || "").trim();
-    const contact_lastNameLat = String(formData.get("contact_lastNameLat") || "").trim();
+    const contact_firstNameLat = String(
+      formData.get("contact_firstNameLat") || ""
+    ).trim();
+    const contact_lastNameLat = String(
+      formData.get("contact_lastNameLat") || ""
+    ).trim();
     const contact_phone = String(formData.get("contact_phone") || "").trim();
 
-    if (!contact_email || !contact_firstNameLat || !contact_lastNameLat || !contact_phone) {
+    if (
+      !contact_email ||
+      !contact_firstNameLat ||
+      !contact_lastNameLat ||
+      !contact_phone
+    ) {
       return Response.json(
         { ok: false, message: "Не заполнены обязательные контактные данные" },
         { status: 400 }
@@ -296,13 +316,16 @@ export async function POST(req: Request): Promise<Response> {
 
     const person_gender_raw = String(formData.get("person_gender") || "").trim();
     const person_gender =
-      person_gender_raw === "male" ? "45" : person_gender_raw === "female" ? "47" : person_gender_raw;
+      person_gender_raw === "male"
+        ? "45"
+        : person_gender_raw === "female"
+        ? "47"
+        : person_gender_raw;
 
     const person_birthDate = parseDateISO(
       String(formData.get("person_birthDate") || "") || null
     );
 
-   
     const person_country = String(formData.get("person_country") || "").trim();
     const person_address = String(formData.get("person_address") || "").trim();
 
@@ -311,7 +334,6 @@ export async function POST(req: Request): Promise<Response> {
     const person_passportIssuedAt = parseDateISO(
       String(formData.get("person_passportIssuedAt") || "") || null
     );
-    
 
     // UTM и URL страницы
     const pageUrlRaw = String(formData.get("pageUrl") || "").trim();
@@ -332,26 +354,61 @@ export async function POST(req: Request): Promise<Response> {
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     const userAgent = req.headers.get("user-agent") || "unknown";
 
-    // --- 2. Парсим транспортные средства ---
+    // --- 2. Парсим транспортные средства + водителей ---
     const vehiclesMap = new Map<number, VehicleInput>();
 
-    for (const [key, value] of formData.entries()) {
-      const m = key.match(/^vehicles\[(\d+)\]\[(\w+)\]$/);
-      if (!m) continue;
-
-      const index = Number(m[1]);
-      const field = m[2] as keyof VehicleInput;
-
+    function ensureVehicle(index: number): VehicleInput {
       if (!vehiclesMap.has(index)) {
-        vehiclesMap.set(index, { techPassportFiles: [], driverLicenseFiles: [] });
+        vehiclesMap.set(index, {
+          techPassportFiles: [],
+          driverLicenseFiles: [],
+          drivers: [],
+        });
+      }
+      return vehiclesMap.get(index)!;
+    }
 
+    function ensureDriver(v: VehicleInput, driverIndex: number): DriverInput {
+      while (v.drivers.length <= driverIndex) {
+        v.drivers.push({ licenseFiles: [] });
+      }
+      return v.drivers[driverIndex];
+    }
+
+    for (const [key, value] of formData.entries()) {
+      // ✅ nested drivers: vehicles[i][drivers][j][field]
+      const md = key.match(
+        /^vehicles\[(\d+)\]\[drivers\]\[(\d+)\]\[(\w+)\]$/
+      );
+      if (md) {
+        const vIndex = Number(md[1]);
+        const dIndex = Number(md[2]);
+        const field = md[3] as "fullName" | "experienceYears" | "licenseFiles";
+
+        const v = ensureVehicle(vIndex);
+        const d = ensureDriver(v, dIndex);
+
+        if (field === "licenseFiles") {
+          if (value instanceof File && value.size > 0) d.licenseFiles.push(value);
+        } else {
+          (d as Record<string, unknown>)[field] = String(value);
+        }
+        continue;
       }
 
-      const v = vehiclesMap.get(index)!;
+      // ✅ flat vehicle fields: vehicles[i][field]
+      const mv = key.match(/^vehicles\[(\d+)\]\[(\w+)\]$/);
+      if (!mv) continue;
 
-            if (field === "techPassportFiles") {
+      const index = Number(mv[1]);
+      const field = mv[2] as keyof VehicleInput;
+
+      const v = ensureVehicle(index);
+
+      if (field === "techPassportFiles") {
         if (value instanceof File && value.size > 0) v.techPassportFiles.push(value);
       } else if (field === "driverLicenseFiles") {
+        // старое поле (на всякий случай)
         if (value instanceof File && value.size > 0) v.driverLicenseFiles.push(value);
       } else if (field === "driversLimited") {
         // чекбокс отдаёт "on"
@@ -361,7 +418,6 @@ export async function POST(req: Request): Promise<Response> {
       } else {
         (v as Record<string, unknown>)[field] = String(value);
       }
-
     }
 
     const vehicles = Array.from(vehiclesMap.entries())
@@ -374,17 +430,53 @@ export async function POST(req: Request): Promise<Response> {
         { status: 400 }
       );
     }
+
+    // ✅ серверная валидация ограниченного списка водителей
     for (let i = 0; i < vehicles.length; i++) {
       const v = vehicles[i];
+      if (!v.driversLimited) continue;
 
-      if (v.driversLimited && v.driverLicenseFiles.length === 0) {
+      const drivers = (v.drivers || []).filter((d) => (d.fullName || "").trim() !== "");
+      if (drivers.length === 0) {
         return Response.json(
           {
             ok: false,
-            message: `Авто #${i + 1}: при ограничении списка водителей нужно загрузить фото водительских удостоверений.`,
+            message: `Авто #${i + 1}: при ограничении списка водителей добавьте минимум одного водителя.`,
           },
           { status: 400 }
         );
+      }
+
+      for (let j = 0; j < drivers.length; j++) {
+        const d = drivers[j];
+        const fio = String(d.fullName || "").trim();
+        const expRaw = String(d.experienceYears ?? "").trim();
+        const exp = Number(expRaw);
+
+        if (!fio) {
+          return Response.json(
+            { ok: false, message: `Авто #${i + 1}: заполните ФИО водителя #${j + 1}.` },
+            { status: 400 }
+          );
+        }
+        if (!Number.isFinite(exp) || exp < 0 || !Number.isInteger(exp)) {
+          return Response.json(
+            {
+              ok: false,
+              message: `Авто #${i + 1}: укажите корректный стаж (полных лет) для водителя #${j + 1}.`,
+            },
+            { status: 400 }
+          );
+        }
+        if (!d.licenseFiles || d.licenseFiles.length === 0) {
+          return Response.json(
+            {
+              ok: false,
+              message: `Авто #${i + 1}: загрузите фото ВУ водителя #${j + 1}.`,
+            },
+            { status: 400 }
+          );
+        }
       }
     }
 
@@ -423,13 +515,11 @@ export async function POST(req: Request): Promise<Response> {
       if (person_birthDate) contactUpdateFields.BIRTHDATE = person_birthDate;
       if (person_address) contactUpdateFields.ADDRESS = person_address;
 
-      
       setIfValue(contactUpdateFields, UF.CONTACT_GENDER, person_gender);
       setIfValue(contactUpdateFields, UF.CONTACT_COUNTRY, person_country);
       setIfValue(contactUpdateFields, UF.CONTACT_PASSPORT_NUMBER, person_passportNumber);
       setIfValue(contactUpdateFields, UF.CONTACT_PASSPORT_ISSUER, person_passportIssuer);
       setIfValue(contactUpdateFields, UF.CONTACT_PASSPORT_ISSUED_AT, person_passportIssuedAt);
-
 
       if (Object.keys(contactUpdateFields).length > 0) {
         await bitrix<boolean>("crm.contact.update", {
@@ -486,7 +576,8 @@ export async function POST(req: Request): Promise<Response> {
     // --- 5. Подготовка почты (один transporter на весь запрос) ---
     const mailer = buildMailer();
     const mailTo = process.env.MAIL_TO || "info@ibb.expert";
-    const mailFrom = process.env.MAIL_FROM || process.env.MAIL_USER || "no-reply@localhost";
+    const mailFrom =
+      process.env.MAIL_FROM || process.env.MAIL_USER || "no-reply@localhost";
 
     // --- 6. Сделки по каждому авто + письмо по каждому авто ---
     const createdDeals: number[] = [];
@@ -509,18 +600,36 @@ export async function POST(req: Request): Promise<Response> {
     for (let i = 0; i < vehicles.length; i++) {
       const vehicle = vehicles[i];
 
+      const drivers = (vehicle.drivers || []).filter((d) => (d.fullName || "").trim() !== "");
+
+      // ✅ В НАЧАЛО COMMENTS — водители (если ограниченный список)
+      let driversComment = "";
+      if (vehicle.driversLimited) {
+        const lines: string[] = [];
+        lines.push("Водители (ограниченный список):");
+        for (let j = 0; j < drivers.length; j++) {
+          const d = drivers[j];
+          lines.push(
+            `${j + 1}) ${String(d.fullName || "").trim()} — стаж ${String(
+              d.experienceYears || ""
+            ).trim()} полных лет`
+          );
+        }
+        driversComment = lines.join("\n") + "\n\n";
+      }
+
       const dealFields: Record<string, unknown> = {
         TITLE: `Заявка ОСАГО РФ: ${vehicle.plate || "ТС"}`,
         CONTACT_ID: contactId,
         COMPANY_ID: companyId,
-        COMMENTS: commonComment,
+        COMMENTS: driversComment + commonComment, // ✅ перед всеми прочими комментариями
       };
 
       setIfValue(dealFields, UF.DEAL_TYP_INSURANCE, 425);
       setIfValue(dealFields, UF.DEAL_INSURANCE_TERRITORY, 1097);
       setIfValue(dealFields, UF.DEAL_AGRIGATION, 1169);
       setIfValue(dealFields, UF.DEAL_AGENT, 3907);
-      setIfValue(dealFields, UF.DEAL_VEHICLE_COUNTRY, vehicle.country || null);
+      setIfValue(dealFields, UF.DEAL_VEHICLE_COUNTRY, 385); // по стране не правим
       setIfValue(dealFields, UF.DEAL_VEHICLE_PLATE, vehicle.plate || null);
       setIfValue(dealFields, UF.DEAL_VEHICLE_TYPE, vehicle.type || null);
       setIfValue(dealFields, UF.DEAL_START_DATE, vehicle.startDate || null);
@@ -532,19 +641,23 @@ export async function POST(req: Request): Promise<Response> {
         );
         dealFields[UF.DEAL_FILES] = filesData.map((fd) => ({ fileData: fd }));
       }
-      if (
-        UF.DEAL_DRIVER_LICENSE_FILES &&
-        vehicle.driversLimited &&
-        vehicle.driverLicenseFiles.length > 0
-      ) {
-        const dlFilesData = await Promise.all(
-          vehicle.driverLicenseFiles.map((f) => fileToBitrixFileData(f))
-        );
-        dealFields[UF.DEAL_DRIVER_LICENSE_FILES] = dlFilesData.map((fd) => ({
-          fileData: fd,
-        }));
-      }
 
+      // ✅ файлы ВУ водителей — в то же поле, что и раньше
+      if (UF.DEAL_DRIVER_LICENSE_FILES && vehicle.driversLimited) {
+        const licenseFiles: File[] = [
+          ...(vehicle.driverLicenseFiles ?? []), // старое (если придёт)
+          ...drivers.flatMap((d) => d.licenseFiles ?? []),
+        ].filter((f) => f instanceof File && f.size > 0);
+
+        if (licenseFiles.length > 0) {
+          const dlFilesData = await Promise.all(
+            licenseFiles.map((f) => fileToBitrixFileData(f))
+          );
+          dealFields[UF.DEAL_DRIVER_LICENSE_FILES] = dlFilesData.map((fd) => ({
+            fileData: fd,
+          }));
+        }
+      }
 
       const dealIdStr = await bitrix<string>("crm.deal.add", { fields: dealFields });
       const dealId = Number(dealIdStr);
@@ -552,7 +665,9 @@ export async function POST(req: Request): Promise<Response> {
 
       // --- ПИСЬМО: по каждому авто отдельно ---
       if (mailer) {
-        const subject = `ОСАГО РФ нерезов - ДИОНИС - новая заявка (сделка #${dealId}) - ${vehicle.plate || "ТС"}`;
+        const subject = `ОСАГО РФ нерезов - ДИОНИС - новая заявка (сделка #${dealId}) - ${
+          vehicle.plate || "ТС"
+        }`;
 
         const metaText =
           "\n\n---\n" +
@@ -560,6 +675,24 @@ export async function POST(req: Request): Promise<Response> {
           `UTM: ${utm ? safeJsonStringify(utm) : "none"}\n` +
           `IP: ${ip}\n` +
           `User-Agent: ${userAgent}\n`;
+
+        const driverTextLines =
+          vehicle.driversLimited
+            ? [
+                "",
+                "Водители (ограниченный список):",
+                ...drivers.map(
+                  (d, idx) =>
+                    `${idx + 1}) ${String(d.fullName || "").trim()} — стаж ${String(
+                      d.experienceYears || ""
+                    ).trim()} полных лет`
+                ),
+                `Файлов ВУ (всего): ${drivers.reduce(
+                  (acc, d) => acc + (d.licenseFiles?.length ?? 0),
+                  0
+                )}`,
+              ]
+            : [];
 
         const text = [
           `Сделка: #${dealId}`,
@@ -579,11 +712,36 @@ export async function POST(req: Request): Promise<Response> {
           `- Дата начала: ${vehicle.startDate || "-"}`,
           `- Период: ${vehicle.period || "-"}`,
           `- Файлов техпаспорта: ${vehicle.techPassportFiles.length}`,
+          ...driverTextLines,
           metaText,
         ].join("\n");
 
+        const driversHtml =
+          vehicle.driversLimited
+            ? `
+            <div style="margin-top: 12px; padding: 12px; border: 1px solid #eee; border-radius: 8px;">
+              <h3 style="margin: 0 0 8px; font-size: 14px;">Водители (ограниченный список)</h3>
+              <div style="font-size: 13px; color: #333;">
+                ${
+                  drivers.length
+                    ? drivers
+                        .map(
+                          (d, idx) =>
+                            `${idx + 1}) <strong>${escapeHtml(
+                              String(d.fullName || "").trim()
+                            )}</strong> — стаж ${escapeHtml(
+                              String(d.experienceYears || "").trim()
+                            )} полных лет`
+                        )
+                        .join("<br>")
+                    : "—"
+                }
+              </div>
+            </div>
+          `
+            : "";
+
         const html = `
-          
           <div style="max-width: 600px; margin: 0 auto; background-color: #FFFFFF; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
             <img
                 src="https://dionis-insurance.com/logo_1.webp"
@@ -594,17 +752,25 @@ export async function POST(req: Request): Promise<Response> {
             >
             <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">Новая заявка на ОСАГО РФ нерезов с сайта DIONIS Insurance</h2>
             <p style="font-size: 14px; line-height: 1.6; color: #707070; margin: 0 0 20px;">
-          	  <strong>Сделка:</strong> #${escapeHtml(String(dealId))}<br>
-              <strong>Авто:</strong> ${escapeHtml(String(i + 1))} из ${escapeHtml(String(vehicles.length))}
+              <strong>Сделка:</strong> #${escapeHtml(String(dealId))}<br>
+              <strong>Авто:</strong> ${escapeHtml(String(i + 1))} из ${escapeHtml(
+                String(vehicles.length)
+              )}
             </p>
-          
+
             <div style="margin-top: 12px; padding: 12px; border: 1px solid #eee; border-radius: 8px;">
               <h3 style="margin: 0 0 8px; font-size: 14px;">Контакт</h3>
               <div style="font-size: 13px; color: #333;">
-                <strong>${escapeHtml(contact_firstNameLat)} ${escapeHtml(contact_lastNameLat)}</strong><br>
+                <strong>${escapeHtml(contact_firstNameLat)} ${escapeHtml(
+          contact_lastNameLat
+        )}</strong><br>
                 Email: ${escapeHtml(contact_email)}<br>
                 Телефон: ${escapeHtml(contact_phone)}<br>
-                ${order_isCompany ? `ИНН: <strong>${escapeHtml(company_inn)}</strong><br>` : `Договор на физлицо (компания ID=1817)<br>`}
+                ${
+                  order_isCompany
+                    ? `ИНН: <strong>${escapeHtml(company_inn)}</strong><br>`
+                    : `Договор на физлицо (компания ID=1817)<br>`
+                }
                 Contact ID: ${escapeHtml(String(contactId))}<br>
                 Company ID: ${escapeHtml(String(companyId))}
               </div>
@@ -615,12 +781,18 @@ export async function POST(req: Request): Promise<Response> {
               <div style="font-size: 13px; color: #333;">
                 Номер: <strong>${escapeHtml(vehicle.plate || "-")}</strong><br>
                 Тип: ${escapeHtml(vehicle.type || "-")}<br>
-                Страна (значение справочника): ${escapeHtml(vehicle.country || "-")}<br>
+                Страна (значение справочника): ${escapeHtml(
+                  vehicle.country || "-"
+                )}<br>
                 Дата начала: ${escapeHtml(vehicle.startDate || "-")}<br>
                 Период: ${escapeHtml(vehicle.period || "-")}<br>
-                Файлов техпаспорта: ${escapeHtml(String(vehicle.techPassportFiles.length))}
+                Файлов техпаспорта: ${escapeHtml(
+                  String(vehicle.techPassportFiles.length)
+                )}
               </div>
             </div>
+
+            ${driversHtml}
 
             <div style="margin-top: 12px; font-size: 12px; color: #666; white-space: normal;">
               <h3 style="margin: 0 0 8px; font-size: 14px; color: #111;">Мета</h3>
@@ -629,8 +801,8 @@ export async function POST(req: Request): Promise<Response> {
               IP: ${escapeHtml(ip)}<br>
               User-Agent: ${escapeHtml(userAgent)}
             </div>
-     
-			      <p></p>
+
+            <p></p>
 
             <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">С уважением, Денис БОРОВОЙ</h2>
             <span style="color: #707070;">директор<br>
@@ -678,7 +850,9 @@ export async function POST(req: Request): Promise<Response> {
         }
       } else {
         // чтобы было видно в логах, почему не шлём
-        console.error("Mail env vars are not fully set (MAIL_HOST/MAIL_USER/MAIL_PASS/MAIL_FROM)");
+        console.error(
+          "Mail env vars are not fully set (MAIL_HOST/MAIL_USER/MAIL_PASS/MAIL_FROM)"
+        );
       }
     }
 

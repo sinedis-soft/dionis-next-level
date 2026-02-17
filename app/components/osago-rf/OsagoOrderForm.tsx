@@ -2,7 +2,6 @@
 "use client";
 
 import React, { useMemo, useRef, useState } from "react";
-
 import type { OsagoRfFormDictionary } from "@/dictionaries/osagoRfForm";
 
 // Имя/фамилия/отчество: кириллица + латиница, пробел, дефис, апостроф
@@ -40,7 +39,6 @@ function formatLatinAlnum(raw: string, maxLength = 20): string {
 }
 
 type Props = { dict: OsagoRfFormDictionary };
-
 type FormStatus = "idle" | "loading" | "success" | "error";
 
 function prefersReducedMotion(): boolean {
@@ -64,6 +62,9 @@ function toLocalDateString(date: Date) {
   return `${y}-${m}-${d}`;
 }
 
+// водитель внутри ТС
+type Driver = { id: number };
+
 export function OsagoOrderForm({ dict }: Props) {
   const [isCompany, setIsCompany] = useState(false);
   const [vehicleBlocks, setVehicleBlocks] = useState<number[]>([0]);
@@ -76,17 +77,21 @@ export function OsagoOrderForm({ dict }: Props) {
   const [personMiddleName, setPersonMiddleName] = useState("");
   const [passportNumber, setPassportNumber] = useState("");
 
-  const [driversLimitedByVehicleId, setDriversLimitedByVehicleId] = useState<
-    Record<number, boolean>
-  >({});
+  // false -> фото паспорта (обяз), true -> ручной ввод
+  const [manualPassportEntry, setManualPassportEntry] = useState(false);
+
+  const [driversLimitedByVehicleId, setDriversLimitedByVehicleId] = useState<Record<number, boolean>>({});
+  const [driversByVehicleId, setDriversByVehicleId] = useState<Record<number, Driver[]>>({});
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
-
   const [formStatus, setFormStatus] = useState<FormStatus>("idle");
   const [formMessage, setFormMessage] = useState<string>("");
 
   const formRef = useRef<HTMLFormElement | null>(null);
   const topRef = useRef<HTMLDivElement | null>(null);
+
+  // ✅ глобальный счётчик ID водителей (не state)
+  const driverIdSeqRef = useRef(0);
 
   const HEADER_OFFSET = 88;
 
@@ -110,14 +115,11 @@ export function OsagoOrderForm({ dict }: Props) {
     scrollToTopAnchor();
   }
 
-  // даты: локально, без UTC-сдвига
   const todayLocal = new Date();
   const maxBirthDate = toLocalDateString(
     new Date(todayLocal.getFullYear() - 18, todayLocal.getMonth(), todayLocal.getDate())
   );
   const maxPassDate = toLocalDateString(todayLocal);
-
-  // дата начала страховки: можно с сегодня (локально)
   const minStartDate = toLocalDateString(todayLocal);
 
   const forbiddenTypes = [
@@ -139,19 +141,15 @@ export function OsagoOrderForm({ dict }: Props) {
   function validateStep(stepToValidate: 1 | 2 | 3): boolean {
     if (!formRef.current) return true;
 
-    const root = formRef.current.querySelector(
-      `[data-step="${stepToValidate}"]`
-    ) as HTMLElement | null;
-
+    const root = formRef.current.querySelector(`[data-step="${stepToValidate}"]`) as HTMLElement | null;
     if (!root) return true;
 
-    const elements = root.querySelectorAll<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >("input, select, textarea");
+    const elements = root.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+      "input, select, textarea"
+    );
 
     for (const el of Array.from(elements)) {
       if (el.offsetParent === null) continue;
-
       if (!el.checkValidity()) {
         el.reportValidity();
         el.focus();
@@ -163,19 +161,13 @@ export function OsagoOrderForm({ dict }: Props) {
 
   function validateFiles(files: FileList): File[] {
     const accepted: File[] = [];
-
     Array.from(files).forEach((file) => {
-      if (
-        forbiddenTypes.some((t) =>
-          t.endsWith("/") ? file.type.startsWith(t) : file.type === t
-        )
-      ) {
+      if (forbiddenTypes.some((t) => (t.endsWith("/") ? file.type.startsWith(t) : file.type === t))) {
         alert(`${file.name}: ${dict.fileForbidden}`);
         return;
       }
       accepted.push(file);
     });
-
     return accepted;
   }
 
@@ -192,12 +184,36 @@ export function OsagoOrderForm({ dict }: Props) {
       return prev.filter((vId) => vId !== id);
     });
 
-    // чистим состояние чекбокса для удаленного блока
     setDriversLimitedByVehicleId((prev) => {
       if (!(id in prev)) return prev;
       const next = { ...prev };
       delete next[id];
       return next;
+    });
+
+    setDriversByVehicleId((prev) => {
+      if (!(id in prev)) return prev;
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
+  }
+
+  // ✅ добавить водителя в конкретное ТС (ровно одного)
+  function addDriver(vehicleId: number) {
+    const newId = ++driverIdSeqRef.current;
+
+    setDriversByVehicleId((prev) => {
+      const list = prev[vehicleId] ?? [];
+      return { ...prev, [vehicleId]: [...list, { id: newId }] };
+    });
+  }
+
+  // ✅ удалить конкретного водителя
+  function removeDriver(vehicleId: number, driverId: number) {
+    setDriversByVehicleId((prev) => {
+      const list = prev[vehicleId] ?? [];
+      return { ...prev, [vehicleId]: list.filter((d) => d.id !== driverId) };
     });
   }
 
@@ -215,26 +231,69 @@ export function OsagoOrderForm({ dict }: Props) {
     try {
       const formEl = e.currentTarget;
 
-      // HTML5 required не работает на скрытых инпутах, поэтому добавляем ручную проверку:
-      for (const [id] of vehicleBlocks.entries()) {
-        const isLimited = Boolean(driversLimitedByVehicleId[vehicleBlocks[id]]);
-        if (!isLimited) continue;
-
-        const input = formEl.querySelector(
-          `input[name="vehicles[${id}][driverLicenseFiles]"]`
-        ) as HTMLInputElement | null;
-
-        if (input && (!input.files || input.files.length === 0)) {
-          input.focus();
-          alert("Загрузите фото/сканы водительских удостоверений. | Жүргізуші куәліктерінің фото/скандарын жүктеңіз. | Upload photos/scans of the driver’s licenses.");
+      // паспорт: если НЕ ручной ввод — файл обязателен (для физлица)
+      if (!manualPassportEntry && !isCompany) {
+        const passFiles = formEl.querySelector(`input[name="person_passportFiles"]`) as HTMLInputElement | null;
+        if (!passFiles || !passFiles.files || passFiles.files.length === 0) {
+          passFiles?.focus();
+          alert("Загрузите фото паспорта.");
           setFormStatus("idle");
           return;
         }
       }
 
+      // водители: если ограничение — минимум 1 водитель и все поля обязательны
+      for (let idx = 0; idx < vehicleBlocks.length; idx++) {
+        const vehicleId = vehicleBlocks[idx];
+        const isLimited = Boolean(driversLimitedByVehicleId[vehicleId]);
+        if (!isLimited) continue;
+
+        const drivers = driversByVehicleId[vehicleId] ?? [];
+        if (drivers.length === 0) {
+          alert("Добавьте минимум одного водителя (при ограничении списка).");
+          setFormStatus("idle");
+          return;
+        }
+
+        for (let j = 0; j < drivers.length; j++) {
+          const fullNameInput = formEl.querySelector(
+            `input[name="vehicles[${idx}][drivers][${j}][fullName]"]`
+          ) as HTMLInputElement | null;
+
+          const expInput = formEl.querySelector(
+            `input[name="vehicles[${idx}][drivers][${j}][experienceYears]"]`
+          ) as HTMLInputElement | null;
+
+          const filesInput = formEl.querySelector(
+            `input[name="vehicles[${idx}][drivers][${j}][licenseFiles]"]`
+          ) as HTMLInputElement | null;
+
+          if (!fullNameInput || !fullNameInput.value.trim()) {
+            fullNameInput?.focus();
+            alert(`Заполните ФИО водителя ${j + 1}.`);
+            setFormStatus("idle");
+            return;
+          }
+
+          const expVal = Number(expInput?.value ?? "");
+          if (!Number.isFinite(expVal) || expVal < 0 || !Number.isInteger(expVal)) {
+            expInput?.focus();
+            alert(`Укажите корректный стаж (полных лет) для водителя ${j + 1}.`);
+            setFormStatus("idle");
+            return;
+          }
+
+          if (!filesInput || !filesInput.files || filesInput.files.length === 0) {
+            filesInput?.focus();
+            alert(`Загрузите фото ВУ водителя ${j + 1}.`);
+            setFormStatus("idle");
+            return;
+          }
+        }
+      }
+
       const formData = new FormData(formEl);
 
-      // URL + UTM
       if (typeof window !== "undefined") {
         try {
           formData.append("pageUrl", window.location.href);
@@ -245,10 +304,7 @@ export function OsagoOrderForm({ dict }: Props) {
         }
       }
 
-      const res = await fetch("/api/osago-rf-order", {
-        method: "POST",
-        body: formData,
-      });
+      const res = await fetch("/api/osago-rf-order", { method: "POST", body: formData });
 
       const data: unknown = await res.json().catch(() => null);
       const ok = Boolean((data as { ok?: boolean } | null)?.ok);
@@ -256,17 +312,13 @@ export function OsagoOrderForm({ dict }: Props) {
 
       if (!res.ok || !ok) {
         setFormStatus("error");
-        setFormMessage(
-          message ||
-            "Ошибка при отправке заявки на ОСАГО РФ | РФ ОСАҒО-ға өтінімді жіберу кезінде қате орын алды | Error while submitting the OSAGO RF application"
-        );
+        setFormMessage(message || dict.messages.submitError);
         return;
       }
 
       setFormStatus("success");
       setFormMessage(dict.successMessage);
 
-      // reset
       formEl.reset();
       setContactFirstNameLat("");
       setContactLastNameLat("");
@@ -274,16 +326,16 @@ export function OsagoOrderForm({ dict }: Props) {
       setContactEmail("");
       setPersonMiddleName("");
       setPassportNumber("");
+      setManualPassportEntry(false);
       setDriversLimitedByVehicleId({});
+      setDriversByVehicleId({});
       setVehicleBlocks([0]);
       setIsCompany(false);
       setStep(1);
     } catch (err) {
       console.error("OSAGO RF ORDER ERROR:", err);
       setFormStatus("error");
-      setFormMessage(
-        "Ошибка на сервере при отправке заявки на ОСАГО РФ | РФ ОСАҒО-ға өтінімді жіберу кезінде серверлік қате орын алды | Server error while submitting the OSAGO RF application"
-      );
+      setFormMessage(dict.messages.serverError);
     }
   }
 
@@ -311,9 +363,7 @@ export function OsagoOrderForm({ dict }: Props) {
             {/* STEP 1: CONTACT */}
             <div data-step="1" className={step !== 1 ? "hidden" : ""}>
               <div className="mb-3">
-                <h3 className="text-base sm:text-lg font-bold text-[#C89F4A]">
-                  {dict.contact.legend}
-                </h3>
+                <h3 className="text-base sm:text-lg font-bold text-[#C89F4A]">{dict.contact.legend}</h3>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -400,7 +450,7 @@ export function OsagoOrderForm({ dict }: Props) {
                   }}
                   disabled={formStatus === "loading"}
                 >
-                  {"Далее"}
+                  {dict.buttons.next}
                 </button>
               </div>
             </div>
@@ -433,55 +483,32 @@ export function OsagoOrderForm({ dict }: Props) {
                 </div>
               ) : (
                 <>
+                  <div className="mb-3 flex items-start gap-2 text-xs text-gray-700">
+                    <input
+                      id="manual-passport-entry"
+                      name="manualPassportEntry"
+                      type="checkbox"
+                      className="mt-0.5"
+                      checked={manualPassportEntry}
+                      onChange={(e) => setManualPassportEntry(e.target.checked)}
+                    />
+                    <label htmlFor="manual-passport-entry" className="font-semibold">
+                      Ввести данные вручную (не хочу отправлять фото паспорта)
+                    </label>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.middleName}
-                      </label>
-                      <input
-                        type="text"
-                        name="person_middleName"
-                        value={personMiddleName}
-                        onChange={(e) => setPersonMiddleName(formatPersonName(e.target.value))}
-                        className={fieldClass}
-                      />
-                    </div>
+                    
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.gender}
-                        <RequiredMark />
-                      </label>
-                      <select name="person_gender" className={fieldClass} defaultValue="" required>
-                        <option value="">{dict.notSelected}</option>
-                        <option value="male">{dict.person.genderMale}</option>
-                        <option value="female">{dict.person.genderFemale}</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.birthDate}
-                        <RequiredMark />
-                      </label>
-                      <input
-                        type="date"
-                        name="person_birthDate"
-                        max={maxBirthDate}
-                        className={fieldClass}
-                        required
-                      />
-                    </div>
+                    
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         {dict.person.countryLabel}
                         <RequiredMark />
                       </label>
-
                       <select name="person_country" className={fieldClass} defaultValue="" required>
                         <option value="">{dict.notSelected}</option>
-
                         {Object.entries(dict.person.countries).map(([id, label]) => (
                           <option key={id} value={id}>
                             {label}
@@ -499,55 +526,95 @@ export function OsagoOrderForm({ dict }: Props) {
                     </div>
                   </div>
 
-                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
+                  {!manualPassportEntry ? (
+                    <div className="mt-4">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.passportNumber}
+                        Фото паспорта
                         <RequiredMark />
                       </label>
+                      <input
+                        type="file"
+                        name="person_passportFiles"
+                        multiple
+                        onChange={(e) => {
+                          if (!e.target.files) return;
+                          const validFiles = validateFiles(e.target.files);
+                          if (validFiles.length !== e.target.files.length) e.target.value = "";
+                        }}
+                        accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border file:border-gray-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50"
+                        required
+                      />
+                    </div>
+                  ) : (
+                    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {dict.person.gender}
+                        <RequiredMark />
+                      </label>
+                      <select name="person_gender" className={fieldClass} defaultValue="" required>
+                        <option value="">{dict.notSelected}</option>
+                        <option value="male">{dict.person.genderMale}</option>
+                        <option value="female">{dict.person.genderFemale}</option>
+                      </select>
+                    </div>
+                      <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">{dict.person.middleName}</label>
                       <input
                         type="text"
-                        name="person_passportNumber"
-                        value={passportNumber}
-                        onChange={(e) => setPassportNumber(formatLatinAlnum(e.target.value, 20))}
+                        name="person_middleName"
+                        value={personMiddleName}
+                        onChange={(e) => setPersonMiddleName(formatPersonName(e.target.value))}
                         className={fieldClass}
-                        required
                       />
                     </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {dict.person.birthDate}
+                          <RequiredMark />
+                        </label>
+                        <input type="date" name="person_birthDate" max={maxBirthDate} className={fieldClass} required />
+                      </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.passportIssuer}
-                        <RequiredMark />
-                      </label>
-                      <input type="text" name="person_passportIssuer" className={fieldClass} required />
-                    </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {dict.person.passportNumber}
+                          <RequiredMark />
+                        </label>
+                        <input
+                          type="text"
+                          name="person_passportNumber"
+                          value={passportNumber}
+                          onChange={(e) => setPassportNumber(formatLatinAlnum(e.target.value, 20))}
+                          className={fieldClass}
+                          required
+                        />
+                      </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.person.passportIssuedAt}
-                        <RequiredMark />
-                      </label>
-                      <input
-                        type="date"
-                        name="person_passportIssuedAt"
-                        max={maxPassDate}
-                        className={fieldClass}
-                        required
-                      />
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {dict.person.passportIssuer}
+                          <RequiredMark />
+                        </label>
+                        <input type="text" name="person_passportIssuer" className={fieldClass} required />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {dict.person.passportIssuedAt}
+                          <RequiredMark />
+                        </label>
+                        <input type="date" name="person_passportIssuedAt" max={maxPassDate} className={fieldClass} required />
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </>
               )}
 
               <div className="pt-2 flex justify-between gap-3">
-                <button
-                  type="button"
-                  className="btn btn-secondary w-full sm:w-auto"
-                  onClick={() => goToStep(1)}
-                  disabled={formStatus === "loading"}
-                >
-                  {"Назад"}
+                <button type="button" className="btn btn-secondary w-full sm:w-auto" onClick={() => goToStep(1)} disabled={formStatus === "loading"}>
+                  Назад
                 </button>
 
                 <button
@@ -559,7 +626,7 @@ export function OsagoOrderForm({ dict }: Props) {
                   }}
                   disabled={formStatus === "loading"}
                 >
-                  {"Далее"}
+                  {dict.buttons.next}
                 </button>
               </div>
             </div>
@@ -567,9 +634,7 @@ export function OsagoOrderForm({ dict }: Props) {
             {/* STEP 3: VEHICLES */}
             <div data-step="3" className={step !== 3 ? "hidden" : ""}>
               <div className="mb-3">
-                <h3 className="text-base sm:text-lg font-bold text-[#C89F4A]">
-                  {dict.vehicles.legend}
-                </h3>
+                <h3 className="text-base sm:text-lg font-bold text-[#C89F4A]">{dict.vehicles.legend}</h3>
               </div>
 
               <div className="flex justify-between items-center gap-4">
@@ -586,11 +651,12 @@ export function OsagoOrderForm({ dict }: Props) {
               </div>
 
               <div className="mt-4 space-y-6">
-                {vehicleBlocks.map((id, idx) => {
-                  const driversLimited = Boolean(driversLimitedByVehicleId[id]);
+                {vehicleBlocks.map((vehicleId, idx) => {
+                  const driversLimited = Boolean(driversLimitedByVehicleId[vehicleId]);
+                  const drivers = driversByVehicleId[vehicleId] ?? [];
 
                   return (
-                    <div key={id} className="rounded-xl border border-gray-200 bg-white p-4">
+                    <div key={vehicleId} className="rounded-xl border border-gray-200 bg-white p-4">
                       <div className="flex justify-between items-center mb-3">
                         <p className="text-xs font-semibold text-gray-500">
                           {dict.vehicles.blockTitle} #{idx + 1}
@@ -599,7 +665,7 @@ export function OsagoOrderForm({ dict }: Props) {
                         {vehicleBlocks.length > 1 && (
                           <button
                             type="button"
-                            onClick={() => handleRemoveVehicle(id)}
+                            onClick={() => handleRemoveVehicle(vehicleId)}
                             className="text-xs text-red-500 underline underline-offset-2"
                             disabled={formStatus === "loading"}
                           >
@@ -630,12 +696,7 @@ export function OsagoOrderForm({ dict }: Props) {
                             {dict.vehicles.vehicleTypeLabel}
                             <RequiredMark />
                           </label>
-                          <select
-                            name={`vehicles[${idx}][type]`}
-                            className={fieldClass}
-                            defaultValue=""
-                            required
-                          >
+                          <select name={`vehicles[${idx}][type]`} className={fieldClass} defaultValue="" required>
                             <option value="">{dict.notSelected}</option>
                             <option value="127">{dict.vehicles.vehicleTypePassenger}</option>
                             <option value="131">{dict.vehicles.vehicleTypeBus}</option>
@@ -646,34 +707,23 @@ export function OsagoOrderForm({ dict }: Props) {
                           </select>
                         </div>
 
-                        <div>
+                        {/*<div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             {dict.vehicles.countryLabel}
                             <RequiredMark />
                           </label>
-                          <select
-                            name={`vehicles[${idx}][country]`}
-                            className={fieldClass}
-                            defaultValue="385"
-                            required
-                          >
+                          <select name={`vehicles[${idx}][country]`} className={fieldClass} defaultValue="385" required>
                             <option value="">{dict.notSelected}</option>
                             <option value="385">{dict.vehicles.countryKZ}</option>
                           </select>
-                        </div>
+                        </div>*/}
 
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">
                             {dict.vehicles.startDate}
                             <RequiredMark />
                           </label>
-                          <input
-                            type="date"
-                            name={`vehicles[${idx}][startDate]`}
-                            min={minStartDate}
-                            className={fieldClass}
-                            required
-                          />
+                          <input type="date" name={`vehicles[${idx}][startDate]`} min={minStartDate} className={fieldClass} required />
                         </div>
 
                         <div>
@@ -681,12 +731,7 @@ export function OsagoOrderForm({ dict }: Props) {
                             {dict.vehicles.periodLabel}
                             <RequiredMark />
                           </label>
-                          <select
-                            name={`vehicles[${idx}][period]`}
-                            className={fieldClass}
-                            defaultValue=""
-                            required
-                          >
+                          <select name={`vehicles[${idx}][period]`} className={fieldClass} defaultValue="" required>
                             <option value="">{dict.notSelected}</option>
                             <option value="585">{dict.vehicles.period15d}</option>
                             <option value="115">{dict.vehicles.period1m}</option>
@@ -698,77 +743,141 @@ export function OsagoOrderForm({ dict }: Props) {
                         </div>
                       </div>
 
-                      {/* ✅ ЧЕКБОКС ОГРАНИЧЕНИЯ ВОДИТЕЛЕЙ (по каждому авто) */}
+                      
+
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {dict.vehicles.techPassportFilesLabel}
+                          <RequiredMark />
+                        </label>
+                        <input
+                          type="file"
+                          name={`vehicles[${idx}][techPassportFiles]`}
+                          multiple
+                          onChange={(e) => {
+                            if (!e.target.files) return;
+                            const validFiles = validateFiles(e.target.files);
+                            if (validFiles.length !== e.target.files.length) e.target.value = "";
+                          }}
+                          accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                          className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border file:border-gray-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50"
+                          required
+                        />
+                      </div>
                       <div className="mt-4 flex items-start gap-2 text-xs text-gray-700">
                         <input
-                          id={`driversLimited-${id}`}
+                          id={`driversLimited-${vehicleId}`}
                           type="checkbox"
                           name={`vehicles[${idx}][driversLimited]`}
                           className="mt-0.5"
                           checked={driversLimited}
                           onChange={(e) => {
                             const checked = e.target.checked;
-                            setDriversLimitedByVehicleId((prev) => ({
-                              ...prev,
-                              [id]: checked,
-                            }));
+
+                            setDriversLimitedByVehicleId((prev) => ({ ...prev, [vehicleId]: checked }));
+
+                            // ✅ если выключили — очищаем водителей этого ТС
+                            if (!checked) {
+                              setDriversByVehicleId((prev) => ({ ...prev, [vehicleId]: [] }));
+                            }
                           }}
                         />
-                        <label htmlFor={`driversLimited-${id}`}>
-                          {dict.vehicles.driversLimitedLabel}
-                        </label>
+                        <label htmlFor={`driversLimited-${vehicleId}`}>{dict.vehicles.driversLimitedLabel}</label>
                       </div>
 
-                      {/* ✅ ФАЙЛЫ: 2 колонки. Техпаспорт слева всегда. ВУ справа только при чекбоксе */}
-                      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {/* 🔹 СЛЕВА — ТЕХПАСПОРТ (всегда). Если ВУ не показываем — занимаем всю ширину */}
-                        <div className={!driversLimited ? "sm:col-span-2" : ""}>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            {dict.vehicles.techPassportFilesLabel}
-                            <RequiredMark />
-                          </label>
+                      {driversLimited && (
+                        <div className="mt-6 rounded-lg border border-gray-100 bg-gray-50 p-4">
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-sm font-semibold text-gray-800">Водители (ограниченный список)</p>
 
-                          <input
-                            type="file"
-                            name={`vehicles[${idx}][techPassportFiles]`}
-                            multiple
-                            onChange={(e) => {
-                              if (!e.target.files) return;
-                              const validFiles = validateFiles(e.target.files);
-                              if (validFiles.length !== e.target.files.length) e.target.value = "";
-                            }}
-                            accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                            className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border file:border-gray-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50"
-                            required
-                          />
-                        </div>
-
-                        {/* 🔹 СПРАВА — ВУ (только если чекбокс включён). required остаётся, но дополнительно проверяем в submit */}
-                        {driversLimited && (
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              {dict.vehicles.driverLicenseFilesLabel}
-                              <RequiredMark />
-                            </label>
-
-                            
-
-                            <input
-                              type="file"
-                              name={`vehicles[${idx}][driverLicenseFiles]`}
-                              multiple
-                              onChange={(e) => {
-                                if (!e.target.files) return;
-                                const validFiles = validateFiles(e.target.files);
-                                if (validFiles.length !== e.target.files.length) e.target.value = "";
-                              }}
-                              accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                              className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border file:border-gray-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50"
-                              required
-                            />
+                            <button
+                              type="button"
+                              className="btn btn-secondary w-full sm:w-auto"
+                              onClick={() => addDriver(vehicleId)}
+                              disabled={formStatus === "loading"}
+                            >
+                              + Добавить водителя
+                            </button>
                           </div>
-                        )}
-                      </div>
+
+                          {drivers.length === 0 ? (
+                            <p className="mt-3 text-xs text-gray-600">Добавьте минимум одного водителя.</p>
+                          ) : (
+                            <div className="mt-4 space-y-4">
+                              {drivers.map((d, j) => (
+                                <div key={d.id} className="rounded-lg bg-white border border-gray-200 p-4">
+                                  <div className="flex items-center justify-between">
+                                    <p className="text-sm font-semibold text-gray-700">Водитель {j + 1}</p>
+
+                                    <button
+                                      type="button"
+                                      className="text-xs text-red-600 underline underline-offset-2"
+                                      onClick={() => removeDriver(vehicleId, d.id)}
+                                      disabled={formStatus === "loading"}
+                                    >
+                                      Удалить водителя {j + 1}
+                                    </button>
+                                  </div>
+
+                                  <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        ФИО водителя {j + 1}
+                                        <RequiredMark />
+                                      </label>
+                                      <input
+                                        type="text"
+                                        name={`vehicles[${idx}][drivers][${j}][fullName]`}
+                                        className={fieldClass}
+                                        onChange={(e) => {
+                                          e.target.value = formatPersonName(e.target.value);
+                                        }}
+                                        required
+                                      />
+                                    </div>
+
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Стаж вождения (полных лет)
+                                        <RequiredMark />
+                                      </label>
+                                      <input
+                                        type="number"
+                                        inputMode="numeric"
+                                        min={0}
+                                        step={1}
+                                        name={`vehicles[${idx}][drivers][${j}][experienceYears]`}
+                                        className={fieldClass}
+                                        required
+                                      />
+                                    </div>
+
+                                    <div className="sm:col-span-2">
+                                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Фото водительского удостоверения водителя {j + 1}
+                                        <RequiredMark />
+                                      </label>
+                                      <input
+                                        type="file"
+                                        name={`vehicles[${idx}][drivers][${j}][licenseFiles]`}
+                                        multiple
+                                        onChange={(e) => {
+                                          if (!e.target.files) return;
+                                          const validFiles = validateFiles(e.target.files);
+                                          if (validFiles.length !== e.target.files.length) e.target.value = "";
+                                        }}
+                                        accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                        className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border file:border-gray-300 file:bg-white file:px-3 file:py-2 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-50"
+                                        required
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -779,17 +888,9 @@ export function OsagoOrderForm({ dict }: Props) {
                   id={statusId}
                   role="status"
                   aria-live="polite"
-                  className={
-                    hasSuccess
-                      ? "text-sm text-green-700"
-                      : hasError
-                      ? "text-sm text-red-600"
-                      : "text-sm text-gray-600"
-                  }
+                  className={hasSuccess ? "text-sm text-green-700" : hasError ? "text-sm text-red-600" : "text-sm text-gray-600"}
                 >
-                  {formStatus === "loading"
-                    ? "Отправка... | Жіберілуде... | Sending..."
-                    : formMessage}
+                  {formStatus === "loading" ? dict.loading : formMessage || dict.submit}
                 </div>
               )}
 
@@ -800,7 +901,7 @@ export function OsagoOrderForm({ dict }: Props) {
                   onClick={() => goToStep(2)}
                   disabled={formStatus === "loading"}
                 >
-                  {"Назад"}
+                  {dict.buttons.back}
                 </button>
 
                 <button
@@ -808,9 +909,7 @@ export function OsagoOrderForm({ dict }: Props) {
                   className="btn w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
                   disabled={formStatus === "loading"}
                 >
-                  {formStatus === "loading"
-                    ? "Отправка... | Жіберілуде... | Sending..."
-                    : dict.submit}
+                  {formStatus === "loading" ? dict.loading : dict.submit}
                 </button>
               </div>
             </div>
