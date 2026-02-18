@@ -18,6 +18,8 @@ import FAQSection from "@/components/osago-rf/FAQSection";
 import OsagoRfQuestionForm from "@/components/osago-rf/OsagoRfQuestionForm";
 import DeferredHydration from "@/components/DeferredHydration";
 import ContactSection from "@/components/ContactSection";
+import OsagoRfCalculator from "@/components/osago-rf/OsagoRfCalculator";
+import { getOsagoRfCalculatorDictionary } from "@/dictionaries/osagoRfCalculator";
 
 export const dynamicParams = false;
 
@@ -298,6 +300,7 @@ export default async function OsagoRfPage({
   const agreement = getAgreementDictionary(lang);
   const osagoFormDict = getOsagoRfFormDictionary(lang);
   const osagoPageDict: OsagoRfPageDictionary = getOsagoRfPageDictionary(lang);
+  const osagoCalcDict = getOsagoRfCalculatorDictionary(lang);
 
   const pageUrl = `${SITE_URL}/${lang}/osago-rf`;
 
@@ -438,6 +441,25 @@ export default async function OsagoRfPage({
             </div>
           </section>
         </DeferredHydration>
+
+              
+
+        {/* CALCULATOR (before order form) */}
+        <DeferredHydration rootMargin="800px" minDelayMs={150}>
+          <OsagoRfCalculator dict={osagoCalcDict} />
+        </DeferredHydration>
+
+        {/* ADVANTAGES */}
+        <DeferredHydration rootMargin="800px" minDelayMs={150}>
+          <section
+            className="border-t border-gray-200 bg-[#FFFFFF] py-12 sm:py-16"
+            aria-labelledby="advantages-heading"
+          >
+            ...
+          </section>
+        </DeferredHydration>
+
+
 
         {/* ORDER FORM */}
         <OsagoOrderForm dict={osagoFormDict} />

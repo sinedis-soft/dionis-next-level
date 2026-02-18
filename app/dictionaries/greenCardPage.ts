@@ -103,7 +103,7 @@ const ru: GreenCardPageDictionary = {
   },
   calculator: {
     title: "Расчёт стоимости Green Card",
-    subtitle: "Онлайн расчет за 20 секунд!",
+    subtitle: "Онлайн расчет за 20 секунд! Не является публичной офертой.",
     labels: {
       region: "Направление    ",
       vehicle: "Категория ТС    ",
@@ -134,7 +134,7 @@ const ru: GreenCardPageDictionary = {
       "Не удалось загрузить курс автоматически — введите курс тенге вручную.",
     calcButton: "Рассчитать",
     errorInvalidRate: "⚠️ Введите корректный курс тенге.",
-    resultPrefix: "Стоимость полиса:",
+    resultPrefix: "Стоимость полиса (справочно):",
     resultApprox: "≈",
   },
   howItWorks: {

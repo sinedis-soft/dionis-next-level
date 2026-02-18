@@ -18,21 +18,21 @@ const RATES_USD: Record<
   Record<VehicleKey, Record<PeriodKey, number>>
 > = {
   group1: {
-      passenger:{1:16.24, 3:40.59, 6:81.18, 12:147.47},
-      bus:{1:152.21, 3:388.97, 6:581.76, 12:1102.65},
-      truck:{1:67.65, 3:91.32, 6:202.94, 12:1102.65},  
-      trailer:{1:6.76, 3:10.15, 6:40.59, 12:67.65},
-      motorcycle:{1:13.53, 3:33.82, 6:54.12, 12:81.18},
-      tractor:{1:23.68, 3:50.74, 6:77.79, 12:101.47}
+      passenger:{1:14.12, 3:35.29, 6:70.59, 12:128.24},
+      bus:{1:132.35, 3:338.24, 6:505.88, 12:958.82},
+      truck:{1:58.82, 3:79.41, 6:176.47, 12:329.41},  
+      trailer:{1:5.88, 3:8.82, 6:35.29, 12:58.82},
+      motorcycle:{1:11.76, 3:29.41, 6:47.06, 12:70.59},
+      tractor:{1:20.59, 3:44.12, 6:67.65, 12:88.24}
   },
 
   group2: {
-      passenger:{1:57.5, 3:131.91, 6:250.29, 12:473.53},
-      bus:{1:248.26, 3:517.5, 6:893.62, 12:1616.09},
-      truck:{1:121.76, 3:358.53, 6:676.47, 12:1014.71},
-      trailer:{1:16.91, 3:43.97, 6:75.76, 12:94.71},
-      motorcycle:{1:43.97, 3:96.06, 6:138.0, 12:180.62},
-      tractor:{1:46.97, 3:106.21, 6:152.21, 12:198.21}
+      passenger:{1:50.00, 3:114.71, 6:217.65, 12:411.76},
+      bus:{1:215.88, 3:450.00, 6:777.06, 12:1405.29},
+      truck:{1:105.88, 3:311.76, 6:588.24, 12:882.35},
+      trailer:{1:14.71, 3:38.24, 6:65.88, 12:82.35},
+      motorcycle:{1:38.24, 3:83.53, 6:120.00, 12:157.06},
+      tractor:{1:40.59, 3:92.35, 6:132.35, 12:172.35}
   },
 };
 
@@ -49,6 +49,19 @@ function formatKzt(value: number): string {
   }).format(rounded);
 }
 
+type MarkupMode = "weekday" | "holiday";
+
+const MARKUP: Record<MarkupMode, number> = {
+  weekday: 1.015, // +1.5%
+  holiday: 1.02,  // +2%
+};
+
+function applyNewMarkup(legacyPrice: number, mode: MarkupMode): number {
+  const base = legacyPrice   
+  const updated = base * MARKUP[mode];           // добавили нужную наценку
+  return Math.round(updated * 100) / 100;         // 2 знака
+}
+
 function parseRate(raw: string): number {
   const normalized = raw.replace(",", ".").trim();
   const n = Number(normalized);
@@ -62,6 +75,7 @@ export default function GreenCardCalculator({ dict }: Props) {
   const [rate, setRate] = useState<string>("");
   const [autoRateNote, setAutoRateNote] = useState<string>("");
   const [result, setResult] = useState<string>("");
+  const [markupMode, setMarkupMode] = useState<MarkupMode>("weekday");
 
   // общий класс для инпутов/селектов — как в ContactForm
   const fieldClass = useMemo(
@@ -98,18 +112,16 @@ export default function GreenCardCalculator({ dict }: Props) {
   }, [dict.autoRateOk, dict.autoRateError]);
 
   function handleCalculate() {
-    const priceUsd = RATES_USD[region][vehicle][period];
-    const kztRate = parseRate(rate);
+  const legacyUsd = RATES_USD[region][vehicle][period];     // с +15%
+  const priceUsd = applyNewMarkup(legacyUsd, markupMode);   // с 1.5%/2%
+  const kztRate = parseRate(rate);
 
-    if (!Number.isFinite(kztRate) || kztRate <= 0) {
+  if (!Number.isFinite(kztRate) || kztRate <= 0) {
       setResult(dict.errorInvalidRate);
       return;
     }
 
-    // ▶ расчёт
     const priceKztRaw = priceUsd * kztRate;
-
-    // ▶ округление до 2 знаков
     const priceKzt = Math.round(priceKztRaw * 100) / 100;
 
     setResult(
