@@ -69,17 +69,17 @@ export type OsagoRfPageDictionary = {
 
 const ru: OsagoRfPageDictionary = {
   hero: {
-    title: "ОСАГО РФ для нерезидентов",
+    title: "ОГПО в РФ на казахские авто",
     subtitle:
       "Обязательный страховой полис для въезда и передвижения по территории России на автомобиле с иностранными номерами.",
-    ctaOrder: "Оформить ОСАГО РФ",
+    ctaOrder: "Оформить ОГПО в РФ",
     carAlt: "Автомобиль с иностранными номерами и полисом ОСАГО РФ",
     policyAlt: "Электронный полис ОСАГО РФ для нерезидентов",
     logoAlt: "Dionis Insurance Broker",
   },
 
   questionBlock: {
-    title: "Нужна консультация по ОСАГО РФ?",
+    title: "Нужна консультация по ОГПО в РФ?",
     text1:
       "Подскажем по срокам действия, стоимости и требованиям для нерезидентов.",
     text2:
@@ -87,7 +87,7 @@ const ru: OsagoRfPageDictionary = {
   },
 
   advantages: {
-    title: "Почему оформляют ОСАГО РФ через «Дионис»",
+    title: "Почему оформляют ОГПО в РФ через «Дионис»",
     items: [
       {
         icon: "⏱",
@@ -117,7 +117,7 @@ const ru: OsagoRfPageDictionary = {
   },
 
   howItWorks: {
-    title: "Как оформить ОСАГО РФ",
+    title: "Как оформить ОГПО в РФ (ОСАГО РФ)",
     subtitle: "Пошаговый процесс без лишних действий",
     steps: [
       {
@@ -160,7 +160,7 @@ const ru: OsagoRfPageDictionary = {
       {
         title: "Законный въезд и передвижение",
         text:
-          "Наличие полиса ОСАГО обязательно для легального передвижения по дорогам РФ на автомобиле с иностранными номерами.",
+          "Наличие полиса ОГПО в РФ обязательно для легального передвижения по дорогам РФ на автомобиле с иностранными номерами.",
       },
       {
         title: "Финансовая защита при ДТП",
@@ -205,7 +205,7 @@ const ru: OsagoRfPageDictionary = {
       id: "electronic-policy",
       question: "Можно ли использовать электронный полис?",
       answer:
-        "Да. Электронный полис ОСАГО официально признаётся и не требует бумажного оригинала.",
+        "Да. Электронный полис ОГПО в РФ официально признаётся и не требует бумажного оригинала.",
     },
     {
       id: "term",
@@ -229,7 +229,7 @@ const ru: OsagoRfPageDictionary = {
     },
     {
       id: "what-covers",
-      question: "Что покрывает ОСАГО при ДТП?",
+      question: "Что покрывает ОГПО в РФ при ДТП?",
       answer:
         "Полис покрывает ответственность водителя за вред, причинённый жизни, здоровью или имуществу третьих лиц в результате ДТП на территории РФ — в пределах установленных лимитов.",
     },
@@ -261,7 +261,7 @@ const ru: OsagoRfPageDictionary = {
     },
     {
       id: "flex-term",
-      question: "Можно ли оформить ОСАГО только на срок поездки?",
+      question: "Можно ли оформить ОГПО в РФ только на срок поездки?",
       answer:
         "Да. Обычно можно подобрать срок так, чтобы он покрывал период пребывания в РФ и не переплачивать за лишние месяцы.",
     },
@@ -269,7 +269,322 @@ const ru: OsagoRfPageDictionary = {
   },
 }
 
-export function getOsagoRfPageDictionary(_lang: Lang): OsagoRfPageDictionary {
-  // пока используется русская версия
+const en: OsagoRfPageDictionary = {
+  hero: {
+    title: "MTPL in Russia for Kazakh-registered vehicles",
+    subtitle:
+      "Mandatory motor third-party liability insurance required to enter and drive within the Russian Federation with foreign license plates.",
+    ctaOrder: "Get MTPL for Russia",
+    carAlt: "Vehicle with foreign plates and Russian MTPL policy",
+    policyAlt: "Electronic MTPL policy for non-residents",
+    logoAlt: "Dionis Insurance Broker",
+  },
+
+  questionBlock: {
+    title: "Need консультаtion on MTPL for Russia?",
+    text1:
+      "We clarify validity period, pricing and requirements for non-residents.",
+    text2:
+      "To issue a policy, complete the application form above. It takes only a few minutes.",
+  },
+
+  advantages: {
+    title: "Why clients arrange MTPL in Russia via Dionis",
+    items: [
+      {
+        icon: "⏱",
+        title: "Fast online issuance",
+        text:
+          "No office visit required. All data is submitted remotely.",
+      },
+      {
+        icon: "📄",
+        title: "Electronic policy (PDF)",
+        text:
+          "The policy is sent by email in PDF format and is valid throughout the Russian Federation.",
+      },
+      {
+        icon: "🛂",
+        title: "Suitable for non-residents",
+        text:
+          "We arrange MTPL for vehicles with foreign registration.",
+      },
+      {
+        icon: "💳",
+        title: "Transparent payment",
+        text:
+          "Card payment or bank transfer without hidden fees.",
+      },
+    ],
+  },
+
+  howItWorks: {
+    title: "How to obtain MTPL in Russia",
+    subtitle: "Clear step-by-step process",
+    steps: [
+      {
+        title: "Submit an application",
+        text:
+          "Provide vehicle details and planned travel period.",
+      },
+      {
+        title: "Data verification",
+        text:
+          "We check information accuracy and confirm conditions.",
+      },
+      {
+        title: "Payment",
+        text:
+          "Online card payment or bank transfer. Available for individuals and companies.",
+      },
+      {
+        title: "Receive the policy",
+        text:
+          "Electronic MTPL is sent by email, usually within 15–20 minutes.",
+      },
+    ],
+  },
+
+  info: {
+    title: "What is MTPL in Russia for non-residents",
+    paragraphs: [
+      "MTPL is mandatory motor third-party liability insurance. For vehicles registered abroad, a valid MTPL policy is required when entering and operating within the Russian Federation.",
+      "The policy covers the driver’s liability for damage caused to third parties’ life, health or property as a result of a traffic accident in Russia.",
+      "Electronic MTPL policies are officially recognized by traffic police and other supervisory authorities.",
+    ],
+  },
+
+  benefits: {
+    title: "Key benefits of MTPL in Russia",
+    imageAlt: "Online MTPL for foreign vehicles in Russia",
+    items: [
+      {
+        title: "Legal driving in Russia",
+        text:
+          "MTPL is mandatory for lawful operation of a foreign-registered vehicle on Russian roads.",
+      },
+      {
+        title: "Financial protection",
+        text:
+          "In case of an accident, the insurer compensates third parties within statutory limits.",
+      },
+      {
+        title: "Valid across Russia",
+        text:
+          "The policy applies in all regions of the Russian Federation.",
+      },
+      {
+        title: "Flexible duration",
+        text:
+          "You may choose the period corresponding to your stay in Russia.",
+      },
+    ],
+  },
+
+  greenCardUpsell: {
+    title: "Planning trips to the EU or Turkey?",
+    text1:
+      "For travel to EU countries and certain other states, a Green Card policy may be required.",
+    text2:
+      "We help structure coverage for multi-country routes.",
+    btn: "Learn about Green Card",
+    imageAlt: "Green Card motor insurance for international travel",
+  },
+
+  faq: {
+    title: "FAQ on MTPL in Russia for non-residents",
+    intro: "Answers to common questions before issuing a policy.",
+    items: [
+      {
+        id: "mandatory",
+        question: "Is MTPL mandatory for foreign vehicles?",
+        answer:
+          "Yes. A valid MTPL policy is required when entering and using a foreign-registered vehicle in Russia.",
+      },
+      {
+        id: "electronic-policy",
+        question: "Is an electronic policy sufficient?",
+        answer:
+          "Yes. Electronic MTPL policies are legally recognized.",
+      },
+      {
+        id: "term",
+        question: "What duration should be selected?",
+        answer:
+          "The policy must cover the entire period of stay in Russia.",
+      },
+      {
+        id: "check",
+        question: "Who may verify MTPL validity?",
+        answer:
+          "Traffic police, border authorities and in case of an accident.",
+      },
+      {
+        id: "what-is-osago",
+        question: "What does MTPL cover?",
+        answer:
+          "Liability for damage to third parties’ life, health or property resulting from a traffic accident in Russia.",
+      },
+    ],
+  },
+};
+
+const kz: OsagoRfPageDictionary = {
+  hero: {
+    title: "РФ аумағында қазақстандық көлікке арналған МІАЖ (ОСАГО)",
+    subtitle:
+      "Шетелдік тіркеудегі автокөлікпен Ресей Федерациясына кіру және қозғалу үшін міндетті азаматтық-құқықтық жауапкершілік сақтандыруы.",
+    ctaOrder: "РФ үшін МІАЖ рәсімдеу",
+    carAlt: "Шетелдік нөмірлі автокөлік және РФ МІАЖ полисі",
+    policyAlt: "Резидент емес тұлғаларға арналған электрондық ОСАГО",
+    logoAlt: "Dionis Insurance Broker",
+  },
+
+  questionBlock: {
+    title: "РФ бойынша МІАЖ туралы кеңес керек пе?",
+    text1:
+      "Қолданылу мерзімі, құны және резидент емес тұлғаларға қойылатын талаптар бойынша түсіндіреміз.",
+    text2:
+      "Полис рәсімдеу үшін жоғарыдағы өтінімді толтырыңыз.",
+  },
+
+  advantages: {
+    title: "Неліктен МІАЖ-ды «Дионис» арқылы рәсімдейді",
+    items: [
+      {
+        icon: "⏱",
+        title: "Онлайн рәсімдеу",
+        text:
+          "Кеңсеге барудың қажеті жоқ. Барлық деректер қашықтан беріледі.",
+      },
+      {
+        icon: "📄",
+        title: "Электрондық полис",
+        text:
+          "Полис e-mail арқылы PDF форматында жіберіледі және РФ аумағында жарамды.",
+      },
+      {
+        icon: "🛂",
+        title: "Резидент еместерге арналған",
+        text:
+          "Шетелдік тіркеудегі автокөліктер үшін рәсімдейміз.",
+      },
+      {
+        icon: "💳",
+        title: "Айқын төлем",
+        text:
+          "Банк картасы немесе аударым арқылы төлем.",
+      },
+    ],
+  },
+
+  howItWorks: {
+    title: "РФ үшін МІАЖ қалай рәсімделеді",
+    subtitle: "Қарапайым кезеңдер",
+    steps: [
+      {
+        title: "Өтінім беру",
+        text:
+          "Көлік деректерін және сапар мерзімін көрсетесіз.",
+      },
+      {
+        title: "Деректерді тексеру",
+        text:
+          "Ақпараттың дұрыстығын тексеріп, шарттарды нақтылаймыз.",
+      },
+      {
+        title: "Төлем жасау",
+        text:
+          "Онлайн төлем немесе банк аударымы.",
+      },
+      {
+        title: "Полисті алу",
+        text:
+          "Электрондық полис e-mail арқылы жіберіледі.",
+      },
+    ],
+  },
+
+  info: {
+    title: "РФ үшін ОСАГО дегеніміз не",
+    paragraphs: [
+      "ОСАГО — көлік иелерінің азаматтық-құқықтық жауапкершілігін міндетті сақтандыру.",
+      "Шетелдік тіркеудегі автокөлікпен РФ аумағында жүру үшін жарамды полис міндетті.",
+      "Электрондық полис РФ бақылаушы органдарымен ресми түрде танылады.",
+    ],
+  },
+
+  benefits: {
+    title: "РФ үшін МІАЖ артықшылықтары",
+    imageAlt: "РФ аумағында онлайн МІАЖ рәсімдеу",
+    items: [
+      {
+        title: "Заңды қозғалыс",
+        text:
+          "Полис РФ аумағында заңды түрде жүруге мүмкіндік береді.",
+      },
+      {
+        title: "Қаржылық қорғау",
+        text:
+          "ЖКО кезінде үшінші тұлғаларға келтірілген залал сақтандыру лимиттері шегінде өтеледі.",
+      },
+      {
+        title: "РФ бойынша жарамды",
+        text:
+          "Барлық аймақтарда қолданылады.",
+      },
+      {
+        title: "Икемді мерзім",
+        text:
+          "Сапар мерзіміне сәйкес рәсімдеуге болады.",
+      },
+    ],
+  },
+
+  greenCardUpsell: {
+    title: "ЕО немесе Түркияға сапар жоспарлап отырсыз ба?",
+    text1:
+      "Кейбір елдерге бару үшін «Жасыл карта» полисі қажет болуы мүмкін.",
+    text2:
+      "Маршрутыңызға сәйкес сақтандыру шешімін ұсынамыз.",
+    btn: "Жасыл карта туралы білу",
+    imageAlt: "Халықаралық сапарға арналған Жасыл карта",
+  },
+
+  faq: {
+    title: "РФ үшін МІАЖ бойынша сұрақтар",
+    intro: "Полис рәсімдеу алдындағы негізгі сұрақтар.",
+    items: [
+      {
+        id: "mandatory",
+        question: "Шетелдік көлік үшін ОСАГО міндетті ме?",
+        answer:
+          "Иә. РФ аумағында жүру үшін жарамды полис болуы қажет.",
+      },
+      {
+        id: "electronic-policy",
+        question: "Электрондық полис жарамды ма?",
+        answer:
+          "Иә. Электрондық полис ресми түрде танылады.",
+      },
+      {
+        id: "term",
+        question: "Қандай мерзімге рәсімдеген дұрыс?",
+        answer:
+          "Полис РФ аумағында болу мерзімін толық қамтуы тиіс.",
+      },
+      {
+        id: "check",
+        question: "Полисті кім тексере алады?",
+        answer:
+          "Жол полициясы және шекара қызметі.",
+      },
+    ],
+  },
+};
+
+export function getOsagoRfPageDictionary(lang: Lang): OsagoRfPageDictionary {
+  if (lang === "en") return en;
+  if (lang === "kz") return kz;
   return ru;
 }
