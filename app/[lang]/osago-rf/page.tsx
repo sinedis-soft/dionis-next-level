@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
 import Image from "next/image";
 import Script from "next/script";
+import type { CSSProperties } from "react";
 
 import { getHomeDictionary } from "@/dictionaries/home";
 import { getAgreementDictionary } from "@/dictionaries/agreement";
@@ -24,7 +25,7 @@ export const dynamicParams = false;
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-  "https://dionis-insurance.com";
+  "https://dionis-insurance.kz";
 
 export function generateStaticParams(): Array<{ lang: Lang }> {
   return [{ lang: "ru" }, { lang: "kz" }, { lang: "en" }];
@@ -49,7 +50,7 @@ function AdvantageIcon({ index }: { index: number }) {
     width: 20,
     height: 20,
     className: common,
-    style: { width: 20, height: 20, display: "block" } as React.CSSProperties,
+    style: { width: 20, height: 20, display: "block" } as CSSProperties,
     fill: "none" as const,
     "aria-hidden": true as const,
     focusable: "false" as const,
@@ -123,6 +124,23 @@ function AdvantageIcon({ index }: { index: number }) {
   }
 }
 
+/**
+ * ВАЖНО:
+ * Карту РФ НЕ грузим через <Image/> в блоке benefits.
+ * Вместо этого используем div с background-image, который включается ТОЛЬКО в современных браузерах через @supports(display:grid).
+ * В legacy браузерах картинка вообще не будет запрошена → не будет “появления через 2 минуты”.
+ *
+ * Добавь в глобальный CSS (app/globals.css) правило:
+ *
+ * @supports (display: grid) {
+ *   .osago-map-bg {
+ *     background-image: url("/osago-rf/Виды_субъектов_России_на_политической_карте.webp");
+ *     background-size: cover;
+ *     background-position: center;
+ *     opacity: 0.9;
+ *   }
+ * }
+ */
 function OsagoInfoBlocks({
   dict,
 }: {
@@ -227,23 +245,14 @@ function OsagoInfoBlocks({
                   </div>
                 </div>
 
+                {/* вместо <Image/> — фон через @supports(display:grid) */}
                 <div className="p-6 sm:p-10 flex items-center justify-center">
-                  <div className="w-full max-w-md aspect-[4/3] bg-white/5 flex items-center justify-center relative overflow-hidden rounded-xl">
-                    <DeferredHydration
-                      disableOnLegacy
-                      rootMargin="1200px"
-                      minDelayMs={0}
-                      className="absolute inset-0"
-                    >
-                      <Image
-                        src="/osago-rf/Виды_субъектов_России_на_политической_карте.png"
-                        alt={dict.benefits.imageAlt}
-                        fill
-                        className="object-cover opacity-90"
-                        sizes="(min-width: 1024px) 520px, 90vw"
-                        priority={false}
-                      />
-                    </DeferredHydration>
+                  <div
+                    className="w-full max-w-md aspect-[4/3] bg-white/5 relative overflow-hidden rounded-xl"
+                    aria-label={dict.benefits.imageAlt}
+                    role="img"
+                  >
+                    <div className="osago-map-bg absolute inset-0" aria-hidden="true" />
                     <div className="absolute inset-0 bg-black/10" />
                   </div>
                 </div>
@@ -543,7 +552,6 @@ export default async function OsagoRfPage({
               </DeferredHydration>
             </div>
 
-            {/* обёртка для legacy-стилей формы */}
             <div className="legacy-form-scope legacy-form-card">
               <OsagoRfQuestionForm
                 homeContact={homeDict.contact}

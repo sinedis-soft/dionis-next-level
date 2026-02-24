@@ -270,6 +270,15 @@ h6,
   transform: translateX(100%);
 }
 
+@supports (display: grid) {
+  .osago-map-bg {
+    background-image: url("/osago-rf/Виды_субъектов_России_на_политической_карте.webp");
+    background-size: cover;
+    background-position: center;
+    opacity: 0.9;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .card,
   .card::before {

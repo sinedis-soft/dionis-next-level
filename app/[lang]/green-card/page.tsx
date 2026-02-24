@@ -240,7 +240,7 @@ export default async function GreenCardPage({
             </div>
 
             <div className="flex justify-center lg:justify-end">
-              {/* Декоративный hero-арт: в legacy (без IO) не рендерим */}
+              {/* Декоративный hero-арт: в legacy не рендерим */}
               <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
                 <div className="hidden lg:block">
                   <div className="gc-hero-visual w-[520px] h-[280px] xl:w-[620px] xl:h-[320px] relative">
@@ -280,11 +280,46 @@ export default async function GreenCardPage({
           </div>
         </section>
 
-        {/* CALCULATOR (обёртка для legacy-стилей формы) */}
-        <section className="py-8 sm:py-10 bg-white">
+        {/* CALCULATOR */}
+        <section className="py-8 sm:py-10 bg-white" id="green-card-calculator">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="legacy-form-card">
-              <GreenCardCalculator dict={gcPageDict.calculator} />
+            {/* ВАЖНО: legacy-form-scope добавлен, чтобы legacy.css реально применял стили полей */}
+            <div className="legacy-form-scope legacy-form-card">
+              {/* Modern-only: React калькулятор */}
+              <div className="modern-only">
+                <DeferredHydration rootMargin="800px" minDelayMs={150}>
+                  <GreenCardCalculator dict={gcPageDict.calculator} />
+                </DeferredHydration>
+              </div>
+
+              {/* Legacy-only: статичный HTML (без JS), показываем ТОЛЬКО когда html.is-legacy */}
+              <div className="legacy-only">
+                <h2 className="text-xl font-semibold text-[#1A3A5F]">
+                  {gcPageDict.calculator.title}
+                </h2>
+                <p className="text-sm text-gray-600">{gcPageDict.calculator.subtitle}</p>
+
+                <div className="mt-4 rounded-xl border border-gray-200 bg-white p-4">
+                  <p className="text-sm text-gray-600">
+                    Ваш браузер устарел. Калькулятор может работать медленно или не работать.
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    Оформите заявку — мы рассчитаем стоимость и пришлём предложение.
+                  </p>
+
+                  <div className="mt-3">
+                    <a href={orderAnchor} className="btn btn-secondary w-full text-center" role="button">
+                      {gcPageDict.hero.ctaOrder}
+                    </a>
+                  </div>
+                </div>
+
+                <noscript>
+                  <div className="mt-3 text-sm text-gray-600">
+                    JavaScript отключён. Оформите заявку ниже — мы рассчитаем стоимость вручную.
+                  </div>
+                </noscript>
+              </div>
             </div>
           </div>
         </section>
@@ -334,10 +369,10 @@ export default async function GreenCardPage({
           </section>
         </DeferredHydration>
 
-        {/* ORDER FORM (обёртка для legacy-стилей формы) */}
+        {/* ORDER FORM */}
         <section id="green-card-order" className="py-10 sm:py-12 bg-white">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="legacy-form-card">
+            <div className="legacy-form-scope legacy-form-card">
               <GreenCardOrderForm dict={gcFormDict} />
             </div>
           </div>
@@ -409,7 +444,7 @@ export default async function GreenCardPage({
               </DeferredHydration>
             </div>
 
-            <div className="legacy-form-card">
+            <div className="legacy-form-scope legacy-form-card">
               <GreenCardQuestionForm
                 homeContact={homeDict.contact}
                 agreement={agreement}
