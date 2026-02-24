@@ -1,12 +1,37 @@
+// app/components/DeferredHydration.tsx
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 type Props = {
   children: ReactNode;
+
+  // Когда блок должен "включиться" при наличии IntersectionObserver
   rootMargin?: string;
-  minDelayMs?: number; // доп. страховка: не грузить мгновенно
+
+  // Доп. задержка перед включением (мс)
+  minDelayMs?: number;
+
   className?: string;
+
+  /**
+   * Если true: в старых браузерах (где нет IntersectionObserver) children НЕ рендерим.
+   * Полезно, чтобы не показывать картинки/иконки/тяжёлые блоки в legacy.
+   */
+  disableOnLegacy?: boolean;
+
+  /**
+   * Что показать вместо children:
+   * - в legacy при disableOnLegacy=true
+   * - или пока блок ещё не "включился" (если wantFallbackWhileWaiting=true)
+   */
+  fallback?: ReactNode;
+
+  /**
+   * Если true — показывать fallback, пока не включили children (до пересечения/таймера).
+   * По умолчанию false: до включения показываем null (как у вас было).
+   */
+  showFallbackWhileWaiting?: boolean;
 };
 
 export default function DeferredHydration({
@@ -14,14 +39,29 @@ export default function DeferredHydration({
   rootMargin = "600px",
   minDelayMs = 0,
   className,
+  disableOnLegacy = false,
+  fallback = null,
+  showFallbackWhileWaiting = false,
 }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
+
+  // enabled=true => рендерим children
   const [enabled, setEnabled] = useState(false);
 
-  const canUseIO = useMemo(
-    () => typeof window !== "undefined" && "IntersectionObserver" in window,
-    []
-  );
+  // Чтобы не дёргать setState после размонтирования
+  const unmountedRef = useRef(false);
+
+  const canUseIO = useMemo(() => {
+    // вычисляем один раз на клиенте
+    return typeof window !== "undefined" && "IntersectionObserver" in window;
+  }, []);
+
+  useEffect(() => {
+    unmountedRef.current = false;
+    return () => {
+      unmountedRef.current = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (enabled) return;
@@ -31,24 +71,36 @@ export default function DeferredHydration({
 
     let timeoutId: number | undefined;
 
+    const safeSetEnabled = () => {
+      if (!unmountedRef.current) setEnabled(true);
+    };
+
     const enable = () => {
       if (timeoutId) window.clearTimeout(timeoutId);
+
       if (minDelayMs > 0) {
-        timeoutId = window.setTimeout(() => setEnabled(true), minDelayMs);
+        timeoutId = window.setTimeout(() => {
+          safeSetEnabled();
+        }, minDelayMs);
       } else {
-        setEnabled(true);
+        safeSetEnabled();
       }
     };
 
+    // Legacy браузер (нет IO)
     if (!canUseIO) {
-      // старые браузеры — просто включаем
+      // Если нужно отключать в legacy — просто ничего не включаем
+      if (disableOnLegacy) return;
+
+      // Иначе ведём себя как раньше: включаем сразу (или с minDelayMs)
       enable();
       return;
     }
 
     const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
+      (entries) => {
+        const entry = entries[0];
+        if (entry && entry.isIntersecting) {
           enable();
           io.disconnect();
         }
@@ -62,18 +114,29 @@ export default function DeferredHydration({
       io.disconnect();
       if (timeoutId) window.clearTimeout(timeoutId);
     };
-  }, [enabled, rootMargin, minDelayMs, canUseIO]);
+  }, [enabled, rootMargin, minDelayMs, canUseIO, disableOnLegacy]);
 
-  /**
-   * Важно:
-   * Это НЕ “серверный HTML + отложенная гидратация того же HTML”.
-   * Это “не рендерим тяжёлые клиентские части, пока не доскроллили”.
-   * Для SEO ниже первого экрана — делай секции серверными (без "use client"),
-   * а интерактивность выноси в маленькие client-компоненты.
-   */
+  // Логика отображения:
+  // 1) enabled => children
+  // 2) legacy + disableOnLegacy => fallback
+  // 3) иначе пока ждём => fallback (если showFallbackWhileWaiting), либо null
+  const shouldShowChildren = enabled;
+
+  const isLegacyAndDisabled = !canUseIO && disableOnLegacy;
+
+  if (shouldShowChildren) {
+    return (
+      <div ref={ref} className={className} suppressHydrationWarning>
+        {children}
+      </div>
+    );
+  }
+
+  const shouldShowFallback = isLegacyAndDisabled || showFallbackWhileWaiting;
+
   return (
     <div ref={ref} className={className} suppressHydrationWarning>
-      {enabled ? children : null}
+      {shouldShowFallback ? fallback : null}
     </div>
   );
 }

@@ -11,16 +11,14 @@ import {
   getOsagoRfPageDictionary,
   type OsagoRfPageDictionary,
 } from "@/dictionaries/osagoRfPage";
-import { OsagoOrderForm } from "@/components/osago-rf/OsagoOrderForm";
+import { getOsagoRfCalculatorDictionary } from "@/dictionaries/osagoRfCalculator";
 
 import { BrokerSection } from "@/components/BrokerSection";
 import OsagoRfCalculator from "@/components/osago-rf/OsagoRfCalculator";
 import FAQSection from "@/components/osago-rf/FAQSection";
 import OsagoRfQuestionForm from "@/components/osago-rf/OsagoRfQuestionForm";
 import DeferredHydration from "@/components/DeferredHydration";
-import ContactSection from "@/components/ContactSection";
-
-import { getOsagoRfCalculatorDictionary } from "@/dictionaries/osagoRfCalculator";
+import { OsagoOrderForm } from "@/components/osago-rf/OsagoOrderForm";
 
 export const dynamicParams = false;
 
@@ -46,11 +44,23 @@ function langToIana(lang: Lang): string {
 
 /* ---- local helper ---- */
 function AdvantageIcon({ index }: { index: number }) {
+  // В старых браузерах Tailwind/CSS может не примениться -> SVG раздувается.
+  // Поэтому фиксируем размер атрибутами width/height (и style как резерв).
   const common = "h-5 w-5 text-[#C89F4A]";
+  const baseSvgProps = {
+    width: 20,
+    height: 20,
+    className: common,
+    style: { width: 20, height: 20, display: "block" } as React.CSSProperties,
+    fill: "none" as const,
+    "aria-hidden": true as const,
+    focusable: "false" as const,
+  };
+
   switch (index) {
     case 0:
       return (
-        <svg viewBox="0 0 24 24" className={common} fill="none" aria-hidden="true">
+        <svg viewBox="0 0 24 24" {...baseSvgProps}>
           <path
             d="M12 8v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
             stroke="currentColor"
@@ -62,7 +72,7 @@ function AdvantageIcon({ index }: { index: number }) {
       );
     case 1:
       return (
-        <svg viewBox="0 0 24 24" className={common} fill="none" aria-hidden="true">
+        <svg viewBox="0 0 24 24" {...baseSvgProps}>
           <path
             d="M4 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z"
             stroke="currentColor"
@@ -80,7 +90,7 @@ function AdvantageIcon({ index }: { index: number }) {
       );
     case 2:
       return (
-        <svg viewBox="0 0 24 24" className={common} fill="none" aria-hidden="true">
+        <svg viewBox="0 0 24 24" {...baseSvgProps}>
           <path
             d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
             stroke="currentColor"
@@ -102,7 +112,7 @@ function AdvantageIcon({ index }: { index: number }) {
       );
     default:
       return (
-        <svg viewBox="0 0 24 24" className={common} fill="none" aria-hidden="true">
+        <svg viewBox="0 0 24 24" {...baseSvgProps}>
           <path
             d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"
             stroke="currentColor"
@@ -114,8 +124,6 @@ function AdvantageIcon({ index }: { index: number }) {
       );
   }
 }
-
-
 
 function OsagoInfoBlocks({
   dict,
@@ -225,14 +233,22 @@ function OsagoInfoBlocks({
 
                 <div className="p-6 sm:p-10 flex items-center justify-center">
                   <div className="w-full max-w-md aspect-[4/3] bg-white/5 flex items-center justify-center relative overflow-hidden rounded-xl">
-                    <Image
-                      src="/osago-rf/Виды_субъектов_России_на_политической_карте.png"
-                      alt={dict.benefits.imageAlt}
-                      fill
-                      className="object-cover opacity-90"
-                      sizes="(min-width: 1024px) 520px, 90vw"
-                      priority={false}
-                    />
+                    {/* В legacy браузерах (без IntersectionObserver) картинку не показываем */}
+                    <DeferredHydration
+                      disableOnLegacy
+                      rootMargin="1200px"
+                      minDelayMs={0}
+                      className="absolute inset-0"
+                    >
+                      <Image
+                        src="/osago-rf/Виды_субъектов_России_на_политической_карте.png"
+                        alt={dict.benefits.imageAlt}
+                        fill
+                        className="object-cover opacity-90"
+                        sizes="(min-width: 1024px) 520px, 90vw"
+                        priority={false}
+                      />
+                    </DeferredHydration>
                     <div className="absolute inset-0 bg-black/10" />
                   </div>
                 </div>
@@ -364,39 +380,42 @@ export default async function OsagoRfPage({
             </div>
 
             <div className="flex justify-center lg:justify-end">
-              <div className="hidden lg:block">
-                <div className="gc-hero-visual w-[520px] h-[280px] xl:w-[620px] xl:h-[320px] relative">
-                  <Image
-                    src="/osago-rf/car-osago.png"
-                    alt={osagoPageDict.hero.carAlt}
-                    width={620}
-                    height={320}
-                    sizes="(min-width: 1280px) 620px, (min-width: 1024px) 520px, 0px"
-                    className="absolute bottom-[-120px] left-0 w-full h-auto gc-anim-car"
-                    priority
-                  />
+              {/* В legacy браузерах (без IntersectionObserver) эту декоративную графику не показываем */}
+              <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+                <div className="hidden lg:block">
+                  <div className="gc-hero-visual w-[520px] h-[280px] xl:w-[620px] xl:h-[320px] relative">
+                    <Image
+                      src="/osago-rf/car-osago.png"
+                      alt={osagoPageDict.hero.carAlt}
+                      width={620}
+                      height={320}
+                      sizes="(min-width: 1280px) 620px, (min-width: 1024px) 520px, 0px"
+                      className="absolute bottom-[-120px] left-0 w-full h-auto gc-anim-car"
+                      priority
+                    />
 
-                  <Image
-                    src="/osago-rf/policy-large.webp"
-                    alt={osagoPageDict.hero.policyAlt}
-                    width={160}
-                    height={160}
-                    sizes="160px"
-                    className="gc-hero-policy gc-anim-policy"
-                    loading="lazy"
-                  />
+                    <Image
+                      src="/osago-rf/policy-large.webp"
+                      alt={osagoPageDict.hero.policyAlt}
+                      width={160}
+                      height={160}
+                      sizes="160px"
+                      className="gc-hero-policy gc-anim-policy"
+                      loading="lazy"
+                    />
 
-                  <Image
-                    src="/dionis-crkl.webp"
-                    alt={osagoPageDict.hero.logoAlt}
-                    width={110}
-                    height={110}
-                    sizes="110px"
-                    className="gc-hero-logo-small gc-anim-logo"
-                    loading="lazy"
-                  />
+                    <Image
+                      src="/dionis-crkl.webp"
+                      alt={osagoPageDict.hero.logoAlt}
+                      width={110}
+                      height={110}
+                      sizes="110px"
+                      className="gc-hero-logo-small gc-anim-logo"
+                      loading="lazy"
+                    />
+                  </div>
                 </div>
-              </div>
+              </DeferredHydration>
             </div>
           </div>
         </section>
@@ -407,8 +426,6 @@ export default async function OsagoRfPage({
         </DeferredHydration>
 
         <OsagoInfoBlocks dict={osagoPageDict} />
-
-        
 
         {/* ADVANTAGES */}
         <DeferredHydration rootMargin="800px" minDelayMs={150}>
@@ -432,7 +449,10 @@ export default async function OsagoRfPage({
                   >
                     <div className="mb-3">
                       <div className="h-9 w-9 rounded-lg bg-[#EBCA45]/15 flex items-center justify-center">
-                        <AdvantageIcon index={idx} />
+                        {/* Иконки: фиксируем размер в самом SVG (см. AdvantageIcon) + в legacy не рендерим */}
+                        <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+                          <AdvantageIcon index={idx} />
+                        </DeferredHydration>
                       </div>
                     </div>
 
@@ -440,27 +460,13 @@ export default async function OsagoRfPage({
                       {item.title}
                     </div>
 
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-                      {item.text}
-                    </p>
+                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">{item.text}</p>
                   </article>
                 ))}
               </div>
             </div>
           </section>
         </DeferredHydration>
-
-        {/* ADVANTAGES */}
-        <DeferredHydration rootMargin="800px" minDelayMs={150}>
-          <section
-            className="border-t border-gray-200 bg-[#FFFFFF] py-12 sm:py-16"
-            aria-labelledby="advantages-heading"
-          >
-            ...
-          </section>
-        </DeferredHydration>
-
-
 
         {/* ORDER FORM */}
         <OsagoOrderForm dict={osagoFormDict} />
@@ -469,17 +475,26 @@ export default async function OsagoRfPage({
         <section className="py-10 sm:py-12 bg-[#F5F7FA]">
           <div className="max-w-5xl mx-auto px-4">
             <article className="card overflow-hidden flex flex-col md:flex-row items-stretch">
-              <div className="md:w-1/3">
-                <Image
-                  src="/services/zk_photo.webp"
-                  alt={osagoPageDict.greenCardUpsell.imageAlt}
-                  width={400}
-                  height={260}
-                  sizes="(min-width: 768px) 33vw, 100vw"
-                  className="h-40 md:h-full w-full object-cover"
-                  loading="lazy"
-                />
+              <div className="md:w-1/3 relative">
+                {/* Картинку в legacy не показываем */}
+                <DeferredHydration
+                  disableOnLegacy
+                  rootMargin="1200px"
+                  minDelayMs={0}
+                  className="h-40 md:h-full w-full"
+                >
+                  <Image
+                    src="/services/zk_photo.webp"
+                    alt={osagoPageDict.greenCardUpsell.imageAlt}
+                    width={400}
+                    height={260}
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="h-40 md:h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </DeferredHydration>
               </div>
+
               <div className="md:w-2/3 px-6 py-6 flex flex-col justify-between bg-[#F5F7FA]">
                 <div>
                   <h3 className="text-lg sm:text-xl font-bold text-[#1A3A5F] mb-2">
@@ -512,15 +527,18 @@ export default async function OsagoRfPage({
         <section className="py-12 sm:py-16 bg-[#F4F6FA]">
           <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-10 items-start">
             <div className="flex justify-center lg:justify-start">
-              <Image
-                src="/osago-rf/policy-large.webp"
-                alt={osagoPageDict.hero.policyAlt}
-                width={520}
-                height={360}
-                sizes="(min-width: 1024px) 520px, 90vw"
-                className="w-full max-w-md lg:max-w-lg h-auto rounded-2xl shadow-lg"
-                loading="lazy"
-              />
+              {/* Картинку в legacy не показываем */}
+              <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+                <Image
+                  src="/osago-rf/policy-large.webp"
+                  alt={osagoPageDict.hero.policyAlt}
+                  width={520}
+                  height={360}
+                  sizes="(min-width: 1024px) 520px, 90vw"
+                  className="w-full max-w-md lg:max-w-lg h-auto rounded-2xl shadow-lg"
+                  loading="lazy"
+                />
+              </DeferredHydration>
             </div>
 
             <OsagoRfQuestionForm

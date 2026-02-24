@@ -88,7 +88,7 @@ export type GreenCardPageDictionary = {
 
 const ru: GreenCardPageDictionary = {
   hero: {
-    title: "ЗЕЛЕНАЯ КАРТА",
+    title: "ЗЕЛЕНАЯ КАРТА В ЕВРОПУ И ТУРЦИЮ",
     subtitle:
       "Международная страховка ответственности для автомобилей, зарегистрированных в Казахстане. Обязательна при въезде в страны ЕС, Турцию и другие государства.",
     ctaOrder: "Заказать Зеленую карту",
@@ -483,10 +483,10 @@ faq: {
 
 const kz: GreenCardPageDictionary = {
   hero: {
-  title: "GREEN CARD",
+  title: "ЕУРОПА МЕН ТҮРКИЯҒА ЖАСЫЛ КАРТА",
   subtitle:
     "Қазақстанда тіркелген автокөліктерге арналған азаматтық-құқықтық жауапкершіліктің халықаралық сақтандыруы. Еуропалық Одақ елдеріне, Түркияға және басқа мемлекеттерге кіру кезінде міндетті.",
-    ctaOrder: "Green Card рәсімдеу",
+    ctaOrder: "ЖАСЫЛ КАРТА рәсімдеу",
     carAlt: "Green Card полисі бар автомобиль",
     policyAlt: "Green Card полисінің үлгісі",
     logoAlt: "Dionis Insurance Broker логотипі",
