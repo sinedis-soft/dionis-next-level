@@ -108,16 +108,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ru" className={`${roboto.variable} ${montserrat.variable}`}>
       <head>
+        {/* ✅ Legacy fallback styles (гарантируются даже если Tailwind/CSS сломался) */}
+        <link rel="stylesheet" href="/legacy.css" />
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-screen flex flex-col">
-        {/* ✅ Аналитика грузится ТОЛЬКО после cookie-consent=accepted */}
-        <AnalyticsScripts />
 
-        {/* ✅ Pageview/events (если используешь GTM dataLayer) */}
+      <body className="min-h-screen flex flex-col">
+        {/* ✅ Аналитика — один раз, на уровне root */}
+        <AnalyticsScripts />
         <AnalyticsManager />
 
         {children}

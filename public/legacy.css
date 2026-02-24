@@ -1,0 +1,214 @@
+/* public/legacy.css */
+
+/* Включаем только если браузер очень старый (нет grid) */
+@supports not (display: grid) {
+  :root {
+    --lc-text: #1a2b3a;
+    --lc-muted: #5b6b7a;
+    --lc-border: #d4dde6;
+    --lc-bg: #ffffff;
+    --lc-bg-soft: #f5f7fa;
+    --lc-primary: #1a3a5f;
+    --lc-primary-2: #0f2742;
+    --lc-focus: rgba(26, 58, 95, 0.25);
+    --lc-danger: #b42318;
+  }
+
+  /* базовая типографика, чтобы не было "голого HTML" */
+  html {
+    font-family: Arial, sans-serif;
+  }
+  body {
+    margin: 0;
+    line-height: 1.4;
+    color: var(--lc-text);
+    background: var(--lc-bg);
+  }
+
+  /* чтобы ничего не раздувало экран */
+  img,
+  video,
+  canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* SVG не должен раздуваться */
+  svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Иконки: фиксируем размер железно */
+  .icon-svg,
+  .icon-svg svg {
+    width: 20px !important;
+    height: 20px !important;
+    max-width: 20px !important;
+    max-height: 20px !important;
+    display: block !important;
+  }
+
+  /* если хотите в legacy вообще отключить декоративные картинки */
+  .legacy-hide {
+    display: none !important;
+  }
+
+  /* чуть нормализуем контейнеры */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  /* ------------------------
+     LEGACY FORM STYLES
+     Ограничиваем область, чтобы не ломать весь сайт:
+     добавляйте .legacy-form-scope вокруг форм
+  ------------------------ */
+
+  .legacy-form-card {
+    background: var(--lc-bg);
+    border: 1px solid var(--lc-border);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 6px 16px rgba(15, 39, 66, 0.08);
+  }
+
+  .legacy-form-scope form {
+    background: transparent;
+  }
+
+  .legacy-form-scope label {
+    display: block;
+    font-weight: 600;
+    color: var(--lc-text);
+    margin: 0 0 6px;
+  }
+
+  .legacy-form-scope input,
+  .legacy-form-scope select,
+  .legacy-form-scope textarea {
+    font: inherit;
+    color: var(--lc-text);
+    background: var(--lc-bg);
+    border: 1px solid var(--lc-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    width: 100%;
+    max-width: 100%;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .legacy-form-scope textarea {
+    min-height: 96px;
+    resize: vertical;
+  }
+
+  .legacy-form-scope input::placeholder,
+  .legacy-form-scope textarea::placeholder {
+    color: #95a3b1;
+  }
+
+  .legacy-form-scope input:focus,
+  .legacy-form-scope select:focus,
+  .legacy-form-scope textarea:focus {
+    border-color: var(--lc-primary);
+    box-shadow: 0 0 0 3px var(--lc-focus);
+  }
+
+  /* select стрелка (простая) */
+  .legacy-form-scope select {
+    background-image: linear-gradient(
+        45deg,
+        transparent 50%,
+        var(--lc-muted) 50%
+      ),
+      linear-gradient(135deg, var(--lc-muted) 50%, transparent 50%),
+      linear-gradient(to right, transparent, transparent);
+    background-position: calc(100% - 18px) calc(50% - 3px),
+      calc(100% - 13px) calc(50% - 3px), 0 0;
+    background-size: 5px 5px, 5px 5px, 100% 100%;
+    background-repeat: no-repeat;
+    padding-right: 34px;
+  }
+
+  .legacy-form-scope .field-hint {
+    margin-top: 6px;
+    color: var(--lc-muted);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .legacy-form-scope .field-error {
+    margin-top: 6px;
+    color: var(--lc-danger);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  .legacy-form-scope .has-error input,
+  .legacy-form-scope .has-error select,
+  .legacy-form-scope .has-error textarea {
+    border-color: rgba(180, 35, 24, 0.65);
+    box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.12);
+  }
+
+  /* кнопки */
+  .legacy-form-scope button,
+  .legacy-form-scope input[type="submit"],
+  .legacy-form-scope input[type="button"] {
+    font: inherit;
+    font-weight: 700;
+    color: #fff;
+    background: var(--lc-primary);
+    border: 1px solid var(--lc-primary);
+    border-radius: 12px;
+    padding: 11px 14px;
+    cursor: pointer;
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .legacy-form-scope button:hover,
+  .legacy-form-scope input[type="submit"]:hover,
+  .legacy-form-scope input[type="button"]:hover {
+    background: var(--lc-primary-2);
+    border-color: var(--lc-primary-2);
+  }
+
+  .legacy-form-scope button:disabled,
+  .legacy-form-scope input[type="submit"]:disabled,
+  .legacy-form-scope input[type="button"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* чекбоксы/радио */
+  .legacy-form-scope input[type="checkbox"],
+  .legacy-form-scope input[type="radio"] {
+    width: auto;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .legacy-form-row {
+    margin-bottom: 12px;
+  }
+  .legacy-form-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .legacy-form-actions {
+    margin-top: 14px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .legacy-form-actions > * {
+    width: 100%;
+  }
+}

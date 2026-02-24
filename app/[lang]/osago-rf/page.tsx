@@ -44,8 +44,6 @@ function langToIana(lang: Lang): string {
 
 /* ---- local helper ---- */
 function AdvantageIcon({ index }: { index: number }) {
-  // В старых браузерах Tailwind/CSS может не примениться -> SVG раздувается.
-  // Поэтому фиксируем размер атрибутами width/height (и style как резерв).
   const common = "h-5 w-5 text-[#C89F4A]";
   const baseSvgProps = {
     width: 20,
@@ -132,7 +130,6 @@ function OsagoInfoBlocks({
 }) {
   return (
     <>
-      {/* HOW IT WORKS */}
       <DeferredHydration rootMargin="800px" minDelayMs={150}>
         <section
           className="py-12 sm:py-16 bg-white [overflow-anchor:none]"
@@ -197,7 +194,6 @@ function OsagoInfoBlocks({
         </section>
       </DeferredHydration>
 
-      {/* BENEFITS (COVERAGE) */}
       <DeferredHydration rootMargin="800px" minDelayMs={150}>
         <section
           className="py-12 sm:py-16 bg-white [overflow-anchor:none]"
@@ -233,7 +229,6 @@ function OsagoInfoBlocks({
 
                 <div className="p-6 sm:p-10 flex items-center justify-center">
                   <div className="w-full max-w-md aspect-[4/3] bg-white/5 flex items-center justify-center relative overflow-hidden rounded-xl">
-                    {/* В legacy браузерах (без IntersectionObserver) картинку не показываем */}
                     <DeferredHydration
                       disableOnLegacy
                       rootMargin="1200px"
@@ -380,7 +375,6 @@ export default async function OsagoRfPage({
             </div>
 
             <div className="flex justify-center lg:justify-end">
-              {/* В legacy браузерах (без IntersectionObserver) эту декоративную графику не показываем */}
               <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
                 <div className="hidden lg:block">
                   <div className="gc-hero-visual w-[520px] h-[280px] xl:w-[620px] xl:h-[320px] relative">
@@ -420,10 +414,16 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
-        {/* CALCULATOR (before order form) */}
-        <DeferredHydration rootMargin="800px" minDelayMs={150}>
-          <OsagoRfCalculator dict={osagoCalcDict} />
-        </DeferredHydration>
+        {/* CALCULATOR (обёртка для legacy-стилей формы) */}
+        <section className="py-8 sm:py-10 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="legacy-form-scope legacy-form-card">
+              <DeferredHydration rootMargin="800px" minDelayMs={150}>
+                <OsagoRfCalculator dict={osagoCalcDict} />
+              </DeferredHydration>
+            </div>
+          </div>
+        </section>
 
         <OsagoInfoBlocks dict={osagoPageDict} />
 
@@ -449,7 +449,6 @@ export default async function OsagoRfPage({
                   >
                     <div className="mb-3">
                       <div className="h-9 w-9 rounded-lg bg-[#EBCA45]/15 flex items-center justify-center">
-                        {/* Иконки: фиксируем размер в самом SVG (см. AdvantageIcon) + в legacy не рендерим */}
                         <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
                           <AdvantageIcon index={idx} />
                         </DeferredHydration>
@@ -460,7 +459,9 @@ export default async function OsagoRfPage({
                       {item.title}
                     </div>
 
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">{item.text}</p>
+                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+                      {item.text}
+                    </p>
                   </article>
                 ))}
               </div>
@@ -468,15 +469,20 @@ export default async function OsagoRfPage({
           </section>
         </DeferredHydration>
 
-        {/* ORDER FORM */}
-        <OsagoOrderForm dict={osagoFormDict} />
+        {/* ORDER FORM (обёртка для legacy-стилей формы) */}
+        <section id="osago-rf-order" className="py-10 sm:py-12 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="legacy-form-scope legacy-form-card">
+              <OsagoOrderForm dict={osagoFormDict} />
+            </div>
+          </div>
+        </section>
 
         {/* UPSALE GREEN CARD */}
         <section className="py-10 sm:py-12 bg-[#F5F7FA]">
           <div className="max-w-5xl mx-auto px-4">
             <article className="card overflow-hidden flex flex-col md:flex-row items-stretch">
               <div className="md:w-1/3 relative">
-                {/* Картинку в legacy не показываем */}
                 <DeferredHydration
                   disableOnLegacy
                   rootMargin="1200px"
@@ -517,17 +523,13 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
-        {/* FAQ */}
         <FAQSection dict={osagoPageDict.faq} />
-
-        {/* BROKER */}
         <BrokerSection broker={homeDict.broker} />
 
         {/* QUESTION BLOCK */}
         <section className="py-12 sm:py-16 bg-[#F4F6FA]">
           <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-10 items-start">
             <div className="flex justify-center lg:justify-start">
-              {/* Картинку в legacy не показываем */}
               <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
                 <Image
                   src="/osago-rf/policy-large.webp"
@@ -541,12 +543,15 @@ export default async function OsagoRfPage({
               </DeferredHydration>
             </div>
 
-            <OsagoRfQuestionForm
-              homeContact={homeDict.contact}
-              agreement={agreement}
-              dict={osagoPageDict.questionBlock}
-              context="osago-rf-question"
-            />
+            {/* обёртка для legacy-стилей формы */}
+            <div className="legacy-form-scope legacy-form-card">
+              <OsagoRfQuestionForm
+                homeContact={homeDict.contact}
+                agreement={agreement}
+                dict={osagoPageDict.questionBlock}
+                context="osago-rf-question"
+              />
+            </div>
           </div>
         </section>
       </main>

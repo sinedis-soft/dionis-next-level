@@ -1,15 +1,12 @@
 // app/[lang]/layout.tsx
 import type { ReactNode } from "react";
-import { Suspense } from "react"; // ✅ важно для useSearchParams() в Header
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
 
 import Header from "@/components/Header";
 import SiteFooter from "@/components/SiteFooter";
 import CookieConsent from "@/components/CookieConsent";
-import AnalyticsScripts from "@/components/AnalyticsScripts";
-import AnalyticsManager from "@/components/AnalyticsManager";
-
 
 const SITE_URL =
   (process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ??
@@ -69,7 +66,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
-  const { lang: rawLang } = await params; // ✅ оставлено как есть
+  const { lang: rawLang } = await params;
   const lang = normalizeLang(rawLang);
   const seo = getSeo(lang);
 
@@ -104,12 +101,11 @@ export default async function LangLayout({
   children: ReactNode;
   params: Promise<{ lang: string }>;
 }) {
-  const { lang: rawLang } = await params; // ✅ оставлено как есть
+  const { lang: rawLang } = await params;
   const lang = normalizeLang(rawLang);
 
   return (
     <>
-      {/* ✅ обязательно, иначе next build упадёт из-за useSearchParams() в Header */}
       <Suspense fallback={<div className="h-16 xl:h-20" />}>
         <Header lang={lang} />
       </Suspense>
@@ -117,8 +113,6 @@ export default async function LangLayout({
       <main className="flex-1">{children}</main>
       <SiteFooter lang={lang} />
       <CookieConsent lang={lang} />
-      <AnalyticsScripts />
-      <AnalyticsManager />
     </>
   );
 }

@@ -44,8 +44,6 @@ function langToIana(lang: Lang): string {
 
 /* ---- local helper ---- */
 function AdvantageIcon({ index }: { index: number }) {
-  // Фикс: в legacy браузерах Tailwind/CSS может не примениться -> SVG раздувается.
-  // Поэтому задаём размер атрибутами width/height + style (резерв).
   const common = "h-5 w-5 text-[#C89F4A]";
   const baseSvgProps = {
     width: 20,
@@ -241,7 +239,6 @@ export default async function GreenCardPage({
             </div>
 
             <div className="flex justify-center lg:justify-end">
-              {/* Декоративный hero-арт: в legacy (без IO) не рендерим */}
               <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
                 <div className="hidden lg:block">
                   <div className="gc-hero-visual w-[520px] h-[280px] xl:w-[620px] xl:h-[320px] relative">
@@ -281,8 +278,14 @@ export default async function GreenCardPage({
           </div>
         </section>
 
-        {/* CALCULATOR */}
-        <GreenCardCalculator dict={gcPageDict.calculator} />
+        {/* CALCULATOR (обёртка для legacy-стилей формы) */}
+        <section className="py-8 sm:py-10 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="legacy-form-scope legacy-form-card">
+              <GreenCardCalculator dict={gcPageDict.calculator} />
+            </div>
+          </div>
+        </section>
 
         {/* INFO BLOCKS */}
         <GreenCardInfoBlocks dict={gcPageDict} />
@@ -307,10 +310,8 @@ export default async function GreenCardPage({
                     key={`${item.title}-${idx}`}
                     className="rounded-xl border border-gray-200 bg-white shadow-sm p-4 sm:p-5 text-left"
                   >
-                    {/* icon */}
                     <div className="mb-3">
                       <div className="h-9 w-9 rounded-lg bg-[#EBCA45]/15 flex items-center justify-center">
-                        {/* Иконки в legacy не рендерим (и даже если рендерятся — SVG уже фиксирован по размеру) */}
                         <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
                           <AdvantageIcon index={idx} />
                         </DeferredHydration>
@@ -321,7 +322,9 @@ export default async function GreenCardPage({
                       {item.title}
                     </div>
 
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">{item.text}</p>
+                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">
+                      {item.text}
+                    </p>
                   </article>
                 ))}
               </div>
@@ -329,15 +332,20 @@ export default async function GreenCardPage({
           </section>
         </DeferredHydration>
 
-        {/* ORDER FORM */}
-        <GreenCardOrderForm dict={gcFormDict} />
+        {/* ORDER FORM (обёртка для legacy-стилей формы) */}
+        <section id="green-card-order" className="py-10 sm:py-12 bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="legacy-form-scope legacy-form-card">
+              <GreenCardOrderForm dict={gcFormDict} />
+            </div>
+          </div>
+        </section>
 
         {/* UPSALE OSAGO RF */}
         <section className="py-10 sm:py-12 bg-[#F5F7FA]">
           <div className="max-w-6xl mx-auto px-4">
             <article className="card overflow-hidden flex flex-col md:flex-row items-stretch">
               <div className="md:w-1/3 relative">
-                {/* Картинку в legacy не показываем */}
                 <DeferredHydration
                   disableOnLegacy
                   rootMargin="1200px"
@@ -386,7 +394,6 @@ export default async function GreenCardPage({
         <section className="py-12 sm:py-16 bg-[#F4F6FA]">
           <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-10 items-start">
             <div className="flex justify-center lg:justify-start">
-              {/* Картинку в legacy не показываем */}
               <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
                 <Image
                   src="/green-card/policy-large.webp"
@@ -400,11 +407,14 @@ export default async function GreenCardPage({
               </DeferredHydration>
             </div>
 
-            <GreenCardQuestionForm
-              homeContact={homeDict.contact}
-              agreement={agreement}
-              dict={gcPageDict.questionBlock}
-            />
+            {/* обёртка для legacy-стилей формы */}
+            <div className="legacy-form-scope legacy-form-card">
+              <GreenCardQuestionForm
+                homeContact={homeDict.contact}
+                agreement={agreement}
+                dict={gcPageDict.questionBlock}
+              />
+            </div>
           </div>
         </section>
       </main>
