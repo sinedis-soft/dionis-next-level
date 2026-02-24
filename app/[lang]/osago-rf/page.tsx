@@ -11,14 +11,15 @@ import {
   getOsagoRfPageDictionary,
   type OsagoRfPageDictionary,
 } from "@/dictionaries/osagoRfPage";
+import { OsagoOrderForm } from "@/components/osago-rf/OsagoOrderForm";
 
 import { BrokerSection } from "@/components/BrokerSection";
-import { OsagoOrderForm } from "@/components/osago-rf/OsagoOrderForm";
+import OsagoRfCalculator from "@/components/osago-rf/OsagoRfCalculator";
 import FAQSection from "@/components/osago-rf/FAQSection";
 import OsagoRfQuestionForm from "@/components/osago-rf/OsagoRfQuestionForm";
 import DeferredHydration from "@/components/DeferredHydration";
 import ContactSection from "@/components/ContactSection";
-import OsagoRfCalculator from "@/components/osago-rf/OsagoRfCalculator";
+
 import { getOsagoRfCalculatorDictionary } from "@/dictionaries/osagoRfCalculator";
 
 export const dynamicParams = false;
@@ -113,6 +114,8 @@ function AdvantageIcon({ index }: { index: number }) {
       );
   }
 }
+
+
 
 function OsagoInfoBlocks({
   dict,
@@ -398,6 +401,11 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
+        {/* CALCULATOR (before order form) */}
+        <DeferredHydration rootMargin="800px" minDelayMs={150}>
+          <OsagoRfCalculator dict={osagoCalcDict} />
+        </DeferredHydration>
+
         <OsagoInfoBlocks dict={osagoPageDict} />
 
         
@@ -440,13 +448,6 @@ export default async function OsagoRfPage({
               </div>
             </div>
           </section>
-        </DeferredHydration>
-
-              
-
-        {/* CALCULATOR (before order form) */}
-        <DeferredHydration rootMargin="800px" minDelayMs={150}>
-          <OsagoRfCalculator dict={osagoCalcDict} />
         </DeferredHydration>
 
         {/* ADVANTAGES */}

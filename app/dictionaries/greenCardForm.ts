@@ -8,10 +8,27 @@ export type GreenCardFormDictionary = {
   submit: string;
   successMessage: string;
   fileForbidden: string;
+
   nextStep: string;
   prevStep: string;
-  manualEntryLabel: string;
+
+  stepLabels: {
+    step1: string;
+    step2: string;
+  };
+
+  // для FilePicker (если required не ловится нативно)
   passportFilesLabel: string;
+  passportFilesRequiredError: string;
+
+  // для общего списка ошибок
+  errors: {
+    title: string;
+    requiredField: string; // "Не заполнено: {field}"
+    requiredFiles: string; // "Не загружено: {field}"
+  };
+
+  manualEntryLabel: string;
 
   contact: {
     legend: string;
@@ -88,10 +105,25 @@ const ru: GreenCardFormDictionary = {
   submit: "Отправить заявку на Зеленую карту",
   successMessage: "Заявка на Зеленую карту отправлена. Мы свяжемся с вами.",
   fileForbidden: "недопустим (архив, аудио или видео).",
+
   nextStep: "Далее",
   prevStep: "Назад",
-  manualEntryLabel: "Ввести данные вручную (не хочу отправлять фото паспорта)",
+
+  stepLabels: {
+    step1: "Контакты и документы",
+    step2: "Авто и отправка",
+  },
+
   passportFilesLabel: "Фото паспорта",
+  passportFilesRequiredError: "Не загружено: Фото паспорта",
+
+  errors: {
+    title: "Проверьте данные:",
+    requiredField: "Не заполнено: {field}",
+    requiredFiles: "Не загружено: {field}",
+  },
+
+  manualEntryLabel: "Ввести данные вручную (не хочу отправлять фото паспорта)",
 
   contact: {
     legend: "Контактные данные (для связи с вами)",
@@ -144,7 +176,6 @@ const ru: GreenCardFormDictionary = {
       "4021": "Кипр",
       "557": "Другая страна",
     },
-
   },
 
   insurance: {
@@ -156,8 +187,7 @@ const ru: GreenCardFormDictionary = {
 
   vehicles: {
     legend: "Данные по транспортным средствам",
-    description:
-      "Можно добавить несколько автомобилей, если требуется оформить несколько полисов.",
+    description: "Можно добавить несколько автомобилей, если требуется оформить несколько полисов.",
     addButton: "Добавить ещё ТС",
     blockTitle: "Транспортное средство",
     removeButton: "Удалить это ТС",
@@ -191,10 +221,25 @@ const en: GreenCardFormDictionary = {
   submit: "Submit Green Card application",
   successMessage: "Green Card application sent. We will contact you.",
   fileForbidden: "is not allowed (archive, audio or video).",
+
   nextStep: "Next",
   prevStep: "Back",
-  manualEntryLabel: "Enter details manually (I don't want to upload passport photo)",
+
+  stepLabels: {
+    step1: "Contacts & documents",
+    step2: "Vehicle & submit",
+  },
+
   passportFilesLabel: "Passport photo",
+  passportFilesRequiredError: "Not uploaded: Passport photo",
+
+  errors: {
+    title: "Please check:",
+    requiredField: "Missing: {field}",
+    requiredFiles: "Not uploaded: {field}",
+  },
+
+  manualEntryLabel: "Enter details manually (I don't want to upload passport photo)",
 
   contact: {
     legend: "Contact details",
@@ -247,7 +292,6 @@ const en: GreenCardFormDictionary = {
       "4021": "Cyprus",
       "557": "Other country",
     },
-
   },
 
   insurance: {
@@ -259,8 +303,7 @@ const en: GreenCardFormDictionary = {
 
   vehicles: {
     legend: "Vehicle data",
-    description:
-      "You can add several vehicles if you need to issue multiple policies.",
+    description: "You can add several vehicles if you need to issue multiple policies.",
     addButton: "Add one more vehicle",
     blockTitle: "Vehicle",
     removeButton: "Remove this vehicle",
@@ -294,10 +337,25 @@ const kz: GreenCardFormDictionary = {
   submit: "Жасыл картаға өтінімді жіберу",
   successMessage: "Жасыл картаға өтінім жіберілді. Біз сізбен байланысамыз.",
   fileForbidden: "рұқсат етілмейді (мұрағат, аудио немесе бейне).",
+
   nextStep: "Келесі",
   prevStep: "Артқа",
-  manualEntryLabel: "Деректерді қолмен енгізу (паспорт фотосын жібергім келмейді)",
+
+  stepLabels: {
+    step1: "Байланыс және құжаттар",
+    step2: "Көлік және жіберу",
+  },
+
   passportFilesLabel: "Паспорттың фотосы",
+  passportFilesRequiredError: "Жүктелмеген: Паспорттың фотосы",
+
+  errors: {
+    title: "Деректерді тексеріңіз:",
+    requiredField: "Толтырылмаған: {field}",
+    requiredFiles: "Жүктелмеген: {field}",
+  },
+
+  manualEntryLabel: "Деректерді қолмен енгізу (паспорт фотосын жібергім келмейді)",
 
   contact: {
     legend: "Байланыс деректері",
@@ -350,7 +408,6 @@ const kz: GreenCardFormDictionary = {
       "4021": "Кипр",
       "557": "Басқа ел",
     },
-
   },
 
   insurance: {
@@ -362,8 +419,7 @@ const kz: GreenCardFormDictionary = {
 
   vehicles: {
     legend: "Көлік құралдары туралы деректер",
-    description:
-      "Бірнеше полис қажет болса, бірнеше көлік құралын қоса аласыз.",
+    description: "Бірнеше полис қажет болса, бірнеше көлік құралын қоса аласыз.",
     addButton: "Тағы бір көлік қосу",
     blockTitle: "Көлік құралы",
     removeButton: "Бұл көлікті жою",

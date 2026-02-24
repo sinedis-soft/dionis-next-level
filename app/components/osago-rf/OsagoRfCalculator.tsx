@@ -20,11 +20,14 @@ export type OsagoRfCalculatorDictionary = {
     carAge: string;
     term: string;
 
-    useExp: string; // оставляем для совместимости, но UI будет табами
+    useExp: string;
     driverAge: string;
     driverExp: string;
 
     rateRub: string;
+
+    paramsTitle: string;
+    calcMode: string;
   };
 
   hints: {
@@ -36,11 +39,13 @@ export type OsagoRfCalculatorDictionary = {
     useExp: string;
     kvsUsed: string;
 
-    cheaperOn: string; // "{mode} дешевле на {diff}"
-    moreExpensiveOn: string; // "{mode} дороже на {diff}"
+    cheaperOn: string;
+    moreExpensiveOn: string;
     equal: string;
     modeMulti: string;
     modeLimited: string;
+
+    multiShort: string; // короткое пояснение, чтобы не прыгало
   };
 
   ratePlaceholder: string;
@@ -53,6 +58,11 @@ export type OsagoRfCalculatorDictionary = {
     kztLinePrefix: string;
     volatilityNote: string;
     disclaimer: string;
+  };
+
+  cta: {
+    orderGreenCardToRussia: string;
+    orderHref: string; // уже локализованный /ru|/en|/kz
   };
 
   errors: {
@@ -192,7 +202,6 @@ function bstByRules(args: {
     return isShort ? 3300 : 3800;
   }
 
-  // Остальное — как было
   if (isLegal && !isTruck) {
     if (args.useExp) return 6580;
   }
@@ -260,7 +269,8 @@ export default function OsagoRfCalculator({ dict }: Props) {
   useEffect(() => {
     const normalized = normalizeTerm(term, termMax);
     if (normalized !== term) setTerm(normalized);
-  }, [term, termMax]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [termMax]);
 
   // автоподстановка курса
   useEffect(() => {
@@ -380,7 +390,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
 
   const card = "rounded-xl border border-gray-200 bg-white";
 
-  // Контрастные сегменты (активное состояние очевидное)
+  // Контрастные сегменты
   const segWrap =
     "inline-flex rounded-lg border border-gray-300 bg-white p-1 gap-1";
   const segBtn = (active: boolean) =>
@@ -401,6 +411,12 @@ export default function OsagoRfCalculator({ dict }: Props) {
     "w-full rounded-md border border-gray-300 px-2 py-2 text-sm bg-white " +
     "focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]";
   const slider = "w-full accent-[#C89F4A] cursor-pointer";
+
+  // чтобы “форма не прыгала”:
+  // 1) фиксируем высоту блока пояснения режима
+  const modeHintClass = "text-xs text-gray-600 min-h-[36px] sm:min-h-[20px]";
+  // 2) резервируем место под панель “Ограничение по водителям” (даже когда выключена)
+  const driversReserve = "min-h-[360px] sm:min-h-[260px]";
 
   function NumField(props: {
     label: string;
@@ -424,7 +440,9 @@ export default function OsagoRfCalculator({ dict }: Props) {
           <button
             type="button"
             className="h-10 w-10 rounded-md border border-gray-300 bg-white font-bold text-gray-800 hover:bg-gray-50"
-            onClick={() => props.onChange(clamp(props.value - step, props.min, props.max))}
+            onClick={() =>
+              props.onChange(clamp(props.value - step, props.min, props.max))
+            }
             aria-label={`${props.label}: меньше`}
           >
             −
@@ -437,7 +455,10 @@ export default function OsagoRfCalculator({ dict }: Props) {
               value={String(props.value)}
               onChange={(e) => {
                 const n = Number(e.target.value);
-                if (Number.isFinite(n)) props.onChange(clamp(Math.round(n), props.min, props.max));
+                if (Number.isFinite(n))
+                  props.onChange(
+                    clamp(Math.round(n), props.min, props.max)
+                  );
               }}
             />
           </div>
@@ -449,7 +470,9 @@ export default function OsagoRfCalculator({ dict }: Props) {
           <button
             type="button"
             className="h-10 w-10 rounded-md border border-gray-300 bg-white font-bold text-gray-800 hover:bg-gray-50"
-            onClick={() => props.onChange(clamp(props.value + step, props.min, props.max))}
+            onClick={() =>
+              props.onChange(clamp(props.value + step, props.min, props.max))
+            }
             aria-label={`${props.label}: больше`}
           >
             +
@@ -468,16 +491,19 @@ export default function OsagoRfCalculator({ dict }: Props) {
           />
         ) : null}
 
-        {props.hint ? <div className="text-xs text-gray-600">{props.hint}</div> : null}
+        {props.hint ? (
+          <div className="text-xs text-gray-600">{props.hint}</div>
+        ) : null}
       </div>
     );
   }
 
   function TermField() {
-    // срок: НЕ редактируемый input, управление только −/+ и ползунком
     return (
       <div className="space-y-2">
-        <div className="text-sm font-medium text-gray-800">{dict.labels.term}</div>
+        <div className="text-sm font-medium text-gray-800">
+          {dict.labels.term}
+        </div>
 
         <div className="flex items-center gap-2">
           <button
@@ -514,7 +540,9 @@ export default function OsagoRfCalculator({ dict }: Props) {
           max={termMax}
           step={0.5}
           value={term}
-          onChange={(e) => setTerm(normalizeTerm(Number(e.currentTarget.value), termMax))}
+          onChange={(e) =>
+            setTerm(normalizeTerm(Number(e.currentTarget.value), termMax))
+          }
         />
 
         <div className="text-xs text-gray-600">{dict.hints.term}</div>
@@ -537,10 +565,12 @@ export default function OsagoRfCalculator({ dict }: Props) {
     return `${p} • ${v} • ${termLabel(term)} • ${m}`;
   }, [policyholderType, vehicleKind, term, isLimited, dict]);
 
+  const modeHintText = isLimited ? dict.hints.useExp : dict.hints.multiShort;
+
   return (
     <section className="bg-[#F4F6FA]" id="osago-rf-calculator">
       <div className="max-w-5xl mx-auto px-4 py-10 sm:py-14">
-        <div className="card p-5 sm:p-7">
+        <div className={`${card} p-5 sm:p-7`}>
           <div className="text-center">
             <h2 className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F]">
               {dict.title}
@@ -553,8 +583,8 @@ export default function OsagoRfCalculator({ dict }: Props) {
             </div>
           </div>
 
-          {/* 1) Сегменты + табы (контрастные) */}
           <div className="mt-6 flex flex-col gap-3">
+            {/* Сегменты + табы */}
             <div className={`${card} p-3 sm:p-4`}>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
@@ -618,43 +648,76 @@ export default function OsagoRfCalculator({ dict }: Props) {
                 </div>
               </div>
 
-              <div className="mt-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="text-xs font-semibold text-gray-500">
-                  Режим расчёта
-                </div>
-                <div className={tabWrap} role="tablist" aria-label="Режим расчёта">
-                  <button
-                    type="button"
-                    className={tabBtn(mode === "multi")}
-                    onClick={() => setMode("multi")}
-                    role="tab"
-                    aria-selected={mode === "multi"}
-                  >
-                    {dict.hints.modeMulti}
-                  </button>
-                  <button
-                    type="button"
-                    className={tabBtn(mode === "limited")}
-                    onClick={() => setMode("limited")}
-                    role="tab"
-                    aria-selected={mode === "limited"}
-                  >
-                    {dict.hints.modeLimited}
-                  </button>
+              <div className="mt-3">
+              {/* Desktop: 3 колонки, Mobile: label+tabs в одну строку, hint ниже */}
+              <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr_minmax(220px,360px)] items-center gap-2 sm:gap-3">
+                {/* label */}
+                <div className="hidden sm:block text-xs font-semibold text-gray-500 whitespace-nowrap">
+                  {dict.labels.calcMode}
                 </div>
 
-                <div className="text-xs text-gray-600">
-                  {isLimited ? dict.hints.useExp : "Мультидрайв: управлять может любой водитель."}
+                {/* mobile row: label + tabs */}
+                <div className="flex items-center gap-2 sm:gap-0">
+                  <div className="sm:hidden text-xs font-semibold text-gray-500 whitespace-nowrap">
+                    {dict.labels.calcMode}
+                  </div>
+
+                  <div
+                    className={[
+                      tabWrap,
+                      "flex-1 sm:flex-none", // на мобиле занимает доступную ширину
+                      "justify-start",
+                    ].join(" ")}
+                    role="tablist"
+                    aria-label={dict.labels.calcMode}
+                  >
+                    <button
+                      type="button"
+                      className={[
+                        tabBtn(mode === "multi"),
+                        "whitespace-nowrap",      // не переносить текст
+                        "h-10",                   // одинаковая высота
+                        "min-w-[132px] sm:min-w-[160px]", // чтобы обе кнопки были одинаковые
+                      ].join(" ")}
+                      onClick={() => setMode("multi")}
+                      role="tab"
+                      aria-selected={mode === "multi"}
+                    >
+                      {dict.hints.modeMulti}
+                    </button>
+
+                    <button
+                      type="button"
+                      className={[
+                        tabBtn(mode === "limited"),
+                        "whitespace-nowrap",
+                        "h-10",
+                        "min-w-[132px] sm:min-w-[160px]",
+                      ].join(" ")}
+                      onClick={() => setMode("limited")}
+                      role="tab"
+                      aria-selected={mode === "limited"}
+                    >
+                      {dict.hints.modeLimited}
+                    </button>
+                  </div>
+                </div>
+
+                {/* hint: на мобиле всегда снизу */}
+                <div className="text-xs text-gray-600 sm:text-right min-h-[16px]">
+                  {modeHintText}
                 </div>
               </div>
             </div>
+            </div>
 
-            {/* 2) Параметры авто: 3 колонки */}
+            {/* Параметры */}
             <div className={`${card} p-3 sm:p-4`}>
-              <div className="text-sm font-bold text-gray-900">Параметры</div>
+              <div className="text-sm font-bold text-gray-900">
+                {dict.labels.paramsTitle}
+              </div>
 
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Мощность: только для легковых */}
                 <div>
                   {!isTruck ? (
                     <NumField
@@ -696,9 +759,15 @@ export default function OsagoRfCalculator({ dict }: Props) {
                 </div>
               </div>
 
-              {/* Водители: только в режиме ограничений */}
-              {isLimited ? (
-                <div className="mt-5 rounded-lg border border-gray-200 bg-gray-50 p-3">
+              {/* РЕЗЕРВ МЕСТА (не прыгает). Контент либо видим, либо скрыт, но высота блока одна и та же */}
+              <div className={`mt-5 ${driversReserve}`}>
+                <div
+                  className={
+                    "rounded-lg border border-gray-200 bg-gray-50 p-3 transition-opacity " +
+                    (isLimited ? "opacity-100" : "opacity-0 pointer-events-none")
+                  }
+                  aria-hidden={!isLimited}
+                >
                   <div className="text-sm font-semibold text-gray-900">
                     {dict.hints.modeLimited}
                   </div>
@@ -723,7 +792,8 @@ export default function OsagoRfCalculator({ dict }: Props) {
                           value={String(driverAge)}
                           onChange={(e) => {
                             const n = Number(e.target.value);
-                            if (Number.isFinite(n)) setDriverAge(clamp(Math.round(n), 18, 80));
+                            if (Number.isFinite(n))
+                              setDriverAge(clamp(Math.round(n), 18, 80));
                           }}
                         />
                         <button
@@ -763,7 +833,8 @@ export default function OsagoRfCalculator({ dict }: Props) {
                           value={String(driverExp)}
                           onChange={(e) => {
                             const n = Number(e.target.value);
-                            if (Number.isFinite(n)) setDriverExp(clamp(Math.round(n), 0, 60));
+                            if (Number.isFinite(n))
+                              setDriverExp(clamp(Math.round(n), 0, 60));
                           }}
                         />
                         <button
@@ -798,9 +869,9 @@ export default function OsagoRfCalculator({ dict }: Props) {
                     </div>
                   ) : null}
                 </div>
-              ) : null}
+              </div>
 
-              {/* Курс: оставил как было (по клику), это не мешает UX */}
+              {/* Курс */}
               <div className="mt-5 rounded-lg border border-gray-200 bg-white p-3">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -810,7 +881,9 @@ export default function OsagoRfCalculator({ dict }: Props) {
                     <div className="text-sm font-bold text-gray-900">
                       {rubRate ? rubRate : "—"}
                     </div>
-                    <div className="mt-1 text-xs text-gray-600">{autoRateNote}</div>
+                    <div className="mt-1 text-xs text-gray-600 min-h-[16px]">
+                      {autoRateNote}
+                    </div>
                   </div>
                   <button
                     type="button"
@@ -821,31 +894,29 @@ export default function OsagoRfCalculator({ dict }: Props) {
                   </button>
                 </div>
 
-                {showRateInput ? (
-                  <div className="mt-3">
-                    <input
-                      className={inputBase}
-                      type="text"
-                      inputMode="decimal"
-                      placeholder={dict.ratePlaceholder}
-                      value={rubRate}
-                      onChange={(e) => setRubRate(e.target.value)}
-                      aria-describedby="osago-rf-rate-note"
-                    />
-                    <div
-                      id="osago-rf-rate-note"
-                      aria-live="polite"
-                      className="mt-2 text-xs text-gray-600"
-                    >
-                      {autoRateNote}
-                    </div>
+                <div className={showRateInput ? "mt-3" : "mt-3 hidden"}>
+                  <input
+                    className={inputBase}
+                    type="text"
+                    inputMode="decimal"
+                    placeholder={dict.ratePlaceholder}
+                    value={rubRate}
+                    onChange={(e) => setRubRate(e.target.value)}
+                    aria-describedby="osago-rf-rate-note"
+                  />
+                  <div
+                    id="osago-rf-rate-note"
+                    aria-live="polite"
+                    className="mt-2 text-xs text-gray-600"
+                  >
+                    {autoRateNote}
                   </div>
-                ) : null}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* 3) Sticky итог */}
+          {/* Sticky итог + CTA */}
           <div className="mt-6">
             <div className="sticky bottom-3">
               <div className={`${card} shadow-sm p-4 sm:p-5`}>
@@ -866,6 +937,16 @@ export default function OsagoRfCalculator({ dict }: Props) {
                     <div>{dict.result.volatilityNote}</div>
                     <div className="mt-1">{dict.result.disclaimer}</div>
                   </div>
+                </div>
+
+                {/* CTA снизу, всегда на одном месте */}
+                <div className="mt-4">
+                  <a
+                    href={dict.cta.orderHref}
+                    className="block w-full text-center rounded-lg px-4 py-3 font-bold text-white bg-[#1A3A5F] hover:opacity-95 transition"
+                  >
+                    {dict.cta.orderGreenCardToRussia}
+                  </a>
                 </div>
               </div>
             </div>

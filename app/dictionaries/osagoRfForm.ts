@@ -1,3 +1,4 @@
+// app/dictionaries/osagoRfForm.ts
 import type { Lang } from "./header";
 
 export type OsagoRfFormDictionary = {
@@ -8,6 +9,24 @@ export type OsagoRfFormDictionary = {
   successMessage: string;
   fileForbidden: string;
   loading: string;
+
+  stepLabels: {
+    step1: string;
+    step2: string;
+  };
+
+  errors: {
+    title: string;
+    requiredField: string; // "Не заполнено поле: {field}"
+    requiredFiles: string; // "Не загружены файлы: {field}"
+  };
+
+  filePicker: {
+    choose: string;
+    clear: string;
+    noFiles: string;
+    selectedCount: string; // "{count} файл(ов) выбрано"
+  };
 
   contact: {
     legend: string;
@@ -39,11 +58,9 @@ export type OsagoRfFormDictionary = {
   person: {
     legend: string;
 
-    // ✅ новое
     manualPassportEntryLabel: string;
     passportFilesLabel: string;
     passportFilesHint: string;
-    passportFilesRequired: string;
 
     middleName: string;
     gender: string;
@@ -78,10 +95,6 @@ export type OsagoRfFormDictionary = {
     vehicleTypeMotorcycle: string;
     vehicleTypeSpecial: string;
 
-    countryLabel: string;
-    countryKZ: string;
-    countryGE: string;
-
     startDate: string;
     periodLabel: string;
     period15d: string;
@@ -94,9 +107,19 @@ export type OsagoRfFormDictionary = {
     techPassportFilesLabel: string;
 
     driversLimitedLabel: string;
+
+    // NEW (drivers UI)
+    driversTitle: string;
+    driversEmptyHint: string;
+    addDriverButton: string;
+    driverBlockTitle: string;
+    removeDriverButton: string;
+
+    driverFullName: string;
+    driverExperienceYears: string;
+
     driverLicenseFilesLabel: string;
     driverLicenseHint: string;
-    driverLicenseFilesRequired: string;
   };
 };
 
@@ -109,6 +132,24 @@ const ru: OsagoRfFormDictionary = {
   successMessage: "Заявка на ОСАГО РФ отправлена. Мы свяжемся с вами.",
   fileForbidden: "недопустим (архив, аудио или видео).",
   loading: "Отправка...",
+
+  stepLabels: {
+    step1: "Контакты и данные",
+    step2: "Автомобиль и отправка",
+  },
+
+  errors: {
+    title: "Проверьте форму — есть незаполненные поля",
+    requiredField: "Не заполнено поле: {field}",
+    requiredFiles: "Не загружены файлы: {field}",
+  },
+
+  filePicker: {
+    choose: "Выбрать файлы",
+    clear: "Очистить",
+    noFiles: "Файлы не выбраны",
+    selectedCount: "Выбрано файлов: {count}",
+  },
 
   buttons: {
     back: "Назад",
@@ -140,20 +181,19 @@ const ru: OsagoRfFormDictionary = {
   person: {
     legend: "Личные данные страхователя / водителя",
 
-    manualPassportEntryLabel:
-      "Ввести данные вручную (не хочу отправлять фото паспорта)",
+    manualPassportEntryLabel: "Ввести данные вручную (не хочу отправлять фото паспорта)",
     passportFilesLabel: "Фото паспорта",
-    passportFilesHint:
-      "Загрузите фото/скан паспорта (можно несколько файлов). Допустимы изображения и PDF.",
-    passportFilesRequired: "Загрузите фото/скан паспорта.",
+    passportFilesHint: "Загрузите фото/скан паспорта (можно несколько файлов). Допустимы изображения и PDF.",
 
     middleName: "Отчество",
     gender: "Пол",
     genderMale: "Мужской",
     genderFemale: "Женский",
+
     birthDate: "Дата рождения",
     countryLabel: "Страна проживания",
     address: "Адрес проживания",
+
     passportNumber: "Серия и номер паспорта (латиницей)",
     passportIssuer: "Кем выдан паспорт",
     passportIssuedAt: "Когда выдан паспорт",
@@ -184,8 +224,7 @@ const ru: OsagoRfFormDictionary = {
 
   vehicles: {
     legend: "Данные по транспортным средствам",
-    description:
-      "Можно добавить несколько автомобилей, если требуется оформить несколько полисов ОСАГО РФ.",
+    description: "Можно добавить несколько автомобилей, если требуется оформить несколько полисов ОСАГО РФ.",
     addButton: "Добавить ещё ТС",
     blockTitle: "Транспортное средство",
     removeButton: "Удалить это ТС",
@@ -200,10 +239,6 @@ const ru: OsagoRfFormDictionary = {
     vehicleTypeMotorcycle: "Мотоцикл",
     vehicleTypeSpecial: "Спецтехника",
 
-    countryLabel: "Страна регистрации ТС",
-    countryKZ: "КАЗАХСТАН",
-    countryGE: "Грузия",
-
     startDate: "Начало действия страховки",
     periodLabel: "Срок страхования",
     period15d: "15 дней",
@@ -217,12 +252,18 @@ const ru: OsagoRfFormDictionary = {
 
     driversLimitedLabel:
       "Ограничить список водителей, допущенных к управлению ТС (может снизить стоимость полиса; страхование не действует, если ТС управляет лицо, не указанное в полисе)",
-    driverLicenseFilesLabel:
-      "Фото водительских удостоверений допущенных водителей",
-    driverLicenseHint:
-      "Загрузите фото/сканы ВУ (поддерживаются те же форматы, что и для техпаспорта).",
-    driverLicenseFilesRequired:
-      "Загрузите фото/сканы водительских удостоверений.",
+
+    driversTitle: "Водители (ограниченный список)",
+    driversEmptyHint: "Добавьте минимум одного водителя.",
+    addDriverButton: "+ Добавить водителя",
+    driverBlockTitle: "Водитель",
+    removeDriverButton: "Удалить водителя",
+
+    driverFullName: "ФИО водителя",
+    driverExperienceYears: "Стаж вождения (полных лет)",
+
+    driverLicenseFilesLabel: "Фото водительского удостоверения",
+    driverLicenseHint: "Загрузите фото/сканы ВУ (допустимы изображения и PDF).",
   },
 };
 
@@ -235,6 +276,24 @@ const en: OsagoRfFormDictionary = {
   successMessage: "OSAGO RF application sent. We will contact you.",
   fileForbidden: "is not allowed (archive, audio or video).",
   loading: "Sending...",
+
+  stepLabels: {
+    step1: "Contacts & details",
+    step2: "Vehicle & submit",
+  },
+
+  errors: {
+    title: "Please check the form — some fields are missing",
+    requiredField: "Missing field: {field}",
+    requiredFiles: "Missing files: {field}",
+  },
+
+  filePicker: {
+    choose: "Choose files",
+    clear: "Clear",
+    noFiles: "No files selected",
+    selectedCount: "Files selected: {count}",
+  },
 
   buttons: {
     back: "Back",
@@ -266,20 +325,19 @@ const en: OsagoRfFormDictionary = {
   person: {
     legend: "Personal details of the policyholder / driver",
 
-    manualPassportEntryLabel:
-      "Enter details manually (I don't want to upload passport photos)",
+    manualPassportEntryLabel: "Enter details manually (I don't want to upload passport photos)",
     passportFilesLabel: "Passport photos",
-    passportFilesHint:
-      "Upload passport photo/scan (multiple files allowed). Images and PDF are supported.",
-    passportFilesRequired: "Please upload passport photo/scan.",
+    passportFilesHint: "Upload passport photo/scan (multiple files allowed). Images and PDF are supported.",
 
     middleName: "Middle name",
     gender: "Gender",
     genderMale: "Male",
     genderFemale: "Female",
+
     birthDate: "Date of birth",
     countryLabel: "Country of residence",
     address: "Address",
+
     passportNumber: "Passport series and number (Latin)",
     passportIssuer: "Passport issuing authority",
     passportIssuedAt: "Passport issue date",
@@ -310,8 +368,7 @@ const en: OsagoRfFormDictionary = {
 
   vehicles: {
     legend: "Vehicle data",
-    description:
-      "You can add several vehicles if you need to issue multiple OSAGO RF policies.",
+    description: "You can add several vehicles if you need to issue multiple OSAGO RF policies.",
     addButton: "Add one more vehicle",
     blockTitle: "Vehicle",
     removeButton: "Remove this vehicle",
@@ -326,10 +383,6 @@ const en: OsagoRfFormDictionary = {
     vehicleTypeMotorcycle: "Motorcycle",
     vehicleTypeSpecial: "Special machinery",
 
-    countryLabel: "Registration country",
-    countryKZ: "KAZAKHSTAN",
-    countryGE: "Georgia",
-
     startDate: "Policy start date",
     periodLabel: "Insurance period",
     period15d: "15 days",
@@ -343,10 +396,18 @@ const en: OsagoRfFormDictionary = {
 
     driversLimitedLabel:
       "Limit the list of drivers allowed to drive the vehicle (may reduce the premium; coverage does not apply if the vehicle is driven by a person not included in the policy)",
-    driverLicenseFilesLabel: "Driver’s license photos of authorized drivers",
-    driverLicenseHint:
-      "Upload driver’s license photos/scans (same file formats as for the registration certificate).",
-    driverLicenseFilesRequired: "Upload photos/scans of the driver’s licenses.",
+
+    driversTitle: "Drivers (limited list)",
+    driversEmptyHint: "Add at least one driver.",
+    addDriverButton: "+ Add driver",
+    driverBlockTitle: "Driver",
+    removeDriverButton: "Remove driver",
+
+    driverFullName: "Driver full name",
+    driverExperienceYears: "Driving experience (full years)",
+
+    driverLicenseFilesLabel: "Driver’s license photo",
+    driverLicenseHint: "Upload driver’s license photos/scans (images and PDF are supported).",
   },
 };
 
@@ -359,6 +420,24 @@ const kz: OsagoRfFormDictionary = {
   successMessage: "РФ ОСАҒО-ға өтінім жіберілді. Біз сізбен байланысамыз.",
   fileForbidden: "рұқсат етілмейді (мұрағат, аудио немесе бейне).",
   loading: "Жіберілуде...",
+
+  stepLabels: {
+    step1: "Байланыс және деректер",
+    step2: "Көлік және жіберу",
+  },
+
+  errors: {
+    title: "Форманы тексеріңіз — толтырылмаған өрістер бар",
+    requiredField: "Толтырылмаған өріс: {field}",
+    requiredFiles: "Файлдар жүктелмеген: {field}",
+  },
+
+  filePicker: {
+    choose: "Файлдарды таңдау",
+    clear: "Тазарту",
+    noFiles: "Файл таңдалмады",
+    selectedCount: "Таңдалған файлдар: {count}",
+  },
 
   buttons: {
     back: "Артқа",
@@ -390,20 +469,19 @@ const kz: OsagoRfFormDictionary = {
   person: {
     legend: "Сақтанушының / жүргізушінің жеке деректері",
 
-    manualPassportEntryLabel:
-      "Деректерді қолмен енгізу (паспорт фотосын жібергім келмейді)",
+    manualPassportEntryLabel: "Деректерді қолмен енгізу (паспорт фотосын жібергім келмейді)",
     passportFilesLabel: "Паспорт фотосы",
-    passportFilesHint:
-      "Паспорттың фото/сканын жүктеңіз (бірнеше файл болуы мүмкін). Суреттер мен PDF қолдайды.",
-    passportFilesRequired: "Паспорттың фото/сканын жүктеңіз.",
+    passportFilesHint: "Паспорттың фото/сканын жүктеңіз (бірнеше файл болуы мүмкін). Суреттер мен PDF қолдайды.",
 
     middleName: "Әкесінің аты",
     gender: "Жынысы",
     genderMale: "Ер",
     genderFemale: "Әйел",
+
     birthDate: "Туған күні",
     countryLabel: "Тұратын елі",
     address: "Мекенжайы",
+
     passportNumber: "Паспорт сериясы мен нөмірі (латын)",
     passportIssuer: "Паспортты берген орган",
     passportIssuedAt: "Паспорт берілген күні",
@@ -434,8 +512,7 @@ const kz: OsagoRfFormDictionary = {
 
   vehicles: {
     legend: "Көлік құралдары туралы деректер",
-    description:
-      "Бірнеше ОСАҒО полисі қажет болса, бірнеше көлік құралын қоса аласыз.",
+    description: "Бірнеше ОСАҒО полисі қажет болса, бірнеше көлік құралын қоса аласыз.",
     addButton: "Тағы бір көлік қосу",
     blockTitle: "Көлік құралы",
     removeButton: "Бұл көлікті жою",
@@ -450,10 +527,6 @@ const kz: OsagoRfFormDictionary = {
     vehicleTypeMotorcycle: "Мотоцикл",
     vehicleTypeSpecial: "Арнайы техника",
 
-    countryLabel: "Көліктің тіркелген елі",
-    countryKZ: "ҚАЗАҚСТАН",
-    countryGE: "Грузия",
-
     startDate: "Сақтандырудың басталу күні",
     periodLabel: "Сақтандыру мерзімі",
     period15d: "15 күн",
@@ -467,12 +540,18 @@ const kz: OsagoRfFormDictionary = {
 
     driversLimitedLabel:
       "Көлікті басқаруға рұқсат етілген жүргізушілер тізімін шектеу (полис құнын төмендетуі мүмкін; полисте көрсетілмеген адам басқарса, сақтандыру қолданылмайды)",
-    driverLicenseFilesLabel:
-      "Рұқсат етілген жүргізушілердің жүргізуші куәліктерінің фотосы",
-    driverLicenseHint:
-      "Жүргізуші куәліктерінің фото/скандарын жүктеңіз (техпаспорттағыдай файл форматтары).",
-    driverLicenseFilesRequired:
-      "Жүргізуші куәліктерінің фото/скандарын жүктеңіз.",
+
+    driversTitle: "Жүргізушілер (шектеулі тізім)",
+    driversEmptyHint: "Кемінде бір жүргізушіні қосыңыз.",
+    addDriverButton: "+ Жүргізуші қосу",
+    driverBlockTitle: "Жүргізуші",
+    removeDriverButton: "Жүргізушіні жою",
+
+    driverFullName: "Жүргізушінің аты-жөні",
+    driverExperienceYears: "Жүргізу өтілі (толық жыл)",
+
+    driverLicenseFilesLabel: "Жүргізуші куәлігінің фотосы",
+    driverLicenseHint: "Жүргізуші куәлігінің фото/сканын жүктеңіз (суреттер және PDF қолдайды).",
   },
 };
 

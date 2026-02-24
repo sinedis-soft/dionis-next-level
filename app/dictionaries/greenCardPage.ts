@@ -40,6 +40,8 @@ export type GreenCardPageDictionary = {
       vehicle: string;
       period: string;
       rate: string;
+      orderEuropeLabel: string;
+      orderEuropeHref: string;
     };
     regionOptions: {
       group1: string;
@@ -109,6 +111,8 @@ const ru: GreenCardPageDictionary = {
       vehicle: "Категория ТС    ",
       period: "Срок действия    ",
       rate: "Курс тенге за $    ",
+      orderEuropeLabel: "ЗАКАЗАТЬ ЗЕЛЕНУЮ КАРТУ В ЕВРОПУ",
+      orderEuropeHref: "/ru/green-card#green-card-order",
     },
     regionOptions: {
       group1: "Только страны: Турция, Молдова, Украина",
@@ -303,6 +307,9 @@ const en: GreenCardPageDictionary = {
       vehicle: "Vehicle category    ",
       period: "Policy period     ",
       rate: "KZT per 1 USD    ",
+      orderEuropeLabel: "ORDER A GREEN CARD FOR EUROPE",
+      orderEuropeHref: "/en/green-card#green-card-order",
+
     },
     regionOptions: {
       group1: "Only Türkiye, Moldova, Ukraine",
@@ -499,6 +506,8 @@ const kz: GreenCardPageDictionary = {
       vehicle: "Көлік құралының санаты    ",
       period: "Полис мерзімі    ",
       rate: "1 АҚШ долларына теңге курсы    ",
+      orderEuropeLabel: "ЕУРОПАҒА ЖАСЫЛ КАРТА ТАПСЫРЫС БЕРУ",
+      orderEuropeHref: "/kz/green-card#green-card-order",
     },
     regionOptions: {
       group1: "Тек Түркия, Молдова, Украина",

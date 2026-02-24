@@ -268,6 +268,8 @@ export default async function GreenCardPage({
           </div>
         </section>
 
+        <GreenCardCalculator dict={gcPageDict.calculator} />
+
         <GreenCardInfoBlocks dict={gcPageDict}  />
 
 
@@ -315,7 +317,7 @@ export default async function GreenCardPage({
           </section>
         </DeferredHydration>
 
-        <GreenCardCalculator dict={gcPageDict.calculator} />
+        
         <GreenCardOrderForm dict={gcFormDict} />
 
         <section className="py-10 sm:py-12 bg-[#F5F7FA]">

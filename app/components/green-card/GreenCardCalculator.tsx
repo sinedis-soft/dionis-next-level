@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import type { GreenCardPageDictionary } from "@/dictionaries/greenCardPage";
 
 type RegionKey = "group1" | "group2";
@@ -13,28 +14,26 @@ type VehicleKey =
   | "tractor";
 type PeriodKey = "1" | "3" | "6" | "12";
 
-const RATES_USD: Record<
-  RegionKey,
-  Record<VehicleKey, Record<PeriodKey, number>>
-> = {
-  group1: {
-      passenger:{1:14.12, 3:35.29, 6:70.59, 12:128.24},
-      bus:{1:132.35, 3:338.24, 6:505.88, 12:958.82},
-      truck:{1:58.82, 3:79.41, 6:176.47, 12:329.41},  
-      trailer:{1:5.88, 3:8.82, 6:35.29, 12:58.82},
-      motorcycle:{1:11.76, 3:29.41, 6:47.06, 12:70.59},
-      tractor:{1:20.59, 3:44.12, 6:67.65, 12:88.24}
-  },
+const RATES_USD: Record<RegionKey, Record<VehicleKey, Record<PeriodKey, number>>> =
+  {
+    group1: {
+      passenger: { 1: 14.12, 3: 35.29, 6: 70.59, 12: 128.24 },
+      bus: { 1: 132.35, 3: 338.24, 6: 505.88, 12: 958.82 },
+      truck: { 1: 58.82, 3: 79.41, 6: 176.47, 12: 329.41 },
+      trailer: { 1: 5.88, 3: 8.82, 6: 35.29, 12: 58.82 },
+      motorcycle: { 1: 11.76, 3: 29.41, 6: 47.06, 12: 70.59 },
+      tractor: { 1: 20.59, 3: 44.12, 6: 67.65, 12: 88.24 },
+    },
 
-  group2: {
-      passenger:{1:50.00, 3:114.71, 6:217.65, 12:411.76},
-      bus:{1:215.88, 3:450.00, 6:777.06, 12:1405.29},
-      truck:{1:105.88, 3:311.76, 6:588.24, 12:882.35},
-      trailer:{1:14.71, 3:38.24, 6:65.88, 12:82.35},
-      motorcycle:{1:38.24, 3:83.53, 6:120.00, 12:157.06},
-      tractor:{1:40.59, 3:92.35, 6:132.35, 12:172.35}
-  },
-};
+    group2: {
+      passenger: { 1: 50.0, 3: 114.71, 6: 217.65, 12: 411.76 },
+      bus: { 1: 215.88, 3: 450.0, 6: 777.06, 12: 1405.29 },
+      truck: { 1: 105.88, 3: 311.76, 6: 588.24, 12: 882.35 },
+      trailer: { 1: 14.71, 3: 38.24, 6: 65.88, 12: 82.35 },
+      motorcycle: { 1: 38.24, 3: 83.53, 6: 120.0, 12: 157.06 },
+      tractor: { 1: 40.59, 3: 92.35, 6: 132.35, 12: 172.35 },
+    },
+  };
 
 type Props = { dict: GreenCardPageDictionary["calculator"] };
 
@@ -42,7 +41,6 @@ type NbkRateResponse = { ok: boolean; rate?: number | string; message?: string }
 
 function formatKzt(value: number): string {
   const rounded = Math.round(value * 100) / 100;
-
   return new Intl.NumberFormat("ru-RU", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -53,31 +51,32 @@ type MarkupMode = "weekday" | "holiday";
 
 const MARKUP: Record<MarkupMode, number> = {
   weekday: 1.015, // +1.5%
-  holiday: 1.02,  // +2%
+  holiday: 1.02, // +2%
 };
 
 function applyNewMarkup(legacyPrice: number, mode: MarkupMode): number {
-  const base = legacyPrice   
-  const updated = base * MARKUP[mode];           // добавили нужную наценку
-  return Math.round(updated * 100) / 100;         // 2 знака
+  const updated = legacyPrice * MARKUP[mode];
+  return Math.round(updated * 100) / 100;
 }
 
 function parseRate(raw: string): number {
   const normalized = raw.replace(",", ".").trim();
-  const n = Number(normalized);
-  return n;
+  return Number(normalized);
 }
 
 export default function GreenCardCalculator({ dict }: Props) {
-  const [region, setRegion] = useState<RegionKey>("group1");
+  // ✅ дефолты как ты просил:
+  // 1 месяц, легковой, все страны (group2)
+  const [region, setRegion] = useState<RegionKey>("group2");
   const [vehicle, setVehicle] = useState<VehicleKey>("passenger");
-  const [period, setPeriod] = useState<PeriodKey>("12");
+  const [period, setPeriod] = useState<PeriodKey>("1");
+
   const [rate, setRate] = useState<string>("");
   const [autoRateNote, setAutoRateNote] = useState<string>("");
-  const [result, setResult] = useState<string>("");
-  const [markupMode, setMarkupMode] = useState<MarkupMode>("weekday");
 
-  // общий класс для инпутов/селектов — как в ContactForm
+  // если UI для наценки нет — будет weekday по умолчанию
+  const [markupMode] = useState<MarkupMode>("weekday");
+
   const fieldClass = useMemo(
     () =>
       "w-full rounded-md border border-gray-300 px-3 py-2 text-sm " +
@@ -111,24 +110,21 @@ export default function GreenCardCalculator({ dict }: Props) {
     autoFillKztRate();
   }, [dict.autoRateOk, dict.autoRateError]);
 
-  function handleCalculate() {
-  const legacyUsd = RATES_USD[region][vehicle][period];     // с +15%
-  const priceUsd = applyNewMarkup(legacyUsd, markupMode);   // с 1.5%/2%
-  const kztRate = parseRate(rate);
+  // ✅ результат считается автоматически
+  const resultText = useMemo(() => {
+    const kztRate = parseRate(rate);
+    if (!Number.isFinite(kztRate) || kztRate <= 0) return dict.errorInvalidRate;
 
-  if (!Number.isFinite(kztRate) || kztRate <= 0) {
-      setResult(dict.errorInvalidRate);
-      return;
-    }
+    const legacyUsd = RATES_USD[region][vehicle][period];
+    const priceUsd = applyNewMarkup(legacyUsd, markupMode);
 
     const priceKztRaw = priceUsd * kztRate;
     const priceKzt = Math.round(priceKztRaw * 100) / 100;
 
-    setResult(
-      `${dict.resultPrefix} ${priceUsd}$ ${dict.resultApprox} ${formatKzt(priceKzt)}\u00A0₸`
-    );
-  }
-
+    return `${dict.resultPrefix} ${priceUsd}$ ${dict.resultApprox} ${formatKzt(
+      priceKzt
+    )}\u00A0₸`;
+  }, [dict.errorInvalidRate, dict.resultApprox, dict.resultPrefix, markupMode, period, rate, region, vehicle]);
 
   const statusId = "gc-calc-note";
 
@@ -145,9 +141,8 @@ export default function GreenCardCalculator({ dict }: Props) {
             </p>
           </div>
 
-          {/* form */}
           <div className="mt-8 space-y-4">
-            {/* ROW: region */}
+            {/* region */}
             <div className="grid grid-cols-1 sm:grid-cols-[220px_1fr] gap-2 sm:gap-4 items-start sm:items-center">
               <label
                 htmlFor="gc-region"
@@ -167,7 +162,7 @@ export default function GreenCardCalculator({ dict }: Props) {
               </select>
             </div>
 
-            {/* ROW: vehicle */}
+            {/* vehicle */}
             <div className="grid grid-cols-1 sm:grid-cols-[220px_1fr] gap-2 sm:gap-4 items-start sm:items-center">
               <label
                 htmlFor="gc-vehicle"
@@ -191,7 +186,7 @@ export default function GreenCardCalculator({ dict }: Props) {
               </select>
             </div>
 
-            {/* ROW: period */}
+            {/* period */}
             <div className="grid grid-cols-1 sm:grid-cols-[220px_1fr] gap-2 sm:gap-4 items-start sm:items-center">
               <label
                 htmlFor="gc-period"
@@ -213,7 +208,7 @@ export default function GreenCardCalculator({ dict }: Props) {
               </select>
             </div>
 
-            {/* ROW: rate */}
+            {/* rate */}
             <div className="grid grid-cols-1 sm:grid-cols-[220px_1fr] gap-2 sm:gap-4 items-start sm:items-center">
               <label
                 htmlFor="gc-exchangeRate"
@@ -234,7 +229,6 @@ export default function GreenCardCalculator({ dict }: Props) {
               />
             </div>
 
-            {/* note */}
             <div
               id={statusId}
               aria-live="polite"
@@ -243,18 +237,7 @@ export default function GreenCardCalculator({ dict }: Props) {
               {autoRateNote}
             </div>
 
-            {/* button */}
-            <div className="pt-2">
-              <button
-                type="button"
-                className="btn btn-secondary w-full"
-                onClick={handleCalculate}
-              >
-                {dict.calcButton}
-              </button>
-            </div>
-
-            {/* result */}
+            {/* ✅ результат без кнопки */}
             <div
               className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5"
               role="status"
@@ -262,8 +245,18 @@ export default function GreenCardCalculator({ dict }: Props) {
             >
               <div className="text-sm text-gray-600">{dict.resultPrefix}</div>
               <div className="mt-1 text-xl sm:text-2xl font-extrabold text-[#1A3A5F]">
-                {result || "\u00A0"}
+                {resultText || "\u00A0"}
               </div>
+            </div>
+            {/* ✅ кнопка заказа */}
+            <div className="pt-2">
+              <Link
+                href={dict.labels.orderEuropeHref}
+                className="btn btn-secondary w-full text-center"
+                aria-label={dict.labels.orderEuropeLabel}
+              >
+                {dict.labels.orderEuropeLabel}
+              </Link>
             </div>
           </div>
         </div>

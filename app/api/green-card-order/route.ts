@@ -113,7 +113,6 @@ async function fileToBitrixFileData(file: File): Promise<[string, string]> {
 type VehicleInput = {
   plate?: string;
   type?: string;
-  country?: string;
   startDate?: string | null; // DD.MM.YYYY (для сделки)
   period?: string;
   techPassportFiles: File[];
@@ -357,7 +356,6 @@ export async function POST(req: Request): Promise<Response> {
       const missing =
         !v.plate ||
         !v.type ||
-        !v.country ||
         !v.startDate ||
         !v.period ||
         !v.techPassportFiles ||
@@ -523,7 +521,7 @@ export async function POST(req: Request): Promise<Response> {
         COMPANY_ID: companyId,
 
         // vehicle fields
-        UF_CRM_1686152306664: vehicle.country || null,
+
         UF_CRM_1686152485641: vehicle.plate || null,
         UF_CRM_1686152567597: vehicle.type || null,
         UF_CRM_1686152209741: vehicle.period || null,
@@ -531,6 +529,7 @@ export async function POST(req: Request): Promise<Response> {
 
         // common deal fields (green card)
         UF_CRM_1690539097: 429,
+        UF_CRM_1686152306664: 385,
         UF_CRM_1700656576088: insurance_territory || null,
         UF_CRM_1693578066803: 1169,
         UF_CRM_1686682902533: 3907,

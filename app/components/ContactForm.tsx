@@ -330,7 +330,7 @@ export default function ContactForm({
             id="email"
             inputMode="email"
             autoComplete="email"
-            pattern="^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+
             type="email"
             name="email"
             value={formData.email}

@@ -24,6 +24,9 @@ const ru: OsagoRfCalculatorDictionary = {
     driverExp: "Стаж самого малоопытного водителя (лет)",
 
     rateRub: "Курс тенге за 1 RUB",
+
+    paramsTitle: "Параметры",
+    calcMode: "Режим расчёта",
   },
 
   hints: {
@@ -38,12 +41,13 @@ const ru: OsagoRfCalculatorDictionary = {
       "Если включить ограничение по водителям, стоимость рассчитывается по возрасту и стажу самого малоопытного. Управление запрещено для водителей, не включённых в полис.",
     kvsUsed: "КВС по таблице: возраст {age} лет, стаж {exp} лет.",
 
-    // ✅ новые строки для подсказки (KZT) — соответствуют обновлённому компоненту
     cheaperOn: "{mode} дешевле на {diff}.",
     moreExpensiveOn: "{mode} дороже на {diff}.",
     equal: "Подсказка: оба варианта дают одинаковую стоимость.",
     modeMulti: "Мультидрайв",
     modeLimited: "Ограничение по водителям",
+
+    multiShort: "Мультидрайв: управлять может любой водитель.",
   },
 
   ratePlaceholder: "Например, 5.20",
@@ -55,10 +59,13 @@ const ru: OsagoRfCalculatorDictionary = {
     title: "Итоговая стоимость:",
     rubLinePrefix: "≈",
     kztLinePrefix: "≈",
-    volatilityNote:
-      "Стоимость указана справочно. Не является публичной офертой.",
-    disclaimer:
-      "При заявке полиса для въезда в Российскую Федерацию счёт актуален 1 день.",
+    volatilityNote: "Стоимость указана справочно. Не является публичной офертой.",
+    disclaimer: "При заявке полиса для въезда в Российскую Федерацию счёт актуален 1 день.",
+  },
+
+  cta: {
+    orderGreenCardToRussia: "ЗАКАЗАТЬ ЗЕЛЕНУЮ КАРТУ В РОССИЮ",
+    orderHref: "/ru/osago-rf#osago-rf-order",
   },
 
   errors: {
@@ -88,6 +95,9 @@ const en: OsagoRfCalculatorDictionary = {
     driverExp: "Driving experience of the least experienced driver (years)",
 
     rateRub: "KZT per 1 RUB exchange rate",
+
+    paramsTitle: "Parameters",
+    calcMode: "Calculation mode",
   },
 
   hints: {
@@ -107,21 +117,25 @@ const en: OsagoRfCalculatorDictionary = {
     equal: "Both options result in the same premium.",
     modeMulti: "Unlimited drivers",
     modeLimited: "Driver restriction",
+
+    multiShort: "Unlimited drivers: anyone can drive.",
   },
 
   ratePlaceholder: "e.g. 5.20",
   autoRateOk: "RUB exchange rate loaded automatically from the National Bank of Kazakhstan.",
-  autoRateError:
-    "Unable to load RUB exchange rate automatically — please enter manually.",
+  autoRateError: "Unable to load RUB exchange rate automatically — please enter manually.",
 
   result: {
     title: "Total premium:",
     rubLinePrefix: "≈",
     kztLinePrefix: "≈",
-    volatilityNote:
-      "The amount is indicative and does not constitute a public offer.",
-    disclaimer:
-      "For entry to the Russian Federation, the invoice remains valid for 1 day.",
+    volatilityNote: "The amount is indicative and does not constitute a public offer.",
+    disclaimer: "For entry to the Russian Federation, the invoice remains valid for 1 day.",
+  },
+
+  cta: {
+    orderGreenCardToRussia: "ORDER GREEN CARD TO RUSSIA",
+    orderHref: "/en/osago-rf#osago-rf-order",
   },
 
   errors: {
@@ -151,6 +165,9 @@ const kz: OsagoRfCalculatorDictionary = {
     driverExp: "Ең тәжірибесі аз жүргізушінің жүргізушілік өтілі (жыл)",
 
     rateRub: "1 RUB үшін KZT бағамы",
+
+    paramsTitle: "Параметрлер",
+    calcMode: "Есептеу режимі",
   },
 
   hints: {
@@ -159,8 +176,7 @@ const kz: OsagoRfCalculatorDictionary = {
       "Егер көлік 20 жылдан асқан болса, сақтандыру мерзімі ең көбі 3 аймен шектеледі.",
     term:
       "15 күн немесе толық ай санын таңдауға болады. Қолжетімді мерзім көлік жасына байланысты.",
-    termLimited:
-      "Шектеу қолданылды: 20 жылдан асқан көлік — ең көбі 3 ай.",
+    termLimited: "Шектеу қолданылды: 20 жылдан асқан көлік — ең көбі 3 ай.",
 
     useExp:
       "Қосылған жағдайда сыйақы ең тәжірибесі аз жүргізушінің жасы мен өтілі бойынша есептеледі. Полиске енгізілмеген тұлғаларға көлікті басқаруға болмайды.",
@@ -171,21 +187,25 @@ const kz: OsagoRfCalculatorDictionary = {
     equal: "Екі нұсқа бойынша құн бірдей.",
     modeMulti: "Шектеусіз жүргізушілер",
     modeLimited: "Жүргізушілерге шектеу",
+
+    multiShort: "Шектеусіз: көлікті кез келген жүргізуші басқара алады.",
   },
 
   ratePlaceholder: "Мысалы, 5.20",
   autoRateOk: "RUB бағамы ҚР Ұлттық Банкінің деректері бойынша автоматты түрде қойылды.",
-  autoRateError:
-    "RUB бағамын автоматты түрде жүктеу мүмкін болмады — қолмен енгізіңіз.",
+  autoRateError: "RUB бағамын автоматты түрде жүктеу мүмкін болмады — қолмен енгізіңіз.",
 
   result: {
     title: "Қорытынды құны:",
     rubLinePrefix: "≈",
     kztLinePrefix: "≈",
-    volatilityNote:
-      "Құны анықтамалық сипатта. Жария оферта болып табылмайды.",
-    disclaimer:
-      "РФ аумағына кіру үшін рәсімделген полис бойынша шот 1 күн ішінде жарамды.",
+    volatilityNote: "Құны анықтамалық сипатта. Жария оферта болып табылмайды.",
+    disclaimer: "РФ аумағына кіру үшін рәсімделген полис бойынша шот 1 күн ішінде жарамды.",
+  },
+
+  cta: {
+    orderGreenCardToRussia: "РЕСЕЙГЕ «ЖАСЫЛ КАРТАНЫ» ТАПСЫРЫС БЕРУ",
+    orderHref: "/kz/osago-rf#osago-rf-order",
   },
 
   errors: {
@@ -193,9 +213,7 @@ const kz: OsagoRfCalculatorDictionary = {
   },
 };
 
-export function getOsagoRfCalculatorDictionary(
-  lang: Lang
-): OsagoRfCalculatorDictionary {
+export function getOsagoRfCalculatorDictionary(lang: Lang): OsagoRfCalculatorDictionary {
   if (lang === "en") return en;
   if (lang === "kz") return kz;
   return ru;
