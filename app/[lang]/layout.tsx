@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
+import Script from "next/script";
 
 import Header from "@/components/Header";
 import SiteFooter from "@/components/SiteFooter";
@@ -106,6 +107,43 @@ export default async function LangLayout({
 
   return (
     <>
+      {/* Legacy detector: ставит html.is-legacy, если нет CSS.supports или нет grid */}
+      <Script id="legacy-detector" strategy="beforeInteractive">
+        {`
+(function () {
+  try {
+    var isLegacy = false;
+
+    // очень старые браузеры: нет CSS.supports
+    if (!window.CSS || !CSS.supports) {
+      isLegacy = true;
+    } else {
+      // legacy: grid не поддерживается
+      isLegacy = !CSS.supports('display', 'grid');
+    }
+
+    if (isLegacy) {
+      var root = document.documentElement;
+      if (root.className.indexOf('is-legacy') === -1) {
+        root.className = (root.className ? root.className + ' ' : '') + 'is-legacy';
+      }
+
+      // подключаем legacy.css только для legacy
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '/legacy.css';
+      document.head.appendChild(link);
+    }
+  } catch (e) {}
+})();
+        `}
+      </Script>
+
+      {/* Если JS выключен, лучше хоть так (подключит legacy.css всегда) */}
+      <noscript>
+        <link rel="stylesheet" href="/legacy.css" />
+      </noscript>
+
       <Suspense fallback={<div className="h-16 xl:h-20" />}>
         <Header lang={lang} />
       </Suspense>

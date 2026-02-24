@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
 import Image from "next/image";
 import Script from "next/script";
+import type { CSSProperties } from "react";
 
 import { getHomeDictionary } from "@/dictionaries/home";
 import { getAgreementDictionary } from "@/dictionaries/agreement";
@@ -49,7 +50,7 @@ function AdvantageIcon({ index }: { index: number }) {
     width: 20,
     height: 20,
     className: common,
-    style: { width: 20, height: 20, display: "block" } as React.CSSProperties,
+    style: { width: 20, height: 20, display: "block" } as CSSProperties,
     fill: "none" as const,
     "aria-hidden": true as const,
     focusable: "false" as const,
@@ -239,6 +240,7 @@ export default async function GreenCardPage({
             </div>
 
             <div className="flex justify-center lg:justify-end">
+              {/* Декоративный hero-арт: в legacy (без IO) не рендерим */}
               <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
                 <div className="hidden lg:block">
                   <div className="gc-hero-visual w-[520px] h-[280px] xl:w-[620px] xl:h-[320px] relative">
@@ -281,7 +283,7 @@ export default async function GreenCardPage({
         {/* CALCULATOR (обёртка для legacy-стилей формы) */}
         <section className="py-8 sm:py-10 bg-white">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="legacy-form-scope legacy-form-card">
+            <div className="legacy-form-card">
               <GreenCardCalculator dict={gcPageDict.calculator} />
             </div>
           </div>
@@ -335,7 +337,7 @@ export default async function GreenCardPage({
         {/* ORDER FORM (обёртка для legacy-стилей формы) */}
         <section id="green-card-order" className="py-10 sm:py-12 bg-white">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="legacy-form-scope legacy-form-card">
+            <div className="legacy-form-card">
               <GreenCardOrderForm dict={gcFormDict} />
             </div>
           </div>
@@ -407,8 +409,7 @@ export default async function GreenCardPage({
               </DeferredHydration>
             </div>
 
-            {/* обёртка для legacy-стилей формы */}
-            <div className="legacy-form-scope legacy-form-card">
+            <div className="legacy-form-card">
               <GreenCardQuestionForm
                 homeContact={homeDict.contact}
                 agreement={agreement}

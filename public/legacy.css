@@ -1,6 +1,14 @@
 /* public/legacy.css */
 
-/* Включаем только если браузер очень старый (нет grid) */
+/* Включаемся либо по @supports, либо по классу .is-legacy (скрипт в head) */
+@supports not (display: grid) {
+  /* ничего */
+}
+.is-legacy {
+  /* ничего */
+}
+
+/* Общий блок правил: срабатывает в одном из режимов */
 @supports not (display: grid) {
   :root {
     --lc-text: #1a2b3a;
@@ -12,12 +20,10 @@
     --lc-primary-2: #0f2742;
     --lc-focus: rgba(26, 58, 95, 0.25);
     --lc-danger: #b42318;
+    --lc-gap: 12px; /* единый шаг вертикальных отступов */
   }
 
-  /* базовая типографика, чтобы не было "голого HTML" */
-  html {
-    font-family: Arial, sans-serif;
-  }
+  html { font-family: Arial, sans-serif; }
   body {
     margin: 0;
     line-height: 1.4;
@@ -25,23 +31,15 @@
     background: var(--lc-bg);
   }
 
-  /* чтобы ничего не раздувало экран */
-  img,
-  video,
-  canvas {
-    max-width: 100% !important;
-    height: auto !important;
-  }
+  /* абзацы: расстояние между ними */
+  p { margin: 0 0 12px; }
+  p:last-child { margin-bottom: 0; }
 
-  /* SVG не должен раздуваться */
-  svg {
-    max-width: 100% !important;
-    height: auto !important;
-  }
+  img, video, canvas { max-width: 100% !important; height: auto !important; }
 
-  /* Иконки: фиксируем размер железно */
-  .icon-svg,
-  .icon-svg svg {
+  svg { max-width: 100% !important; height: auto !important; }
+
+  .icon-svg, .icon-svg svg {
     width: 20px !important;
     height: 20px !important;
     max-width: 20px !important;
@@ -49,23 +47,11 @@
     display: block !important;
   }
 
-  /* если хотите в legacy вообще отключить декоративные картинки */
-  .legacy-hide {
-    display: none !important;
-  }
+  .legacy-hide { display: none !important; }
 
-  /* чуть нормализуем контейнеры */
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
+  *, *::before, *::after { box-sizing: border-box; }
 
-  /* ------------------------
-     LEGACY FORM STYLES
-     Ограничиваем область, чтобы не ломать весь сайт:
-     добавляйте .legacy-form-scope вокруг форм
-  ------------------------ */
+  /* ----- FORM SCOPE ----- */
 
   .legacy-form-card {
     background: var(--lc-bg);
@@ -75,9 +61,14 @@
     box-shadow: 0 6px 16px rgba(15, 39, 66, 0.08);
   }
 
-  .legacy-form-scope form {
-    background: transparent;
-  }
+  /* расстояние между “соседними” блоками в карточке (калькулятор/формы часто так устроены) */
+  .legacy-form-card > * + * { margin-top: 14px; }
+
+  .legacy-form-scope form { background: transparent; }
+
+  /* абзацы внутри форм/калькуляторов тоже раздвигаем */
+  .legacy-form-scope p { margin: 0 0 12px; }
+  .legacy-form-scope p:last-child { margin-bottom: 0; }
 
   .legacy-form-scope label {
     display: block;
@@ -107,10 +98,27 @@
     resize: vertical;
   }
 
-  .legacy-form-scope input::placeholder,
-  .legacy-form-scope textarea::placeholder {
-    color: #95a3b1;
+  /* ВЕРТИКАЛЬНЫЕ ОТСТУПЫ МЕЖДУ ПОЛЯМИ:
+     даём margin-bottom всем полям, кроме checkbox/radio */
+  .legacy-form-scope input:not([type="checkbox"]):not([type="radio"]),
+  .legacy-form-scope select,
+  .legacy-form-scope textarea {
+    margin-bottom: var(--lc-gap);
   }
+
+  /* если после поля сразу идут hint/error — убираем “двойной” отступ */
+  .legacy-form-scope .field-hint,
+  .legacy-form-scope .field-error {
+    margin-top: 6px;
+    margin-bottom: var(--lc-gap);
+    color: var(--lc-muted);
+    font-size: 12px;
+    line-height: 1.35;
+  }
+  .legacy-form-scope .field-error { color: var(--lc-danger); }
+
+  .legacy-form-scope input::placeholder,
+  .legacy-form-scope textarea::placeholder { color: #95a3b1; }
 
   .legacy-form-scope input:focus,
   .legacy-form-scope select:focus,
@@ -119,34 +127,18 @@
     box-shadow: 0 0 0 3px var(--lc-focus);
   }
 
-  /* select стрелка (простая) */
   .legacy-form-scope select {
-    background-image: linear-gradient(
-        45deg,
-        transparent 50%,
-        var(--lc-muted) 50%
-      ),
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--lc-muted) 50%),
       linear-gradient(135deg, var(--lc-muted) 50%, transparent 50%),
       linear-gradient(to right, transparent, transparent);
-    background-position: calc(100% - 18px) calc(50% - 3px),
-      calc(100% - 13px) calc(50% - 3px), 0 0;
+    background-position:
+      calc(100% - 18px) calc(50% - 3px),
+      calc(100% - 13px) calc(50% - 3px),
+      0 0;
     background-size: 5px 5px, 5px 5px, 100% 100%;
     background-repeat: no-repeat;
     padding-right: 34px;
-  }
-
-  .legacy-form-scope .field-hint {
-    margin-top: 6px;
-    color: var(--lc-muted);
-    font-size: 12px;
-    line-height: 1.35;
-  }
-
-  .legacy-form-scope .field-error {
-    margin-top: 6px;
-    color: var(--lc-danger);
-    font-size: 12px;
-    line-height: 1.35;
   }
 
   .legacy-form-scope .has-error input,
@@ -171,6 +163,7 @@
     width: 100%;
     -webkit-appearance: none;
     appearance: none;
+    margin-top: 6px; /* чуть воздуха над кнопкой */
   }
 
   .legacy-form-scope button:hover,
@@ -187,7 +180,7 @@
     cursor: not-allowed;
   }
 
-  /* чекбоксы/радио */
+  /* чекбоксы/радио — отдельный режим, без width:100% и без margin-bottom */
   .legacy-form-scope input[type="checkbox"],
   .legacy-form-scope input[type="radio"] {
     width: auto;
@@ -195,12 +188,8 @@
     vertical-align: middle;
   }
 
-  .legacy-form-row {
-    margin-bottom: 12px;
-  }
-  .legacy-form-row:last-child {
-    margin-bottom: 0;
-  }
+  .legacy-form-row { margin-bottom: var(--lc-gap); }
+  .legacy-form-row:last-child { margin-bottom: 0; }
 
   .legacy-form-actions {
     margin-top: 14px;
@@ -208,7 +197,22 @@
     gap: 10px;
     flex-wrap: wrap;
   }
-  .legacy-form-actions > * {
-    width: 100%;
-  }
+  .legacy-form-actions > * { width: 100%; }
 }
+
+/* Дублируем те же правила для случая, когда @supports не работает */
+.is-legacy :root {
+  --lc-text: #1a2b3a;
+  --lc-muted: #5b6b7a;
+  --lc-border: #d4dde6;
+  --lc-bg: #ffffff;
+  --lc-bg-soft: #f5f7fa;
+  --lc-primary: #1a3a5f;
+  --lc-primary-2: #0f2742;
+  --lc-focus: rgba(26, 58, 95, 0.25);
+  --lc-danger: #b42318;
+  --lc-gap: 12px;
+}
+
+/* Коротко: чтобы не копировать весь блок второй раз, можно оставить только важное в .is-legacy,
+   но тогда часть “reset” не применится. Если хочешь — я дам компактную версию без дубля. */
