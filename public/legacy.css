@@ -1,14 +1,18 @@
 /* public/legacy.css */
 
-/* Включаемся либо по @supports, либо по классу .is-legacy (скрипт в head) */
-@supports not (display: grid) {
-  /* ничего */
-}
-.is-legacy {
-  /* ничего */
-}
+/*
+  Цель:
+  1) Работает в 2 режимах:
+     A) автоматически: @supports not (display: grid)
+     B) принудительно: html.is-legacy (ставит ваш скрипт)
+  2) Без "пустых" блоков и без неправильного селектора ".is-legacy :root"
+     (это НЕ сработает, т.к. :root — это html и он не бывает "внутри" html)
+  3) Добавлены нормальные вертикальные отступы:
+     - между абзацами
+     - между полями
+     - между секциями внутри карточки
+*/
 
-/* Общий блок правил: срабатывает в одном из режимов */
 @supports not (display: grid) {
   :root {
     --lc-text: #1a2b3a;
@@ -20,7 +24,8 @@
     --lc-primary-2: #0f2742;
     --lc-focus: rgba(26, 58, 95, 0.25);
     --lc-danger: #b42318;
-    --lc-gap: 12px; /* единый шаг вертикальных отступов */
+    --lc-gap: 12px;        /* базовый вертикальный шаг */
+    --lc-gap-lg: 16px;     /* крупнее для секций/карточек */
   }
 
   html { font-family: Arial, sans-serif; }
@@ -31,15 +36,23 @@
     background: var(--lc-bg);
   }
 
-  /* абзацы: расстояние между ними */
-  p { margin: 0 0 12px; }
+  /* базовая типографика */
+  p { margin: 0 0 var(--lc-gap); }
   p:last-child { margin-bottom: 0; }
 
+  /* чтобы ничего не раздувало экран */
   img, video, canvas { max-width: 100% !important; height: auto !important; }
-
   svg { max-width: 100% !important; height: auto !important; }
 
-  .icon-svg, .icon-svg svg {
+  /* если хотите в legacy вообще отключать декоративные картинки */
+  .legacy-hide { display: none !important; }
+
+  /* нормальный box sizing */
+  *, *::before, *::after { box-sizing: border-box; }
+
+  /* Иконки: фиксируем размер железно */
+  .icon-svg,
+  .icon-svg svg {
     width: 20px !important;
     height: 20px !important;
     max-width: 20px !important;
@@ -47,11 +60,7 @@
     display: block !important;
   }
 
-  .legacy-hide { display: none !important; }
-
-  *, *::before, *::after { box-sizing: border-box; }
-
-  /* ----- FORM SCOPE ----- */
+  /* ----- FORM / CALC SCOPE ----- */
 
   .legacy-form-card {
     background: var(--lc-bg);
@@ -61,13 +70,13 @@
     box-shadow: 0 6px 16px rgba(15, 39, 66, 0.08);
   }
 
-  /* расстояние между “соседними” блоками в карточке (калькулятор/формы часто так устроены) */
-  .legacy-form-card > * + * { margin-top: 14px; }
+  /* расстояние между “соседними” блоками в карточке */
+  .legacy-form-card > * + * { margin-top: var(--lc-gap-lg); }
 
   .legacy-form-scope form { background: transparent; }
 
-  /* абзацы внутри форм/калькуляторов тоже раздвигаем */
-  .legacy-form-scope p { margin: 0 0 12px; }
+  /* абзацы внутри калькуляторов/форм */
+  .legacy-form-scope p { margin: 0 0 var(--lc-gap); }
   .legacy-form-scope p:last-child { margin-bottom: 0; }
 
   .legacy-form-scope label {
@@ -98,22 +107,21 @@
     resize: vertical;
   }
 
-  /* ВЕРТИКАЛЬНЫЕ ОТСТУПЫ МЕЖДУ ПОЛЯМИ:
-     даём margin-bottom всем полям, кроме checkbox/radio */
+  /* ВЕРТИКАЛЬНЫЕ ОТСТУПЫ МЕЖДУ ПОЛЯМИ */
   .legacy-form-scope input:not([type="checkbox"]):not([type="radio"]),
   .legacy-form-scope select,
   .legacy-form-scope textarea {
     margin-bottom: var(--lc-gap);
   }
 
-  /* если после поля сразу идут hint/error — убираем “двойной” отступ */
+  /* hint/error: не даём “двойной” отступ */
   .legacy-form-scope .field-hint,
   .legacy-form-scope .field-error {
     margin-top: 6px;
     margin-bottom: var(--lc-gap);
-    color: var(--lc-muted);
     font-size: 12px;
     line-height: 1.35;
+    color: var(--lc-muted);
   }
   .legacy-form-scope .field-error { color: var(--lc-danger); }
 
@@ -127,6 +135,7 @@
     box-shadow: 0 0 0 3px var(--lc-focus);
   }
 
+  /* select стрелка (простая) */
   .legacy-form-scope select {
     background-image:
       linear-gradient(45deg, transparent 50%, var(--lc-muted) 50%),
@@ -163,7 +172,7 @@
     width: 100%;
     -webkit-appearance: none;
     appearance: none;
-    margin-top: 6px; /* чуть воздуха над кнопкой */
+    margin-top: 6px;
   }
 
   .legacy-form-scope button:hover,
@@ -180,7 +189,7 @@
     cursor: not-allowed;
   }
 
-  /* чекбоксы/радио — отдельный режим, без width:100% и без margin-bottom */
+  /* чекбоксы/радио — без width:100% и без margin-bottom */
   .legacy-form-scope input[type="checkbox"],
   .legacy-form-scope input[type="radio"] {
     width: auto;
@@ -200,8 +209,12 @@
   .legacy-form-actions > * { width: 100%; }
 }
 
-/* Дублируем те же правила для случая, когда @supports не работает */
-.is-legacy :root {
+/* =========================================================
+   Fallback: если @supports НЕ работает, но скрипт поставил html.is-legacy
+   Важно: селектор должен быть html.is-legacy (а не .is-legacy :root)
+   ========================================================= */
+
+html.is-legacy {
   --lc-text: #1a2b3a;
   --lc-muted: #5b6b7a;
   --lc-border: #d4dde6;
@@ -212,7 +225,158 @@
   --lc-focus: rgba(26, 58, 95, 0.25);
   --lc-danger: #b42318;
   --lc-gap: 12px;
+  --lc-gap-lg: 16px;
 }
 
-/* Коротко: чтобы не копировать весь блок второй раз, можно оставить только важное в .is-legacy,
-   но тогда часть “reset” не применится. Если хочешь — я дам компактную версию без дубля. */
+html.is-legacy { font-family: Arial, sans-serif; }
+html.is-legacy body {
+  margin: 0;
+  line-height: 1.4;
+  color: var(--lc-text);
+  background: var(--lc-bg);
+}
+
+html.is-legacy p { margin: 0 0 var(--lc-gap); }
+html.is-legacy p:last-child { margin-bottom: 0; }
+
+html.is-legacy img,
+html.is-legacy video,
+html.is-legacy canvas { max-width: 100% !important; height: auto !important; }
+
+html.is-legacy svg { max-width: 100% !important; height: auto !important; }
+
+html.is-legacy .legacy-hide { display: none !important; }
+
+html.is-legacy *,
+html.is-legacy *::before,
+html.is-legacy *::after { box-sizing: border-box; }
+
+html.is-legacy .icon-svg,
+html.is-legacy .icon-svg svg {
+  width: 20px !important;
+  height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
+  display: block !important;
+}
+
+html.is-legacy .legacy-form-card {
+  background: var(--lc-bg);
+  border: 1px solid var(--lc-border);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 6px 16px rgba(15, 39, 66, 0.08);
+}
+html.is-legacy .legacy-form-card > * + * { margin-top: var(--lc-gap-lg); }
+
+html.is-legacy .legacy-form-scope form { background: transparent; }
+
+html.is-legacy .legacy-form-scope p { margin: 0 0 var(--lc-gap); }
+html.is-legacy .legacy-form-scope p:last-child { margin-bottom: 0; }
+
+html.is-legacy .legacy-form-scope label {
+  display: block;
+  font-weight: 600;
+  color: var(--lc-text);
+  margin: 0 0 6px;
+}
+
+html.is-legacy .legacy-form-scope input,
+html.is-legacy .legacy-form-scope select,
+html.is-legacy .legacy-form-scope textarea {
+  font: inherit;
+  color: var(--lc-text);
+  background: var(--lc-bg);
+  border: 1px solid var(--lc-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  width: 100%;
+  max-width: 100%;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+html.is-legacy .legacy-form-scope textarea { min-height: 96px; resize: vertical; }
+
+html.is-legacy .legacy-form-scope input:not([type="checkbox"]):not([type="radio"]),
+html.is-legacy .legacy-form-scope select,
+html.is-legacy .legacy-form-scope textarea {
+  margin-bottom: var(--lc-gap);
+}
+
+html.is-legacy .legacy-form-scope .field-hint,
+html.is-legacy .legacy-form-scope .field-error {
+  margin-top: 6px;
+  margin-bottom: var(--lc-gap);
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--lc-muted);
+}
+html.is-legacy .legacy-form-scope .field-error { color: var(--lc-danger); }
+
+html.is-legacy .legacy-form-scope input::placeholder,
+html.is-legacy .legacy-form-scope textarea::placeholder { color: #95a3b1; }
+
+html.is-legacy .legacy-form-scope input:focus,
+html.is-legacy .legacy-form-scope select:focus,
+html.is-legacy .legacy-form-scope textarea:focus {
+  border-color: var(--lc-primary);
+  box-shadow: 0 0 0 3px var(--lc-focus);
+}
+
+html.is-legacy .legacy-form-scope select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--lc-muted) 50%),
+    linear-gradient(135deg, var(--lc-muted) 50%, transparent 50%),
+    linear-gradient(to right, transparent, transparent);
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 13px) calc(50% - 3px),
+    0 0;
+  background-size: 5px 5px, 5px 5px, 100% 100%;
+  background-repeat: no-repeat;
+  padding-right: 34px;
+}
+
+html.is-legacy .legacy-form-scope .has-error input,
+html.is-legacy .legacy-form-scope .has-error select,
+html.is-legacy .legacy-form-scope .has-error textarea {
+  border-color: rgba(180, 35, 24, 0.65);
+  box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.12);
+}
+
+html.is-legacy .legacy-form-scope button,
+html.is-legacy .legacy-form-scope input[type="submit"],
+html.is-legacy .legacy-form-scope input[type="button"] {
+  font: inherit;
+  font-weight: 700;
+  color: #fff;
+  background: var(--lc-primary);
+  border: 1px solid var(--lc-primary);
+  border-radius: 12px;
+  padding: 11px 14px;
+  cursor: pointer;
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: 6px;
+}
+
+html.is-legacy .legacy-form-scope input[type="checkbox"],
+html.is-legacy .legacy-form-scope input[type="radio"] {
+  width: auto;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+html.is-legacy .legacy-form-row { margin-bottom: var(--lc-gap); }
+html.is-legacy .legacy-form-row:last-child { margin-bottom: 0; }
+
+html.is-legacy .legacy-form-actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+html.is-legacy .legacy-form-actions > * { width: 100%; }

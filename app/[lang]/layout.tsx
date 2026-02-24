@@ -107,39 +107,52 @@ export default async function LangLayout({
 
   return (
     <>
-      {/* Legacy detector: ставит html.is-legacy, если нет CSS.supports или нет grid */}
-      <Script id="legacy-detector" strategy="beforeInteractive">
-        {`
+      {/* Legacy detector:
+          - ставит html.is-legacy
+          - подключает /legacy.css ТОЛЬКО для legacy
+          Критично: use BEFORE Interactive и без React-опасных конструкций */}
+      <Script
+        id="legacy-detector"
+        strategy="beforeInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
 (function () {
   try {
+    var docEl = document.documentElement;
     var isLegacy = false;
 
-    // очень старые браузеры: нет CSS.supports
+    // 1) очень старые: нет CSS.supports
     if (!window.CSS || !CSS.supports) {
       isLegacy = true;
     } else {
-      // legacy: grid не поддерживается
-      isLegacy = !CSS.supports('display', 'grid');
+      // 2) нет grid -> legacy
+      if (!CSS.supports('display', 'grid')) isLegacy = true;
     }
+
+    // 3) ваш практический маркер: нет IntersectionObserver
+    if (!('IntersectionObserver' in window)) isLegacy = true;
 
     if (isLegacy) {
-      var root = document.documentElement;
-      if (root.className.indexOf('is-legacy') === -1) {
-        root.className = (root.className ? root.className + ' ' : '') + 'is-legacy';
+      if (docEl.className.indexOf('is-legacy') === -1) {
+        docEl.className = (docEl.className ? docEl.className + ' ' : '') + 'is-legacy';
       }
 
-      // подключаем legacy.css только для legacy
-      var link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = '/legacy.css';
-      document.head.appendChild(link);
+      // Подключаем legacy.css один раз
+      var id = 'legacy-css';
+      if (!document.getElementById(id)) {
+        var link = document.createElement('link');
+        link.id = id;
+        link.rel = 'stylesheet';
+        link.href = '/legacy.css';
+        document.head.appendChild(link);
+      }
     }
   } catch (e) {}
-})();
-        `}
-      </Script>
+})();`,
+        }}
+      />
 
-      {/* Если JS выключен, лучше хоть так (подключит legacy.css всегда) */}
+      {/* Если JS выключен — подключаем legacy.css всегда (лучше, чем голый HTML). */}
       <noscript>
         <link rel="stylesheet" href="/legacy.css" />
       </noscript>

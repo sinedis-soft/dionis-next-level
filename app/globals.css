@@ -1,24 +1,58 @@
 @import "tailwindcss";
 
 /* =========================
-   Базовые CSS-переменные
+   DESIGN TOKENS (один :root, без дублей)
    ========================= */
 :root {
   --background: #ffffff;
   --foreground: #171717;
 
-  /* Бренд */
-  --brand-blue: #0f2238;
-  --brand-gold: #c89f4a;        /* исходный "золотой" */
-  --brand-gold-ui: #ebca45;     /* золото для кнопок/фонов (у тебя уже используется) */
+  /* Brand */
+  --brand-blue: #23376c;       /* основной синий для UI */
+  --brand-blue-dark: #0f2238;  /* более тёмный (если нужен) */
+  --brand-gold-ui: #ebca45;    /* золото для кнопок/акцентов */
+  --brand-gold-text: #8a6a2f;  /* золото для текста на белом (контраст) */
+
+  /* Fonts */
   --font-text: var(--font-roboto);
   --font-accent: var(--font-montserrat);
 
-  /* ВАЖНО: золото для ТЕКСТА на белом (должно быть темнее для контраста) */
-  --brand-gold-text: #8a6a2f;   /* проходит контраст на белом */
+  /* Button visuals */
+  --gold-grad: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0) 55%
+  );
+  --blue-grad: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0) 60%
+  );
+
+  --shadow-soft:
+    0 10px 28px rgba(15, 23, 42, 0.12),
+    0 4px 10px rgba(15, 23, 42, 0.10),
+    0 1px 0 rgba(255, 255, 255, 0.55) inset;
+
+  --shadow-soft-hover:
+    0 16px 40px rgba(15, 23, 42, 0.16),
+    0 6px 14px rgba(15, 23, 42, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset;
+
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --radius-12: 12px;
+
+  /* Card visuals */
+  --card-shadow-rest:
+    0 6px 18px rgba(15, 23, 42, 0.08),
+    0 2px 6px rgba(15, 23, 42, 0.06);
+
+  --card-shadow-hover:
+    0 18px 42px rgba(15, 23, 42, 0.14),
+    0 6px 14px rgba(15, 23, 42, 0.10);
 }
 
-/* Тёмная тема */
+/* Dark theme: только фон/текст (не трогаем brand) */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -26,7 +60,7 @@
   }
 }
 
-/* Проброс переменных в Tailwind */
+/* Tailwind theme bridge (если используешь Tailwind v4 @theme) */
 @theme {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -34,14 +68,16 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Глобальные стили */
+/* =========================
+   GLOBAL
+   ========================= */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-text), system-ui, -apple-system, sans-serif;
 }
 
-/* ВАЖНАЯ ИНФОРМАЦИЯ — Montserrat */
+/* Заголовки и акцентные элементы — Montserrat */
 h1,
 h2,
 h3,
@@ -56,84 +92,41 @@ h6,
   font-family: var(--font-accent), system-ui, sans-serif;
 }
 
-.btn { will-change: transform; }
-@media (hover: none) {
-  .btn:hover { transform: none; }
-}
-
 /* =========================
-   NAV: серый текст + белая обводка (тонкая)
+   NAV
    ========================= */
 .nav-outline {
-  color: #0f1112; /* slate-300 */
- /* -webkit-text-stroke: 0.6px rgba(255, 255, 255, 0.85);*/
+  color: #0f1112;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.667);
 }
 
-/* активный пункт (золото + обводка) */
 .nav-outline-active {
   color: var(--brand-gold-ui);
- /* -webkit-text-stroke: 0.6px rgba(255, 255, 255, 0.75);*/
-  text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
-
-/* =========================================================
+/* =========================
    ACCESSIBILITY FIX:
-   text-[#C89F4A] на белом не проходит контраст → переопределяем
-   ========================================================= */
-
-/* Tailwind-класс text-[#C89F4A] превращается в .text-\[\#C89F4A\] */
+   text-[#C89F4A] на белом → темнее
+   (не конфликтует с legacy.css, т.к. legacy.css подключается отдельно)
+   ========================= */
 .text-\[\#C89F4A\] {
   color: var(--brand-gold-text) !important;
 }
-
-/* Если где-то есть hover:text-[#C89F4A] — тоже на всякий случай */
 .hover\:text-\[\#C89F4A\]:hover {
   color: var(--brand-gold-text) !important;
 }
 
 /* =========================
-   Кнопки DIONIS — современный «мягкий» стиль
-   - Primary (accent): gold #EBCA45 + текст #23376C
-   - Secondary: blue #23376C + текст white
-   - Больше «воздуха», мягкие кривые, микро-градиенты, уточнённые тени
+   BUTTONS
    ========================= */
-
-:root {
-  --brand-blue: #23376c;
-  --brand-gold: #ebca45;
-
-  /* микро-градиенты (очень деликатные) */
-  --gold-grad: linear-gradient(180deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 55%);
-  --blue-grad: linear-gradient(180deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,0) 60%);
-
-  /* «мягкая» глубина: несколько слоёв как мягкий свет в 3D-иконках */
-  --shadow-soft:
-    0 10px 28px rgba(15, 23, 42, 0.12),
-    0 4px 10px rgba(15, 23, 42, 0.10),
-    0 1px 0 rgba(255, 255, 255, 0.55) inset;
-
-  --shadow-soft-hover:
-    0 16px 40px rgba(15, 23, 42, 0.16),
-    0 6px 14px rgba(15, 23, 42, 0.12),
-    0 1px 0 rgba(255, 255, 255, 0.65) inset;
-
-  /* «дорогая» динамика */
-  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
-
-  /* геометрия макета */
-  --radius-12: 12px;
-}
-
-/* Базовая кнопка */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
 
-  padding: 0.85rem 1.85rem; /* больше воздуха */
+  padding: 0.85rem 1.85rem;
   border-radius: var(--radius-12);
 
   font-weight: 600;
@@ -147,7 +140,8 @@ h6,
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 
-  transform: translateZ(0); /* более плавная анимация */
+  transform: translateZ(0);
+  will-change: transform;
   transition:
     transform 220ms var(--ease-spring),
     box-shadow 220ms var(--ease-spring),
@@ -156,16 +150,16 @@ h6,
     filter 220ms var(--ease-spring);
 }
 
-/* Primary / Accent (золото) */
-.btn-primary,
-.btn {
-  background-color: var(--brand-gold);
+/* Primary (по умолчанию .btn) */
+.btn,
+.btn-primary {
+  background-color: var(--brand-gold-ui);
   background-image: var(--gold-grad);
-  color: var(--brand-blue); /* важно: читаемость */
+  color: var(--brand-blue);
   box-shadow: var(--shadow-soft);
 }
 
-/* Secondary (тёмно-синяя) */
+/* Secondary */
 .btn-secondary {
   background-color: var(--brand-blue);
   background-image: var(--blue-grad);
@@ -173,7 +167,6 @@ h6,
   box-shadow: var(--shadow-soft);
 }
 
-/* Hover / Focus */
 .btn:hover {
   transform: translateY(-1px) scale(1.015);
   box-shadow: var(--shadow-soft-hover);
@@ -192,22 +185,19 @@ h6,
     0 1px 0 rgba(255, 255, 255, 0.50) inset;
 }
 
-/* Доступность: красивый, но аккуратный focus-ring */
 .btn:focus-visible {
   outline: none;
-  box-shadow:
-    var(--shadow-soft-hover),
-    0 0 0 3px rgba(235, 202, 69, 0.45); /* для gold */
+  box-shadow: var(--shadow-soft-hover), 0 0 0 3px rgba(235, 202, 69, 0.45);
 }
 
 .btn-secondary:focus-visible {
+  outline: none;
   box-shadow:
     var(--shadow-soft-hover),
     0 0 0 3px rgba(35, 55, 108, 0.35),
-    0 0 0 6px rgba(235, 202, 69, 0.30); /* лёгкий брендовый «ореол» */
+    0 0 0 6px rgba(235, 202, 69, 0.30);
 }
 
-/* Disabled */
 .btn:disabled,
 .btn[aria-disabled="true"] {
   opacity: 0.55;
@@ -217,42 +207,33 @@ h6,
   box-shadow: none;
 }
 
+/* Hover off on touch */
+@media (hover: none) {
+  .btn:hover {
+    transform: none;
+    box-shadow: var(--shadow-soft);
+    filter: none;
+  }
+}
+
 /* Wide */
 .btn-wide {
   width: 100%;
 }
-
 @media (min-width: 640px) {
   .btn-wide {
     width: 260px;
   }
 }
 
-
 /* =========================
-   Карточки — мягкая Fintech-анимация + glass highlight
+   CARDS
    ========================= */
-
-:root {
-  /* «дорогая» динамика */
-  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
-
-  /* слоистые тени (воздушность) */
-  --card-shadow-rest:
-    0 6px 18px rgba(15, 23, 42, 0.08),   /* широкая, мягкая */
-    0 2px 6px rgba(15, 23, 42, 0.06);    /* ближняя, чёткая */
-
-  --card-shadow-hover:
-    0 18px 42px rgba(15, 23, 42, 0.14),
-    0 6px 14px rgba(15, 23, 42, 0.10);
-}
-
-/* Базовая карточка */
 .card {
   position: relative;
   background-color: #ffffff;
   border-radius: 12px;
-  overflow: hidden; /* обязательно для «стеклянного» блика */
+  overflow: hidden;
 
   box-shadow: var(--card-shadow-rest);
   transform: translateZ(0);
@@ -262,7 +243,6 @@ h6,
     transform 280ms var(--ease-spring);
 }
 
-/* «Стеклянный блеск» */
 .card::before {
   content: "";
   position: absolute;
@@ -278,21 +258,18 @@ h6,
   pointer-events: none;
 }
 
-/* Hover / Focus */
 .card:hover,
 .card:focus-within {
   box-shadow: var(--card-shadow-hover);
   transform: translateY(-2px) scale(1.01);
 }
 
-/* Запуск «блеска» */
 .card:hover::before,
 .card:focus-within::before {
   transition: transform 900ms var(--ease-spring);
   transform: translateX(100%);
 }
 
-/* Уважение к prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   .card,
   .card::before {
@@ -301,25 +278,21 @@ h6,
   }
 }
 
-/* Информационные карточки (без hover-движения) */
 .card-static {
   cursor: default;
 }
-
 .card-static:hover,
 .card-static:focus-within {
   transform: none;
   box-shadow: var(--card-shadow-rest);
 }
-
 .card-static::before {
-  display: none; /* без стеклянного блика */
+  display: none;
 }
 
-
-
-
-/* Фото директора */
+/* =========================
+   HERO ANIMATIONS
+   ========================= */
 .director-photo {
   border-radius: 1.5rem;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
@@ -339,71 +312,92 @@ h6,
   }
 }
 
-
-
-/* --- policy: нижний левый угол фиксируем, поворот -28° --- */
+/* policy */
 .gc-hero-policy {
   position: absolute;
   right: 14px;
   bottom: 12px;
   z-index: 20;
-
   transform-origin: left bottom;
   transform: rotate(-23deg) translateX(-50px) translateY(-55px);
 }
 
-/* --- logo позиция --- */
-.gc-hero-logo-small{
+/* logo */
+.gc-hero-logo-small {
   position: absolute;
   right: 14px;
   top: 12px;
   z-index: 30;
 }
 
-/* 1) Машина: въезжает справа налево "из-за экрана" */
-.gc-anim-car{
-  animation: gcCarIn 1700ms cubic-bezier(.2,.8,.2,1) 0ms both;
+/* car */
+.gc-anim-car {
+  animation: gcCarIn 1700ms cubic-bezier(0.2, 0.8, 0.2, 1) 0ms both;
   will-change: transform, opacity;
 }
 
-@keyframes gcCarIn{
-  from { transform: translateX(120%); opacity: 1; }
-  to   { transform: translateX(0%);   opacity: 1; }
+@keyframes gcCarIn {
+  from {
+    transform: translateX(120%);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(0%);
+    opacity: 1;
+  }
 }
 
-/* 2) Полис: появляется из центральной точки (fade + scale), но остаётся повернутым */
-.gc-anim-policy{
+/* policy pop */
+.gc-anim-policy {
   opacity: 0;
   transform: rotate(-28deg) scale(0.2);
-  animation: gcPolicyPop 420ms cubic-bezier(.2,.9,.2,1) 720ms both;
+  animation: gcPolicyPop 420ms cubic-bezier(0.2, 0.9, 0.2, 1) 720ms both;
   will-change: transform, opacity;
 }
 
-@keyframes gcPolicyPop{
-  from { opacity: 0; transform: rotate(-28deg) scale(0.2); }
-  to   { opacity: 1; transform: rotate(-28deg) scale(1); }
+@keyframes gcPolicyPop {
+  from {
+    opacity: 0;
+    transform: rotate(-28deg) scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-28deg) scale(1);
+  }
 }
 
-/* 3) Лого: "растёт" (scale up) */
-.gc-anim-logo{
+/* logo grow */
+.gc-anim-logo {
   opacity: 0;
   transform: scale(0.2);
-  animation: gcLogoGrow 520ms cubic-bezier(.2,.9,.2,1) 1160ms both;
+  animation: gcLogoGrow 520ms cubic-bezier(0.2, 0.9, 0.2, 1) 1160ms both;
   will-change: transform, opacity;
 }
 
-@keyframes gcLogoGrow{
-  from { opacity: 0; transform: scale(0.2); }
-  70%  { opacity: 1; transform: scale(1.08); }
-  to   { opacity: 1; transform: scale(1); }
+@keyframes gcLogoGrow {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-/* Доступность: отключаем анимации при reduce motion */
-@media (prefers-reduced-motion: reduce){
-  .gc-anim-car, .gc-anim-policy, .gc-anim-logo{
+@media (prefers-reduced-motion: reduce) {
+  .gc-anim-car,
+  .gc-anim-policy,
+  .gc-anim-logo {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
   }
-  .gc-anim-policy{ transform: rotate(-28deg) !important; }
+  .gc-anim-policy {
+    transform: rotate(-28deg) !important;
+  }
 }
