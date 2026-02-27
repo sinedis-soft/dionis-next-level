@@ -1,5 +1,6 @@
 // app/[lang]/about/page.tsx
 export const dynamic = "force-static";
+export const dynamicParams = false;
 
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
@@ -10,8 +11,16 @@ import { getAgreementDictionary } from "@/dictionaries/agreement";
 
 import AboutPage from "@/components/AboutPage";
 
+const ALLOWED_LANGS: Lang[] = ["ru", "kz", "en"];
+
 function normalizeLang(value: string): Lang {
-  return value === "ru" || value === "kz" || value === "en" ? value : "ru";
+  return (ALLOWED_LANGS as readonly string[]).includes(value)
+    ? (value as Lang)
+    : "ru";
+}
+
+export function generateStaticParams() {
+  return ALLOWED_LANGS.map((lang) => ({ lang }));
 }
 
 export async function generateMetadata({
@@ -19,7 +28,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ lang: string }>;
 }): Promise<Metadata> {
-  const { lang: rawLang } = await params;
+  const { lang: rawLang } = await params; // ✅ обязательно await
   const lang = normalizeLang(rawLang);
 
   const t = getAboutDictionary(lang);
@@ -34,7 +43,7 @@ export default async function Page({
 }: {
   params: Promise<{ lang: string }>;
 }) {
-  const { lang: rawLang } = await params;
+  const { lang: rawLang } = await params; // ✅ обязательно await
   const lang = normalizeLang(rawLang);
 
   const t: AboutDictionary = getAboutDictionary(lang);
@@ -45,7 +54,6 @@ export default async function Page({
     <AboutPage
       lang={lang}
       t={t}
-
       contact={home.contact}
       agreement={agreement}
     />

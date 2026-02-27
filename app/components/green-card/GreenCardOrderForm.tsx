@@ -1,37 +1,46 @@
 // app/components/green-card/GreenCardOrderForm.tsx
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useId,
+  type FormEvent,
+} from "react";
 import type { GreenCardFormDictionary } from "@/dictionaries/greenCardForm";
 import FilePicker from "@/components/FilePicker";
 
-// Маска: только латиница, пробел, дефис, апостроф
+type Props = { dict: GreenCardFormDictionary };
+
+type FormStatus = "idle" | "loading" | "success" | "error";
+type Step = 1 | 2;
+
+type VehicleBlock = { id: number };
+
 function formatLatinName(raw: string): string {
   return raw.replace(/[^A-Za-z\s'-]/g, "");
 }
 
-// Маска телефона: только цифры, с плюсом в начале
 function formatPhone(raw: string): string {
   const digits = raw.replace(/\D/g, "");
-  if (!digits) return "";
-  return "+" + digits;
+  return digits ? "+" + digits : "";
 }
 
-// Маска e-mail:
 function formatEmail(raw: string): string {
   let value = raw.replace(/\s/g, "");
   value = value.replace(/[^A-Za-z0-9.@_-]/g, "");
-  const firstAtIndex = value.indexOf("@");
-  if (firstAtIndex !== -1) {
-    const beforeAt = value.slice(0, firstAtIndex + 1);
-    const afterAt = value.slice(firstAtIndex + 1).replace(/@/g, "");
-    value = beforeAt + afterAt;
+  const at = value.indexOf("@");
+  if (at !== -1) {
+    const before = value.slice(0, at + 1);
+    const after = value.slice(at + 1).replace(/@/g, "");
+    value = before + after;
   }
   if (value.length > 50) value = value.slice(0, 50);
   return value.toLowerCase();
 }
 
-// Маска для "Индивидуальный номер (ИИН и т.п.)"
 function formatIdNumber(raw: string): string {
   return raw.replace(/\s/g, "").replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 20);
 }
@@ -40,32 +49,31 @@ function formatLatinAlnum(raw: string, maxLength = 20): string {
   return raw.replace(/\s/g, "").replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, maxLength);
 }
 
-type Props = {
-  dict: GreenCardFormDictionary;
-};
+function tpl(s: string, params: Record<string, string>) {
+  return s.replace(/\{(\w+)\}/g, (_, k) => params[k] ?? "");
+}
 
-type FormStatus = "idle" | "loading" | "success" | "error";
-type Step = 1 | 2;
+function safeCssEscape(value: string): string {
+  const esc = (globalThis as any)?.CSS?.escape;
+  if (typeof esc === "function") return esc(value);
+  return value.replace(/["\\]/g, "\\$&");
+}
 
 function RequiredMark() {
   return (
-    <span className="text-red-500" aria-hidden="true">
+    <span className="req" aria-hidden="true">
       {" "}
       *
     </span>
   );
 }
 
-function tpl(s: string, params: Record<string, string>) {
-  return s.replace(/\{(\w+)\}/g, (_, k) => params[k] ?? "");
-}
-
 function ErrorSummary({ title, items }: { title: string; items: string[] }) {
   if (!items.length) return null;
   return (
-    <div className="rounded-xl border border-red-200 bg-red-50 p-4">
-      <p className="text-sm font-semibold text-red-700">{title}</p>
-      <ul className="mt-2 list-disc pl-5 text-sm text-red-700 space-y-1">
+    <div className="err-box" role="alert" aria-live="polite">
+      <p className="err-box__title">{title}</p>
+      <ul className="err-box__list">
         {items.map((m, i) => (
           <li key={i}>{m}</li>
         ))}
@@ -89,34 +97,39 @@ function StepCrumbs({
   isBusy: boolean;
   labels: { step1: string; step2: string };
 }) {
-  const itemBase = "flex items-center gap-2 rounded-full px-3 py-1 text-xs sm:text-sm border transition";
-  const active = "bg-[#1A3A5F] text-white border-[#1A3A5F]";
-  const idle = "bg-white text-gray-700 border-gray-200 hover:border-gray-300";
-  const disabled = "bg-gray-50 text-gray-400 border-gray-200 cursor-not-allowed";
-
   return (
-    <nav aria-label="Form steps" className="mb-5">
-      <ol className="flex flex-wrap items-center justify-center gap-2">
+    <nav aria-label="Form steps" className="steps">
+      <ol className="steps__row">
         <li>
           <button
             type="button"
-            className={[itemBase, step === 1 ? active : idle].join(" ")}
+            className={[
+              "steps__btn",
+              step === 1 ? "steps__btn--active" : "steps__btn--idle",
+              isBusy ? "is-disabled" : "",
+            ].join(" ")}
             onClick={onGoStep1}
             disabled={isBusy}
           >
-            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/20 text-[11px]">
+            <span className="steps__num" aria-hidden="true">
               1
             </span>
-            <span className="font-semibold">{labels.step1}</span>
+            <span className="steps__label">{labels.step1}</span>
           </button>
         </li>
 
-        <li className="text-gray-300">→</li>
+        <li className="steps__sep" aria-hidden="true">
+          →
+        </li>
 
         <li>
           <button
             type="button"
-            className={[itemBase, step === 2 ? active : canAttemptStep2 ? idle : disabled].join(" ")}
+            className={[
+              "steps__btn",
+              step === 2 ? "steps__btn--active" : canAttemptStep2 ? "steps__btn--idle" : "steps__btn--disabled",
+              isBusy ? "is-disabled" : "",
+            ].join(" ")}
             onClick={() => {
               if (!canAttemptStep2) return;
               onGoStep2();
@@ -124,10 +137,10 @@ function StepCrumbs({
             disabled={isBusy || !canAttemptStep2}
             aria-disabled={isBusy || !canAttemptStep2}
           >
-            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/20 text-[11px]">
+            <span className="steps__num" aria-hidden="true">
               2
             </span>
-            <span className="font-semibold">{labels.step2}</span>
+            <span className="steps__label">{labels.step2}</span>
           </button>
         </li>
       </ol>
@@ -136,13 +149,13 @@ function StepCrumbs({
 }
 
 export function GreenCardOrderForm({ dict }: Props) {
-  const [step, setStep] = useState<Step>(1);
+  const uid = useId();
 
+  const [step, setStep] = useState<Step>(1);
   const [isCompany, setIsCompany] = useState(false);
-  // ✅ по умолчанию: НЕ ручной ввод → просим фото паспорта
   const [manualEntry, setManualEntry] = useState(false);
 
-  const [vehicleBlocks, setVehicleBlocks] = useState<number[]>([0]);
+  const [vehicles, setVehicles] = useState<VehicleBlock[]>([{ id: 0 }]);
 
   const [contactFirstNameLat, setContactFirstNameLat] = useState("");
   const [contactLastNameLat, setContactLastNameLat] = useState("");
@@ -153,9 +166,8 @@ export function GreenCardOrderForm({ dict }: Props) {
   const [passportNumber, setPassportNumber] = useState("");
 
   const [formStatus, setFormStatus] = useState<FormStatus>("idle");
-  const [formMessage, setFormMessage] = useState<string>("");
+  const [formMessage, setFormMessage] = useState("");
 
-  // ✅ ошибки по шагам (списком)
   const [step1Errors, setStep1Errors] = useState<string[]>([]);
   const [step2Errors, setStep2Errors] = useState<string[]>([]);
 
@@ -181,25 +193,22 @@ export function GreenCardOrderForm({ dict }: Props) {
     []
   );
 
-  const fieldClass = useMemo(
-    () =>
-      "w-full rounded-md border border-gray-300 px-3 py-2 text-sm bg-white " +
-      "focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]",
-    []
-  );
+  const isBusy = formStatus === "loading";
+  const hasError = formStatus === "error";
+  const hasSuccess = formStatus === "success";
+  const statusId = `${uid}-green-card-order-status`;
 
   const validateFiles = useCallback(
     (files: FileList): boolean => {
       let ok = true;
-
-      Array.from(files).forEach((file) => {
-        const forbidden = forbiddenTypes.some((t) => (t.endsWith("/") ? file.type.startsWith(t) : file.type === t));
+      Array.from(files || []).forEach((file) => {
+        const type = (file?.type || "").toLowerCase();
+        const forbidden = forbiddenTypes.some((t) => (t.endsWith("/") ? type.startsWith(t) : type === t));
         if (forbidden) {
           ok = false;
           alert(`${file.name}: ${dict.fileForbidden}`);
         }
       });
-
       return ok;
     },
     [dict.fileForbidden, forbiddenTypes]
@@ -211,12 +220,11 @@ export function GreenCardOrderForm({ dict }: Props) {
 
     const id = (el as HTMLInputElement).id;
     if (id) {
-      const lab = root.querySelector(`label[for="${CSS.escape(id)}"]`);
+      const lab = root.querySelector(`label[for="${safeCssEscape(id)}"]`) as HTMLLabelElement | null;
       const t = (lab?.textContent || "").replace(/\*/g, "").trim();
       if (t) return t;
     }
 
-    // fallback: name (но в норме не понадобится, т.к. всем полям даём id+htmlFor)
     const name = (el as HTMLInputElement).getAttribute?.("name")?.trim();
     if (name) return name;
 
@@ -234,9 +242,11 @@ export function GreenCardOrderForm({ dict }: Props) {
         root.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input, select, textarea")
       ).filter((el) => {
         if (el.disabled) return false;
+        if (el instanceof HTMLInputElement && el.type === "hidden") return false;
+
         const style = window.getComputedStyle(el);
         if (style.display === "none" || style.visibility === "hidden") return false;
-        if (el instanceof HTMLInputElement && el.type === "hidden") return false;
+
         return true;
       });
 
@@ -247,7 +257,7 @@ export function GreenCardOrderForm({ dict }: Props) {
         }
       }
 
-      // Паспортные файлы на шаге 1, если не company и не manualEntry
+      // Step 1: passport files required when person + auto mode
       if (s === 1 && !isCompany && !manualEntry) {
         const formEl = formRef.current;
         if (formEl) {
@@ -260,12 +270,12 @@ export function GreenCardOrderForm({ dict }: Props) {
         }
       }
 
-      // Техпаспорта на шаге 2 по каждому ТС
+      // Step 2: tech passport files for each vehicle
       if (s === 2) {
         const formEl = formRef.current;
         if (formEl) {
           const fd = new FormData(formEl);
-          vehicleBlocks.forEach((_, idx) => {
+          vehicles.forEach((_, idx) => {
             const key = `vehicles[${idx}][techPassportFiles]`;
             const vals = fd.getAll(key);
             const hasFiles = vals.some((v) => v instanceof File && (v as File).size > 0);
@@ -282,54 +292,21 @@ export function GreenCardOrderForm({ dict }: Props) {
 
       return Array.from(new Set(errors));
     },
-    [dict, getLabelForElement, isCompany, manualEntry, vehicleBlocks]
+    [dict, getLabelForElement, isCompany, manualEntry, vehicles]
   );
 
-  const refreshStep1Errors = useCallback(() => {
-    const errs = collectStepErrors(1);
-    setStep1Errors(errs);
-  }, [collectStepErrors]);
-
-  const refreshStep2Errors = useCallback(() => {
-    const errs = collectStepErrors(2);
-    setStep2Errors(errs);
-  }, [collectStepErrors]);
-
-  const handleAddVehicle = useCallback(() => {
-    setVehicleBlocks((prev) => {
-      const lastId = prev.length ? prev[prev.length - 1] : 0;
-      return [...prev, lastId + 1];
-    });
-
-    // если мы уже на шаге 2 — пересчитать ошибки после добавления блока
-    if (step === 2) {
-      setTimeout(() => refreshStep2Errors(), 0);
-    }
-  }, [refreshStep2Errors, step]);
-
-  const handleRemoveVehicle = useCallback(
-    (id: number) => {
-      setVehicleBlocks((prev) => {
-        if (prev.length === 1) return prev;
-        return prev.filter((vId) => vId !== id);
-      });
-
-      if (step === 2) {
-        setTimeout(() => refreshStep2Errors(), 0);
-      }
-    },
-    [refreshStep2Errors, step]
-  );
+  const refreshStep1Errors = useCallback(() => setStep1Errors(collectStepErrors(1)), [collectStepErrors]);
+  const refreshStep2Errors = useCallback(() => setStep2Errors(collectStepErrors(2)), [collectStepErrors]);
 
   const goStep1 = useCallback(() => {
-    if (formStatus === "loading") return;
+    if (isBusy) return;
     setStep(1);
     setStep2Errors([]);
     setTimeout(() => step1Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
-  }, [formStatus]);
+  }, [isBusy]);
 
   const goStep2 = useCallback(() => {
-    if (formStatus === "loading") return;
+    if (isBusy) return;
 
     const errs = collectStepErrors(1);
     if (errs.length) {
@@ -341,33 +318,69 @@ export function GreenCardOrderForm({ dict }: Props) {
 
     setStep1Errors([]);
     setStep(2);
-    // на входе шага 2 сразу показываем его ошибки (чтобы "как на шаге 1")
     setTimeout(() => {
       step2Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       refreshStep2Errors();
     }, 50);
-  }, [collectStepErrors, formStatus, refreshStep2Errors]);
+  }, [collectStepErrors, isBusy, refreshStep2Errors]);
 
-  const handleNext = useCallback(() => {
-    goStep2();
-  }, [goStep2]);
+  const handleAddVehicle = useCallback(() => {
+    setVehicles((prev) => {
+      const lastId = prev.length ? prev[prev.length - 1].id : 0;
+      return [...prev, { id: lastId + 1 }];
+    });
+    if (step === 2) setTimeout(() => refreshStep2Errors(), 0);
+  }, [refreshStep2Errors, step]);
 
-  const handlePrev = useCallback(() => {
-    goStep1();
-  }, [goStep1]);
+  const handleRemoveVehicle = useCallback(
+    (id: number) => {
+      setVehicles((prev) => {
+        if (prev.length === 1) return prev;
+        return prev.filter((v) => v.id !== id);
+      });
+      if (step === 2) setTimeout(() => refreshStep2Errors(), 0);
+    },
+    [refreshStep2Errors, step]
+  );
 
-  const handleOrderSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
+  const canAttemptStep2 = useMemo(() => {
+    if (!contactFirstNameLat.trim()) return false;
+    if (!contactLastNameLat.trim()) return false;
+    if (!contactPhone.trim()) return false;
+    if (!contactEmail.trim()) return false;
+    return true;
+  }, [contactFirstNameLat, contactLastNameLat, contactPhone, contactEmail]);
+
+  const resetAll = useCallback((formEl: HTMLFormElement) => {
+    formEl.reset();
+
+    setContactFirstNameLat("");
+    setContactLastNameLat("");
+    setContactPhone("");
+    setContactEmail("");
+
+    setPersonIdNumber("");
+    setPassportNumber("");
+
+    setVehicles([{ id: 0 }]);
+    setIsCompany(false);
+    setManualEntry(false);
+
+    setStep1Errors([]);
+    setStep2Errors([]);
+    setStep(1);
+  }, []);
+
+  const handleSubmit = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
-      if (formStatus === "loading") return;
+      if (isBusy) return;
 
-      // если вдруг submit на шаге 1 — пробуем перейти на шаг 2
       if (step !== 2) {
         goStep2();
         return;
       }
 
-      // финальная проверка шага 2
       const errs2 = collectStepErrors(2);
       if (errs2.length) {
         setStep2Errors(errs2);
@@ -391,20 +404,15 @@ export function GreenCardOrderForm({ dict }: Props) {
       try {
         const fd = new FormData(formEl);
 
-        if (typeof window !== "undefined") {
-          try {
-            fd.append("pageUrl", window.location.href);
-            const utm = localStorage.getItem("utm_data");
-            if (utm) fd.append("utm", utm);
-          } catch {
-            // ignore
-          }
+        try {
+          fd.append("pageUrl", window.location.href);
+          const utm = localStorage.getItem("utm_data");
+          if (utm) fd.append("utm", utm);
+        } catch {
+          // ignore
         }
 
-        const res = await fetch("/api/green-card-order", {
-          method: "POST",
-          body: fd,
-        });
+        const res = await fetch("/api/green-card-order", { method: "POST", body: fd });
 
         const data: unknown = await res.json().catch(() => null);
         const ok = Boolean((data as { ok?: boolean } | null)?.ok);
@@ -418,263 +426,294 @@ export function GreenCardOrderForm({ dict }: Props) {
 
         setFormStatus("success");
         setFormMessage(dict.successMessage);
-
-        // reset
-        formEl.reset();
-        setContactFirstNameLat("");
-        setContactLastNameLat("");
-        setContactPhone("");
-        setContactEmail("");
-        setPersonIdNumber("");
-        setPassportNumber("");
-        setVehicleBlocks([0]);
-        setIsCompany(false);
-        setManualEntry(false);
-        setStep1Errors([]);
-        setStep2Errors([]);
-        setStep(1);
+        resetAll(formEl);
       } catch (err) {
         console.error("GREEN CARD ORDER ERROR:", err);
         setFormStatus("error");
         setFormMessage("Ошибка на сервере при отправке заявки на Зеленую карту");
       }
     },
-    [collectStepErrors, dict.successMessage, formStatus, goStep2, step]
+    [collectStepErrors, dict.successMessage, goStep2, isBusy, resetAll, step]
   );
 
-  const statusId = "green-card-order-status";
-  const hasError = formStatus === "error";
-  const hasSuccess = formStatus === "success";
-  const isBusy = formStatus === "loading";
-
-  const canAttemptStep2 = useMemo(() => {
-    if (!contactFirstNameLat.trim()) return false;
-    if (!contactLastNameLat.trim()) return false;
-    if (!contactPhone.trim()) return false;
-    if (!contactEmail.trim()) return false;
-    return true;
-  }, [contactFirstNameLat, contactLastNameLat, contactPhone, contactEmail]);
-
   return (
-    <section id="green-card-order" className="py-12 sm:py-16 bg-white">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="card w-full bg-white px-6 sm:px-8 py-6 sm:py-8">
-          <div className="mb-4 text-center">
-            <h2 className="text-xl sm:text-2xl font-bold text-[#1A3A5F]">{dict.title}</h2>
-            <p className="mt-1 text-sm text-gray-600">{dict.intro}</p>
-          </div>
+    <section className="gc-form">
+      <div className="card card--pad">
+        <div className="gc-form__head">
+          <h2 className="gc-form__title">{dict.title}</h2>
+          <p className="gc-form__intro">{dict.intro}</p>
+        </div>
 
-          <StepCrumbs
-            step={step}
-            onGoStep1={goStep1}
-            onGoStep2={goStep2}
-            canAttemptStep2={canAttemptStep2}
-            isBusy={isBusy}
-            labels={dict.stepLabels}
-          />
+        <StepCrumbs
+          step={step}
+          onGoStep1={goStep1}
+          onGoStep2={goStep2}
+          canAttemptStep2={canAttemptStep2}
+          isBusy={isBusy}
+          labels={dict.stepLabels}
+        />
 
-          <form
-            ref={formRef}
-            className="space-y-8"
-            onSubmit={handleOrderSubmit}
-            aria-describedby={formStatus !== "idle" ? statusId : undefined}
-          >
-            {/* ===================== STEP 1 ===================== */}
-            <div ref={step1Ref} data-step="1" className={step === 1 ? "block" : "hidden"}>
-              <ErrorSummary title={dict.errors.title} items={step1Errors} />
+        <form ref={formRef} className="gc-form__inner" onSubmit={handleSubmit} aria-describedby={formStatus !== "idle" ? statusId : undefined}>
+          {/* ===================== STEP 1 ===================== */}
+          <div ref={step1Ref} hidden={step !== 1}>
+            <ErrorSummary title={dict.errors.title} items={step1Errors} />
 
-              {/* ========== CONTACT ========== */}
-              <div className="mb-6 mt-4">
-                <div className="mb-3">
-                  <h3 className="text-base sm:text-lg font-bold text-[#C89F4A]">{dict.contact.legend}</h3>
-                </div>
+            {/* CONTACT */}
+            <div className="gc-block">
+              <div className="gc-block__hd">
+                <h3 className="gc-block__title">{dict.contact.legend}</h3>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="contact_firstNameLat" className="block text-sm font-medium text-gray-700 mb-1">
-                      {dict.contact.firstName}
-                      <RequiredMark />
-                    </label>
-                    <input
-                      id="contact_firstNameLat"
-                      type="text"
-                      name="contact_firstNameLat"
-                      value={contactFirstNameLat}
-                      onChange={(e) => {
-                        setContactFirstNameLat(formatLatinName(e.target.value));
-                        if (step1Errors.length) setStep1Errors([]);
-                      }}
-                      className={fieldClass}
-                      required
-                      disabled={isBusy}
-                      autoComplete="given-name"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="contact_lastNameLat" className="block text-sm font-medium text-gray-700 mb-1">
-                      {dict.contact.lastName}
-                      <RequiredMark />
-                    </label>
-                    <input
-                      id="contact_lastNameLat"
-                      type="text"
-                      name="contact_lastNameLat"
-                      value={contactLastNameLat}
-                      onChange={(e) => {
-                        setContactLastNameLat(formatLatinName(e.target.value));
-                        if (step1Errors.length) setStep1Errors([]);
-                      }}
-                      className={fieldClass}
-                      required
-                      disabled={isBusy}
-                      autoComplete="family-name"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="contact_phone" className="block text-sm font-medium text-gray-700 mb-1">
-                      {dict.contact.phone}
-                      <RequiredMark />
-                    </label>
-                    <input
-                      id="contact_phone"
-                      type="tel"
-                      name="contact_phone"
-                      value={contactPhone}
-                      onChange={(e) => {
-                        setContactPhone(formatPhone(e.target.value));
-                        if (step1Errors.length) setStep1Errors([]);
-                      }}
-                      className={fieldClass}
-                      required
-                      disabled={isBusy}
-                      autoComplete="tel"
-                      inputMode="tel"
-                      placeholder="+7 777 1234567"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="contact_email" className="block text-sm font-medium text-gray-700 mb-1">
-                      {dict.contact.email}
-                      <RequiredMark />
-                    </label>
-                    <input
-                      id="contact_email"
-                      type="email"
-                      name="contact_email"
-                      value={contactEmail}
-                      onChange={(e) => {
-                        setContactEmail(formatEmail(e.target.value));
-                        if (step1Errors.length) setStep1Errors([]);
-                      }}
-                      className={fieldClass}
-                      required
-                      disabled={isBusy}
-                      autoComplete="email"
-                      inputMode="email"
-                    />
-                  </div>
-                </div>
-
-                <div className="mt-4 flex items-start gap-2 text-xs text-gray-700">
-                  <input
-                    id="order-isCompany"
-                    name="order_isCompany"
-                    type="checkbox"
-                    className="mt-0.5"
-                    checked={isCompany}
-                    disabled={isBusy}
-                    onChange={(e) => {
-                      const checked = e.target.checked;
-                      setIsCompany(checked);
-                      if (checked) setManualEntry(false);
-                      setStep1Errors([]);
-                      // сразу обновим ошибки, если пользователь кликает туда-сюда
-                      setTimeout(() => refreshStep1Errors(), 0);
-                    }}
-                  />
-                  <label htmlFor="order-isCompany" className="font-bold">
-                    {dict.contact.isCompanyLabel}
+              <div className="grid grid-2">
+                <div className="field">
+                  <label htmlFor={`${uid}-contact_firstNameLat`} className="lbl">
+                    {dict.contact.firstName}
+                    <RequiredMark />
                   </label>
+                  <input
+                    id={`${uid}-contact_firstNameLat`}
+                    type="text"
+                    name="contact_firstNameLat"
+                    className="control"
+                    value={contactFirstNameLat}
+                    onChange={(e) => {
+                      setContactFirstNameLat(formatLatinName(e.target.value));
+                      if (step1Errors.length) setStep1Errors([]);
+                    }}
+                    required
+                    disabled={isBusy}
+                    autoComplete="given-name"
+                  />
+                </div>
+
+                <div className="field">
+                  <label htmlFor={`${uid}-contact_lastNameLat`} className="lbl">
+                    {dict.contact.lastName}
+                    <RequiredMark />
+                  </label>
+                  <input
+                    id={`${uid}-contact_lastNameLat`}
+                    type="text"
+                    name="contact_lastNameLat"
+                    className="control"
+                    value={contactLastNameLat}
+                    onChange={(e) => {
+                      setContactLastNameLat(formatLatinName(e.target.value));
+                      if (step1Errors.length) setStep1Errors([]);
+                    }}
+                    required
+                    disabled={isBusy}
+                    autoComplete="family-name"
+                  />
+                </div>
+
+                <div className="field">
+                  <label htmlFor={`${uid}-contact_phone`} className="lbl">
+                    {dict.contact.phone}
+                    <RequiredMark />
+                  </label>
+                  <input
+                    id={`${uid}-contact_phone`}
+                    type="tel"
+                    name="contact_phone"
+                    className="control"
+                    value={contactPhone}
+                    onChange={(e) => {
+                      setContactPhone(formatPhone(e.target.value));
+                      if (step1Errors.length) setStep1Errors([]);
+                    }}
+                    required
+                    disabled={isBusy}
+                    autoComplete="tel"
+                    inputMode="tel"
+                    placeholder="+7 777 1234567"
+                  />
+                </div>
+
+                <div className="field">
+                  <label htmlFor={`${uid}-contact_email`} className="lbl">
+                    {dict.contact.email}
+                    <RequiredMark />
+                  </label>
+                  <input
+                    id={`${uid}-contact_email`}
+                    type="email"
+                    name="contact_email"
+                    className="control"
+                    value={contactEmail}
+                    onChange={(e) => {
+                      setContactEmail(formatEmail(e.target.value));
+                      if (step1Errors.length) setStep1Errors([]);
+                    }}
+                    required
+                    disabled={isBusy}
+                    autoComplete="email"
+                    inputMode="email"
+                  />
                 </div>
               </div>
 
-              {/* ========== PERSON / COMPANY ========== */}
-              <div>
-                <div className="mb-3">
-                  <h3 className="text-base sm:text-lg font-bold text-[#C89F4A]">
-                    {isCompany ? dict.company.legend : dict.person.legend}
-                  </h3>
-                </div>
+              <div className="gc-checkrow">
+                <input
+                  id={`${uid}-order-isCompany`}
+                  name="order_isCompany"
+                  type="checkbox"
+                  checked={isCompany}
+                  disabled={isBusy}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setIsCompany(checked);
+                    if (checked) setManualEntry(false);
+                    setStep1Errors([]);
+                    setTimeout(() => refreshStep1Errors(), 0);
+                  }}
+                />
+                <label htmlFor={`${uid}-order-isCompany`} className="gc-checkrow__label">
+                  {dict.contact.isCompanyLabel}
+                </label>
+              </div>
+            </div>
 
-                {isCompany ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="company_bin" className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.company.bin}
-                        <RequiredMark />
-                      </label>
-                      <input
-                        id="company_bin"
-                        type="text"
-                        name="company_bin"
-                        className={fieldClass}
-                        required
-                        disabled={isBusy}
-                        onChange={() => step1Errors.length && setStep1Errors([])}
-                      />
-                    </div>
+            {/* PERSON / COMPANY */}
+            <div className="gc-block">
+              <div className="gc-block__hd">
+                <h3 className="gc-block__title">{isCompany ? dict.company.legend : dict.person.legend}</h3>
+              </div>
 
-                    <div>
-                      <label htmlFor="company_email" className="block text-sm font-medium text-gray-700 mb-1">
-                        {dict.company.email}
-                        <RequiredMark />
-                      </label>
-                      <input
-                        id="company_email"
-                        type="email"
-                        name="company_email"
-                        className={fieldClass}
-                        required
-                        disabled={isBusy}
-                        onChange={() => step1Errors.length && setStep1Errors([])}
-                      />
-                    </div>
+              {isCompany ? (
+                <div className="grid grid-2">
+                  <div className="field">
+                    <label htmlFor={`${uid}-company_bin`} className="lbl">
+                      {dict.company.bin}
+                      <RequiredMark />
+                    </label>
+                    <input
+                      id={`${uid}-company_bin`}
+                      type="text"
+                      name="company_bin"
+                      className="control"
+                      required
+                      disabled={isBusy}
+                      onChange={() => step1Errors.length && setStep1Errors([])}
+                    />
                   </div>
-                ) : (
-                  <>
-                    <div className="mb-3 flex items-start gap-2 text-xs text-gray-600">
-                      <input
-                        id="person-manualEntry"
-                        name="person_manualEntry"
-                        type="checkbox"
-                        className="mt-0.5"
-                        checked={manualEntry}
-                        disabled={isBusy}
-                        onChange={(e) => {
-                          setManualEntry(e.target.checked);
-                          setStep1Errors([]);
-                          setTimeout(() => refreshStep1Errors(), 0);
-                        }}
-                      />
-                      <label htmlFor="person-manualEntry" className="font-bold">
-                        {dict.manualEntryLabel}
-                      </label>
-                    </div>
 
-                    {!manualEntry ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <label htmlFor="person_gender_auto" className="block text-sm font-medium text-gray-700 mb-1">
+                  <div className="field">
+                    <label htmlFor={`${uid}-company_email`} className="lbl">
+                      {dict.company.email}
+                      <RequiredMark />
+                    </label>
+                    <input
+                      id={`${uid}-company_email`}
+                      type="email"
+                      name="company_email"
+                      className="control"
+                      required
+                      disabled={isBusy}
+                      onChange={() => step1Errors.length && setStep1Errors([])}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="gc-checkrow gc-checkrow--hint">
+                    <input
+                      id={`${uid}-person-manualEntry`}
+                      name="person_manualEntry"
+                      type="checkbox"
+                      checked={manualEntry}
+                      disabled={isBusy}
+                      onChange={(e) => {
+                        setManualEntry(e.target.checked);
+                        setStep1Errors([]);
+                        setTimeout(() => refreshStep1Errors(), 0);
+                      }}
+                    />
+                    <label htmlFor={`${uid}-person-manualEntry`} className="gc-checkrow__label">
+                      {dict.manualEntryLabel}
+                    </label>
+                  </div>
+
+                  {!manualEntry ? (
+                    <div className="grid grid-2">
+                      <div className="field">
+                        <label htmlFor={`${uid}-person_gender_auto`} className="lbl">
+                          {dict.person.gender}
+                          <RequiredMark />
+                        </label>
+                        <select
+                          id={`${uid}-person_gender_auto`}
+                          name="person_gender"
+                          className="control"
+                          defaultValue=""
+                          required
+                          disabled={isBusy}
+                          onChange={() => step1Errors.length && setStep1Errors([])}
+                        >
+                          <option value="">{dict.notSelected}</option>
+                          <option value="male">{dict.person.genderMale}</option>
+                          <option value="female">{dict.person.genderFemale}</option>
+                        </select>
+                      </div>
+
+                      <div className="field">
+                        <label htmlFor={`${uid}-person_address_auto`} className="lbl">
+                          {dict.person.address}
+                          <RequiredMark />
+                        </label>
+                        <input
+                          id={`${uid}-person_address_auto`}
+                          type="text"
+                          name="person_address"
+                          className="control"
+                          required
+                          disabled={isBusy}
+                          onChange={() => step1Errors.length && setStep1Errors([])}
+                        />
+                      </div>
+
+                      <div className="field field--full">
+                        <FilePicker
+                          id={`${uid}-person_passportFiles`}
+                          name="person_passportFiles"
+                          label={dict.passportFilesLabel}
+                          required
+                          multiple
+                          disabled={isBusy}
+                          accept="image/*,application/pdf"
+                          onValidate={(files) => {
+                            const ok = validateFiles(files);
+                            setTimeout(() => refreshStep1Errors(), 0);
+                            return ok;
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="grid grid-2">
+                        <div className="field">
+                          <label htmlFor={`${uid}-person_middleName`} className="lbl">
+                            {dict.person.middleName}
+                          </label>
+                          <input
+                            id={`${uid}-person_middleName`}
+                            type="text"
+                            name="person_middleName"
+                            className="control"
+                            disabled={isBusy}
+                          />
+                        </div>
+
+                        <div className="field">
+                          <label htmlFor={`${uid}-person_gender_manual`} className="lbl">
                             {dict.person.gender}
                             <RequiredMark />
                           </label>
                           <select
-                            id="person_gender_auto"
+                            id={`${uid}-person_gender_manual`}
                             name="person_gender"
-                            className={fieldClass}
+                            className="control"
                             defaultValue=""
                             required
                             disabled={isBusy}
@@ -686,378 +725,306 @@ export function GreenCardOrderForm({ dict }: Props) {
                           </select>
                         </div>
 
-                        <div>
-                          <label htmlFor="person_address_auto" className="block text-sm font-medium text-gray-700 mb-1">
-                            {dict.person.address}
+                        <div className="field">
+                          <label htmlFor={`${uid}-person_birthDate`} className="lbl">
+                            {dict.person.birthDate}
                             <RequiredMark />
                           </label>
                           <input
-                            id="person_address_auto"
-                            type="text"
-                            name="person_address"
-                            className={fieldClass}
+                            id={`${uid}-person_birthDate`}
+                            type="date"
+                            name="person_birthDate"
+                            max={maxBirthDate}
+                            className="control"
                             required
                             disabled={isBusy}
                             onChange={() => step1Errors.length && setStep1Errors([])}
                           />
                         </div>
 
-                        <div className="sm:col-span-2">
-                          <FilePicker
-                            id="person_passportFiles"
-                            name="person_passportFiles"
-                            label={dict.passportFilesLabel}
-                            required
-                            multiple
-                            disabled={isBusy}
-                            accept="image/*,application/pdf"
-                            onValidate={(files) => {
-                              const ok = validateFiles(files);
-                              // если ок — обновим ошибки шага 1, чтобы убрать "Не загружено"
-                              setTimeout(() => refreshStep1Errors(), 0);
-                              return ok;
+                        <div className="field">
+                          <label htmlFor={`${uid}-person_idNumber`} className="lbl">
+                            {dict.person.idNumber}
+                            <RequiredMark />
+                          </label>
+                          <input
+                            id={`${uid}-person_idNumber`}
+                            type="text"
+                            name="person_idNumber"
+                            className="control"
+                            value={personIdNumber}
+                            onChange={(e) => {
+                              setPersonIdNumber(formatIdNumber(e.target.value));
+                              if (step1Errors.length) setStep1Errors([]);
                             }}
+                            required
+                            disabled={isBusy}
+                          />
+                        </div>
+
+                        <div className="field field--full">
+                          <label htmlFor={`${uid}-person_address_manual`} className="lbl">
+                            {dict.person.address}
+                            <RequiredMark />
+                          </label>
+                          <input
+                            id={`${uid}-person_address_manual`}
+                            type="text"
+                            name="person_address"
+                            className="control"
+                            required
+                            disabled={isBusy}
+                            onChange={() => step1Errors.length && setStep1Errors([])}
                           />
                         </div>
                       </div>
-                    ) : (
-                      <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div>
-                            <label htmlFor="person_middleName" className="block text-sm font-medium text-gray-700 mb-1">
-                              {dict.person.middleName}
-                            </label>
-                            <input
-                              id="person_middleName"
-                              type="text"
-                              name="person_middleName"
-                              className={fieldClass}
-                              disabled={isBusy}
-                            />
-                          </div>
 
-                          <div>
-                            <label htmlFor="person_gender_manual" className="block text-sm font-medium text-gray-700 mb-1">
-                              {dict.person.gender}
-                              <RequiredMark />
-                            </label>
-                            <select
-                              id="person_gender_manual"
-                              name="person_gender"
-                              className={fieldClass}
-                              defaultValue=""
-                              required
-                              disabled={isBusy}
-                              onChange={() => step1Errors.length && setStep1Errors([])}
-                            >
-                              <option value="">{dict.notSelected}</option>
-                              <option value="male">{dict.person.genderMale}</option>
-                              <option value="female">{dict.person.genderFemale}</option>
-                            </select>
-                          </div>
-
-                          <div>
-                            <label htmlFor="person_birthDate" className="block text-sm font-medium text-gray-700 mb-1">
-                              {dict.person.birthDate}
-                              <RequiredMark />
-                            </label>
-                            <input
-                              id="person_birthDate"
-                              type="date"
-                              name="person_birthDate"
-                              max={maxBirthDate}
-                              className={fieldClass}
-                              required
-                              disabled={isBusy}
-                              onChange={() => step1Errors.length && setStep1Errors([])}
-                            />
-                          </div>
-
-                          <div>
-                            <label htmlFor="person_idNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                              {dict.person.idNumber}
-                              <RequiredMark />
-                            </label>
-                            <input
-                              id="person_idNumber"
-                              type="text"
-                              name="person_idNumber"
-                              value={personIdNumber}
-                              onChange={(e) => {
-                                setPersonIdNumber(formatIdNumber(e.target.value));
-                                if (step1Errors.length) setStep1Errors([]);
-                              }}
-                              className={fieldClass}
-                              required
-                              disabled={isBusy}
-                            />
-                          </div>
-
-                          <div className="sm:col-span-2">
-                            <label htmlFor="person_address_manual" className="block text-sm font-medium text-gray-700 mb-1">
-                              {dict.person.address}
-                              <RequiredMark />
-                            </label>
-                            <input
-                              id="person_address_manual"
-                              type="text"
-                              name="person_address"
-                              className={fieldClass}
-                              required
-                              disabled={isBusy}
-                              onChange={() => step1Errors.length && setStep1Errors([])}
-                            />
-                          </div>
+                      <div className="grid grid-2 mt-4">
+                        <div className="field">
+                          <label htmlFor={`${uid}-person_passportNumber`} className="lbl">
+                            {dict.person.passportNumber}
+                            <RequiredMark />
+                          </label>
+                          <input
+                            id={`${uid}-person_passportNumber`}
+                            type="text"
+                            name="person_passportNumber"
+                            className="control"
+                            value={passportNumber}
+                            onChange={(e) => {
+                              setPassportNumber(formatLatinAlnum(e.target.value, 20));
+                              if (step1Errors.length) setStep1Errors([]);
+                            }}
+                            required
+                            disabled={isBusy}
+                          />
                         </div>
 
-                        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div>
-                            <label htmlFor="person_passportNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                              {dict.person.passportNumber}
-                              <RequiredMark />
-                            </label>
-                            <input
-                              id="person_passportNumber"
-                              type="text"
-                              name="person_passportNumber"
-                              value={passportNumber}
-                              onChange={(e) => {
-                                setPassportNumber(formatLatinAlnum(e.target.value, 20));
-                                if (step1Errors.length) setStep1Errors([]);
-                              }}
-                              className={fieldClass}
-                              required
-                              disabled={isBusy}
-                            />
-                          </div>
-
-                          <div>
-                            <label htmlFor="person_passportIssuer" className="block text-sm font-medium text-gray-700 mb-1">
-                              {dict.person.passportIssuer}
-                              <RequiredMark />
-                            </label>
-                            <input
-                              id="person_passportIssuer"
-                              type="text"
-                              name="person_passportIssuer"
-                              className={fieldClass}
-                              required
-                              disabled={isBusy}
-                              onChange={() => step1Errors.length && setStep1Errors([])}
-                            />
-                          </div>
-
-                          <div>
-                            <label htmlFor="person_passportIssuedAt" className="block text-sm font-medium text-gray-700 mb-1">
-                              {dict.person.passportIssuedAt}
-                              <RequiredMark />
-                            </label>
-                            <input
-                              id="person_passportIssuedAt"
-                              type="date"
-                              name="person_passportIssuedAt"
-                              max={maxIssuedDate}
-                              className={fieldClass}
-                              required
-                              disabled={isBusy}
-                              onChange={() => step1Errors.length && setStep1Errors([])}
-                            />
-                          </div>
-
-                          <div>
-                            <label htmlFor="person_passportValidTo" className="block text-sm font-medium text-gray-700 mb-1">
-                              {dict.person.passportValidTo}
-                              <RequiredMark />
-                            </label>
-                            <input
-                              id="person_passportValidTo"
-                              type="date"
-                              name="person_passportValidTo"
-                              min={minStartDate}
-                              className={fieldClass}
-                              required
-                              disabled={isBusy}
-                              onChange={() => step1Errors.length && setStep1Errors([])}
-                            />
-                          </div>
+                        <div className="field">
+                          <label htmlFor={`${uid}-person_passportIssuer`} className="lbl">
+                            {dict.person.passportIssuer}
+                            <RequiredMark />
+                          </label>
+                          <input
+                            id={`${uid}-person_passportIssuer`}
+                            type="text"
+                            name="person_passportIssuer"
+                            className="control"
+                            required
+                            disabled={isBusy}
+                            onChange={() => step1Errors.length && setStep1Errors([])}
+                          />
                         </div>
-                      </>
-                    )}
-                  </>
-                )}
-              </div>
 
-              <div className="pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3">
-                <button
-                  type="button"
-                  className="btn w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
-                  onClick={() => {
-                    // при клике "Далее" сразу показываем все ошибки шага 1
-                    const errs = collectStepErrors(1);
-                    if (errs.length) {
-                      setStep1Errors(errs);
-                      setTimeout(() => step1Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
-                      return;
-                    }
-                    goStep2();
-                  }}
-                  disabled={isBusy}
-                >
-                  {dict.nextStep} →
-                </button>
-              </div>
+                        <div className="field">
+                          <label htmlFor={`${uid}-person_passportIssuedAt`} className="lbl">
+                            {dict.person.passportIssuedAt}
+                            <RequiredMark />
+                          </label>
+                          <input
+                            id={`${uid}-person_passportIssuedAt`}
+                            type="date"
+                            name="person_passportIssuedAt"
+                            max={maxIssuedDate}
+                            className="control"
+                            required
+                            disabled={isBusy}
+                            onChange={() => step1Errors.length && setStep1Errors([])}
+                          />
+                        </div>
+
+                        <div className="field">
+                          <label htmlFor={`${uid}-person_passportValidTo`} className="lbl">
+                            {dict.person.passportValidTo}
+                            <RequiredMark />
+                          </label>
+                          <input
+                            id={`${uid}-person_passportValidTo`}
+                            type="date"
+                            name="person_passportValidTo"
+                            min={minStartDate}
+                            className="control"
+                            required
+                            disabled={isBusy}
+                            onChange={() => step1Errors.length && setStep1Errors([])}
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
             </div>
 
-            {/* ===================== STEP 2 ===================== */}
-            <div ref={step2Ref} data-step="2" className={step === 2 ? "block" : "hidden"}>
-              <ErrorSummary title={dict.errors.title} items={step2Errors} />
+            <div className="row-between mt-4">
+              <span />
+              <button
+                type="button"
+                className={["btn btn-primary", isBusy ? "is-disabled" : ""].join(" ")}
+                onClick={() => {
+                  const errs = collectStepErrors(1);
+                  if (errs.length) {
+                    setStep1Errors(errs);
+                    setTimeout(() => step1Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+                    return;
+                  }
+                  goStep2();
+                }}
+                disabled={isBusy}
+              >
+                {dict.nextStep} →
+              </button>
+            </div>
+          </div>
 
-              <div className="mt-4">
-                <div className="mb-3">
-                  <h3 className="text-base sm:text-lg font-bold text-[#C89F4A]">{dict.vehicles.legend}</h3>
-                </div>
+          {/* ===================== STEP 2 ===================== */}
+          <div ref={step2Ref} hidden={step !== 2}>
+            <ErrorSummary title={dict.errors.title} items={step2Errors} />
 
-                <div className="flex justify-between items-center gap-4">
-                  <p className="text-xs text-gray-600">{dict.vehicles.description}</p>
+            <div className="gc-block">
+              <div className="gc-block__hd">
+                <h3 className="gc-block__title">{dict.vehicles.legend}</h3>
+              </div>
 
-                  <button
-                    type="button"
-                    className="text-xs sm:text-sm text-[#23376c] underline underline-offset-2 hover:opacity-80"
-                    onClick={handleAddVehicle}
-                    disabled={isBusy}
-                  >
-                    {dict.vehicles.addButton}
-                  </button>
-                </div>
+              <div className="row-between">
+                <p className="hint">{dict.vehicles.description}</p>
 
-                <div className="mt-4 space-y-6">
-                  {vehicleBlocks.map((id, idx) => (
-                    <div key={id} className="rounded-xl border border-gray-200 bg-white p-4">
-                      <div className="flex justify-between items-center mb-3">
-                        <p className="text-xs font-semibold text-gray-500">
-                          {dict.vehicles.blockTitle} #{idx + 1}
-                        </p>
+                <button
+                  type="button"
+                  className={["link", isBusy ? "is-disabled" : ""].join(" ")}
+                  onClick={handleAddVehicle}
+                  disabled={isBusy}
+                >
+                  {dict.vehicles.addButton}
+                </button>
+              </div>
 
-                        {vehicleBlocks.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveVehicle(id)}
-                            className="text-xs text-red-500 underline underline-offset-2"
-                            disabled={isBusy}
-                          >
-                            {dict.vehicles.removeButton}
-                          </button>
-                        )}
+              <div className="stack gap-14 mt-4">
+                {vehicles.map((v, idx) => (
+                  <div key={v.id} className="card card--pad gc-vehicle">
+                    <div className="row-between">
+                      <p className="card-title" style={{ margin: 0 }}>
+                        {dict.vehicles.blockTitle} #{idx + 1}
+                      </p>
+
+                      {vehicles.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveVehicle(v.id)}
+                          className={["link link--danger", isBusy ? "is-disabled" : ""].join(" ")}
+                          disabled={isBusy}
+                        >
+                          {dict.vehicles.removeButton}
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-2 mt-4">
+                      <div className="field">
+                        <label htmlFor={`${uid}-vehicles_${idx}_plate`} className="lbl">
+                          {dict.vehicles.plate}
+                          <RequiredMark />
+                        </label>
+                        <input
+                          id={`${uid}-vehicles_${idx}_plate`}
+                          type="text"
+                          name={`vehicles[${idx}][plate]`}
+                          className="control"
+                          required
+                          disabled={isBusy}
+                          onChange={(e) => {
+                            e.currentTarget.value = formatLatinAlnum(e.currentTarget.value, 12);
+                            if (step2Errors.length) setStep2Errors([]);
+                          }}
+                        />
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                          <label htmlFor={`vehicles_${idx}_plate`} className="block text-sm font-medium text-gray-700 mb-1">
-                            {dict.vehicles.plate}
-                            <RequiredMark />
-                          </label>
-                          <input
-                            id={`vehicles_${idx}_plate`}
-                            type="text"
-                            name={`vehicles[${idx}][plate]`}
-                            onChange={(e) => {
-                              e.currentTarget.value = formatLatinAlnum(e.currentTarget.value, 12);
-                              if (step2Errors.length) setStep2Errors([]);
-                            }}
-                            className={fieldClass}
-                            required
-                            disabled={isBusy}
-                          />
-                        </div>
-
-                        <div>
-                          <label htmlFor={`vehicles_${idx}_type`} className="block text-sm font-medium text-gray-700 mb-1">
-                            {dict.vehicles.vehicleTypeLabel}
-                            <RequiredMark />
-                          </label>
-                          <select
-                            id={`vehicles_${idx}_type`}
-                            name={`vehicles[${idx}][type]`}
-                            className={fieldClass}
-                            defaultValue=""
-                            required
-                            disabled={isBusy}
-                            onChange={() => step2Errors.length && setStep2Errors([])}
-                          >
-                            <option value="">{dict.notSelected}</option>
-                            <option value="127">{dict.vehicles.vehicleTypePassenger}</option>
-                            <option value="131">{dict.vehicles.vehicleTypeBus}</option>
-                            <option value="453">{dict.vehicles.vehicleTypeTruck}</option>
-                            <option value="251">{dict.vehicles.vehicleTypeTrailer}</option>
-                            <option value="217">{dict.vehicles.vehicleTypeMotorcycle}</option>
-                            <option value="457">{dict.vehicles.vehicleTypeSpecial}</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label htmlFor={`insurance_territory_${idx}`} className="block text-sm font-medium text-gray-700 mb-1">
-                            {dict.insurance.territoryLabel}
-                            <RequiredMark />
-                          </label>
-                          {/* оставляем name один (как у тебя), но id делаем уникальным на блок */}
-                          <select
-                            id={`insurance_territory_${idx}`}
-                            name="insurance_territory"
-                            className={fieldClass}
-                            defaultValue=""
-                            required
-                            disabled={isBusy}
-                            onChange={() => step2Errors.length && setStep2Errors([])}
-                          >
-                            <option value="">{dict.notSelected}</option>
-                            <option value="1155">{dict.insurance.territoryAll}</option>
-                            <option value="1267">{dict.insurance.territoryTMU}</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label htmlFor={`vehicles_${idx}_startDate`} className="block text-sm font-medium text-gray-700 mb-1">
-                            {dict.vehicles.startDate}
-                            <RequiredMark />
-                          </label>
-                          <input
-                            id={`vehicles_${idx}_startDate`}
-                            type="date"
-                            name={`vehicles[${idx}][startDate]`}
-                            min={minStartDate}
-                            className={fieldClass}
-                            required
-                            disabled={isBusy}
-                            onChange={() => step2Errors.length && setStep2Errors([])}
-                          />
-                        </div>
-
-                        <div>
-                          <label htmlFor={`vehicles_${idx}_period`} className="block text-sm font-medium text-gray-700 mb-1">
-                            {dict.vehicles.periodLabel}
-                            <RequiredMark />
-                          </label>
-                          <select
-                            id={`vehicles_${idx}_period`}
-                            name={`vehicles[${idx}][period]`}
-                            className={fieldClass}
-                            defaultValue=""
-                            required
-                            disabled={isBusy}
-                            onChange={() => step2Errors.length && setStep2Errors([])}
-                          >
-                            <option value="">{dict.notSelected}</option>
-                            <option value="115">{dict.vehicles.period1m}</option>
-                            <option value="117">{dict.vehicles.period3m}</option>
-                            <option value="119">{dict.vehicles.period6m}</option>
-                            <option value="121">{dict.vehicles.period12m}</option>
-                          </select>
-                        </div>
+                      <div className="field">
+                        <label htmlFor={`${uid}-vehicles_${idx}_type`} className="lbl">
+                          {dict.vehicles.vehicleTypeLabel}
+                          <RequiredMark />
+                        </label>
+                        <select
+                          id={`${uid}-vehicles_${idx}_type`}
+                          name={`vehicles[${idx}][type]`}
+                          className="control"
+                          defaultValue=""
+                          required
+                          disabled={isBusy}
+                          onChange={() => step2Errors.length && setStep2Errors([])}
+                        >
+                          <option value="">{dict.notSelected}</option>
+                          <option value="127">{dict.vehicles.vehicleTypePassenger}</option>
+                          <option value="131">{dict.vehicles.vehicleTypeBus}</option>
+                          <option value="453">{dict.vehicles.vehicleTypeTruck}</option>
+                          <option value="251">{dict.vehicles.vehicleTypeTrailer}</option>
+                          <option value="217">{dict.vehicles.vehicleTypeMotorcycle}</option>
+                          <option value="457">{dict.vehicles.vehicleTypeSpecial}</option>
+                        </select>
                       </div>
 
-                      <div className="mt-4">
+                      <div className="field">
+                        <label htmlFor={`${uid}-insurance_territory_${idx}`} className="lbl">
+                          {dict.insurance.territoryLabel}
+                          <RequiredMark />
+                        </label>
+                        <select
+                          id={`${uid}-insurance_territory_${idx}`}
+                          name="insurance_territory"
+                          className="control"
+                          defaultValue=""
+                          required
+                          disabled={isBusy}
+                          onChange={() => step2Errors.length && setStep2Errors([])}
+                        >
+                          <option value="">{dict.notSelected}</option>
+                          <option value="1155">{dict.insurance.territoryAll}</option>
+                          <option value="1267">{dict.insurance.territoryTMU}</option>
+                        </select>
+                      </div>
+
+                      <div className="field">
+                        <label htmlFor={`${uid}-vehicles_${idx}_startDate`} className="lbl">
+                          {dict.vehicles.startDate}
+                          <RequiredMark />
+                        </label>
+                        <input
+                          id={`${uid}-vehicles_${idx}_startDate`}
+                          type="date"
+                          name={`vehicles[${idx}][startDate]`}
+                          min={minStartDate}
+                          className="control"
+                          required
+                          disabled={isBusy}
+                          onChange={() => step2Errors.length && setStep2Errors([])}
+                        />
+                      </div>
+
+                      <div className="field">
+                        <label htmlFor={`${uid}-vehicles_${idx}_period`} className="lbl">
+                          {dict.vehicles.periodLabel}
+                          <RequiredMark />
+                        </label>
+                        <select
+                          id={`${uid}-vehicles_${idx}_period`}
+                          name={`vehicles[${idx}][period]`}
+                          className="control"
+                          defaultValue=""
+                          required
+                          disabled={isBusy}
+                          onChange={() => step2Errors.length && setStep2Errors([])}
+                        >
+                          <option value="">{dict.notSelected}</option>
+                          <option value="115">{dict.vehicles.period1m}</option>
+                          <option value="117">{dict.vehicles.period3m}</option>
+                          <option value="119">{dict.vehicles.period6m}</option>
+                          <option value="121">{dict.vehicles.period12m}</option>
+                        </select>
+                      </div>
+
+                      <div className="field field--full">
                         <FilePicker
-                          id={`vehicles_${idx}_techPassportFiles`}
+                          id={`${uid}-vehicles_${idx}_techPassportFiles`}
                           name={`vehicles[${idx}][techPassportFiles]`}
                           label={dict.vehicles.techPassportFilesLabel}
                           required
@@ -1066,71 +1033,53 @@ export function GreenCardOrderForm({ dict }: Props) {
                           accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                           onValidate={(files) => {
                             const ok = validateFiles(files);
-                            // пересчитать ошибки шага 2, чтобы убрать "Не загружено"
                             setTimeout(() => refreshStep2Errors(), 0);
                             return ok;
                           }}
                         />
                       </div>
                     </div>
-                  ))}
-                </div>
-
-                {formStatus !== "idle" && (
-                  <div
-                    id={statusId}
-                    role="status"
-                    aria-live="polite"
-                    className={
-                      hasSuccess
-                        ? "text-sm text-green-700"
-                        : hasError
-                        ? "text-sm text-red-600"
-                        : "text-sm text-gray-600"
-                    }
-                  >
-                    {formStatus === "loading" ? "Отправка..." : formMessage}
                   </div>
-                )}
+                ))}
+              </div>
 
-                <div className="pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <button
-                    type="button"
-                    className="btn btn-secondary w-full sm:w-auto"
-                    onClick={handlePrev}
-                    disabled={isBusy}
-                  >
-                    ← {dict.prevStep}
+              {formStatus !== "idle" && (
+                <div
+                  id={statusId}
+                  role="status"
+                  aria-live="polite"
+                  className={hasSuccess ? "status status--ok" : hasError ? "status status--err" : "status"}
+                >
+                  {formStatus === "loading" ? "Отправка..." : formMessage}
+                </div>
+              )}
+
+              <div className="row-between mt-4 gc-actions">
+                <button type="button" className={["btn btn-secondary", isBusy ? "is-disabled" : ""].join(" ")} onClick={goStep1} disabled={isBusy}>
+                  ← {dict.prevStep}
+                </button>
+
+                <div className="row-center gc-actions__right">
+                  <button type="button" className={["btn btn-secondary", isBusy ? "is-disabled" : ""].join(" ")} onClick={handleAddVehicle} disabled={isBusy}>
+                    {dict.vehicles.addButton}
                   </button>
 
-                  <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <button
-                      type="button"
-                      className="btn btn-secondary w-full sm:w-auto"
-                      onClick={handleAddVehicle}
-                      disabled={isBusy}
-                    >
-                      {dict.vehicles.addButton}
-                    </button>
-
-                    <button
-                      type="submit"
-                      className="btn w-full sm:w-auto disabled:opacity-60 disabled:cursor-not-allowed"
-                      disabled={isBusy}
-                      onClick={() => {
-                        // при клике "Отправить" — сразу покажем весь список ошибок шага 2
-                        const errs = collectStepErrors(2);
-                        if (errs.length) setStep2Errors(errs);
-                      }}
-                    >
-                      {isBusy ? "Отправка..." : dict.submit}
-                    </button>
-                  </div>
+                  <button
+                    type="submit"
+                    className={["btn btn-primary", isBusy ? "is-disabled" : ""].join(" ")}
+                    disabled={isBusy}
+                    onClick={() => {
+                      const errs = collectStepErrors(2);
+                      if (errs.length) setStep2Errors(errs);
+                    }}
+                  >
+                    {isBusy ? "Отправка..." : dict.submit}
+                  </button>
                 </div>
               </div>
             </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </section>
   );

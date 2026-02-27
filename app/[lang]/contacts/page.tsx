@@ -77,56 +77,53 @@ export default async function ContactsPage({
   const p = await params;
   const lang = getLangSafe(p?.lang);
 
-  // ✅ ВАЖНО: берём contact и agreement из словарей
   const home = getHomeDictionary(lang);
   const agreement = getAgreementDictionary(lang);
   const contact = home.contact;
 
   return (
-    <section className="py-10 sm:py-14">
-      <div className="max-w-5xl mx-auto px-4">
-        <h1 className="text-3xl sm:text-4xl font-bold text-[#1A3A5F]">
-          {titles[lang]}
-        </h1>
+    <main className="cp-page">
+      <section className="cp-top">
+        <div className="gc-container">
+          <h1 className="cp-title">{titles[lang]}</h1>
 
-        <div className="mt-6 space-y-3 text-gray-700">
-          <p>{introText[lang]}</p>
+          <div className="cp-lead">
+            <p className="cp-intro">{introText[lang]}</p>
 
-          <ul className="mt-4 space-y-2 text-sm sm:text-base">
-            <li>
-              <strong>Email:</strong>{" "}
-              <a
-                href="mailto:info@dionis-insurance.kz"
-                className="text-[#C89F4A] hover:underline"
-              >
-                info@dionis-insurance.kz
-              </a>
-            </li>
+            <ul className="cp-list">
+              <li className="cp-item">
+                <strong className="cp-strong">Email:</strong>{" "}
+                <a
+                  href="mailto:info@dionis-insurance.kz"
+                  className="cp-link"
+                >
+                  info@dionis-insurance.kz
+                </a>
+              </li>
 
-            <li>
-              <strong>Phone:</strong>{" "}
-              <a
-                href="tel:+77273573030"
-                className="text-[#C89F4A] hover:underline"
-              >
-                +7 (727) 357-30-30
-              </a>
-            </li>
+              <li className="cp-item">
+                <strong className="cp-strong">Phone:</strong>{" "}
+                <a href="tel:+77273573030" className="cp-link">
+                  +7 (727) 357-30-30
+                </a>
+              </li>
 
-            <li>
-              <strong>Telegram:</strong> <span>@Dionis_insurance_broker_bot</span>
-            </li>
-          </ul>
+              <li className="cp-item">
+                <strong className="cp-strong">Telegram:</strong>{" "}
+                <span>@Dionis_insurance_broker_bot</span>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* ✅ CONTACT (форма внизу страницы) */}
+      {/* CONTACT (форма внизу страницы) */}
       <ContactSection
         contact={contact}
         agreement={agreement}
         imageSrc="/laiter(1).png"
         context={`contacts-${lang}`}
       />
-    </section>
+    </main>
   );
 }

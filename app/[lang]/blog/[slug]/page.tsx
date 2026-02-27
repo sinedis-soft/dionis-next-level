@@ -73,14 +73,11 @@ export default async function BlogArticlePage({
   const article = await getArticleBySlug(lang, slug);
   if (!article) return notFound();
 
-  // ✅ важно: локализуем автора
   const author = await getAuthorBySlug(article.authorSlug, lang);
 
-  // ✅ explicit links (из frontmatter nextSlugs/requiredSlugs)
   const requiredReading = article.requiredReading ?? [];
   const nextSteps = article.nextSteps ?? [];
 
-  // ✅ похожие статьи (fallback/доп. блок)
   const related = await getRelatedArticles(article, 6);
 
   const jsonLdBase: Record<string, unknown> = {
@@ -122,7 +119,7 @@ export default async function BlogArticlePage({
   const locale = localeByLang(lang);
 
   return (
-    <main className="bg-white">
+    <main className="bp-page">
       <Script
         id="ld-article"
         type="application/ld+json"
@@ -136,132 +133,126 @@ export default async function BlogArticlePage({
         />
       ) : null}
 
-      {/* Breadcrumbs */}
-      <nav className="max-w-6xl mx-auto px-4 pt-6 text-sm text-gray-600">
-        <a className="hover:underline" href={`/${lang}`}>
-          Главная
-        </a>
-        <span className="mx-2">→</span>
-        <a className="hover:underline" href={`/${lang}/blog`}>
-          Блог
-        </a>
-        <span className="mx-2">→</span>
-        <span className="text-gray-900">{article.title}</span>
-      </nav>
+      <div className="gc-container">
+        {/* Breadcrumbs */}
+        <nav className="bp-bc" aria-label="Breadcrumb">
+          <a className="bp-bc__link" href={`/${lang}`}>
+            Главная
+          </a>
+          <span className="bp-bc__sep" aria-hidden="true">
+            →
+          </span>
+          <a className="bp-bc__link" href={`/${lang}/blog`}>
+            Блог
+          </a>
+          <span className="bp-bc__sep" aria-hidden="true">
+            →
+          </span>
+          <span className="bp-bc__current">{article.title}</span>
+        </nav>
 
-      {/* Header */}
-      <header className="max-w-6xl mx-auto px-4 pt-4 pb-6">
-        <h1 className="text-3xl sm:text-4xl font-bold text-[#1A3A5F]">
-          {article.title}
-        </h1>
+        {/* Header */}
+        <header className="bp-head">
+          <h1 className="bp-title">{article.title}</h1>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
-          <ContentTypeBadge type={article.contentType} size="sm" />
+          <div className="bp-subrow">
+            <ContentTypeBadge type={article.contentType} size="sm" />
 
-          {/* ✅ PublishedAt / UpdatedAt / “Актуально на …” */}
-          <ArticleMeta
-            locale={locale}
-            publishedAt={article.publishedAt}
-            updatedAt={article.modifiedAt}
-          />
+            <ArticleMeta
+              locale={locale}
+              publishedAt={article.publishedAt}
+              updatedAt={article.modifiedAt}
+            />
 
-          <span className="hidden sm:inline">•</span>
-          <span>{article.readingTime}</span>
-        </div>
+            <span className="bp-dot" aria-hidden="true">
+              •
+            </span>
 
-        {/* ✅ AuthorBox */}
-        {author ? (
-          <div className="mt-6">
-            <AuthorBox author={author} lang={lang} />
+            <span className="bp-reading">{article.readingTime}</span>
           </div>
-        ) : null}
-      </header>
 
-      {/* Content + TOC */}
-      <section className="max-w-6xl mx-auto px-4 pb-10">
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-8 items-start">
-          {/* Sticky TOC (desktop) */}
-          <aside className="hidden lg:block">
-            <TableOfContents toc={article.toc} className="sticky top-24" />
-          </aside>
-
-          {/* Article */}
-          <div className="min-w-0">
-            {/* TOC on mobile/tablet */}
-            <div className="lg:hidden">
-              <TableOfContents toc={article.toc} className="mb-8" />
+          {author ? (
+            <div className="bp-author">
+              <AuthorBox author={author} lang={lang} />
             </div>
+          ) : null}
+        </header>
 
-            <ArticleBody lang={lang}>
-              {article.content}
+        {/* Content + TOC */}
+        <section className="bp-body">
+          <div className="bp-grid">
+            {/* Desktop TOC */}
+            <aside className="bp-toc bp-toc--desktop">
+              <div className="bp-sticky">
+                <TableOfContents toc={article.toc} />
+              </div>
+            </aside>
 
-              {/* ✅ “система обучения”: required + next */}
-              <RequiredReading items={requiredReading} />
-              <NextStep items={nextSteps} />
+            {/* Article */}
+            <div className="bp-article">
+              {/* Mobile TOC */}
+              <div className="bp-toc bp-toc--mobile">
+                <TableOfContents toc={article.toc} className="bp-toc__mobileBox" />
+              </div>
 
-              {/* ✅ Changelog должен быть внутри контейнера статьи */}
-              <Changelog version={article.version} changes={article.changes} />
-            </ArticleBody>
-          </div>
-        </div>
-      </section>
+              <ArticleBody lang={lang}>
+                {article.content}
 
-      {/* FAQ (визуально на странице) */}
-      {article.faq?.length ? (
-        <section className="max-w-6xl mx-auto px-4 pb-14">
-          <h2 className="text-xl font-semibold text-[#1A3A5F]">
-            Вопросы и ответы
-          </h2>
+                <RequiredReading items={requiredReading} />
+                <NextStep items={nextSteps} />
 
-          <div className="mt-4 space-y-3">
-            {article.faq.map((item, idx) => (
-              <details
-                key={`${idx}-${item.q}`}
-                className="rounded-2xl border bg-white p-4"
-              >
-                <summary className="cursor-pointer font-semibold text-[#1A3A5F]">
-                  {item.q}
-                </summary>
-                <div className="mt-2 text-sm text-gray-700 leading-relaxed">
-                  {item.a}
-                </div>
-              </details>
-            ))}
+                <Changelog version={article.version} changes={article.changes} />
+              </ArticleBody>
+            </div>
           </div>
         </section>
-      ) : null}
 
-      {/* Related */}
-      {related.length ? (
-        <section className="max-w-6xl mx-auto px-4 pb-14">
-          <h2 className="text-xl font-semibold text-[#1A3A5F]">Похожие статьи</h2>
+        {/* FAQ */}
+        {article.faq?.length ? (
+          <section className="bp-faq">
+            <h2 className="bp-h2">Вопросы и ответы</h2>
 
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {related.map((x: BlogArticleCard) => (
-              <a
-                key={x.slug}
-                href={`/${lang}/blog/${x.slug}`}
-                className="rounded-2xl border p-4 hover:shadow-sm"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  {"contentType" in x && x.contentType ? (
-                    <ContentTypeBadge type={x.contentType} size="sm" />
-                  ) : (
-                    <span />
-                  )}
+            <div className="bp-faq__list">
+              {article.faq.map((item, idx) => (
+                <details key={`${idx}-${item.q}`} className="bp-faq__item">
+                  <summary className="bp-faq__q">{item.q}</summary>
+                  <div className="bp-faq__a">{item.a}</div>
+                </details>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
-                  <div className="text-xs text-gray-500">{x.readingTime}</div>
-                </div>
+        {/* Related */}
+        {related.length ? (
+          <section className="bp-related">
+            <h2 className="bp-h2">Похожие статьи</h2>
 
-                <div className="mt-2 font-semibold text-[#1A3A5F]">{x.title}</div>
-                <div className="mt-2 text-sm text-gray-700 line-clamp-2">
-                  {x.excerpt}
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      ) : null}
+            <div className="bp-related__grid">
+              {related.map((x: BlogArticleCard) => (
+                <a
+                  key={x.slug}
+                  href={`/${lang}/blog/${x.slug}`}
+                  className="bp-relcard"
+                >
+                  <div className="bp-relcard__top">
+                    {"contentType" in x && x.contentType ? (
+                      <ContentTypeBadge type={x.contentType} size="sm" />
+                    ) : (
+                      <span />
+                    )}
+
+                    <div className="bp-relcard__rt">{x.readingTime}</div>
+                  </div>
+
+                  <div className="bp-relcard__title">{x.title}</div>
+                  <div className="bp-relcard__text">{x.excerpt}</div>
+                </a>
+              ))}
+            </div>
+          </section>
+        ) : null}
+      </div>
     </main>
   );
 }

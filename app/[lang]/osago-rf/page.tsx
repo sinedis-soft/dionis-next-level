@@ -45,11 +45,11 @@ function langToIana(lang: Lang): string {
 
 /* ---- local helper ---- */
 function AdvantageIcon({ index }: { index: number }) {
-  const common = "h-5 w-5 text-[#C89F4A]";
+  // по образцу green-card: без tailwind-классов на svg
   const baseSvgProps = {
     width: 20,
     height: 20,
-    className: common,
+    className: "gc-adv-icon",
     style: { width: 20, height: 20, display: "block" } as CSSProperties,
     fill: "none" as const,
     "aria-hidden": true as const,
@@ -128,9 +128,8 @@ function AdvantageIcon({ index }: { index: number }) {
  * ВАЖНО:
  * Карту РФ НЕ грузим через <Image/> в блоке benefits.
  * Вместо этого используем div с background-image, который включается ТОЛЬКО в современных браузерах через @supports(display:grid).
- * В legacy браузерах картинка вообще не будет запрошена → не будет “появления через 2 минуты”.
  *
- * Добавь в глобальный CSS (app/globals.css) правило:
+ * Добавь в app/globals.css:
  *
  * @supports (display: grid) {
  *   .osago-map-bg {
@@ -138,6 +137,7 @@ function AdvantageIcon({ index }: { index: number }) {
  *     background-size: cover;
  *     background-position: center;
  *     opacity: 0.9;
+ *     will-change: opacity;
  *   }
  * }
  */
@@ -148,58 +148,40 @@ function OsagoInfoBlocks({
 }) {
   return (
     <>
+      {/* HOW IT WORKS */}
       <DeferredHydration rootMargin="800px" minDelayMs={150}>
-        <section
-          className="py-12 sm:py-16 bg-white [overflow-anchor:none]"
-          aria-labelledby="how-it-works-heading"
-        >
-          <div className="max-w-6xl mx-auto px-4">
-            <h2
-              id="how-it-works-heading"
-              className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center"
-            >
+        <section className="gc-hiw gc-no-anchor" aria-labelledby="how-it-works-heading">
+          <div className="gc-container">
+            <h2 id="how-it-works-heading" className="gc-section-title">
               {dict.howItWorks.title}
             </h2>
 
-            <p className="mt-2 text-center text-gray-600">
-              {dict.howItWorks.subtitle}
-            </p>
+            <p className="gc-section-intro">{dict.howItWorks.subtitle}</p>
 
-            <div className="mt-10">
-              <div className="hidden md:block relative">
-                <div className="absolute left-0 right-0 top-[18px] h-px bg-gray-200" />
-                <div className="grid grid-cols-4 gap-6">
+            <div className="gc-hiw__content">
+              {/* desktop view */}
+              <div className="gc-hiw__desktop">
+                <div className="gc-hiw__line" aria-hidden="true" />
+                <div className="gc-hiw__grid">
                   {dict.howItWorks.steps.map((s, idx) => (
-                    <div key={idx} className="text-center">
-                      <div className="mx-auto h-9 w-9 rounded-full bg-[#0F2742] text-white flex items-center justify-center text-sm font-semibold">
-                        {idx + 1}
-                      </div>
-                      <div className="mt-3 text-sm font-extrabold text-[#1A3A5F]">
-                        {s.title}
-                      </div>
-                      <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-                        {s.text}
-                      </p>
+                    <div key={idx} className="gc-hiw__step">
+                      <div className="gc-hiw__num">{idx + 1}</div>
+                      <div className="gc-hiw__stepTitle">{s.title}</div>
+                      <p className="gc-hiw__stepText">{s.text}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="md:hidden grid gap-4">
+              {/* mobile view */}
+              <div className="gc-hiw__mobile">
                 {dict.howItWorks.steps.map((s, idx) => (
-                  <article
-                    key={idx}
-                    className="card bg-white border border-gray-200 shadow-sm p-5"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="shrink-0 h-9 w-9 rounded-full bg-[#0F2742] text-white flex items-center justify-center text-sm font-semibold">
-                        {idx + 1}
-                      </div>
-                      <div>
-                        <div className="text-sm font-extrabold text-[#1A3A5F]">
-                          {s.title}
-                        </div>
-                        <p className="mt-1 text-sm text-gray-600 leading-relaxed">
+                  <article key={idx} className="card gc-hiw-card">
+                    <div className="gc-hiw-card__row">
+                      <div className="gc-hiw__num gc-hiw__num--mobile">{idx + 1}</div>
+                      <div className="gc-hiw-card__body">
+                        <div className="gc-hiw__stepTitle">{s.title}</div>
+                        <p className="gc-hiw__stepText gc-hiw__stepText--mobile">
                           {s.text}
                         </p>
                       </div>
@@ -212,48 +194,46 @@ function OsagoInfoBlocks({
         </section>
       </DeferredHydration>
 
+      {/* BENEFITS (по образцу COVERAGE, но без <Image/>, фон через .osago-map-bg) */}
       <DeferredHydration rootMargin="800px" minDelayMs={150}>
-        <section
-          className="py-12 sm:py-16 bg-white [overflow-anchor:none]"
-          aria-labelledby="benefits-heading"
-        >
-          <div className="max-w-6xl mx-auto px-4">
-            <article className="rounded-2xl bg-[#0f2238] text-white overflow-hidden shadow-sm">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 items-stretch">
-                <div className="p-6 sm:p-10">
-                  <h2
-                    id="benefits-heading"
-                    className="text-2xl sm:text-3xl font-semibold"
-                  >
+        <section className="gc-coverage gc-no-anchor" aria-labelledby="benefits-heading">
+          <div className="gc-container">
+            <article className="gc-coverage__card">
+              <div className="gc-coverage__grid">
+                {/* left */}
+                <div className="gc-coverage__left">
+                  <h2 id="benefits-heading" className="gc-coverage__title">
                     {dict.benefits.title}
                   </h2>
 
-                  <div className="mt-8 space-y-6">
+                  <div className="gc-coverage__items">
                     {dict.benefits.items.map((it, idx) => (
-                      <div key={idx} className="flex gap-3">
-                        <div className="mt-1 h-8 w-8 shrink-0 rounded-lg bg-white/10 flex items-center justify-center">
-                          <span className="block h-2 w-2 rounded-full bg-[#EBCA45]" />
+                      <div key={idx} className="gc-coverage__item">
+                        <div className="gc-coverage__icon" aria-hidden="true">
+                          <span className="gc-coverage__dot" />
                         </div>
+
                         <div>
-                          <div className="text-sm font-extrabold">{it.title}</div>
-                          <p className="mt-1 text-sm text-white/80 leading-relaxed">
-                            {it.text}
-                          </p>
+                          <div className="gc-coverage__itemTitle">{it.title}</div>
+                          <p className="gc-coverage__itemText">{it.text}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                {/* вместо <Image/> — фон через @supports(display:grid) */}
-                <div className="p-6 sm:p-10 flex items-center justify-center">
-                  <div
-                    className="w-full max-w-md aspect-[4/3] bg-white/5 relative overflow-hidden rounded-xl"
-                    aria-label={dict.benefits.imageAlt}
-                    role="img"
-                  >
-                    <div className="osago-map-bg absolute inset-0" aria-hidden="true" />
-                    <div className="absolute inset-0 bg-black/10" />
+                {/* right */}
+                <div className="gc-coverage__right">
+                  <div className="gc-coverage__imgWrap">
+                    <Image
+                      src="/osago-rf/Виды_субъектов_России_на_политической_карте.png"   // проверь путь к файлу
+                      alt={dict.benefits.imageAlt}
+                      fill
+                      className="gc-coverage__img"
+                      sizes="(min-width: 1024px) 520px, 90vw"
+                      priority={false}
+                    />
+                    <div className="gc-coverage__imgOverlay" aria-hidden="true" />
                   </div>
                 </div>
               </div>
@@ -361,39 +341,33 @@ export default async function OsagoRfPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
       />
 
-      <main className="min-h-screen bg-white">
-        {/* HERO */}
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#F7F7F7] via-[#ffffff] to-[#e9f0f5]" />
+      <main className="gc-page">
+        {/* HERO (по образцу green-card: контейнер/сетка/visual wrap) */}
+        <section className="gc-hero">
+          <div className="gc-hero__bg" aria-hidden="true" />
+          <div className="gc-container gc-hero__grid">
+            <div className="gc-hero__left">
+              <h1 className="gc-hero__title">{osagoPageDict.hero.title}</h1>
+              <p className="gc-hero__subtitle">{osagoPageDict.hero.subtitle}</p>
 
-          <div className="max-w-6xl mx-auto px-4 py-12 sm:py-20 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            <div className="text-left">
-              <h1 className="text-3xl sm:text-4xl font-bold text-[#1A3A5F] leading-tight">
-                {osagoPageDict.hero.title}
-              </h1>
-
-              <p className="mt-4 text-lg sm:text-xl text-gray-600 max-w-xl">
-                {osagoPageDict.hero.subtitle}
-              </p>
-
-              <div className="mt-10 flex flex-col sm:flex-row gap-4">
+              <div className="gc-hero__cta">
                 <a href={orderAnchor} role="button" className="btn btn-wide">
                   {osagoPageDict.hero.ctaOrder}
                 </a>
               </div>
             </div>
 
-            <div className="flex justify-center lg:justify-end">
+            <div className="gc-hero__right">
               <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
-                <div className="hidden lg:block">
-                  <div className="gc-hero-visual w-[520px] h-[280px] xl:w-[620px] xl:h-[320px] relative">
+                <div className="gc-hero__visualWrap">
+                  <div className="gc-hero-visual">
                     <Image
                       src="/osago-rf/car-osago.png"
                       alt={osagoPageDict.hero.carAlt}
                       width={620}
                       height={320}
                       sizes="(min-width: 1280px) 620px, (min-width: 1024px) 520px, 0px"
-                      className="absolute bottom-[-120px] left-0 w-full h-auto gc-anim-car"
+                      className="gc-hero__car gc-anim-car"
                       priority
                     />
 
@@ -423,54 +397,71 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
-        {/* CALCULATOR (обёртка для legacy-стилей формы) */}
-        <section className="py-8 sm:py-10 bg-white">
-          <div className="max-w-6xl mx-auto px-4">
+        {/* CALCULATOR */}
+        <section className="gc-section" id="osago-rf-calculator">
+          <div className="gc-container">
             <div className="legacy-form-scope legacy-form-card">
-              <DeferredHydration rootMargin="800px" minDelayMs={150}>
-                <OsagoRfCalculator dict={osagoCalcDict} />
-              </DeferredHydration>
+              <div className="modern-only">
+                <DeferredHydration rootMargin="800px" minDelayMs={150}>
+                  <OsagoRfCalculator dict={osagoCalcDict} />
+                </DeferredHydration>
+              </div>
+
+              <div className="legacy-only">
+                <h2 className="gc-h2">{osagoCalcDict.title}</h2>
+                <p className="gc-text-muted">{osagoCalcDict.subtitle}</p>
+
+                <div className="gc-legacy-note">
+                  <p className="gc-text-muted">
+                    Ваш браузер устарел. Калькулятор может работать медленно или не работать.
+                  </p>
+                  <p className="gc-text-muted">
+                    Оформите заявку — мы рассчитаем стоимость и пришлём предложение.
+                  </p>
+
+                  <div className="gc-mt-12">
+                    <a
+                      href={orderAnchor}
+                      className="btn btn-secondary btn-wide"
+                      role="button"
+                    >
+                      {osagoPageDict.hero.ctaOrder}
+                    </a>
+                  </div>
+                </div>
+
+                <noscript>
+                  <div className="gc-mt-12 gc-text-muted">
+                    JavaScript отключён. Оформите заявку ниже — мы рассчитаем стоимость вручную.
+                  </div>
+                </noscript>
+              </div>
             </div>
           </div>
         </section>
 
+        {/* INFO BLOCKS */}
         <OsagoInfoBlocks dict={osagoPageDict} />
 
-        {/* ADVANTAGES */}
+        {/* ADVANTAGES (по образцу green-card: секция + сетка) */}
         <DeferredHydration rootMargin="800px" minDelayMs={150}>
-          <section
-            className="border-t border-gray-200 bg-[#FFFFFF] py-12 sm:py-16"
-            aria-labelledby="advantages-heading"
-          >
-            <div className="max-w-6xl mx-auto px-4">
-              <h2
-                id="advantages-heading"
-                className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center"
-              >
+          <section className="gc-advantages" aria-labelledby="advantages-heading">
+            <div className="gc-container">
+              <h2 id="advantages-heading" className="gc-advantages__title">
                 {osagoPageDict.advantages.title}
               </h2>
 
-              <div className="mt-10 grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="gc-advantages__grid">
                 {osagoPageDict.advantages.items.map((item, idx) => (
-                  <article
-                    key={`${item.title}-${idx}`}
-                    className="rounded-xl border border-gray-200 bg-white shadow-sm p-4 sm:p-5 text-left"
-                  >
-                    <div className="mb-3">
-                      <div className="h-9 w-9 rounded-lg bg-[#EBCA45]/15 flex items-center justify-center">
-                        <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
-                          <AdvantageIcon index={idx} />
-                        </DeferredHydration>
-                      </div>
+                  <article key={`${item.title}-${idx}`} className="gc-adv-card">
+                    <div className="gc-adv-card__iconWrap">
+                      <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+                        <AdvantageIcon index={idx} />
+                      </DeferredHydration>
                     </div>
 
-                    <div className="text-xs font-semibold tracking-wide text-gray-500 uppercase">
-                      {item.title}
-                    </div>
-
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-                      {item.text}
-                    </p>
+                    <div className="gc-adv-card__kicker">{item.title}</div>
+                    <p className="gc-adv-card__text">{item.text}</p>
                   </article>
                 ))}
               </div>
@@ -478,52 +469,46 @@ export default async function OsagoRfPage({
           </section>
         </DeferredHydration>
 
-        {/* ORDER FORM (обёртка для legacy-стилей формы) */}
-        <section id="osago-rf-order" className="py-10 sm:py-12 bg-white">
-          <div className="max-w-6xl mx-auto px-4">
+        {/* ORDER FORM */}
+        <section id="osago-rf-order" className="gc-section">
+          <div className="gc-container">
             <div className="legacy-form-scope legacy-form-card">
               <OsagoOrderForm dict={osagoFormDict} />
             </div>
           </div>
         </section>
 
-        {/* UPSALE GREEN CARD */}
-        <section className="py-10 sm:py-12 bg-[#F5F7FA]">
-          <div className="max-w-5xl mx-auto px-4">
-            <article className="card overflow-hidden flex flex-col md:flex-row items-stretch">
-              <div className="md:w-1/3 relative">
-                <DeferredHydration
-                  disableOnLegacy
-                  rootMargin="1200px"
-                  minDelayMs={0}
-                  className="h-40 md:h-full w-full"
-                >
+        {/* UPSALE GREEN CARD (по образцу gc-upsell) */}
+        <section className="gc-section gc-section--muted">
+          <div className="gc-container">
+            <article className="card gc-upsell">
+              <div className="gc-upsell__media">
+                <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
                   <Image
                     src="/services/zk_photo.webp"
                     alt={osagoPageDict.greenCardUpsell.imageAlt}
                     width={400}
                     height={260}
                     sizes="(min-width: 768px) 33vw, 100vw"
-                    className="h-40 md:h-full w-full object-cover"
+                    className="gc-upsell__img"
                     loading="lazy"
                   />
                 </DeferredHydration>
               </div>
 
-              <div className="md:w-2/3 px-6 py-6 flex flex-col justify-between bg-[#F5F7FA]">
+              <div className="gc-upsell__body">
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold text-[#1A3A5F] mb-2">
+                  <h3 className="gc-upsell__title">
                     {osagoPageDict.greenCardUpsell.title}
                   </h3>
-                  <p className="text-sm sm:text-base text-gray-700 mb-2">
-                    {osagoPageDict.greenCardUpsell.text1}
-                  </p>
-                  <p className="text-sm sm:text-base text-gray-600">
+                  <p className="gc-upsell__p">{osagoPageDict.greenCardUpsell.text1}</p>
+                  <p className="gc-upsell__p gc-text-muted">
                     {osagoPageDict.greenCardUpsell.text2}
                   </p>
                 </div>
-                <div className="mt-4 flex justify-end">
-                  <a href={greenCardLink} className="btn w-full sm:w-auto" role="button">
+
+                <div className="gc-upsell__cta">
+                  <a href={greenCardLink} className="btn" role="button">
                     {osagoPageDict.greenCardUpsell.btn}
                   </a>
                 </div>
@@ -532,13 +517,14 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
+        {/* FAQ + BROKER */}
         <FAQSection dict={osagoPageDict.faq} />
         <BrokerSection broker={homeDict.broker} />
 
-        {/* QUESTION BLOCK */}
-        <section className="py-12 sm:py-16 bg-[#F4F6FA]">
-          <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-10 items-start">
-            <div className="flex justify-center lg:justify-start">
+        {/* QUESTION BLOCK (по образцу gc-question) */}
+        <section className="gc-question gc-section--muted">
+          <div className="gc-container gc-question__grid">
+            <div className="gc-question__media">
               <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
                 <Image
                   src="/osago-rf/policy-large.webp"
@@ -546,7 +532,7 @@ export default async function OsagoRfPage({
                   width={520}
                   height={360}
                   sizes="(min-width: 1024px) 520px, 90vw"
-                  className="w-full max-w-md lg:max-w-lg h-auto rounded-2xl shadow-lg"
+                  className="gc-question__img"
                   loading="lazy"
                 />
               </DeferredHydration>

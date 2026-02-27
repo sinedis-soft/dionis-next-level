@@ -9,92 +9,6 @@ import Header from "@/components/Header";
 import SiteFooter from "@/components/SiteFooter";
 import CookieConsent from "@/components/CookieConsent";
 
-const SITE_URL =
-  (process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ??
-    "https://dionis-insurance.kz") as string;
-
-const HREFLANG: Record<Lang, string> = {
-  ru: "ru",
-  kz: "kk-KZ",
-  en: "en",
-};
-
-const LANG_PATH: Record<Lang, string> = {
-  ru: "/ru",
-  kz: "/kz",
-  en: "/en",
-};
-
-export const dynamicParams = false;
-
-export function generateStaticParams(): Array<{ lang: Lang }> {
-  return [{ lang: "ru" }, { lang: "kz" }, { lang: "en" }];
-}
-
-function normalizeLang(value: unknown): Lang {
-  return value === "ru" || value === "kz" || value === "en" ? value : "ru";
-}
-
-function getSeo(lang: Lang) {
-  if (lang === "ru") {
-    return {
-      title:
-        "Dionis Insurance Broker — страховой брокер в Казахстане (Алматы) | Официально",
-      description:
-        "Страховой брокер в Казахстане: подбор страховых программ, консультации и сопровождение. Официально по лицензии. Алматы, связь по телефону и в мессенджерах.",
-    };
-  }
-
-  if (lang === "kz") {
-    return {
-      title:
-        "Dionis Insurance Broker — Қазақстандағы сақтандыру брокері (Алматы) | Ресми",
-      description:
-        "Қазақстандағы сақтандыру брокері: бағдарламаларды таңдау, кеңес беру және сүйемелдеу. Лицензия бойынша ресми жұмыс. Алматы, байланыс телефоны және мессенджерлер.",
-    };
-  }
-
-  return {
-    title:
-      "Dionis Insurance Broker — insurance broker in Kazakhstan (Almaty) | Official",
-    description:
-      "Insurance broker in Kazakhstan: program selection, consulting and support. Officially licensed. Almaty, phone and messengers.",
-  };
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}): Promise<Metadata> {
-  const { lang: rawLang } = await params;
-  const lang = normalizeLang(rawLang);
-  const seo = getSeo(lang);
-
-  return {
-    metadataBase: new URL(SITE_URL),
-    title: seo.title,
-    description: seo.description,
-    alternates: {
-      canonical: LANG_PATH[lang],
-      languages: {
-        [HREFLANG.ru]: LANG_PATH.ru,
-        [HREFLANG.kz]: LANG_PATH.kz,
-        [HREFLANG.en]: LANG_PATH.en,
-        "x-default": LANG_PATH.ru,
-      },
-      types: {
-        "application/rss+xml": [
-          {
-            url: `/${lang}/rss.xml`,
-            title: `Dionis Blog RSS (${lang.toUpperCase()})`,
-          },
-        ],
-      },
-    },
-  };
-}
-
 export default async function LangLayout({
   children,
   params,
@@ -103,59 +17,33 @@ export default async function LangLayout({
   params: Promise<{ lang: string }>;
 }) {
   const { lang: rawLang } = await params;
-  const lang = normalizeLang(rawLang);
+  const lang = (rawLang === "ru" || rawLang === "kz" || rawLang === "en"
+    ? rawLang
+    : "ru") as Lang;
 
   return (
     <>
-      {/* Legacy detector:
-          - ставит html.is-legacy
-          - подключает /legacy.css ТОЛЬКО для legacy
-          Критично: use BEFORE Interactive и без React-опасных конструкций */}
-      <Script
-        id="legacy-detector"
-        strategy="beforeInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
+      {/* legacy.css подключаем ВСЕГДА, он сам "молчит" в modern через @supports */}
+      <link rel="stylesheet" href="/legacy.css" />
+
+      {/* детектор ставит только класс html.is-legacy */}
+      <Script id="legacy-detector" strategy="beforeInteractive">
+        {`
 (function () {
   try {
-    var docEl = document.documentElement;
     var isLegacy = false;
-
-    // 1) очень старые: нет CSS.supports
     if (!window.CSS || !CSS.supports) {
       isLegacy = true;
     } else {
-      // 2) нет grid -> legacy
-      if (!CSS.supports('display', 'grid')) isLegacy = true;
+      isLegacy = !CSS.supports('display', 'grid');
     }
-
-    // 3) ваш практический маркер: нет IntersectionObserver
-    if (!('IntersectionObserver' in window)) isLegacy = true;
-
     if (isLegacy) {
-      if (docEl.className.indexOf('is-legacy') === -1) {
-        docEl.className = (docEl.className ? docEl.className + ' ' : '') + 'is-legacy';
-      }
-
-      // Подключаем legacy.css один раз
-      var id = 'legacy-css';
-      if (!document.getElementById(id)) {
-        var link = document.createElement('link');
-        link.id = id;
-        link.rel = 'stylesheet';
-        link.href = '/legacy.css';
-        document.head.appendChild(link);
-      }
+      document.documentElement.classList.add('is-legacy');
     }
   } catch (e) {}
-})();`,
-        }}
-      />
-
-      {/* Если JS выключен — подключаем legacy.css всегда (лучше, чем голый HTML). */}
-      <noscript>
-        <link rel="stylesheet" href="/legacy.css" />
-      </noscript>
+})();
+        `}
+      </Script>
 
       <Suspense fallback={<div className="h-16 xl:h-20" />}>
         <Header lang={lang} />

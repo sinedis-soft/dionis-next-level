@@ -4,10 +4,6 @@ import type { Lang } from "@/dictionaries/header";
 import type { ProductsPageUI } from "@/dictionaries/products";
 import { getAutoProductsSectionDictionary } from "@/dictionaries/products/autoProductsSection";
 
-function cx(...c: Array<string | false | null | undefined>) {
-  return c.filter(Boolean).join(" ");
-}
-
 type Props = {
   lang: Lang;
   base: string;
@@ -22,12 +18,10 @@ function SectionTitle({
   sub?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 flex-wrap">
-      <div className="max-w-4xl">
-        <h3 className="text-xl sm:text-2xl font-bold text-[#0f2238]">{children}</h3>
-        {sub ? (
-          <p className="mt-2 text-sm sm:text-base text-gray-700">{sub}</p>
-        ) : null}
+    <div className="aps-titleRow">
+      <div className="aps-titleCol">
+        <h3 className="aps-cardTitle">{children}</h3>
+        {sub ? <p className="aps-cardSub">{sub}</p> : null}
       </div>
     </div>
   );
@@ -35,11 +29,13 @@ function SectionTitle({
 
 function BulletList({ items }: { items: string[] }) {
   return (
-    <ul className="space-y-2 text-sm text-gray-700">
+    <ul className="aps-bullets">
       {items.map((x) => (
-        <li key={x} className="flex gap-2">
-          <span aria-hidden className="mt-[2px]">•</span>
-          <span>{x}</span>
+        <li key={x} className="aps-bullets__item">
+          <span aria-hidden className="aps-bullets__dot">
+            •
+          </span>
+          <span className="aps-bullets__text">{x}</span>
         </li>
       ))}
     </ul>
@@ -55,18 +51,15 @@ function KeyValueList({
 }) {
   return (
     <div>
-      <div className="space-y-3 text-sm">
+      <div className="aps-kv">
         {rows.map((row) => (
-          <div
-            key={row.k}
-            className="flex items-start justify-between gap-4 border-b border-black/5 pb-3 last:border-b-0 last:pb-0"
-          >
-            <div className="font-medium text-[#0f2238]">{row.k}</div>
-            <div className="text-gray-700 text-right max-w-[70%]">{row.v}</div>
+          <div key={row.k} className="aps-kv__row">
+            <div className="aps-kv__k">{row.k}</div>
+            <div className="aps-kv__v">{row.v}</div>
           </div>
         ))}
       </div>
-      {note ? <p className="mt-4 text-xs text-gray-500">{note}</p> : null}
+      {note ? <p className="aps-note">{note}</p> : null}
     </div>
   );
 }
@@ -85,17 +78,14 @@ function CardShell({
   actions?: React.ReactNode;
 }) {
   return (
-    <article className="rounded-2xl border border-black/10 bg-white shadow-sm p-6 sm:p-8">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+    <article className="aps-card">
+      <div className="aps-cardHead">
         <SectionTitle sub={subtitle}>{title}</SectionTitle>
 
         {badges?.length ? (
-          <div className="flex gap-2 flex-wrap">
+          <div className="aps-badges">
             {badges.map((b) => (
-              <span
-                key={b}
-                className="text-xs px-2 py-1 rounded-full bg-[#F4F6FA] text-[#1A3A5F] border border-black/5"
-              >
+              <span key={b} className="aps-badge">
                 {b}
               </span>
             ))}
@@ -103,11 +93,9 @@ function CardShell({
         ) : null}
       </div>
 
-      <div className="mt-6 space-y-6">{children}</div>
+      <div className="aps-cardBody">{children}</div>
 
-      {actions ? (
-        <div className="mt-6 flex flex-col sm:flex-row gap-3">{actions}</div>
-      ) : null}
+      {actions ? <div className="aps-actions">{actions}</div> : null}
     </article>
   );
 }
@@ -116,26 +104,24 @@ export default function AutoProductsSection({ lang, base, ui }: Props) {
   const dict = getAutoProductsSectionDictionary(lang);
 
   return (
-    <section id="auto" className="py-10 sm:py-14 bg-[#F7F7F7]">
-      <div className="max-w-6xl mx-auto px-4">
+    <section id="auto" className="aps-section">
+      <div className="gc-container">
         {/* Заголовок блока */}
-        <div className="flex items-end justify-between gap-6 flex-wrap">
-          <div className="max-w-4xl">
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#1A3A5F]">
-              {dict.top.title}
-            </h2>
-            <p className="mt-2 text-gray-700">{dict.top.lead}</p>
+        <div className="aps-top">
+          <div className="aps-top__copy">
+            <h2 className="aps-h2">{dict.top.title}</h2>
+            <p className="aps-lead">{dict.top.lead}</p>
           </div>
 
           {/* Якорь */}
-          <div className="text-sm text-gray-600">
-            <span className="mr-2">{ui.quick}:</span>
-            <span className="font-mono">#auto</span>
+          <div className="aps-anchor">
+            <span className="aps-anchor__label">{ui.quick}:</span>
+            <span className="aps-anchor__hash">#auto</span>
           </div>
         </div>
 
         {/* 3 большие карточки */}
-        <div className="mt-7 space-y-6">
+        <div className="aps-stack">
           {/* GREEN CARD */}
           <CardShell
             title={dict.greenCard.title}
@@ -143,50 +129,33 @@ export default function AutoProductsSection({ lang, base, ui }: Props) {
             badges={[dict.top.badges.online, dict.top.badges.international]}
             actions={
               <>
-                <Link
-                  href={`${base}/green-card`}
-                  className={cx(
-                    "inline-flex items-center justify-center rounded-xl px-4 py-2",
-                    "bg-[#23376C] text-white hover:opacity-95 transition",
-                    "text-sm font-medium"
-                  )}
-                >
+                <Link href={`${base}/green-card`} className="aps-btn aps-btn--primary">
                   {ui.btnGreenCard}
                 </Link>
 
-                <Link
-                  href={`${base}/contacts`}
-                  className={cx(
-                    "inline-flex items-center justify-center rounded-xl px-4 py-2",
-                    "border border-black/10 bg-white hover:bg-white/70 transition",
-                    "text-sm font-medium text-[#0f2238]"
-                  )}
-                >
+                <Link href={`${base}/contacts`} className="aps-btn aps-btn--ghost">
                   {dict.top.askQuestion}
                 </Link>
               </>
             }
           >
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className="rounded-2xl border border-black/10 p-5">
-                <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
-                  {dict.greenCard.whoTitle}
-                </h4>
+            <div className="aps-grid2">
+              <div className="aps-box">
+                <h4 className="aps-h4">{dict.greenCard.whoTitle}</h4>
                 <BulletList items={dict.greenCard.whoItems} />
               </div>
 
-              <div className="rounded-2xl border border-black/10 p-5">
-                <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
-                  {dict.greenCard.includedTitle}
-                </h4>
-                <KeyValueList rows={dict.greenCard.includedRows} note={dict.greenCard.note} />
+              <div className="aps-box">
+                <h4 className="aps-h4">{dict.greenCard.includedTitle}</h4>
+                <KeyValueList
+                  rows={dict.greenCard.includedRows}
+                  note={dict.greenCard.note}
+                />
               </div>
             </div>
 
-            <div className="rounded-2xl border border-black/10 p-5">
-              <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
-                {dict.greenCard.brokerTitle}
-              </h4>
+            <div className="aps-box">
+              <h4 className="aps-h4">{dict.greenCard.brokerTitle}</h4>
               <BulletList items={dict.greenCard.brokerItems} />
             </div>
           </CardShell>
@@ -198,58 +167,36 @@ export default function AutoProductsSection({ lang, base, ui }: Props) {
             badges={[dict.top.badges.online, dict.top.badges.russiaEntry]}
             actions={
               <>
-                <Link
-                  href={`${base}/osago-rf`}
-                  className={cx(
-                    "inline-flex items-center justify-center rounded-xl px-4 py-2",
-                    "bg-[#23376C] text-white hover:opacity-95 transition",
-                    "text-sm font-medium"
-                  )}
-                >
+                <Link href={`${base}/osago-rf`} className="aps-btn aps-btn--primary">
                   {ui.btnOsago}
                 </Link>
 
-                <Link
-                  href={`${base}/contacts`}
-                  className={cx(
-                    "inline-flex items-center justify-center rounded-xl px-4 py-2",
-                    "border border-black/10 bg-white hover:bg-white/70 transition",
-                    "text-sm font-medium text-[#0f2238]"
-                  )}
-                >
+                <Link href={`${base}/contacts`} className="aps-btn aps-btn--ghost">
                   {dict.top.clarifyTermRoute}
                 </Link>
               </>
             }
           >
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className="rounded-2xl border border-black/10 p-5">
-                <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
-                  {dict.osago.whoTitle}
-                </h4>
+            <div className="aps-grid2">
+              <div className="aps-box">
+                <h4 className="aps-h4">{dict.osago.whoTitle}</h4>
                 <BulletList items={dict.osago.whoItems} />
               </div>
 
-              <div className="rounded-2xl border border-black/10 p-5">
-                <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
-                  {dict.osago.includedTitle}
-                </h4>
+              <div className="aps-box">
+                <h4 className="aps-h4">{dict.osago.includedTitle}</h4>
                 <KeyValueList rows={dict.osago.includedRows} note={dict.osago.note} />
               </div>
             </div>
 
-            <div className="rounded-2xl border border-black/10 p-5">
-              <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
-                {dict.osago.brokerTitle}
-              </h4>
+            <div className="aps-box">
+              <h4 className="aps-h4">{dict.osago.brokerTitle}</h4>
               <BulletList items={dict.osago.brokerItems} />
             </div>
 
-            <div className="rounded-2xl border border-black/10 p-5">
-              <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
-                {dict.top.routeBundleTitle}
-              </h4>
-              <p className="text-sm text-gray-700">{dict.top.routeBundleText}</p>
+            <div className="aps-box">
+              <h4 className="aps-h4">{dict.top.routeBundleTitle}</h4>
+              <p className="aps-p">{dict.top.routeBundleText}</p>
             </div>
           </CardShell>
 
@@ -260,58 +207,36 @@ export default function AutoProductsSection({ lang, base, ui }: Props) {
             badges={[dict.top.badges.onRequest, dict.top.badges.kazakhstan]}
             actions={
               <>
-                <Link
-                  href={`${base}/contacts`}
-                  className={cx(
-                    "inline-flex items-center justify-center rounded-xl px-4 py-2",
-                    "bg-[#23376C] text-white hover:opacity-95 transition",
-                    "text-sm font-medium"
-                  )}
-                >
+                <Link href={`${base}/contacts`} className="aps-btn aps-btn--primary">
                   {dict.top.cascoCta}
                 </Link>
 
-                <a
-                  href="tel:+77273573030"
-                  className={cx(
-                    "inline-flex items-center justify-center rounded-xl px-4 py-2",
-                    "border border-black/10 bg-white hover:bg-white/70 transition",
-                    "text-sm font-medium text-[#0f2238]"
-                  )}
-                >
+                <a href="tel:+77273573030" className="aps-btn aps-btn--ghost">
                   +7 (727) 357-30-30
                 </a>
               </>
             }
           >
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className="rounded-2xl border border-black/10 p-5">
-                <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
-                  {dict.casco.whoTitle}
-                </h4>
+            <div className="aps-grid2">
+              <div className="aps-box">
+                <h4 className="aps-h4">{dict.casco.whoTitle}</h4>
                 <BulletList items={dict.casco.whoItems} />
               </div>
 
-              <div className="rounded-2xl border border-black/10 p-5">
-                <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
-                  {dict.casco.includedTitle}
-                </h4>
+              <div className="aps-box">
+                <h4 className="aps-h4">{dict.casco.includedTitle}</h4>
                 <KeyValueList rows={dict.casco.includedRows} note={dict.casco.note} />
               </div>
             </div>
 
-            <div className="rounded-2xl border border-black/10 p-5">
-              <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
-                {dict.casco.brokerTitle}
-              </h4>
+            <div className="aps-box">
+              <h4 className="aps-h4">{dict.casco.brokerTitle}</h4>
               <BulletList items={dict.casco.brokerItems} />
             </div>
 
-            <div className="rounded-2xl border border-black/10 p-5">
-              <h4 className="text-base font-semibold text-[#1A3A5F] mb-2">
-                {dict.casco.franchiseTitle}
-              </h4>
-              <p className="text-sm text-gray-700">{dict.casco.franchiseText}</p>
+            <div className="aps-box">
+              <h4 className="aps-h4 aps-h4--tight">{dict.casco.franchiseTitle}</h4>
+              <p className="aps-p">{dict.casco.franchiseText}</p>
             </div>
           </CardShell>
         </div>

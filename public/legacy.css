@@ -380,3 +380,11 @@ html.is-legacy .legacy-form-actions {
   flex-wrap: wrap;
 }
 html.is-legacy .legacy-form-actions > * { width: 100%; }
+
+/* modern/legacy visibility switches */
+.modern-only { display: block; }
+.legacy-only { display: none; }
+
+/* если детектор поставил класс на html */
+html.is-legacy .modern-only { display: none !important; }
+html.is-legacy .legacy-only { display: block !important; }

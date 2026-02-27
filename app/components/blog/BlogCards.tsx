@@ -3,6 +3,12 @@ import Image from "next/image";
 import type { Lang } from "@/dictionaries/header";
 import type { BlogArticleCard } from "@/lib/blog";
 
+function localeByLang(lang: Lang) {
+  if (lang === "kz") return "kk-KZ";
+  if (lang === "en") return "en-US";
+  return "ru-RU";
+}
+
 export default function BlogCards({
   lang,
   articles,
@@ -10,49 +16,50 @@ export default function BlogCards({
   lang: Lang;
   articles: BlogArticleCard[];
 }) {
+  const locale = localeByLang(lang);
+
   return (
-    <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="bc-grid">
       {articles.map((a) => (
         <a
           key={a.slug}
           href={`/${lang}/blog/${a.slug}`}
-          className="group rounded-2xl border bg-white overflow-hidden hover:shadow-sm transition-shadow"
+          className="bc-card"
         >
-          <div className="relative aspect-[16/9] bg-gray-50">
+          <div className="bc-media">
             <Image
               src={a.image}
-              alt={a.imageAlt}
+              alt={a.imageAlt || a.title}
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="object-cover"
+              className="bc-img"
               priority={false}
             />
           </div>
 
-          <div className="p-5">
+          <div className="bc-body">
             {/* Tags */}
-            <div className="flex flex-wrap gap-2">
-              {a.tags.slice(0, 2).map((t) => (
-                <span
-                  key={t}
-                  className="text-xs rounded-full px-2.5 py-1 bg-[#F4F6FA] text-[#1A3A5F]"
-                >
-                  {t}
-                </span>
-              ))}
-            </div>
+            {a.tags?.length ? (
+              <div className="bc-tags">
+                {a.tags.slice(0, 2).map((t) => (
+                  <span key={t} className="bc-tag">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            ) : null}
 
-            <h3 className="mt-3 text-base font-semibold text-[#1A3A5F] group-hover:underline">
-              {a.title}
-            </h3>
+            <h3 className="bc-title">{a.title}</h3>
 
-            <p className="mt-2 text-sm text-gray-700 line-clamp-2">
-              {a.excerpt}
-            </p>
+            <p className="bc-excerpt">{a.excerpt}</p>
 
-            <div className="mt-4 text-xs text-gray-500 flex items-center gap-2">
-              <span>{new Date(a.publishedAt).toLocaleDateString("ru-RU")}</span>
-              <span>•</span>
+            <div className="bc-meta">
+              <span>
+                {new Date(a.publishedAt).toLocaleDateString(locale)}
+              </span>
+              <span className="bc-dot" aria-hidden="true">
+                •
+              </span>
               <span>{a.readingTime}</span>
             </div>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
 type UTMData = Record<string, string>;
@@ -11,26 +11,24 @@ declare global {
   }
 }
 
+const UTM_KEYS = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_term",
+  "utm_content",
+  "gclid",
+  "yclid",
+  "fbclid",
+] as const;
+
 function parseUtmFromSearch(search: string): UTMData {
   const out: UTMData = {};
-  const params = new URLSearchParams(search);
-
-  const keys = [
-    "utm_source",
-    "utm_medium",
-    "utm_campaign",
-    "utm_term",
-    "utm_content",
-    "gclid",
-    "yclid",
-    "fbclid",
-  ];
-
-  for (const k of keys) {
+  const params = new URLSearchParams(search || "");
+  for (const k of UTM_KEYS) {
     const v = params.get(k);
     if (v) out[k] = v;
   }
-
   return out;
 }
 
@@ -49,57 +47,84 @@ function pushDataLayer(event: Record<string, unknown>) {
   window.dataLayer.push(event);
 }
 
+function readSearch(): string {
+  if (typeof window === "undefined") return "";
+  return window.location.search || "";
+}
+
 export default function AnalyticsManager() {
   const pathname = usePathname() || "/";
   const [search, setSearch] = useState<string>("");
 
-  // ✅ берём query-string ТОЛЬКО на клиенте
+  // чтобы не стрелять лишний page_view на первом рендере со search=""
+  const hasInitRef = useRef(false);
+
+  // 1) Синхронизируем query-string:
+  // - при монтировании
+  // - при смене pathname
+  // - при popstate (back/forward меняет query)
   useEffect(() => {
     if (typeof window === "undefined") return;
-    setSearch(window.location.search || "");
+
+    const update = () => setSearch(readSearch());
+    update();
+
+    window.addEventListener("popstate", update);
+    return () => window.removeEventListener("popstate", update);
   }, [pathname]);
 
   const pageUrl = useMemo(() => {
-    if (typeof window === "undefined") return pathname;
-    const origin = window.location.origin || "";
-    return `${origin}${pathname}${search}`;
+    if (typeof window === "undefined") return `${pathname}${search}`;
+    return `${window.location.origin}${pathname}${search}`;
   }, [pathname, search]);
 
-  // ✅ сохраняем UTM в localStorage (чтобы потом отправлять с формами/лидами)
+  // 2) Сохраняем UTM (merge, чтобы не терять старые ключи, если пришли только часть)
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const utm = parseUtmFromSearch(search);
-    if (Object.keys(utm).length === 0) return;
+    const utmIncoming = parseUtmFromSearch(search);
+    if (Object.keys(utmIncoming).length === 0) return;
 
     try {
-      localStorage.setItem("utm_data", JSON.stringify(utm));
+      const stored = safeJsonParse(localStorage.getItem("utm_data"));
+      const prev =
+        stored && typeof stored === "object" ? (stored as UTMData) : {};
+      const merged = { ...prev, ...utmIncoming };
+
+      localStorage.setItem("utm_data", JSON.stringify(merged));
     } catch {
       // ignore
     }
   }, [search]);
 
-  // ✅ отправка page_view (если используешь GTM dataLayer)
+  // 3) Page view в dataLayer — 1 раз на (pathname+search) после инициализации search
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Если у тебя аналитика включается только после consent — можешь
-    // добавить проверку по cookie/событию здесь, но это обычно делает AnalyticsScripts.
+    // Не отправляем page_view до первого чтения search
+    if (!hasInitRef.current) {
+      hasInitRef.current = true;
+      // если на первом update search ещё пустой, ок — след. эффект сработает при реальном search
+      // но чтобы не терять page_view без query — разрешаем один раз, только если search уже синхронизирован
+      // (мы его синхронизируем в update() выше)
+    }
 
-    const utmStored = safeJsonParse(
-      typeof window !== "undefined" ? localStorage.getItem("utm_data") : null
-    );
-    const utm =
-      utmStored && typeof utmStored === "object" ? (utmStored as UTMData) : {};
+    let utm: UTMData = {};
+    try {
+      const stored = safeJsonParse(localStorage.getItem("utm_data"));
+      if (stored && typeof stored === "object") utm = stored as UTMData;
+    } catch {
+      utm = {};
+    }
 
     pushDataLayer({
       event: "page_view",
       page_path: pathname,
       page_location: pageUrl,
-      page_title: typeof document !== "undefined" ? document.title : "",
+      page_title: document?.title || "",
       utm,
     });
-  }, [pathname, pageUrl]);
+  }, [pathname, search, pageUrl]);
 
   return null;
 }

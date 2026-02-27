@@ -10,35 +10,29 @@ type Props = {
   t: CookiesPolicyDictionary;
 };
 
-function SectionTitle({ children }: { children: string }) {
-  return (
-    <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 mt-10">
-      {children}
-    </h2>
-  );
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return <h2 className="cp-h2">{children}</h2>;
 }
 
 function PolicyTableView({ table }: { table: PolicyTable }) {
   return (
-    <div className="mt-4 overflow-x-auto rounded-2xl border border-gray-200 bg-white">
-      <table className="min-w-full text-left text-sm">
-        <thead className="bg-gray-50">
+    <div className="cp-tableWrap">
+      <table className="cp-table">
+        <thead>
           <tr>
             {table.headers.map((h, idx) => (
-              <th
-                key={idx}
-                className="px-4 py-3 font-semibold text-gray-900"
-              >
+              <th key={idx} className="cp-th">
                 {h}
               </th>
             ))}
           </tr>
         </thead>
+
         <tbody>
           {table.rows.map((row, rIdx) => (
-            <tr key={rIdx} className="border-t border-gray-200">
+            <tr key={rIdx} className="cp-tr">
               {row.map((cell, cIdx) => (
-                <td key={cIdx} className="px-4 py-3 text-gray-700 align-top">
+                <td key={cIdx} className="cp-td">
                   {cell}
                 </td>
               ))}
@@ -51,28 +45,61 @@ function PolicyTableView({ table }: { table: PolicyTable }) {
 }
 
 function Paragraphs({ items }: { items: string[] }) {
-  return (
-    <div className="mt-4 text-sm sm:text-base text-gray-700 leading-relaxed">
-      {items.map((line, i) => {
-        const trimmed = line.trim();
-        if (!trimmed) return <div key={i} className="h-3" />;
+  const blocks: Array<
+    | { type: "spacer"; key: string }
+    | { type: "p"; key: string; text: string }
+    | { type: "ul"; key: string; items: string[] }
+  > = [];
 
-        const isBullet = trimmed.startsWith("• ");
-        if (isBullet) {
+  let buf: string[] = [];
+
+  const flush = (key: string) => {
+    if (!buf.length) return;
+    blocks.push({ type: "ul", key, items: buf });
+    buf = [];
+  };
+
+  items.forEach((line, i) => {
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      flush(`ul-${i}`);
+      blocks.push({ type: "spacer", key: `sp-${i}` });
+      return;
+    }
+
+    const isBullet = /^•\s+/.test(trimmed);
+    if (isBullet) {
+      buf.push(trimmed.replace(/^•\s+/, ""));
+      return;
+    }
+
+    flush(`ul-${i}`);
+    blocks.push({ type: "p", key: `p-${i}`, text: line });
+  });
+
+  flush("ul-end");
+
+  return (
+    <div className="cp-text">
+      {blocks.map((b) => {
+        if (b.type === "spacer") return <div key={b.key} className="cp-spacer" />;
+
+        if (b.type === "ul") {
           return (
-            <ul key={i} className="list-disc pl-5 text-gray-700 my-2">
-              <li className="text-left">{trimmed.replace(/^•\s*/, "")}</li>
+            <ul key={b.key} className="cp-ul">
+              {b.items.map((it, idx) => (
+                <li key={`${b.key}-${idx}`} className="cp-li">
+                  {it}
+                </li>
+              ))}
             </ul>
           );
         }
 
         return (
-          <p
-            key={i}
-            className="my-2 text-justify [hyphens:auto]"
-            style={{ textAlign: "justify", textJustify: "inter-word" }}
-          >
-            {line}
+          <p key={b.key} className="cp-p">
+            {b.text}
           </p>
         );
       })}
@@ -82,21 +109,19 @@ function Paragraphs({ items }: { items: string[] }) {
 
 export default function CookiesPolicyPage({ t }: Props) {
   return (
-    <section className="py-10 sm:py-14 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4">
-        <h1 className="text-3xl sm:text-4xl font-bold text-[#1A3A5F]">
-          {t.pageTitle}
-        </h1>
+    <section className="cp-page">
+      <div className="cp-container">
+        <h1 className="cp-h1">{t.pageTitle}</h1>
 
         {t.updatedAt ? (
-          <p className="mt-3 text-xs sm:text-sm text-gray-500">
+          <p className="cp-updated">
             {t.updatedLabel}: {t.updatedAt}
           </p>
         ) : null}
 
-        <div className="mt-6 rounded-2xl bg-white border border-gray-100 shadow-sm p-6 sm:p-8">
+        <div className="cp-card">
           {t.sections.map((s, idx) => (
-            <div key={idx}>
+            <div key={idx} className="cp-section">
               <SectionTitle>{s.title}</SectionTitle>
 
               {s.paragraphs?.length ? <Paragraphs items={s.paragraphs} /> : null}
@@ -106,13 +131,15 @@ export default function CookiesPolicyPage({ t }: Props) {
               ))}
 
               {s.links?.length ? (
-                <div className="mt-4 text-sm text-gray-700">
+                <div className="cp-links">
                   {s.links.map((l, i) => (
-                    <p key={i} className="my-1">
-                      {l.label}{" "}
+                    <p key={i} className="cp-linkRow">
+                      <span className="cp-linkLabel">{l.label} </span>
                       <a
                         href={l.href}
-                        className="text-[#1A3A5F] underline underline-offset-2"
+                        className="cp-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
                       >
                         {l.text}
                       </a>

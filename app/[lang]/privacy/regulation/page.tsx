@@ -1,5 +1,6 @@
 // app/[lang]/privacy/regulation/page.tsx
 export const dynamic = "force-static";
+export const dynamicParams = false;
 
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
@@ -11,8 +12,16 @@ import {
 
 import RegulationPage from "@/components/RegulationPage";
 
+const ALLOWED_LANGS: Lang[] = ["ru", "kz", "en"];
+
 function normalizeLang(value: string): Lang {
-  return value === "ru" || value === "kz" || value === "en" ? value : "ru";
+  return (ALLOWED_LANGS as readonly string[]).includes(value)
+    ? (value as Lang)
+    : "ru";
+}
+
+export function generateStaticParams() {
+  return ALLOWED_LANGS.map((lang) => ({ lang }));
 }
 
 export async function generateMetadata({
@@ -24,6 +33,7 @@ export async function generateMetadata({
   const lang = normalizeLang(rawLang);
 
   const t = getRegulationDictionary(lang);
+
   return {
     title: t.seo.title,
     description: t.seo.description,

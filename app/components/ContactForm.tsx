@@ -1,20 +1,22 @@
 // app/components/ContactForm.tsx
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import React, { useId, useMemo, useState, type ChangeEvent, type FormEvent } from "react";
 import type { AgreementDictionary } from "@/dictionaries/agreement";
 import type { HomeDictionary } from "@/dictionaries/home";
-import { getRecaptchaToken } from "@/lib/recaptcha";
 
-export type ContactFormResult = {
-  kind: "success" | "error";
-  message: string;
+type Grecaptcha = {
+  ready: (cb: () => void) => void;
+  execute: (siteKey: string, options: { action: string }) => Promise<string>;
 };
 
-// ✅ Тип контактного блока (вырезка из HomeDictionary)
+
+
 export type ContactBlock = HomeDictionary["contact"];
 
-type FormData = {
+export type ContactFormResult = { ok: true } | { ok: false; message?: string };
+
+type ContactFormData = {
   firstName: string;
   lastName: string;
   email: string;
@@ -25,28 +27,27 @@ type FormData = {
 };
 
 type Props = {
-  // ✅ передаём только contact-блок
   t: ContactBlock;
-
   agreement: AgreementDictionary;
-  onOpenAgreement: () => void;
-  onResult: (result: ContactFormResult) => void;
 
-  // PERFORMANCE: включить загрузку reCAPTCHA по фокусу/сабмиту
-  onNeedRecaptcha?: () => void;
-  recaptchaSiteKey?: string;
-
-  // ✅ откуда пришла форма (для аналитики/сегментации)
   context?: string;
-
-  // ✅ можно менять endpoint (если захочешь)
   submitUrl?: string;
-
-  // ✅ action для reCAPTCHA v3
   recaptchaAction?: string;
+
+  // ✅ управляет внешняя секция (ContactSection)
+  recaptchaSiteKey?: string;
+  onNeedRecaptcha?: () => void;
+
+  // ✅ если хочешь — хук под аналитику
+  onResult?: (r: ContactFormResult) => void;
+
+  // ✅ если AgreementModal вынесен наружу — можно использовать это
+  onOpenAgreement?: () => void;
 };
 
-const initialFormData: FormData = {
+type ContactApiResponse = { ok: boolean; message?: string };
+
+const initialData: ContactFormData = {
   firstName: "",
   lastName: "",
   email: "",
@@ -58,396 +59,419 @@ const initialFormData: FormData = {
 
 function formatPhone(raw: string): string {
   const digits = raw.replace(/\D/g, "");
-  if (!digits) return "";
-  return "+" + digits;
+  return digits ? `+${digits}` : "";
 }
 
 function formatEmail(raw: string): string {
   return raw.replace(/\s/g, "").replace(/[^a-zA-Z0-9@._\-+]/g, "");
 }
 
-function isCheckbox(
-  el: EventTarget
-): el is HTMLInputElement & { type: "checkbox" } {
-  return el instanceof HTMLInputElement && el.type === "checkbox";
-}
-
-function safeReadUtmFromLocalStorage(): Record<string, string> {
+function safeReadUtm(): Record<string, string> {
   try {
     const raw = localStorage.getItem("utm_data");
-    if (!raw) return {};
-    const parsed: unknown = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object") return {};
-
-    const out: Record<string, string> = {};
-    for (const [k, v] of Object.entries(parsed as Record<string, unknown>)) {
-      if (typeof v === "string") out[k] = v;
-    }
-    return out;
+    const parsed = raw ? (JSON.parse(raw) as unknown) : {};
+    if (parsed && typeof parsed === "object") return parsed as Record<string, string>;
+    return {};
   } catch {
     return {};
   }
 }
 
+function sleep(ms: number) {
+  return new Promise<void>((r) => setTimeout(r, ms));
+}
+
+function isGrecaptcha(x: unknown): x is Grecaptcha {
+  const g = x as any;
+  return !!g && typeof g.ready === "function" && typeof g.execute === "function";
+}
+
+// ждём появление grecaptcha + успешный ready()
+async function waitForGrecaptchaReady(timeoutMs = 6000): Promise<Grecaptcha | null> {
+  const started = Date.now();
+
+  while (Date.now() - started < timeoutMs) {
+    const candidate = typeof window !== "undefined" ? window.grecaptcha : undefined;
+
+    if (isGrecaptcha(candidate)) {
+      let ok = false;
+
+      await new Promise<void>((resolve) => {
+        try {
+          candidate.ready(() => {
+            ok = true;
+            resolve();
+          });
+        } catch {
+          resolve();
+        }
+      });
+
+      if (ok) return candidate;
+    }
+
+    await sleep(120);
+  }
+
+  return null;
+}
+
 export default function ContactForm({
   t,
   agreement,
-  onOpenAgreement,
-  onResult,
-  onNeedRecaptcha,
-  recaptchaSiteKey: recaptchaSiteKeyProp,
   context = "site-contact",
   submitUrl = "/api/contact",
   recaptchaAction = "contact",
+
+  recaptchaSiteKey,
+  onNeedRecaptcha,
+  onResult,
+  onOpenAgreement,
 }: Props) {
-  const [formData, setFormData] = useState<FormData>(initialFormData);
-  const [formStatus, setFormStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
-  const [formMessage, setFormMessage] = useState<string>("");
+  const uid = useId();
 
-  const recaptchaSiteKey = useMemo(
-    () =>
-      recaptchaSiteKeyProp ??
-      process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ??
-      "",
-    [recaptchaSiteKeyProp]
+  const ids = useMemo(
+    () => ({
+      firstName: `${uid}-firstName`,
+      lastName: `${uid}-lastName`,
+      email: `${uid}-email`,
+      phone: `${uid}-phone`,
+      comment: `${uid}-comment`,
+      agree: `${uid}-agree`,
+      website: `${uid}-website`,
+    }),
+    [uid]
   );
 
-  const markNeedRecaptcha = useCallback(() => {
-    onNeedRecaptcha?.();
-  }, [onNeedRecaptcha]);
+  const [formData, setFormData] = useState<ContactFormData>(initialData);
+  const [formStatus, setFormStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [formMessage, setFormMessage] = useState("");
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [isAgreementOpen, setIsAgreementOpen] = useState(false);
 
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      const { name } = e.target;
-      let nextValue: string | boolean;
+  const isBusy = formStatus === "loading";
 
-      if (isCheckbox(e.target)) {
-        nextValue = e.target.checked;
-      } else {
-        nextValue = e.target.value;
-      }
+  function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    const target = e.target;
+    const name = target.name as keyof ContactFormData;
 
-      if (typeof nextValue === "string") {
-        if (name === "phone") nextValue = formatPhone(nextValue);
-        if (name === "email") nextValue = formatEmail(nextValue);
-      }
+    let value: ContactFormData[keyof ContactFormData];
+    if (target instanceof HTMLInputElement && target.type === "checkbox") {
+      value = target.checked;
+    } else {
+      value = target.value;
+    }
 
-      setFormData((prev) => ({ ...prev, [name]: nextValue } as FormData));
-    },
-    []
-  );
+    if (name === "phone") value = formatPhone(String(value));
+    if (name === "email") value = formatEmail(String(value));
 
-  const handleContactSubmit = useCallback(
-    async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
 
-      setFormStatus("loading");
-      setFormMessage("");
+  async function getRecaptchaToken(): Promise<string | undefined> {
+    const isProd = process.env.NODE_ENV === "production";
+    if (!isProd) return undefined;
+    if (!recaptchaSiteKey) return undefined;
 
-      try {
-        // honeypot → бот, делаем вид, что всё ОК
-        if (formData.website.trim() !== "") {
-          setFormStatus("success");
-          setFormMessage(t.statusSuccess);
-          setFormData(initialFormData);
-          onResult({ kind: "success", message: t.statusSuccess });
-          return;
-        }
+    // попросим секцию подгрузить скрипт, если ещё не подгружен
+    if (typeof window !== "undefined" && !window.grecaptcha) {
+      onNeedRecaptcha?.();
+    }
 
-        // включаем загрузку reCAPTCHA в родителе (если сделано лениво)
-        markNeedRecaptcha();
+    const g = await waitForGrecaptchaReady(7000);
+    if (!g) return undefined;
 
-        let recaptchaToken: string | undefined;
+    try {
+      return await g.execute(recaptchaSiteKey, { action: recaptchaAction });
+    } catch {
+      return undefined;
+    }
+  }
 
-        if (recaptchaSiteKey) {
-          try {
-            recaptchaToken = await getRecaptchaToken(
-              recaptchaSiteKey,
-              recaptchaAction
-            );
-          } catch {
-            const msg = t.statusError;
-            setFormStatus("error");
-            setFormMessage(msg);
-            onResult({ kind: "error", message: msg });
-            return;
-          }
-        }
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (isBusy) return;
 
-        // UTM + адрес страницы
-        let utm: Record<string, string> = {};
-        let pageUrl: string | undefined;
+    setFormStatus("loading");
+    setFormMessage("");
+    setIsStatusModalOpen(false);
 
-        if (typeof window !== "undefined") {
-          utm = safeReadUtmFromLocalStorage();
-          pageUrl = window.location.href;
-        }
-
-        const res = await fetch(submitUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...formData,
-            recaptchaToken,
-            context,
-            utm,
-            pageUrl,
-          }),
-        });
-
-        const data: unknown = await res.json().catch(() => null);
-        const ok = Boolean((data as { ok?: boolean } | null)?.ok);
-        const message = (data as { message?: string } | null)?.message;
-
-        if (!res.ok || !ok) {
-          const msg = message || t.statusError;
-          setFormStatus("error");
-          setFormMessage(msg);
-          onResult({ kind: "error", message: msg });
-          return;
-        }
-
+    try {
+      // honeypot: бот — делаем вид, что всё ок
+      if (formData.website.trim() !== "") {
         setFormStatus("success");
         setFormMessage(t.statusSuccess);
-        setFormData(initialFormData);
-        onResult({ kind: "success", message: t.statusSuccess });
-      } catch {
-        setFormStatus("error");
-        setFormMessage(t.statusError);
-        onResult({ kind: "error", message: t.statusError });
+        setFormData(initialData);
+        setIsStatusModalOpen(true);
+        onResult?.({ ok: true });
+        return;
       }
-    },
-    [
-      formData,
-      markNeedRecaptcha,
-      onResult,
-      recaptchaSiteKey,
-      t.statusError,
-      t.statusSuccess,
-      context,
-      submitUrl,
-      recaptchaAction,
-    ]
-  );
 
-  const statusId = "contact-form-status";
-  const hasError = formStatus === "error";
-  const hasSuccess = formStatus === "success";
+      const recaptchaToken = await getRecaptchaToken();
+      const utm = typeof window !== "undefined" ? safeReadUtm() : {};
+      const pageUrl = typeof window !== "undefined" ? window.location.href : undefined;
+
+      const res = await fetch(submitUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          recaptchaToken,
+          context,
+          utm,
+          pageUrl,
+        }),
+      });
+
+      const data = (await res.json().catch(() => null)) as ContactApiResponse | null;
+
+      if (!res.ok || !data?.ok) {
+        setFormStatus("error");
+        const msg = data?.message || t.statusError;
+        setFormMessage(msg);
+        setIsStatusModalOpen(true);
+        onResult?.({ ok: false, message: msg });
+        return;
+      }
+
+      setFormStatus("success");
+      setFormMessage(t.statusSuccess);
+      setFormData(initialData);
+      setIsStatusModalOpen(true);
+      onResult?.({ ok: true });
+    } catch (err) {
+      console.error("ContactForm submit error:", err);
+      setFormStatus("error");
+      setFormMessage(t.statusError);
+      setIsStatusModalOpen(true);
+      onResult?.({ ok: false, message: t.statusError });
+    }
+  }
 
   return (
-    <div className="w-full">
-      <div className="mb-6 text-center">
-        <h2 className="text-xl sm:text-2xl font-bold text-[#1A3A5F]">
-          {t.sectionTitle}
-        </h2>
-        <p className="mt-1 text-sm text-gray-600">{t.sectionSubtitle}</p>
+    <>
+      <div className="qf-card">
+        <div className="qf-head">
+          <h2 className="qf-title">{t.sectionTitle}</h2>
+          <p className="qf-p">{t.sectionSubtitle}</p>
+        </div>
+
+        <form className="qf-form" onSubmit={handleSubmit} noValidate>
+          {/* honeypot */}
+          <div className="qf-hidden" aria-hidden="true">
+            <label htmlFor={ids.website}>{t.honeypotLabel}</label>
+            <input
+              id={ids.website}
+              type="text"
+              name="website"
+              value={formData.website}
+              onChange={handleChange}
+              autoComplete="off"
+              tabIndex={-1}
+              className="control"
+            />
+          </div>
+
+          <div className="qf-grid2">
+            <div className="field">
+              <label className="label" htmlFor={ids.firstName}>
+                {t.fields.firstName} <span className="req">{t.requiredMark}</span>
+              </label>
+              <input
+                id={ids.firstName}
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleChange}
+                className="control"
+                autoComplete="given-name"
+                required
+                disabled={isBusy}
+              />
+            </div>
+
+            <div className="field">
+              <label className="label" htmlFor={ids.lastName}>
+                {t.fields.lastName} <span className="req">{t.requiredMark}</span>
+              </label>
+              <input
+                id={ids.lastName}
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleChange}
+                className="control"
+                autoComplete="family-name"
+                required
+                disabled={isBusy}
+              />
+            </div>
+          </div>
+
+          <div className="field">
+            <label className="label" htmlFor={ids.email}>
+              {t.fields.email} <span className="req">{t.requiredMark}</span>
+            </label>
+            <input
+              id={ids.email}
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              inputMode="email"
+              autoComplete="email"
+              pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+              className="control"
+              required
+              disabled={isBusy}
+            />
+          </div>
+
+          <div className="field">
+            <label className="label" htmlFor={ids.phone}>
+              {t.fields.phone} <span className="req">{t.requiredMark}</span>
+            </label>
+            <input
+              id={ids.phone}
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              inputMode="tel"
+              autoComplete="tel"
+              placeholder="+7 777 1234567"
+              className="control"
+              required
+              disabled={isBusy}
+            />
+          </div>
+
+          <div className="field">
+            <label className="label" htmlFor={ids.comment}>
+              {t.fields.comment} <span className="req">{t.requiredMark}</span>
+            </label>
+            <textarea
+              id={ids.comment}
+              name="comment"
+              rows={4}
+              value={formData.comment}
+              onChange={handleChange}
+              className="control control--textarea"
+              required
+              disabled={isBusy}
+            />
+          </div>
+
+          <div className="qf-agree">
+            <input
+              id={ids.agree}
+              type="checkbox"
+              name="agree"
+              checked={formData.agree}
+              onChange={handleChange}
+              required
+              disabled={isBusy}
+            />
+            <label htmlFor={ids.agree}>
+              {t.agreePrefix}{" "}
+              <button
+                type="button"
+                onClick={() => (onOpenAgreement ? onOpenAgreement() : setIsAgreementOpen(true))}
+                className="link"
+                disabled={isBusy}
+              >
+                {t.agreeLink}
+              </button>
+              {t.agreeSuffix} <span className="req">{t.requiredMark}</span>
+            </label>
+          </div>
+
+          {formStatus !== "idle" ? (
+            <div className={formStatus === "success" ? "qf-status-ok" : "qf-status-err"} role="status" aria-live="polite">
+              {formMessage}
+            </div>
+          ) : null}
+
+          <div className="qf-actions">
+            <button type="submit" className="btn btn-secondary btn-block" disabled={isBusy}>
+              {isBusy ? t.submitLoading : t.submitDefault}
+            </button>
+          </div>
+        </form>
       </div>
 
-      <form
-        className="space-y-4"
-        onSubmit={handleContactSubmit}
-        aria-describedby={formStatus !== "idle" ? statusId : undefined}
-      >
-        {/* Honeypot */}
-        <div className="hidden" aria-hidden="true">
-          <label htmlFor="website">{t.honeypotLabel}</label>
-          <input
-            id="website"
-            type="text"
-            name="website"
-            value={formData.website}
-            onChange={handleInputChange}
-            autoComplete="off"
-            tabIndex={-1}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="firstName"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              {t.fields.firstName}{" "}
-              <span className="text-red-500" aria-hidden="true">
-                {t.requiredMark}
-              </span>
-            </label>
-            <input
-              id="firstName"
-              type="text"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleInputChange}
-              onFocus={markNeedRecaptcha}
-              autoComplete="given-name"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
-              required
-              aria-required="true"
-              aria-invalid={hasError ? true : undefined}
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="lastName"
-              className="block text-sm font-medium text-gray-700 mb-1"
-            >
-              {t.fields.lastName}{" "}
-              <span className="text-red-500" aria-hidden="true">
-                {t.requiredMark}
-              </span>
-            </label>
-            <input
-              id="lastName"
-              type="text"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleInputChange}
-              onFocus={markNeedRecaptcha}
-              autoComplete="family-name"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
-              required
-              aria-required="true"
-              aria-invalid={hasError ? true : undefined}
-            />
+      {/* STATUS MODAL */}
+      {isStatusModalOpen ? (
+        <div className="modal-overlay" role="dialog" aria-modal="true">
+          <div className="modal modal--sm">
+            <h3 className="modal-title">{formStatus === "success" ? t.modalSuccessTitle : t.modalErrorTitle}</h3>
+            <p className="modal-text">{formMessage}</p>
+            <div className="modal-actions modal-actions--center">
+              <button type="button" className="btn btn-block" onClick={() => setIsStatusModalOpen(false)}>
+                {t.modalClose}
+              </button>
+            </div>
           </div>
         </div>
+      ) : null}
 
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            {t.fields.email}{" "}
-            <span className="text-red-500" aria-hidden="true">
-              {t.requiredMark}
-            </span>
-          </label>
-          <input
-            id="email"
-            inputMode="email"
-            autoComplete="email"
+      {/* AGREEMENT MODAL (используется только если AgreementModal НЕ вынесен наружу) */}
+      {!onOpenAgreement && isAgreementOpen ? (
+        <div className="modal-overlay" role="dialog" aria-modal="true">
+          <div className="modal modal--lg modal-scroll">
+            <h3 className="modal-title">{agreement.title}</h3>
 
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            onFocus={markNeedRecaptcha}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
-            required
-            aria-required="true"
-            aria-invalid={hasError ? true : undefined}
-          />
-        </div>
+            <div className="qf-agreementText">
+              <p style={{ marginTop: 0 }}>{agreement.intro1}</p>
+              <p>{agreement.personalDataDefinition}</p>
 
-        <div>
-          <label
-            htmlFor="phone"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            {t.fields.phone}{" "}
-            <span className="text-red-500" aria-hidden="true">
-              {t.requiredMark}
-            </span>
-          </label>
-          <input
-            id="phone"
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleInputChange}
-            onFocus={markNeedRecaptcha}
-            inputMode="tel"
-            autoComplete="tel"
-            placeholder="+7 777 1234567"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
-            required
-            aria-required="true"
-            aria-invalid={hasError ? true : undefined}
-          />
-        </div>
+              <ul className="list">
+                <li>{agreement.dataList.firstName}</li>
+                <li>{agreement.dataList.lastName}</li>
+                <li>{agreement.dataList.email}</li>
+                <li>{agreement.dataList.phone}</li>
+                <li>{agreement.dataList.comment}</li>
+              </ul>
 
-        <div>
-          <label
-            htmlFor="comment"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
-            {t.fields.comment}{" "}
-            <span className="text-red-500" aria-hidden="true">
-              {t.requiredMark}
-            </span>
-          </label>
-          <textarea
-            id="comment"
-            name="comment"
-            rows={4}
-            value={formData.comment}
-            onChange={handleInputChange}
-            onFocus={markNeedRecaptcha}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A] resize-y"
-            required
-            aria-required="true"
-            aria-invalid={hasError ? true : undefined}
-          />
-        </div>
+              <p>{agreement.processingIntro}</p>
+              <p>{agreement.purposesIntro}</p>
 
-        <div className="flex items-start gap-2 text-xs text-gray-600">
-          <input
-            id="agree"
-            type="checkbox"
-            name="agree"
-            checked={formData.agree}
-            onChange={handleInputChange}
-            className="mt-0.5"
-            required
-            aria-required="true"
-            aria-invalid={hasError ? true : undefined}
-          />
-          <label htmlFor="agree">
-            {t.agreePrefix}{" "}
-            <button
-              type="button"
-              onClick={onOpenAgreement}
-              className="text-[#23376c] underline underline-offset-2 hover:opacity-80"
-              aria-haspopup="dialog"
-              aria-label={`${t.agreeLink} — ${agreement.title}`}
-            >
-              {t.agreeLink}
-            </button>
-            {t.agreeSuffix}
-            <span className="text-red-500" aria-hidden="true">
-              {" "}
-              {t.requiredMark}
-            </span>
-          </label>
-        </div>
+              <ul className="list">
+                {agreement.purposesList.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
 
-        {formStatus !== "idle" && (
-          <div
-            id={statusId}
-            role="status"
-            aria-live="polite"
-            className={
-              hasSuccess ? "text-sm text-green-700" : "text-sm text-red-600"
-            }
-          >
-            {formMessage}
+              <p>{agreement.consentText}</p>
+
+              <h4 className="qf-agreementTitle">{agreement.contactsTitle}</h4>
+
+              <ul className="list">
+                {agreement.contactsList.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="modal-actions">
+              <button type="button" className="btn-ghost" onClick={() => setIsAgreementOpen(false)}>
+                {agreement.closeBtn}
+              </button>
+
+              <button
+                type="button"
+                className="btn"
+                onClick={() => {
+                  setFormData((prev) => ({ ...prev, agree: true }));
+                  setIsAgreementOpen(false);
+                }}
+              >
+                {agreement.acceptBtn}
+              </button>
+            </div>
           </div>
-        )}
-
-        <div className="pt-2">
-          <button
-            type="submit"
-            className="btn btn-secondary w-full"
-            disabled={formStatus === "loading"}
-          >
-            {formStatus === "loading" ? t.submitLoading : t.submitDefault}
-          </button>
         </div>
-      </form>
-    </div>
+      ) : null}
+    </>
   );
 }

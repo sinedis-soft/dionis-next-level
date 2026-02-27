@@ -10,8 +10,6 @@ import {
   type ProductsSectionKey,
 } from "@/dictionaries/products";
 
-
-
 import ProductsDirectoryServer from "@/components/products/ProductsDirectoryServer";
 import AutoProductsSection from "@/components/products/AutoProductsSection";
 import PropertyProductsSection from "@/components/products/PropertyProductsSection";
@@ -19,12 +17,6 @@ import CargoProductsSection from "@/components/products/CargoProductsSection";
 import LiabilityProductsSection from "@/components/products/LiabilityProductsSection";
 import LifeProductsSection from "@/components/products/LifeProductsSection";
 import MedicalProductsSection from "@/components/products/MedicalProductsSection";
-
-
-
-
-
-
 
 import { RequestBox } from "@/components/RequestBox";
 
@@ -105,24 +97,19 @@ export default async function ProductsPage({
 
   const categories: Category[] = PRODUCTS_CATEGORIES;
 
-  const active: ProductsSectionKey = isSection(sp.section)
-    ? sp.section
-    : "auto";
+  const active: ProductsSectionKey = isSection(sp.section) ? sp.section : "auto";
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="pr-page">
       {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#F7F7F7] via-[#ffffff] to-[#e9f0f5]" />
-
-        <div className="max-w-6xl mx-auto px-4 py-10 sm:py-14 lg:py-16">
-          <div className="max-w-3xl">
-            <h1 className="text-3xl sm:text-4xl font-bold text-[#1A3A5F] leading-tight">
-              {ui.h1}
-            </h1>
-            <p className="mt-4 text-base sm:text-lg text-gray-700">
-              {ui.sub}
-            </p>
+      <section className="pr-hero">
+        <div className="pr-hero__bg" aria-hidden="true" />
+        <div className="gc-container">
+          <div className="pr-hero__inner">
+            <div className="pr-hero__copy">
+              <h1 className="pr-hero__title">{ui.h1}</h1>
+              <p className="pr-hero__sub">{ui.sub}</p>
+            </div>
           </div>
         </div>
       </section>
@@ -137,16 +124,28 @@ export default async function ProductsPage({
       />
 
       {/* SECTION CONTENT (server) */}
-      {active === "auto" ? <AutoProductsSection lang={lang} base={base} ui={ui} /> : null}
-      {active === "property" ? <PropertyProductsSection lang={lang} base={base} ui={ui} /> : null}
-      {active === "cargo" ? <CargoProductsSection lang={lang} base={base} ui={ui} /> : null}
-      {active === "liability" ? <LiabilityProductsSection lang={lang} base={base} ui={ui} /> : null}
-      {active === "life" ? <LifeProductsSection lang={lang} base={base} ui={ui} /> : null}
-      {active === "vhi" ? <MedicalProductsSection lang={lang} base={base} ui={ui} /> : null}
+      {active === "auto" ? (
+        <AutoProductsSection lang={lang} base={base} ui={ui} />
+      ) : null}
+      {active === "property" ? (
+        <PropertyProductsSection lang={lang} base={base} ui={ui} />
+      ) : null}
+      {active === "cargo" ? (
+        <CargoProductsSection lang={lang} base={base} ui={ui} />
+      ) : null}
+      {active === "liability" ? (
+        <LiabilityProductsSection lang={lang} base={base} ui={ui} />
+      ) : null}
+      {active === "life" ? (
+        <LifeProductsSection lang={lang} base={base} ui={ui} />
+      ) : null}
+      {active === "vhi" ? (
+        <MedicalProductsSection lang={lang} base={base} ui={ui} />
+      ) : null}
 
       {/* REQUEST BOX */}
-      <section className="py-10 sm:py-14">
-        <div className="max-w-6xl mx-auto px-4">
+      <section className="pr-request">
+        <div className="gc-container">
           <RequestBox
             title={ui.requestTitle}
             text={ui.requestText}
@@ -171,7 +170,3 @@ export default async function ProductsPage({
     </main>
   );
 }
-
-// app/dictionaries/products.ts (добавь в конец файла)
-
-

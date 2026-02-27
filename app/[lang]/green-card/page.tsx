@@ -45,11 +45,10 @@ function langToIana(lang: Lang): string {
 
 /* ---- local helper ---- */
 function AdvantageIcon({ index }: { index: number }) {
-  const common = "h-5 w-5 text-[#C89F4A]";
   const baseSvgProps = {
     width: 20,
     height: 20,
-    className: common,
+    className: "gc-adv-icon",
     style: { width: 20, height: 20, display: "block" } as CSSProperties,
     fill: "none" as const,
     "aria-hidden": true as const,
@@ -218,39 +217,38 @@ export default async function GreenCardPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
       />
 
-      <main className="min-h-screen bg-white">
+      <main className="gc-page">
         {/* HERO */}
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#ffffff] via-white to-[#e9f0f5]" />
+        <section className="gc-hero">
+          <div className="gc-hero__bg" aria-hidden="true" />
+          <div className="gc-container gc-hero__grid">
+            <div className="gc-hero__left">
+              <h1 className="gc-hero__title">{gcPageDict.hero.title}</h1>
+              <p className="gc-hero__subtitle">{gcPageDict.hero.subtitle}</p>
 
-          <div className="max-w-6xl mx-auto px-4 py-12 sm:py-20 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            <div className="text-left">
-              <h1 className="text-3xl sm:text-4xl font-bold text-[#1A3A5F] leading-tight">
-                {gcPageDict.hero.title}
-              </h1>
-              <p className="mt-4 text-lg sm:text-xl text-gray-600 max-w-xl">
-                {gcPageDict.hero.subtitle}
-              </p>
-
-              <div className="mt-10 flex flex-col sm:flex-row gap-4">
-                <a href={orderAnchor} role="button" className="btn btn-wide">
+              <div className="gc-hero__cta">
+                {/* В новой CSS: обязательно указывать intent-класс */}
+                <a
+                  href={orderAnchor}
+                  role="button"
+                  className="btn btn-primary btn-wide"
+                >
                   {gcPageDict.hero.ctaOrder}
                 </a>
               </div>
             </div>
 
-            <div className="flex justify-center lg:justify-end">
-              {/* Декоративный hero-арт: в legacy не рендерим */}
+            <div className="gc-hero__right">
               <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
-                <div className="hidden lg:block">
-                  <div className="gc-hero-visual w-[520px] h-[280px] xl:w-[620px] xl:h-[320px] relative">
+                <div className="gc-hero__visualWrap">
+                  <div className="gc-hero-visual">
                     <Image
                       src="/green-card/car-removebg-preview.png"
                       alt={gcPageDict.hero.carAlt}
                       width={620}
                       height={320}
                       sizes="(min-width: 1280px) 620px, (min-width: 1024px) 520px, 0px"
-                      className="absolute bottom-0 left-0 w-full h-auto z-10 gc-anim-car"
+                      className="gc-hero__car gc-anim-car"
                       priority
                     />
 
@@ -281,42 +279,45 @@ export default async function GreenCardPage({
         </section>
 
         {/* CALCULATOR */}
-        <section className="py-8 sm:py-10 bg-white" id="green-card-calculator">
-          <div className="max-w-6xl mx-auto px-4">
-            {/* ВАЖНО: legacy-form-scope добавлен, чтобы legacy.css реально применял стили полей */}
+        <section className="gc-section" id="green-card-calculator">
+          <div className="gc-container">
+            {/* оставляем твои legacy/modern обёртки — если они есть в проекте.
+                Если их больше нет в новой CSS, просто замени на .card/.card-body в компонентах */}
             <div className="legacy-form-scope legacy-form-card">
-              {/* Modern-only: React калькулятор */}
               <div className="modern-only">
                 <DeferredHydration rootMargin="800px" minDelayMs={150}>
                   <GreenCardCalculator dict={gcPageDict.calculator} />
                 </DeferredHydration>
               </div>
 
-              {/* Legacy-only: статичный HTML (без JS), показываем ТОЛЬКО когда html.is-legacy */}
               <div className="legacy-only">
-                <h2 className="text-xl font-semibold text-[#1A3A5F]">
-                  {gcPageDict.calculator.title}
-                </h2>
-                <p className="text-sm text-gray-600">{gcPageDict.calculator.subtitle}</p>
+                <h2 className="gc-h2">{gcPageDict.calculator.title}</h2>
+                <p className="gc-text-muted">{gcPageDict.calculator.subtitle}</p>
 
-                <div className="mt-4 rounded-xl border border-gray-200 bg-white p-4">
-                  <p className="text-sm text-gray-600">
-                    Ваш браузер устарел. Калькулятор может работать медленно или не работать.
+                <div className="gc-legacy-note">
+                  <p className="gc-text-muted">
+                    Ваш браузер устарел. Калькулятор может работать медленно или не
+                    работать.
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="gc-text-muted">
                     Оформите заявку — мы рассчитаем стоимость и пришлём предложение.
                   </p>
 
-                  <div className="mt-3">
-                    <a href={orderAnchor} className="btn btn-secondary w-full text-center" role="button">
+                  <div className="gc-mt-12">
+                    <a
+                      href={orderAnchor}
+                      className="btn btn-secondary btn-wide"
+                      role="button"
+                    >
                       {gcPageDict.hero.ctaOrder}
                     </a>
                   </div>
                 </div>
 
                 <noscript>
-                  <div className="mt-3 text-sm text-gray-600">
-                    JavaScript отключён. Оформите заявку ниже — мы рассчитаем стоимость вручную.
+                  <div className="gc-mt-12 gc-text-muted">
+                    JavaScript отключён. Оформите заявку ниже — мы рассчитаем стоимость
+                    вручную.
                   </div>
                 </noscript>
               </div>
@@ -329,39 +330,27 @@ export default async function GreenCardPage({
 
         {/* ADVANTAGES */}
         <DeferredHydration rootMargin="800px" minDelayMs={150}>
-          <section
-            className="border-t border-gray-200 bg-[#FFFFFF] py-12 sm:py-16"
-            aria-labelledby="advantages-heading"
-          >
-            <div className="max-w-6xl mx-auto px-4">
-              <h2
-                id="advantages-heading"
-                className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center"
-              >
+          <section className="gc-advantages" aria-labelledby="advantages-heading">
+            <div className="gc-container">
+              <h2 id="advantages-heading" className="gc-advantages__title">
                 {gcPageDict.advantages.title}
               </h2>
 
-              <div className="mt-10 grid gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="gc-advantages__grid">
                 {gcPageDict.advantages.items.map((item, idx) => (
-                  <article
-                    key={`${item.title}-${idx}`}
-                    className="rounded-xl border border-gray-200 bg-white shadow-sm p-4 sm:p-5 text-left"
-                  >
-                    <div className="mb-3">
-                      <div className="h-9 w-9 rounded-lg bg-[#EBCA45]/15 flex items-center justify-center">
-                        <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
-                          <AdvantageIcon index={idx} />
-                        </DeferredHydration>
-                      </div>
+                  <article key={`${item.title}-${idx}`} className="gc-adv-card">
+                    <div className="gc-adv-card__iconWrap">
+                      <DeferredHydration
+                        disableOnLegacy
+                        rootMargin="1200px"
+                        minDelayMs={0}
+                      >
+                        <AdvantageIcon index={idx} />
+                      </DeferredHydration>
                     </div>
 
-                    <div className="text-xs font-semibold tracking-wide text-gray-500 uppercase">
-                      {item.title}
-                    </div>
-
-                    <p className="mt-2 text-sm text-gray-600 leading-relaxed">
-                      {item.text}
-                    </p>
+                    <div className="gc-adv-card__kicker">{item.title}</div>
+                    <p className="gc-adv-card__text">{item.text}</p>
                   </article>
                 ))}
               </div>
@@ -370,8 +359,8 @@ export default async function GreenCardPage({
         </DeferredHydration>
 
         {/* ORDER FORM */}
-        <section id="green-card-order" className="py-10 sm:py-12 bg-white">
-          <div className="max-w-6xl mx-auto px-4">
+        <section id="green-card-order" className="gc-section">
+          <div className="gc-container">
             <div className="legacy-form-scope legacy-form-card">
               <GreenCardOrderForm dict={gcFormDict} />
             </div>
@@ -379,42 +368,35 @@ export default async function GreenCardPage({
         </section>
 
         {/* UPSALE OSAGO RF */}
-        <section className="py-10 sm:py-12 bg-[#F5F7FA]">
-          <div className="max-w-6xl mx-auto px-4">
-            <article className="card overflow-hidden flex flex-col md:flex-row items-stretch">
-              <div className="md:w-1/3 relative">
-                <DeferredHydration
-                  disableOnLegacy
-                  rootMargin="1200px"
-                  minDelayMs={0}
-                  className="h-40 md:h-full w-full"
-                >
+        <section className="gc-section gc-section--muted">
+          <div className="gc-container">
+            <article className="card gc-upsell">
+              <div className="gc-upsell__media">
+                <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
                   <Image
                     src="/services/osago_rf_photo.webp"
                     alt={gcPageDict.osagoUpsell.imageAlt}
                     width={400}
                     height={260}
                     sizes="(min-width: 768px) 33vw, 100vw"
-                    className="h-40 md:h-full w-full object-cover"
+                    className="gc-upsell__img"
                     loading="lazy"
                   />
                 </DeferredHydration>
               </div>
 
-              <div className="md:w-2/3 px-6 py-6 flex flex-col justify-between bg-[#F5F7FA]">
+              <div className="gc-upsell__body">
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold text-[#1A3A5F] mb-2">
-                    {gcPageDict.osagoUpsell.title}
-                  </h3>
-                  <p className="text-sm sm:text-base text-gray-700 mb-2">
-                    {gcPageDict.osagoUpsell.text1}
-                  </p>
-                  <p className="text-sm sm:text-base text-gray-600">
+                  <h3 className="gc-upsell__title">{gcPageDict.osagoUpsell.title}</h3>
+                  <p className="gc-upsell__p">{gcPageDict.osagoUpsell.text1}</p>
+                  <p className="gc-upsell__p gc-text-muted">
                     {gcPageDict.osagoUpsell.text2}
                   </p>
                 </div>
-                <div className="mt-4 flex justify-end">
-                  <a href={osagoLink} className="btn w-full sm:w-auto" role="button">
+
+                <div className="gc-upsell__cta">
+                  {/* для апсейла логичнее вторичная (синяя) */}
+                  <a href={osagoLink} className="btn btn-secondary" role="button">
                     {gcPageDict.osagoUpsell.btn}
                   </a>
                 </div>
@@ -428,9 +410,9 @@ export default async function GreenCardPage({
         <BrokerSection broker={homeDict.broker} />
 
         {/* QUESTION BLOCK */}
-        <section className="py-12 sm:py-16 bg-[#F4F6FA]">
-          <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-10 items-start">
-            <div className="flex justify-center lg:justify-start">
+        <section className="gc-question gc-section--muted">
+          <div className="gc-container gc-question__grid">
+            <div className="gc-question__media">
               <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
                 <Image
                   src="/green-card/policy-large.webp"
@@ -438,7 +420,7 @@ export default async function GreenCardPage({
                   width={520}
                   height={360}
                   sizes="(min-width: 1024px) 520px, 90vw"
-                  className="w-full max-w-md lg:max-w-lg h-auto rounded-2xl shadow-lg"
+                  className="gc-question__img"
                   loading="lazy"
                 />
               </DeferredHydration>

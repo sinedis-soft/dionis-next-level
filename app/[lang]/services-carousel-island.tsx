@@ -14,14 +14,12 @@ export default function ServicesCarouselIsland({
   lang: Lang;
   t: HomeDictionary;
 }) {
-  const otherServices = useMemo(
-    () =>
-      t.services.otherServices.map((service) => ({
-        ...service,
-        link: `/${lang}${service.linkSuffix}`,
-      })),
-    [t.services.otherServices, lang]
-  );
+  const otherServices = useMemo(() => {
+    return t.services.otherServices.map((service) => ({
+      ...service,
+      link: `/${lang}${service.linkSuffix}`,
+    }));
+  }, [t, lang]);
 
   return (
     <DeferredHydration rootMargin="800px" minDelayMs={150}>

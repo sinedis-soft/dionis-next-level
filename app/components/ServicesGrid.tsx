@@ -14,47 +14,37 @@ export default function ServicesGrid({
   moreBtnText: string;
 }) {
   return (
-    <section aria-label={heading} className="mt-10">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg sm:text-xl font-semibold text-[#1A3A5F]">
-          {heading}
-        </h3>
+    <section aria-label={heading} className="svc-section">
+      <div className="svc-head">
+        <h3 className="svc-title">{heading}</h3>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="svc-grid">
         {items.map((service) => (
-          <article
-            key={service.key}
-            className="card card-static overflow-hidden flex flex-col"
-          >
-            <div className="aspect-[16/10] w-full overflow-hidden">
+          <article key={service.key} className="card card-static svc-card">
+            <div className="svc-card__media">
               <Image
                 src={service.image}
                 alt={service.title}
                 width={800}
                 height={500}
-                className="h-full w-full object-cover"
                 loading="lazy"
+                sizes="(max-width: 760px) 100vw, (max-width: 1100px) 50vw, 33vw"
+                className="svc-card__img"
               />
             </div>
 
-            <div className="px-5 py-4 flex flex-col flex-1">
-              <h4 className="text-sm sm:text-base font-semibold text-[#1A3A5F] mb-2">
-                {service.title}
-              </h4>
+            <div className="svc-card__body">
+              <h4 className="svc-card__title">{service.title}</h4>
 
-              <ul className="text-sm text-gray-700 mb-4 list-disc pl-4 space-y-1">
+              <ul className="svc-card__list">
                 {service.items.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
 
-              <div className="mt-auto">
-                <a
-                  href={service.link}
-                  className="btn btn-secondary w-full text-center"
-                  role="button"
-                >
+              <div className="svc-card__cta">
+                <a href={service.link} className="btn btn-secondary svc-card__btn" role="button">
                   {moreBtnText}
                 </a>
               </div>

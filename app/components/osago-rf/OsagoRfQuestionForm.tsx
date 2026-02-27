@@ -2,7 +2,7 @@
 "use client";
 
 import Script from "next/script";
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import React, { useState, type ChangeEvent, type FormEvent } from "react";
 
 type Grecaptcha = {
   ready: (cb: () => void) => void;
@@ -109,9 +109,7 @@ export default function OsagoRfQuestionForm({
   context = "osago-rf-question",
 }: Props) {
   const [formData, setFormData] = useState<ContactFormData>(initialData);
-  const [formStatus, setFormStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
+  const [formStatus, setFormStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [formMessage, setFormMessage] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAgreementOpen, setIsAgreementOpen] = useState(false);
@@ -138,6 +136,7 @@ export default function OsagoRfQuestionForm({
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (formStatus === "loading") return;
 
     setFormStatus("loading");
     setFormMessage("");
@@ -161,10 +160,7 @@ export default function OsagoRfQuestionForm({
         if (grecaptcha?.execute && grecaptcha?.ready) {
           recaptchaToken = await new Promise<string>((resolve, reject) => {
             grecaptcha.ready(() => {
-              grecaptcha
-                .execute(recaptchaSiteKey, { action: "contact" })
-                .then(resolve)
-                .catch(reject);
+              grecaptcha.execute(recaptchaSiteKey, { action: "contact" }).then(resolve).catch(reject);
             });
           });
         }
@@ -176,16 +172,13 @@ export default function OsagoRfQuestionForm({
         try {
           const raw = localStorage.getItem("utm_data");
           const parsed = raw ? (JSON.parse(raw) as unknown) : {};
-          if (parsed && typeof parsed === "object") {
-            utm = parsed as Record<string, string>;
-          }
+          if (parsed && typeof parsed === "object") utm = parsed as Record<string, string>;
         } catch {
           utm = {};
         }
       }
 
-      const pageUrl =
-        typeof window !== "undefined" ? window.location.href : undefined;
+      const pageUrl = typeof window !== "undefined" ? window.location.href : undefined;
 
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -199,9 +192,7 @@ export default function OsagoRfQuestionForm({
         }),
       });
 
-      const data = (await res.json().catch(() => null)) as
-        | ContactApiResponse
-        | null;
+      const data = (await res.json().catch(() => null)) as ContactApiResponse | null;
 
       if (!res.ok || !data?.ok) {
         setFormStatus("error");
@@ -224,72 +215,59 @@ export default function OsagoRfQuestionForm({
 
   return (
     <>
-      {recaptchaSiteKey && (
-        <Script
-          src={`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`}
-          strategy="afterInteractive"
-        />
-      )}
+      {recaptchaSiteKey ? (
+        <Script src={`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`} strategy="afterInteractive" />
+      ) : null}
 
-      <div className="card w-full bg-white rounded-2xl px-6 sm:px-8 py-6 sm:py-8">
-        <div className="mb-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-[#1A3A5F]">
-            {dict.title}
-          </h2>
-          <p className="mt-1 text-sm text-gray-600">{dict.text1}</p>
-          <p className="mt-3 text-xs text-gray-500">{dict.text2}</p>
+      <div className="qf-card">
+        <div className="qf-head">
+          <h2 className="qf-title">{dict.title}</h2>
+          <p className="qf-p">{dict.text1}</p>
+          <p className="qf-p2">{dict.text2}</p>
         </div>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="hidden">
+        <form className="qf-form" onSubmit={handleSubmit} noValidate>
+          {/* honeypot */}
+          <div style={{ display: "none" }}>
             <label>
               {homeContact.honeypotLabel}
-              <input
-                type="text"
-                name="website"
-                value={formData.website}
-                onChange={handleChange}
-                autoComplete="off"
-              />
+              <input type="text" name="website" value={formData.website} onChange={handleChange} autoComplete="off" />
             </label>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="qf-grid2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {homeContact.fields.firstName}{" "}
-                <span className="text-red-500">{homeContact.requiredMark}</span>
+              <label className="qf-label">
+                {homeContact.fields.firstName} <span className="req">{homeContact.requiredMark}</span>
               </label>
               <input
                 type="text"
                 name="firstName"
                 value={formData.firstName}
                 onChange={handleChange}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
+                className="field"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {homeContact.fields.lastName}{" "}
-                <span className="text-red-500">{homeContact.requiredMark}</span>
+              <label className="qf-label">
+                {homeContact.fields.lastName} <span className="req">{homeContact.requiredMark}</span>
               </label>
               <input
                 type="text"
                 name="lastName"
                 value={formData.lastName}
                 onChange={handleChange}
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
+                className="field"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {homeContact.fields.email}{" "}
-              <span className="text-red-500">{homeContact.requiredMark}</span>
+            <label className="qf-label">
+              {homeContact.fields.email} <span className="req">{homeContact.requiredMark}</span>
             </label>
             <input
               type="email"
@@ -298,16 +276,15 @@ export default function OsagoRfQuestionForm({
               onChange={handleChange}
               inputMode="email"
               autoComplete="email"
-              pattern="^[^\s@]+@[^\s@]+\.[^\s@]+$"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
+              pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+              className="field"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {homeContact.fields.phone}{" "}
-              <span className="text-red-500">{homeContact.requiredMark}</span>
+            <label className="qf-label">
+              {homeContact.fields.phone} <span className="req">{homeContact.requiredMark}</span>
             </label>
             <input
               type="tel"
@@ -317,110 +294,77 @@ export default function OsagoRfQuestionForm({
               inputMode="tel"
               autoComplete="tel"
               placeholder="+7 777 1234567"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]"
+              className="field"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {homeContact.fields.comment}{" "}
-              <span className="text-red-500">{homeContact.requiredMark}</span>
+            <label className="qf-label">
+              {homeContact.fields.comment} <span className="req">{homeContact.requiredMark}</span>
             </label>
             <textarea
               name="comment"
               rows={4}
               value={formData.comment}
               onChange={handleChange}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A] resize-y"
+              className="field"
+              style={{ resize: "vertical" }}
               required
             />
           </div>
 
-          <div className="flex items-start gap-2 text-xs text-gray-600">
-            <input
-              id="agree"
-              type="checkbox"
-              name="agree"
-              checked={formData.agree}
-              onChange={handleChange}
-              className="mt-0.5"
-              required
-            />
+          <div className="qf-agree">
+            <input id="agree" type="checkbox" name="agree" checked={formData.agree} onChange={handleChange} required />
             <label htmlFor="agree">
               {homeContact.agreePrefix}{" "}
-              <button
-                type="button"
-                onClick={() => setIsAgreementOpen(true)}
-                className="text-[#C89F4A] underline underline-offset-2 hover:opacity-80"
-              >
+              <button type="button" onClick={() => setIsAgreementOpen(true)} className="qf-link">
                 {homeContact.agreeLink}
               </button>
-              {homeContact.agreeSuffix}
-              <span className="text-red-500"> {homeContact.requiredMark}</span>
+              {homeContact.agreeSuffix} <span className="req">{homeContact.requiredMark}</span>
             </label>
           </div>
 
-          {formStatus !== "idle" && (
-            <div
-              className={
-                formStatus === "success"
-                  ? "text-sm text-green-700"
-                  : "text-sm text-red-600"
-              }
-            >
-              {formMessage}
-            </div>
-          )}
+          {formStatus !== "idle" ? (
+            <div className={formStatus === "success" ? "qf-status-ok" : "qf-status-err"}>{formMessage}</div>
+          ) : null}
 
-          <div className="pt-2">
-            <button
-              type="submit"
-              className="btn btn-secondary w-full"
-              disabled={formStatus === "loading"}
-            >
-              {formStatus === "loading"
-                ? homeContact.submitLoading
-                : homeContact.submitDefault}
+          <div style={{ paddingTop: 6 }}>
+            <button type="submit" className="btn btn-secondary" style={{ width: "100%" }} disabled={formStatus === "loading"}>
+              {formStatus === "loading" ? homeContact.submitLoading : homeContact.submitDefault}
             </button>
           </div>
         </form>
       </div>
 
       {/* STATUS MODAL */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
-            <h3 className="text-lg font-semibold text-[#1A3A5F] mb-3">
-              {formStatus === "success"
-                ? homeContact.modalSuccessTitle
-                : homeContact.modalErrorTitle}
+      {isModalOpen ? (
+        <div className="modal-overlay" role="dialog" aria-modal="true">
+          <div className="modal modal--sm">
+            <h3 className="modal-title">
+              {formStatus === "success" ? homeContact.modalSuccessTitle : homeContact.modalErrorTitle}
             </h3>
-            <p className="text-sm text-gray-700 mb-5">{formMessage}</p>
-            <button
-              type="button"
-              className="btn w-full"
-              onClick={() => setIsModalOpen(false)}
-            >
-              {homeContact.modalClose}
-            </button>
+            <p className="modal-text">{formMessage}</p>
+            <div className="modal-actions modal-actions--center">
+              <button type="button" className="btn" style={{ width: "100%" }} onClick={() => setIsModalOpen(false)}>
+                {homeContact.modalClose}
+              </button>
+            </div>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* AGREEMENT MODAL */}
-      {isAgreementOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full p-6 max-h-[85vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-[#1A3A5F] mb-4">
-              {agreement.title}
-            </h3>
+      {isAgreementOpen ? (
+        <div className="modal-overlay" role="dialog" aria-modal="true">
+          <div className="modal modal--lg modal-scroll">
+            <h3 className="modal-title">{agreement.title}</h3>
 
-            <div className="text-sm text-gray-700 space-y-4">
-              <p>{agreement.intro1}</p>
+            <div style={{ fontSize: 14, color: "#374151" }}>
+              <p style={{ marginTop: 0 }}>{agreement.intro1}</p>
               <p>{agreement.personalDataDefinition}</p>
 
-              <ul className="list-disc pl-6 space-y-1">
+              <ul className="list">
                 <li>{agreement.dataList.firstName}</li>
                 <li>{agreement.dataList.lastName}</li>
                 <li>{agreement.dataList.email}</li>
@@ -431,7 +375,7 @@ export default function OsagoRfQuestionForm({
               <p>{agreement.processingIntro}</p>
               <p>{agreement.purposesIntro}</p>
 
-              <ul className="list-disc pl-6 space-y-1">
+              <ul className="list">
                 {agreement.purposesList.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
@@ -439,22 +383,19 @@ export default function OsagoRfQuestionForm({
 
               <p>{agreement.consentText}</p>
 
-              <h4 className="font-semibold text-[#1A3A5F] mt-4">
+              <h4 style={{ margin: "14px 0 8px", fontSize: 14, fontWeight: 900, color: "#1A3A5F" }}>
                 {agreement.contactsTitle}
               </h4>
-              <ul className="list-disc pl-6 space-y-1">
+
+              <ul className="list">
                 {agreement.contactsList.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                type="button"
-                className="px-4 py-2 rounded-md border text-sm hover:bg-gray-100"
-                onClick={() => setIsAgreementOpen(false)}
-              >
+            <div className="modal-actions">
+              <button type="button" className="btn-ghost" onClick={() => setIsAgreementOpen(false)}>
                 {agreement.closeBtn}
               </button>
 
@@ -471,7 +412,7 @@ export default function OsagoRfQuestionForm({
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </>
   );
 }

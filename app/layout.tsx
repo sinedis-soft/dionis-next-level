@@ -7,11 +7,9 @@ import { Roboto, Montserrat } from "next/font/google";
 import AnalyticsScripts from "@/components/AnalyticsScripts";
 import AnalyticsManager from "@/components/AnalyticsManager";
 
-const SITE_URL =
-  (process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.kz").replace(
-    /\/$/,
-    ""
-  );
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.kz"
+).replace(/\/$/, "");
 
 /* ---------- Fonts ---------- */
 
@@ -47,8 +45,6 @@ export const metadata: Metadata = {
     template: "%s — Dionis Insurance Broker",
   },
 };
-
-/* ---------- Root layout ---------- */
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const jsonLd = {
@@ -108,9 +104,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ru" className={`${roboto.variable} ${montserrat.variable}`}>
       <head>
-        {/* ✅ Legacy fallback styles (гарантируются даже если Tailwind/CSS сломался) */}
+        {/* Fallback-стили (если нужно) */}
         <link rel="stylesheet" href="/legacy.css" />
-
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -118,10 +113,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
 
       <body className="min-h-screen flex flex-col">
-        {/* ✅ Аналитика — один раз, на уровне root */}
         <AnalyticsScripts />
         <AnalyticsManager />
-
         {children}
       </body>
     </html>

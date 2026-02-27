@@ -1,5 +1,6 @@
 // app/[lang]/privacy/cookies/page.tsx
 export const dynamic = "force-static";
+export const dynamicParams = false;
 
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
@@ -11,8 +12,16 @@ import {
 
 import CookiesPolicyPage from "@/components/CookiesPolicyPage";
 
+const ALLOWED_LANGS: Lang[] = ["ru", "kz", "en"];
+
 function normalizeLang(value: string): Lang {
-  return value === "ru" || value === "kz" || value === "en" ? value : "ru";
+  return (ALLOWED_LANGS as readonly string[]).includes(value)
+    ? (value as Lang)
+    : "ru";
+}
+
+export function generateStaticParams() {
+  return ALLOWED_LANGS.map((lang) => ({ lang }));
 }
 
 export async function generateMetadata({

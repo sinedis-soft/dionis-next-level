@@ -18,6 +18,20 @@ function localeByLang(lang: Lang) {
   return "ru-RU";
 }
 
+function formatDateSafe(locale: string) {
+  const d = new Date();
+  try {
+    // на старых браузерах Intl может отсутствовать/работать криво
+    // поэтому пробуем и делаем fallback
+    return d.toLocaleDateString(locale);
+  } catch {
+    const dd = String(d.getDate()).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyyy = String(d.getFullYear());
+    return `${dd}.${mm}.${yyyy}`;
+  }
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -67,54 +81,68 @@ export default async function AuthorPage({
   }
 
   const locale = localeByLang(lang);
+  const dateStr = formatDateSafe(locale);
 
   return (
-    <main className="bg-white">
+    <main className="ap-page">
       <Script
         id="ld-person"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(personLd) }}
       />
 
-      {/* Breadcrumbs */}
-      <nav className="max-w-6xl mx-auto px-4 pt-6 text-sm text-gray-600">
-        <a className="hover:underline" href={`/${lang}`}>
-          Главная
-        </a>
-        <span className="mx-2">→</span>
-        <a className="hover:underline" href={`/${lang}/blog`}>
-          Блог
-        </a>
-        <span className="mx-2">→</span>
-        <span className="text-gray-900">{author.name}</span>
-      </nav>
-
-      <section className="max-w-6xl mx-auto px-4 pt-6 pb-14">
-        <h1 className="text-3xl sm:text-4xl font-bold text-[#1A3A5F]">
-          {author.name}
-        </h1>
-
-        <div className="mt-6 max-w-xl">
-          <AuthorBox author={author} lang={lang} variant="profile" showProfileLink={false} />
-        </div>
-
-        <div className="mt-6 text-sm text-gray-600">
-          Публикации:{" "}
-          <span className="font-semibold text-gray-900">{items.length}</span>
-          {" · "}
-          Язык:{" "}
-          <span className="font-semibold text-gray-900">
-            {lang.toUpperCase()}
+      <div className="gc-container">
+        {/* Breadcrumbs */}
+        <nav className="ap-bc" aria-label="Breadcrumb">
+          <a className="ap-bc__link" href={`/${lang}`}>
+            Главная
+          </a>
+          <span className="ap-bc__sep" aria-hidden="true">
+            →
           </span>
-          {" · "}
-          Актуально на{" "}
-          <span className="font-semibold text-gray-900">
-            {new Date().toLocaleDateString(locale)}
+          <a className="ap-bc__link" href={`/${lang}/blog`}>
+            Блог
+          </a>
+          <span className="ap-bc__sep" aria-hidden="true">
+            →
           </span>
-        </div>
+          <span className="ap-bc__current">{author.name}</span>
+        </nav>
 
-        <AuthorArticles lang={lang} items={items} />
-      </section>
+        <section className="ap-section">
+          <h1 className="ap-title">{author.name}</h1>
+
+          <div className="ap-box">
+            <AuthorBox
+              author={author}
+              lang={lang}
+              variant="profile"
+              showProfileLink={false}
+            />
+          </div>
+
+          <div className="ap-meta">
+            <span className="ap-meta__item">
+              Публикации: <span className="ap-meta__strong">{items.length}</span>
+            </span>
+            <span className="ap-meta__dot" aria-hidden="true">
+              ·
+            </span>
+            <span className="ap-meta__item">
+              Язык:{" "}
+              <span className="ap-meta__strong">{String(lang).toUpperCase()}</span>
+            </span>
+            <span className="ap-meta__dot" aria-hidden="true">
+              ·
+            </span>
+            <span className="ap-meta__item">
+              Актуально на <span className="ap-meta__strong">{dateStr}</span>
+            </span>
+          </div>
+
+          <AuthorArticles lang={lang} items={items} />
+        </section>
+      </div>
     </main>
   );
 }

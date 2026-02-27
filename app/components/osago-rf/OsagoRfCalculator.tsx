@@ -1,7 +1,7 @@
-// components/osago-rf/OsagoRfCalculator.tsx
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 export type OsagoRfCalculatorDictionary = {
   title: string;
@@ -45,7 +45,7 @@ export type OsagoRfCalculatorDictionary = {
     modeMulti: string;
     modeLimited: string;
 
-    multiShort: string; // короткое пояснение, чтобы не прыгало
+    multiShort: string;
   };
 
   ratePlaceholder: string;
@@ -62,7 +62,7 @@ export type OsagoRfCalculatorDictionary = {
 
   cta: {
     orderGreenCardToRussia: string;
-    orderHref: string; // уже локализованный /ru|/en|/kz
+    orderHref: string;
   };
 
   errors: {
@@ -77,15 +77,12 @@ type PolicyholderType = "legal" | "individual";
 type VehicleKind = "passenger" | "truck";
 type Mode = "multi" | "limited";
 
-// фиксированные коэффициенты
 const KT = 1.7;
 const KBM = 1.17;
 
-// мультидрайв КО
 const KO_MULTIDRIVE_INDIVIDUAL = 3.16;
 const KO_MULTIDRIVE_LEGAL = 1.97;
 
-// КВС таблица
 const KVS_TABLE: Array<Array<number | null>> = [
   [2.27, 1.92, 1.84, 1.65, 1.62, null, null, null],
   [1.88, 1.72, 1.71, 1.13, 1.1, 1.09, null, null],
@@ -109,17 +106,11 @@ function parseRate(raw: string): number {
 }
 function formatKzt(value: number): string {
   const rounded = round2(value);
-  return new Intl.NumberFormat("ru-RU", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(rounded);
+  return new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(rounded);
 }
 function formatRub(value: number): string {
   const rounded = round2(value);
-  return new Intl.NumberFormat("ru-RU", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(rounded);
+  return new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(rounded);
 }
 
 function kmByHpPassenger(hp: number): number {
@@ -129,7 +120,6 @@ function kmByHpPassenger(hp: number): number {
   return 1.6;
 }
 
-// 0.5 = 15 дней
 function kpByMonths(months: number): number {
   if (months === 0.5) return 0.2;
   if (months === 1) return 0.3;
@@ -181,26 +171,15 @@ function kvsByAgeExp(driverAge: number, expYears: number): number {
 }
 
 function koMultidriveByPolicyholder(policyholderType: PolicyholderType): number {
-  return policyholderType === "legal"
-    ? KO_MULTIDRIVE_LEGAL
-    : KO_MULTIDRIVE_INDIVIDUAL;
+  return policyholderType === "legal" ? KO_MULTIDRIVE_LEGAL : KO_MULTIDRIVE_INDIVIDUAL;
 }
 
-// БСТ по вашим правилам
-function bstByRules(args: {
-  policyholderType: PolicyholderType;
-  vehicleKind: VehicleKind;
-  term: number; // 0.5..12
-  useExp: boolean; // true => ограничение (КВС), false => мульти
-}): number {
+function bstByRules(args: { policyholderType: PolicyholderType; vehicleKind: VehicleKind; term: number; useExp: boolean }): number {
   const isLegal = args.policyholderType === "legal";
   const isTruck = args.vehicleKind === "truck";
   const isShort = args.term <= 3;
 
-  // Юрлица: мульти — 3300 (<=3м), 3800 (>=4м), независимо от типа ТС
-  if (isLegal && !args.useExp) {
-    return isShort ? 3300 : 3800;
-  }
+  if (isLegal && !args.useExp) return isShort ? 3300 : 3800;
 
   if (isLegal && !isTruck) {
     if (args.useExp) return 6580;
@@ -214,19 +193,14 @@ function bstByRules(args: {
     return isShort ? 2400 : 2500;
   }
 
-  // Физлицо + грузовое
   if (args.useExp) return isShort ? 4400 : 5500;
   return isShort ? 2700 : 2900;
 }
 
-function replaceTokens(tpl: string, vars: Record<string, string>): string {
-  return Object.keys(vars).reduce(
-    (acc, k) => acc.replaceAll(`{${k}}`, vars[k]),
-    tpl
-  );
+function replaceTokensCompat(tpl: string, vars: Record<string, string>): string {
+  return tpl.replace(/\{(\w+)\}/g, (_m, k: string) => (vars[k] ?? ""));
 }
 
-// Нормализация срока: 0.5 или целые, с учетом termMax
 function normalizeTerm(raw: number, termMax: number): number {
   if (!Number.isFinite(raw)) return 1;
 
@@ -242,13 +216,80 @@ function termLabel(term: number): string {
   return term === 0.5 ? "15 дней" : `${term} мес.`;
 }
 
+function NumField(props: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step?: number;
+  suffix?: string;
+  hint?: string;
+  onChange: (v: number) => void;
+  showSlider?: boolean;
+  sliderStep?: number;
+}) {
+  const step = props.step ?? 1;
+
+  return (
+    <div className="os-calc__num">
+      <label className="label" aria-label={props.label}>
+        {props.label}
+      </label>
+
+      <div className="os-calc__numRow">
+        <button
+          type="button"
+          className="btn-square"
+          onClick={() => props.onChange(clamp(props.value - step, props.min, props.max))}
+          aria-label={`${props.label}: меньше`}
+        >
+          −
+        </button>
+
+        <input
+          className="control"
+          inputMode="numeric"
+          value={String(props.value)}
+          onChange={(e) => {
+            const n = Number(e.target.value);
+            if (Number.isFinite(n)) props.onChange(clamp(Math.round(n), props.min, props.max));
+          }}
+        />
+
+        {props.suffix ? <div className="os-calc__suffix">{props.suffix}</div> : null}
+
+        <button
+          type="button"
+          className="btn-square"
+          onClick={() => props.onChange(clamp(props.value + step, props.min, props.max))}
+          aria-label={`${props.label}: больше`}
+        >
+          +
+        </button>
+      </div>
+
+      {props.showSlider ? (
+        <input
+          className="range"
+          type="range"
+          min={props.min}
+          max={props.max}
+          step={props.sliderStep ?? step}
+          value={props.value}
+          onChange={(e) => props.onChange(Number(e.currentTarget.value))}
+        />
+      ) : null}
+
+      {props.hint ? <div className="hint">{props.hint}</div> : null}
+    </div>
+  );
+}
+
 export default function OsagoRfCalculator({ dict }: Props) {
-  const [policyholderType, setPolicyholderType] =
-    useState<PolicyholderType>("individual");
+  const [policyholderType, setPolicyholderType] = useState<PolicyholderType>("individual");
   const [vehicleKind, setVehicleKind] = useState<VehicleKind>("passenger");
   const [mode, setMode] = useState<Mode>("multi");
 
-  // параметры
   const [hp, setHp] = useState<number>(120);
   const [carAge, setCarAge] = useState<number>(5);
   const [term, setTerm] = useState<number>(1);
@@ -256,7 +297,6 @@ export default function OsagoRfCalculator({ dict }: Props) {
   const [driverAge, setDriverAge] = useState<number>(22);
   const [driverExp, setDriverExp] = useState<number>(0);
 
-  // курс KZT за 1 RUB
   const [rubRate, setRubRate] = useState<string>("");
   const [autoRateNote, setAutoRateNote] = useState<string>("");
   const [showRateInput, setShowRateInput] = useState<boolean>(false);
@@ -265,14 +305,12 @@ export default function OsagoRfCalculator({ dict }: Props) {
   const isTruck = vehicleKind === "truck";
   const isLimited = mode === "limited";
 
-  // нормализация срока при смене возраста авто
   useEffect(() => {
     const normalized = normalizeTerm(term, termMax);
     if (normalized !== term) setTerm(normalized);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [termMax]);
 
-  // автоподстановка курса
   useEffect(() => {
     async function autoFillRubRate() {
       try {
@@ -299,39 +337,27 @@ export default function OsagoRfCalculator({ dict }: Props) {
     autoFillRubRate();
   }, [dict.autoRateOk, dict.autoRateError]);
 
-  // коэффициенты
   const KM = useMemo(() => (isTruck ? 1 : kmByHpPassenger(hp)), [isTruck, hp]);
   const KP = useMemo(() => kpByMonths(term), [term]);
-
-  const kvs = useMemo(
-    () => kvsByAgeExp(driverAge, driverExp),
-    [driverAge, driverExp]
-  );
+  const kvs = useMemo(() => kvsByAgeExp(driverAge, driverExp), [driverAge, driverExp]);
 
   const bstLimited = useMemo(
     () => bstByRules({ policyholderType, vehicleKind, term, useExp: true }),
     [policyholderType, vehicleKind, term]
   );
-
   const bstMulti = useMemo(
     () => bstByRules({ policyholderType, vehicleKind, term, useExp: false }),
     [policyholderType, vehicleKind, term]
   );
 
-  const premiumLimitedRub = useMemo(() => {
-    const premium = bstLimited * KT * KBM * KM * kvs * KP;
-    return round2(premium);
-  }, [bstLimited, KM, kvs, KP]);
-
+  const premiumLimitedRub = useMemo(() => round2(bstLimited * KT * KBM * KM * kvs * KP), [bstLimited, KM, kvs, KP]);
   const premiumMultiRub = useMemo(() => {
     const KO = koMultidriveByPolicyholder(policyholderType);
-    const premium = bstMulti * KT * KBM * KM * KO * KP;
-    return round2(premium);
+    return round2(bstMulti * KT * KBM * KM * KO * KP);
   }, [bstMulti, KM, policyholderType, KP]);
 
   const activePremiumRub = isLimited ? premiumLimitedRub : premiumMultiRub;
 
-  // обе премии в KZT для подсказки/сравнения (+5% буфер)
   const premiumsKzt = useMemo(() => {
     const kztPerRub = parseRate(rubRate);
     if (!Number.isFinite(kztPerRub) || kztPerRub <= 0) return null;
@@ -345,7 +371,6 @@ export default function OsagoRfCalculator({ dict }: Props) {
     };
   }, [rubRate, premiumLimitedRub, premiumMultiRub]);
 
-  // подсказка: только в режиме "ограничение"
   const betterHint = useMemo(() => {
     if (!isLimited) return "";
     if (!premiumsKzt) return dict.errors.invalidRate;
@@ -356,19 +381,18 @@ export default function OsagoRfCalculator({ dict }: Props) {
     if (Math.abs(diff) < 0.01) return dict.hints.equal;
 
     if (diff < 0) {
-      return replaceTokens(dict.hints.cheaperOn, {
+      return replaceTokensCompat(dict.hints.cheaperOn, {
         mode: dict.hints.modeLimited,
         diff: `${formatKzt(Math.abs(diff))}\u00A0₸`,
       });
     }
 
-    return replaceTokens(dict.hints.moreExpensiveOn, {
+    return replaceTokensCompat(dict.hints.moreExpensiveOn, {
       mode: dict.hints.modeLimited,
       diff: `${formatKzt(diff)}\u00A0₸`,
     });
   }, [isLimited, premiumsKzt, dict]);
 
-  // итог (RUB + KZT) по активному режиму
   const resultText = useMemo(() => {
     const kztPerRub = parseRate(rubRate);
     const bufferedRub = round2(activePremiumRub * 1.05);
@@ -388,574 +412,305 @@ export default function OsagoRfCalculator({ dict }: Props) {
     };
   }, [rubRate, activePremiumRub, dict]);
 
-  const card = "rounded-xl border border-gray-200 bg-white";
-
-  // Контрастные сегменты
-  const segWrap =
-    "inline-flex rounded-lg border border-gray-300 bg-white p-1 gap-1";
-  const segBtn = (active: boolean) =>
-    "px-3 py-2 text-sm font-semibold rounded-md transition border " +
-    (active
-      ? "bg-[#1A3A5F] text-white border-[#1A3A5F] shadow-sm"
-      : "bg-white text-gray-800 border-gray-200 hover:bg-gray-50");
-
-  const tabWrap =
-    "inline-flex rounded-lg border border-gray-300 bg-white p-1 gap-1";
-  const tabBtn = (active: boolean) =>
-    "px-3 py-2 text-sm font-bold rounded-md transition border " +
-    (active
-      ? "bg-[#C89F4A] text-white border-[#C89F4A] shadow-sm"
-      : "bg-white text-gray-800 border-gray-200 hover:bg-gray-50");
-
-  const inputBase =
-    "w-full rounded-md border border-gray-300 px-2 py-2 text-sm bg-white " +
-    "focus:outline-none focus:ring-2 focus:ring-[#C89F4A] focus:border-[#C89F4A]";
-  const slider = "w-full accent-[#C89F4A] cursor-pointer";
-
-  // чтобы “форма не прыгала”:
-  // 1) фиксируем высоту блока пояснения режима
-  const modeHintClass = "text-xs text-gray-600 min-h-[36px] sm:min-h-[20px]";
-  // 2) резервируем место под панель “Ограничение по водителям” (даже когда выключена)
-  const driversReserve = "min-h-[360px] sm:min-h-[260px]";
-
-  function NumField(props: {
-    label: string;
-    value: number;
-    min: number;
-    max: number;
-    step?: number;
-    suffix?: string;
-    hint?: string;
-    onChange: (v: number) => void;
-    showSlider?: boolean;
-    sliderStep?: number;
-  }) {
-    const step = props.step ?? 1;
-
-    return (
-      <div className="space-y-2">
-        <div className="text-sm font-medium text-gray-800">{props.label}</div>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="h-10 w-10 rounded-md border border-gray-300 bg-white font-bold text-gray-800 hover:bg-gray-50"
-            onClick={() =>
-              props.onChange(clamp(props.value - step, props.min, props.max))
-            }
-            aria-label={`${props.label}: меньше`}
-          >
-            −
-          </button>
-
-          <div className="flex-1">
-            <input
-              className={inputBase}
-              inputMode="numeric"
-              value={String(props.value)}
-              onChange={(e) => {
-                const n = Number(e.target.value);
-                if (Number.isFinite(n))
-                  props.onChange(
-                    clamp(Math.round(n), props.min, props.max)
-                  );
-              }}
-            />
-          </div>
-
-          <div className="min-w-[64px] text-right text-sm font-semibold text-gray-900">
-            {props.suffix ?? ""}
-          </div>
-
-          <button
-            type="button"
-            className="h-10 w-10 rounded-md border border-gray-300 bg-white font-bold text-gray-800 hover:bg-gray-50"
-            onClick={() =>
-              props.onChange(clamp(props.value + step, props.min, props.max))
-            }
-            aria-label={`${props.label}: больше`}
-          >
-            +
-          </button>
-        </div>
-
-        {props.showSlider ? (
-          <input
-            className={slider}
-            type="range"
-            min={props.min}
-            max={props.max}
-            step={props.sliderStep ?? step}
-            value={props.value}
-            onChange={(e) => props.onChange(Number(e.currentTarget.value))}
-          />
-        ) : null}
-
-        {props.hint ? (
-          <div className="text-xs text-gray-600">{props.hint}</div>
-        ) : null}
-      </div>
-    );
-  }
-
-  function TermField() {
-    return (
-      <div className="space-y-2">
-        <div className="text-sm font-medium text-gray-800">
-          {dict.labels.term}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="h-10 w-10 rounded-md border border-gray-300 bg-white font-bold text-gray-800 hover:bg-gray-50"
-            onClick={() =>
-              setTerm((v) => normalizeTerm(v === 0.5 ? 0.5 : v - 1, termMax))
-            }
-            aria-label={`${dict.labels.term}: меньше`}
-          >
-            −
-          </button>
-
-          <div className="flex-1">
-            <input className={inputBase} value={termLabel(term)} readOnly />
-          </div>
-
-          <button
-            type="button"
-            className="h-10 w-10 rounded-md border border-gray-300 bg-white font-bold text-gray-800 hover:bg-gray-50"
-            onClick={() =>
-              setTerm((v) => normalizeTerm(v === 0.5 ? 1 : v + 1, termMax))
-            }
-            aria-label={`${dict.labels.term}: больше`}
-          >
-            +
-          </button>
-        </div>
-
-        <input
-          className={slider}
-          type="range"
-          min={0.5}
-          max={termMax}
-          step={0.5}
-          value={term}
-          onChange={(e) =>
-            setTerm(normalizeTerm(Number(e.currentTarget.value), termMax))
-          }
-        />
-
-        <div className="text-xs text-gray-600">{dict.hints.term}</div>
-
-        {carAge > 20 ? (
-          <div className="text-xs font-semibold text-[#1f5d2b]">
-            {dict.hints.termLimited}
-          </div>
-        ) : null}
-      </div>
-    );
-  }
-
   const summary = useMemo(() => {
-    const p =
-      policyholderType === "legal" ? dict.labels.legal : dict.labels.individual;
-    const v =
-      vehicleKind === "truck" ? dict.labels.truck : dict.labels.passenger;
+    const p = policyholderType === "legal" ? dict.labels.legal : dict.labels.individual;
+    const v = vehicleKind === "truck" ? dict.labels.truck : dict.labels.passenger;
     const m = isLimited ? dict.hints.modeLimited : dict.hints.modeMulti;
     return `${p} • ${v} • ${termLabel(term)} • ${m}`;
   }, [policyholderType, vehicleKind, term, isLimited, dict]);
 
   const modeHintText = isLimited ? dict.hints.useExp : dict.hints.multiShort;
 
+  const statusId = "osago-rf-rate-note";
+
   return (
-    <section className="bg-[#F4F6FA]" id="osago-rf-calculator">
-      <div className="max-w-5xl mx-auto px-4 py-10 sm:py-14">
-        <div className={`${card} p-5 sm:p-7`}>
-          <div className="text-center">
-            <h2 className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F]">
-              {dict.title}
-            </h2>
-            <p className="mt-2 text-sm sm:text-base text-gray-600">
-              {dict.subtitle}
-            </p>
-            <div className="mt-3 text-xs sm:text-sm text-gray-700">
-              <span className="font-semibold">Выбрано:</span> {summary}
+    <section className="os-calc" id="osago-rf-calculator">
+      <div className="gc-container">
+        <div className="card card--pad">
+          <div className="os-calc__head">
+            <h2 className="os-calc__title">{dict.title}</h2>
+            <p className="os-calc__subtitle">{dict.subtitle}</p>
+            <div className="os-calc__summary">
+              <b>Выбрано:</b> {summary}
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col gap-3">
-            {/* Сегменты + табы */}
-            <div className={`${card} p-3 sm:p-4`}>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                  <div className="text-xs font-semibold text-gray-500">
-                    {dict.labels.policyholderType}
-                  </div>
-                  <div
-                    className={segWrap}
-                    role="radiogroup"
-                    aria-label={dict.labels.policyholderType}
+          <div className="os-calc__form">
+            {/* Сегменты */}
+            <div className="os-calc__row2">
+              <div className="field">
+                <div className="label">{dict.labels.policyholderType}</div>
+                <div className="seg" role="radiogroup" aria-label={dict.labels.policyholderType}>
+                  <button
+                    type="button"
+                    className={`seg__btn ${policyholderType === "legal" ? "seg__btn--active" : ""}`}
+                    onClick={() => setPolicyholderType("legal")}
+                    role="radio"
+                    aria-checked={policyholderType === "legal"}
                   >
-                    <button
-                      type="button"
-                      className={segBtn(policyholderType === "legal")}
-                      onClick={() => setPolicyholderType("legal")}
-                      role="radio"
-                      aria-checked={policyholderType === "legal"}
-                    >
-                      {dict.labels.legal}
-                    </button>
-                    <button
-                      type="button"
-                      className={segBtn(policyholderType === "individual")}
-                      onClick={() => setPolicyholderType("individual")}
-                      role="radio"
-                      aria-checked={policyholderType === "individual"}
-                    >
-                      {dict.labels.individual}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                  <div className="text-xs font-semibold text-gray-500">
-                    {dict.labels.vehicleKind}
-                  </div>
-                  <div
-                    className={segWrap}
-                    role="radiogroup"
-                    aria-label={dict.labels.vehicleKind}
+                    {dict.labels.legal}
+                  </button>
+                  <button
+                    type="button"
+                    className={`seg__btn ${policyholderType === "individual" ? "seg__btn--active" : ""}`}
+                    onClick={() => setPolicyholderType("individual")}
+                    role="radio"
+                    aria-checked={policyholderType === "individual"}
                   >
-                    <button
-                      type="button"
-                      className={segBtn(vehicleKind === "passenger")}
-                      onClick={() => setVehicleKind("passenger")}
-                      role="radio"
-                      aria-checked={vehicleKind === "passenger"}
-                    >
-                      {dict.labels.passenger}
-                    </button>
-                    <button
-                      type="button"
-                      className={segBtn(vehicleKind === "truck")}
-                      onClick={() => setVehicleKind("truck")}
-                      role="radio"
-                      aria-checked={vehicleKind === "truck"}
-                    >
-                      {dict.labels.truck}
-                    </button>
-                  </div>
+                    {dict.labels.individual}
+                  </button>
                 </div>
               </div>
 
-              <div className="mt-3">
-              {/* Desktop: 3 колонки, Mobile: label+tabs в одну строку, hint ниже */}
-              <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr_minmax(220px,360px)] items-center gap-2 sm:gap-3">
-                {/* label */}
-                <div className="hidden sm:block text-xs font-semibold text-gray-500 whitespace-nowrap">
-                  {dict.labels.calcMode}
-                </div>
-
-                {/* mobile row: label + tabs */}
-                <div className="flex items-center gap-2 sm:gap-0">
-                  <div className="sm:hidden text-xs font-semibold text-gray-500 whitespace-nowrap">
-                    {dict.labels.calcMode}
-                  </div>
-
-                  <div
-                    className={[
-                      tabWrap,
-                      "flex-1 sm:flex-none", // на мобиле занимает доступную ширину
-                      "justify-start",
-                    ].join(" ")}
-                    role="tablist"
-                    aria-label={dict.labels.calcMode}
+              <div className="field">
+                <div className="label">{dict.labels.vehicleKind}</div>
+                <div className="seg" role="radiogroup" aria-label={dict.labels.vehicleKind}>
+                  <button
+                    type="button"
+                    className={`seg__btn ${vehicleKind === "passenger" ? "seg__btn--active" : ""}`}
+                    onClick={() => setVehicleKind("passenger")}
+                    role="radio"
+                    aria-checked={vehicleKind === "passenger"}
                   >
-                    <button
-                      type="button"
-                      className={[
-                        tabBtn(mode === "multi"),
-                        "whitespace-nowrap",      // не переносить текст
-                        "h-10",                   // одинаковая высота
-                        "min-w-[132px] sm:min-w-[160px]", // чтобы обе кнопки были одинаковые
-                      ].join(" ")}
-                      onClick={() => setMode("multi")}
-                      role="tab"
-                      aria-selected={mode === "multi"}
-                    >
-                      {dict.hints.modeMulti}
-                    </button>
-
-                    <button
-                      type="button"
-                      className={[
-                        tabBtn(mode === "limited"),
-                        "whitespace-nowrap",
-                        "h-10",
-                        "min-w-[132px] sm:min-w-[160px]",
-                      ].join(" ")}
-                      onClick={() => setMode("limited")}
-                      role="tab"
-                      aria-selected={mode === "limited"}
-                    >
-                      {dict.hints.modeLimited}
-                    </button>
-                  </div>
-                </div>
-
-                {/* hint: на мобиле всегда снизу */}
-                <div className="text-xs text-gray-600 sm:text-right min-h-[16px]">
-                  {modeHintText}
+                    {dict.labels.passenger}
+                  </button>
+                  <button
+                    type="button"
+                    className={`seg__btn ${vehicleKind === "truck" ? "seg__btn--active" : ""}`}
+                    onClick={() => setVehicleKind("truck")}
+                    role="radio"
+                    aria-checked={vehicleKind === "truck"}
+                  >
+                    {dict.labels.truck}
+                  </button>
                 </div>
               </div>
             </div>
+
+            {/* Режим */}
+            <div className="field">
+              <div className="os-calc__mode">
+                <div className="label">{dict.labels.calcMode}</div>
+                <div className="tabs" role="tablist" aria-label={dict.labels.calcMode}>
+                  <button
+                    type="button"
+                    className={`tabs__btn ${mode === "multi" ? "tabs__btn--active" : ""}`}
+                    onClick={() => setMode("multi")}
+                    role="tab"
+                    aria-selected={mode === "multi"}
+                  >
+                    {dict.hints.modeMulti}
+                  </button>
+                  <button
+                    type="button"
+                    className={`tabs__btn ${mode === "limited" ? "tabs__btn--active" : ""}`}
+                    onClick={() => setMode("limited")}
+                    role="tab"
+                    aria-selected={mode === "limited"}
+                  >
+                    {dict.hints.modeLimited}
+                  </button>
+                </div>
+              </div>
+
+              <div className="hint">{modeHintText}</div>
             </div>
 
             {/* Параметры */}
-            <div className={`${card} p-3 sm:p-4`}>
-              <div className="text-sm font-bold text-gray-900">
-                {dict.labels.paramsTitle}
-              </div>
+            <div className="os-calc__blockTitle">{dict.labels.paramsTitle}</div>
 
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  {!isTruck ? (
-                    <NumField
-                      label={dict.labels.hp}
-                      value={hp}
-                      min={70}
-                      max={250}
-                      step={1}
-                      suffix="л.с."
-                      hint={dict.hints.hp}
-                      onChange={(v) => setHp(v)}
-                      showSlider={true}
-                      sliderStep={1}
-                    />
-                  ) : (
-                    <div className="text-xs text-gray-600 pt-2">
-                      Для грузовых авто коэффициент мощности (КМ) не применяется.
-                    </div>
-                  )}
-                </div>
-
-                <div>
+            <div className="os-calc__grid3">
+              <div>
+                {!isTruck ? (
                   <NumField
-                    label={dict.labels.carAge}
-                    value={carAge}
-                    min={0}
-                    max={40}
+                    label={dict.labels.hp}
+                    value={hp}
+                    min={70}
+                    max={250}
                     step={1}
-                    suffix="лет"
-                    hint={dict.hints.carAge}
-                    onChange={(v) => setCarAge(v)}
+                    suffix="л.с."
+                    hint={dict.hints.hp}
+                    onChange={(v) => setHp(v)}
                     showSlider={true}
                     sliderStep={1}
                   />
-                </div>
-
-                <div>
-                  <TermField />
-                </div>
+                ) : (
+                  <div className="hint os-calc__note">
+                    Для грузовых авто коэффициент мощности (КМ) не применяется.
+                  </div>
+                )}
               </div>
 
-              {/* РЕЗЕРВ МЕСТА (не прыгает). Контент либо видим, либо скрыт, но высота блока одна и та же */}
-              <div className={`mt-5 ${driversReserve}`}>
-                <div
-                  className={
-                    "rounded-lg border border-gray-200 bg-gray-50 p-3 transition-opacity " +
-                    (isLimited ? "opacity-100" : "opacity-0 pointer-events-none")
-                  }
-                  aria-hidden={!isLimited}
-                >
-                  <div className="text-sm font-semibold text-gray-900">
-                    {dict.hints.modeLimited}
-                  </div>
-                  <div className="mt-1 text-xs text-gray-600">{dict.hints.useExp}</div>
-
-                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <div className="text-xs font-semibold text-gray-600 mb-1">
-                        {dict.labels.driverAge}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          className="h-10 w-10 rounded-md border border-gray-300 bg-white font-bold text-gray-800 hover:bg-gray-50"
-                          onClick={() => setDriverAge((v) => clamp(v - 1, 18, 80))}
-                        >
-                          −
-                        </button>
-                        <input
-                          className={inputBase}
-                          inputMode="numeric"
-                          value={String(driverAge)}
-                          onChange={(e) => {
-                            const n = Number(e.target.value);
-                            if (Number.isFinite(n))
-                              setDriverAge(clamp(Math.round(n), 18, 80));
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="h-10 w-10 rounded-md border border-gray-300 bg-white font-bold text-gray-800 hover:bg-gray-50"
-                          onClick={() => setDriverAge((v) => clamp(v + 1, 18, 80))}
-                        >
-                          +
-                        </button>
-                      </div>
-                      <input
-                        className={`${slider} mt-2`}
-                        type="range"
-                        min={18}
-                        max={80}
-                        step={1}
-                        value={driverAge}
-                        onChange={(e) => setDriverAge(Number(e.currentTarget.value))}
-                      />
-                    </div>
-
-                    <div>
-                      <div className="text-xs font-semibold text-gray-600 mb-1">
-                        {dict.labels.driverExp}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          className="h-10 w-10 rounded-md border border-gray-300 bg-white font-bold text-gray-800 hover:bg-gray-50"
-                          onClick={() => setDriverExp((v) => clamp(v - 1, 0, 60))}
-                        >
-                          −
-                        </button>
-                        <input
-                          className={inputBase}
-                          inputMode="numeric"
-                          value={String(driverExp)}
-                          onChange={(e) => {
-                            const n = Number(e.target.value);
-                            if (Number.isFinite(n))
-                              setDriverExp(clamp(Math.round(n), 0, 60));
-                          }}
-                        />
-                        <button
-                          type="button"
-                          className="h-10 w-10 rounded-md border border-gray-300 bg-white font-bold text-gray-800 hover:bg-gray-50"
-                          onClick={() => setDriverExp((v) => clamp(v + 1, 0, 60))}
-                        >
-                          +
-                        </button>
-                      </div>
-                      <input
-                        className={`${slider} mt-2`}
-                        type="range"
-                        min={0}
-                        max={60}
-                        step={1}
-                        value={driverExp}
-                        onChange={(e) => setDriverExp(Number(e.currentTarget.value))}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-3 text-xs text-gray-600">
-                    {dict.hints.kvsUsed
-                      .replace("{age}", String(driverAge))
-                      .replace("{exp}", String(driverExp))}
-                  </div>
-
-                  {betterHint ? (
-                    <div className="mt-2 text-sm font-semibold text-[#1f5d2b]">
-                      {betterHint}
-                    </div>
-                  ) : null}
-                </div>
+              <div>
+                <NumField
+                  label={dict.labels.carAge}
+                  value={carAge}
+                  min={0}
+                  max={40}
+                  step={1}
+                  suffix="лет"
+                  hint={dict.hints.carAge}
+                  onChange={(v) => setCarAge(v)}
+                  showSlider={true}
+                  sliderStep={1}
+                />
               </div>
 
-              {/* Курс */}
-              <div className="mt-5 rounded-lg border border-gray-200 bg-white p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-xs font-semibold text-gray-600">
-                      {dict.labels.rateRub}
-                    </div>
-                    <div className="text-sm font-bold text-gray-900">
-                      {rubRate ? rubRate : "—"}
-                    </div>
-                    <div className="mt-1 text-xs text-gray-600 min-h-[16px]">
-                      {autoRateNote}
-                    </div>
-                  </div>
+              <div className="field">
+                <label className="label">{dict.labels.term}</label>
+
+                <div className="os-calc__termRow">
                   <button
                     type="button"
-                    className="text-sm font-semibold text-[#1A3A5F] underline underline-offset-2"
-                    onClick={() => setShowRateInput((v) => !v)}
+                    className="btn-square"
+                    onClick={() => setTerm((v) => normalizeTerm(v === 0.5 ? 0.5 : v - 1, termMax))}
+                    aria-label={`${dict.labels.term}: меньше`}
                   >
-                    {showRateInput ? "Скрыть" : "Изменить"}
+                    −
+                  </button>
+
+                  <input className="control" value={termLabel(term)} readOnly />
+
+                  <button
+                    type="button"
+                    className="btn-square"
+                    onClick={() => setTerm((v) => normalizeTerm(v === 0.5 ? 1 : v + 1, termMax))}
+                    aria-label={`${dict.labels.term}: больше`}
+                  >
+                    +
                   </button>
                 </div>
 
-                <div className={showRateInput ? "mt-3" : "mt-3 hidden"}>
+                <input
+                  className="range"
+                  type="range"
+                  min={0.5}
+                  max={termMax}
+                  step={0.5}
+                  value={term}
+                  onChange={(e) => setTerm(normalizeTerm(Number(e.currentTarget.value), termMax))}
+                />
+
+                <div className="hint">{dict.hints.term}</div>
+                {carAge > 20 ? <div className="hint hint--ok">{dict.hints.termLimited}</div> : null}
+              </div>
+            </div>
+
+            {/* Блок водителей (только limited) */}
+            <div className={`panel-muted os-calc__drivers ${isLimited ? "" : "os-calc__drivers--hidden"}`} aria-hidden={!isLimited}>
+              <div className="os-calc__driversTitle">{dict.hints.modeLimited}</div>
+              <div className="hint">{dict.hints.useExp}</div>
+
+              <div className="os-calc__grid2">
+                <div className="field">
+                  <div className="label">{dict.labels.driverAge}</div>
+                  <div className="os-calc__termRow">
+                    <button type="button" className="btn-square" onClick={() => setDriverAge((v) => clamp(v - 1, 18, 80))}>
+                      −
+                    </button>
+                    <input
+                      className="control"
+                      inputMode="numeric"
+                      value={String(driverAge)}
+                      onChange={(e) => {
+                        const n = Number(e.target.value);
+                        if (Number.isFinite(n)) setDriverAge(clamp(Math.round(n), 18, 80));
+                      }}
+                    />
+                    <button type="button" className="btn-square" onClick={() => setDriverAge((v) => clamp(v + 1, 18, 80))}>
+                      +
+                    </button>
+                  </div>
+                  <input className="range" type="range" min={18} max={80} step={1} value={driverAge} onChange={(e) => setDriverAge(Number(e.currentTarget.value))} />
+                </div>
+
+                <div className="field">
+                  <div className="label">{dict.labels.driverExp}</div>
+                  <div className="os-calc__termRow">
+                    <button type="button" className="btn-square" onClick={() => setDriverExp((v) => clamp(v - 1, 0, 60))}>
+                      −
+                    </button>
+                    <input
+                      className="control"
+                      inputMode="numeric"
+                      value={String(driverExp)}
+                      onChange={(e) => {
+                        const n = Number(e.target.value);
+                        if (Number.isFinite(n)) setDriverExp(clamp(Math.round(n), 0, 60));
+                      }}
+                    />
+                    <button type="button" className="btn-square" onClick={() => setDriverExp((v) => clamp(v + 1, 0, 60))}>
+                      +
+                    </button>
+                  </div>
+                  <input className="range" type="range" min={0} max={60} step={1} value={driverExp} onChange={(e) => setDriverExp(Number(e.currentTarget.value))} />
+                </div>
+              </div>
+
+              <div className="hint os-calc__kvsNote">
+                {replaceTokensCompat(dict.hints.kvsUsed, { age: String(driverAge), exp: String(driverExp) })}
+              </div>
+
+              {betterHint ? <div className="hint hint--danger">{betterHint}</div> : null}
+            </div>
+
+            {/* Курс */}
+            <div className="os-calc__rateBox">
+              <div className="os-calc__rateTop">
+                <div>
+                  <div className="label">{dict.labels.rateRub}</div>
+                  <div className="os-calc__rateValue">{rubRate ? rubRate : "—"}</div>
+                  <div className="status" id={statusId} aria-live="polite">
+                    {autoRateNote}
+                  </div>
+                </div>
+
+                <button type="button" className="link" onClick={() => setShowRateInput((v) => !v)} aria-controls={statusId}>
+                  {showRateInput ? "Скрыть" : "Изменить"}
+                </button>
+              </div>
+
+              {showRateInput ? (
+                <div className="os-calc__rateEdit">
                   <input
-                    className={inputBase}
+                    className="control"
                     type="text"
                     inputMode="decimal"
                     placeholder={dict.ratePlaceholder}
                     value={rubRate}
                     onChange={(e) => setRubRate(e.target.value)}
-                    aria-describedby="osago-rf-rate-note"
+                    aria-describedby={statusId}
                   />
-                  <div
-                    id="osago-rf-rate-note"
-                    aria-live="polite"
-                    className="mt-2 text-xs text-gray-600"
-                  >
-                    {autoRateNote}
-                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
-          </div>
 
-          {/* Sticky итог + CTA */}
-          <div className="mt-6">
-            <div className="sticky bottom-3">
-              <div className={`${card} shadow-sm p-4 sm:p-5`}>
-                <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
-                  <div>
-                    <div className="text-xs sm:text-sm text-gray-600">
-                      {dict.result.title}
-                    </div>
-                    <div className="mt-1 text-xl sm:text-2xl font-extrabold text-[#1A3A5F]">
-                      {resultText.kzt}
-                    </div>
-                    <div className="mt-1 text-sm sm:text-base font-bold text-gray-800">
-                      {resultText.rub}
-                    </div>
-                  </div>
+            {/* Итог + CTA (как в образце) */}
+            <div className="os-calc__result" role="status" aria-live="polite">
+              <div className="os-calc__resultLabel">{dict.result.title}</div>
 
-                  <div className="text-xs sm:text-sm text-gray-600 max-w-xl">
-                    <div>{dict.result.volatilityNote}</div>
-                    <div className="mt-1">{dict.result.disclaimer}</div>
-                  </div>
-                </div>
+              <div className="os-calc__resultValue">
+                <span className="os-calc__kzt">{resultText.kzt}</span>
+                <span className="os-calc__rub">{resultText.rub}</span>
+              </div>
 
-                {/* CTA снизу, всегда на одном месте */}
-                <div className="mt-4">
-                  <a
-                    href={dict.cta.orderHref}
-                    className="block w-full text-center rounded-lg px-4 py-3 font-bold text-white bg-[#1A3A5F] hover:opacity-95 transition"
-                  >
-                    {dict.cta.orderGreenCardToRussia}
-                  </a>
-                </div>
+              <div className="os-calc__resultNote">
+                <div>{dict.result.volatilityNote}</div>
+                <div>{dict.result.disclaimer}</div>
               </div>
             </div>
 
-            {carAge > 20 ? (
-              <div className="mt-3 text-xs sm:text-sm font-semibold text-[#1f5d2b]">
-                {dict.hints.termLimited}
-              </div>
-            ) : null}
+            <div className="gc-calc__cta">
+              <Link
+                href={dict.cta.orderHref}
+                className="btn btn-secondary btn-wide"
+                aria-label={dict.cta.orderGreenCardToRussia}
+              >
+                {dict.cta.orderGreenCardToRussia}
+              </Link>
+            </div>
+
+            {carAge > 20 ? <div className="hint hint--ok">{dict.hints.termLimited}</div> : null}
           </div>
         </div>
       </div>

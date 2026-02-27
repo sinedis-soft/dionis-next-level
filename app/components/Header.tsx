@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,13 +12,36 @@ function cx(...c: Array<string | false | null | undefined>) {
   return c.filter(Boolean).join(" ");
 }
 
-const INK = "text-[#0f2238]";
-const INK_HOVER = "hover:text-[#23376C]";
-const PANEL = "bg-white/30 backdrop-blur-md border border-black/10";
-
 // ✅ считаем, что статья блога — это /{lang}/blog/{slug}
 function isBlogArticlePath(pathname: string) {
   return /^\/(ru|kz|en)\/blog\/[^\/]+\/?$/.test(pathname);
+}
+
+// Закрытие по клику вне элемента
+function useClickOutside<T extends HTMLElement>(
+  refs: Array<RefObject<T | null>>,
+  onOutside: () => void,
+  enabled: boolean
+) {
+  useEffect(() => {
+    if (!enabled) return;
+
+    const onDown = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as Node | null;
+      if (!target) return;
+
+      const inside = refs.some((r) => r.current?.contains(target));
+      if (!inside) onOutside();
+    };
+
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("touchstart", onDown, { passive: true });
+
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("touchstart", onDown);
+    };
+  }, [enabled, onOutside, refs]);
 }
 
 export default function Header({ lang }: { lang: Lang }) {
@@ -30,28 +53,27 @@ export default function Header({ lang }: { lang: Lang }) {
   const [insuranceDesktopOpen, setInsuranceDesktopOpen] = useState(false);
   const [insuranceMobileOpen, setInsuranceMobileOpen] = useState(false);
 
-  // ✅ вместо useSearchParams(): берем query-string из window.location.search
+  const desktopDdWrapRef = useRef<HTMLDivElement | null>(null);
+  const desktopDdBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  // ✅ query-string берём из window.location.search (без useSearchParams)
   const [qs, setQs] = useState("");
 
   useEffect(() => {
-    // initial + on pathname change
     if (typeof window === "undefined") return;
 
     const update = () => setQs(window.location.search || "");
     update();
 
-    // на случай popstate / возврата назад, когда меняется query
     window.addEventListener("popstate", update);
     return () => window.removeEventListener("popstate", update);
   }, [pathname]);
 
   // ✅ сборка URL для языка:
-  // - на blog/[slug] -> /{targetLang}/blog (без query/hash)
-  // - в остальных местах -> тот же pathname (с заменой lang) + query
+  // - на blog/[slug] -> /{targetLang}/blog
+  // - иначе -> тот же pathname с заменой lang + query-string
   const buildLangUrl = (targetLang: Lang) => {
-    if (isBlogArticlePath(pathname)) {
-      return `/${targetLang}/blog`;
-    }
+    if (isBlogArticlePath(pathname)) return `/${targetLang}/blog`;
 
     const parts = pathname.split("/");
     if (parts.length > 1) parts[1] = targetLang;
@@ -65,29 +87,22 @@ export default function Header({ lang }: { lang: Lang }) {
     return pathname === target || pathname.startsWith(`${target}/`);
   };
 
-  const navLinkClass = (href: string) =>
-    cx(
-      "transition-colors font-extrabold whitespace-nowrap",
-      "px-3 py-2 rounded-xl",
-      INK,
-      INK_HOVER,
-      isActive(href) && "bg-white/40"
+  const activeInsurance = useMemo(() => {
+    return (
+      isActive(`${base}/green-card`) ||
+      isActive(`${base}/osago-rf`) ||
+      isActive(`${base}/products`)
     );
+  }, [base, pathname]);
 
-  const langLinkClass = (code: Lang) =>
-    cx(
-      "transition-colors uppercase tracking-wide text-[11px] font-extrabold",
-      INK,
-      INK_HOVER,
-      lang === code ? "text-[#B58A2C]" : "opacity-80 hover:opacity-100"
-    );
-
+  // закрытие на смене страницы
   useEffect(() => {
     setInsuranceDesktopOpen(false);
     setInsuranceMobileOpen(false);
     setMenuOpen(false);
   }, [pathname]);
 
+  // блокировка скролла body при открытом мобильном меню
   useEffect(() => {
     if (!menuOpen) return;
     const prev = document.body.style.overflow;
@@ -97,410 +112,273 @@ export default function Header({ lang }: { lang: Lang }) {
     };
   }, [menuOpen]);
 
+  // Esc закрывает dropdown/меню
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      if (insuranceDesktopOpen) setInsuranceDesktopOpen(false);
+      if (menuOpen) setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [insuranceDesktopOpen, menuOpen]);
+
+  // Стабильный список refs, чтобы не пересоздавать effect каждый рендер
+  const desktopOutsideRefs = useMemo(
+    () => [desktopDdWrapRef, desktopDdBtnRef] as Array<RefObject<HTMLElement | null>>,
+    []
+  );
+
+  // клик вне dropdown закрывает
+  useClickOutside(desktopOutsideRefs, () => setInsuranceDesktopOpen(false), insuranceDesktopOpen);
+
+  const ddMenuId = "hdr-insurance-menu";
+
   return (
-    <header className={cx("sticky top-0 z-50", PANEL)}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 xl:px-8">
-        <div className="h-16 xl:h-20 grid grid-cols-[auto_1fr_auto] items-center gap-4">
+    <header className="hdr">
+      <div className="hdr__container">
+        <div className="hdr__row">
           {/* LOGO */}
-          <Link href={base} className="flex items-center gap-2">
-            <Image
-              src="/logo_1.webp"
-              alt="Dionis Insurance"
-              width={56}
-              height={56}
-              priority
-            />
+          <Link href={base} className="hdr__logo" aria-label="Dionis Insurance">
+            <Image src="/logo_1.webp" alt="Dionis Insurance" width={56} height={56} priority />
           </Link>
 
-          {/* DESKTOP NAV (только xl) */}
-          <nav className="hidden xl:flex justify-center">
-            <div className="flex items-center gap-2 text-sm">
-              <Link
-                href={base}
-                className={cx(navLinkClass(base), "min-w-[92px] text-center")}
+          {/* DESKTOP NAV (>=1200px) */}
+          <nav className="hdr__nav" aria-label="Primary navigation">
+            <Link href={base} className={cx("hdr__link", isActive(base) && "is-active")}>
+              {t.home}
+            </Link>
+
+            <Link href={`${base}/about`} className={cx("hdr__link", isActive(`${base}/about`) && "is-active")}>
+              {t.about}
+            </Link>
+
+            {/* INSURANCE DROPDOWN */}
+            <div className="hdr__dd" ref={desktopDdWrapRef}>
+              <button
+                ref={desktopDdBtnRef}
+                type="button"
+                className={cx("hdr__link", "hdr__ddbtn", activeInsurance && "is-active")}
+                onClick={() => setInsuranceDesktopOpen((p) => !p)}
+                aria-haspopup="menu"
+                aria-expanded={insuranceDesktopOpen}
+                aria-controls={ddMenuId}
               >
-                {t.home}
-              </Link>
+                {t.insurances} <span className={cx("hdr__caret", insuranceDesktopOpen && "is-open")}>▾</span>
+              </button>
 
-              <Link
-                href={`${base}/about`}
-                className={cx(
-                  navLinkClass(`${base}/about`),
-                  "min-w-[92px] text-center"
-                )}
-              >
-                {t.about}
-              </Link>
-
-              {/* INSURANCE DROPDOWN */}
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setInsuranceDesktopOpen((p) => !p)}
-                  className={cx(
-                    "min-w-[120px] text-center",
-                    "px-3 py-2 rounded-xl",
-                    "transition-colors font-extrabold whitespace-nowrap",
-                    INK,
-                    INK_HOVER,
-                    (isActive(`${base}/green-card`) ||
-                      isActive(`${base}/osago-rf`) ||
-                      isActive(`${base}/products`)) &&
-                      "bg-white/40"
-                  )}
-                >
-                  {t.insurances} ▾
-                </button>
-
-                {insuranceDesktopOpen && (
-                  <div
-                    className={cx(
-                      "absolute left-0 mt-3 rounded-2xl overflow-hidden min-w-[260px] z-50",
-                      PANEL,
-                      "shadow-2xl"
-                    )}
+              {insuranceDesktopOpen && (
+                <div className="hdr__ddpanel" id={ddMenuId} role="menu">
+                  <Link
+                    href={`${base}/green-card`}
+                    className={cx("hdr__dditem", isActive(`${base}/green-card`) && "is-active")}
+                    role="menuitem"
+                    onClick={() => setInsuranceDesktopOpen(false)}
                   >
-                    <Link
-                      href={`${base}/green-card`}
-                      className={cx(
-                        "block px-4 py-3",
-                        INK,
-                        "hover:bg-white/40",
-                        isActive(`${base}/green-card`) &&
-                          "font-extrabold bg-white/40"
-                      )}
-                      onClick={() => setInsuranceDesktopOpen(false)}
-                    >
-                      {t.greenCard}
-                    </Link>
+                    {t.greenCard}
+                  </Link>
 
-                    <Link
-                      href={`${base}/osago-rf`}
-                      className={cx(
-                        "block px-4 py-3",
-                        INK,
-                        "hover:bg-white/40",
-                        isActive(`${base}/osago-rf`) &&
-                          "font-extrabold bg-white/40"
-                      )}
-                      onClick={() => setInsuranceDesktopOpen(false)}
-                    >
-                      {t.osagoRu}
-                    </Link>
+                  <Link
+                    href={`${base}/osago-rf`}
+                    className={cx("hdr__dditem", isActive(`${base}/osago-rf`) && "is-active")}
+                    role="menuitem"
+                    onClick={() => setInsuranceDesktopOpen(false)}
+                  >
+                    {t.osagoRu}
+                  </Link>
 
-                    <Link
-                      href={`${base}/products`}
-                      className={cx(
-                        "block px-4 py-3",
-                        INK,
-                        "hover:bg-white/40",
-                        isActive(`${base}/products`) &&
-                          "font-extrabold bg-white/40"
-                      )}
-                      onClick={() => setInsuranceDesktopOpen(false)}
-                    >
-                      {t.allProducts}
-                    </Link>
-                  </div>
-                )}
-              </div>
-
-              <Link
-                href={`${base}/blog`}
-                className={cx(
-                  navLinkClass(`${base}/blog`),
-                  "min-w-[92px] text-center"
-                )}
-              >
-                {t.blog}
-              </Link>
-
-              <Link
-                href={`${base}/contacts`}
-                className={cx(
-                  navLinkClass(`${base}/contacts`),
-                  "min-w-[92px] text-center"
-                )}
-              >
-                {t.contacts}
-              </Link>
+                  <Link
+                    href={`${base}/products`}
+                    className={cx("hdr__dditem", isActive(`${base}/products`) && "is-active")}
+                    role="menuitem"
+                    onClick={() => setInsuranceDesktopOpen(false)}
+                  >
+                    {t.allProducts}
+                  </Link>
+                </div>
+              )}
             </div>
+
+            <Link href={`${base}/blog`} className={cx("hdr__link", isActive(`${base}/blog`) && "is-active")}>
+              {t.blog}
+            </Link>
+
+            <Link href={`${base}/contacts`} className={cx("hdr__link", isActive(`${base}/contacts`) && "is-active")}>
+              {t.contacts}
+            </Link>
           </nav>
 
-          {/* RIGHT (desktop) — xl */}
-          <div className="hidden xl:flex flex-col items-end gap-2">
-            <a
-              href="tel:+77273573030"
-              className={cx(
-                "font-extrabold text-base leading-tight",
-                INK,
-                INK_HOVER
-              )}
-            >
+          {/* RIGHT (desktop) */}
+          <div className="hdr__right">
+            <a href="tel:+77273573030" className="hdr__phone">
               +7 (727) 357-30-30
             </a>
 
-            <div className="flex items-center gap-3">
-              <a
-                href="https://wa.me/77273573030"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex"
-              >
+            <div className="hdr__rightRow">
+              <a href="https://wa.me/77273573030" target="_blank" rel="noopener noreferrer" className="hdr__icon">
                 <Image src="/wa.webp" alt="WhatsApp" width={26} height={26} />
               </a>
+
               <a
                 href="https://t.me/Dionis_insurance_broker_bot"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex"
+                className="hdr__icon"
               >
                 <Image src="/tg.webp" alt="Telegram" width={22} height={22} />
               </a>
 
-              <div
-                className={cx(
-                  "ml-2 rounded-full px-2 py-1 flex gap-2",
-                  "bg-white/35 border border-black/10"
-                )}
-              >
-                <Link href={buildLangUrl("ru")} className={langLinkClass("ru")}>
+              <div className="hdr__langs" aria-label="Language switcher">
+                <Link href={buildLangUrl("ru")} className={cx("hdr__lang", lang === "ru" && "is-active")}>
                   RU
                 </Link>
-                <Link href={buildLangUrl("kz")} className={langLinkClass("kz")}>
+                <Link href={buildLangUrl("kz")} className={cx("hdr__lang", lang === "kz" && "is-active")}>
                   KZ
                 </Link>
-                <Link href={buildLangUrl("en")} className={langLinkClass("en")}>
+                <Link href={buildLangUrl("en")} className={cx("hdr__lang", lang === "en" && "is-active")}>
                   EN
                 </Link>
               </div>
             </div>
           </div>
 
-          {/* MOBILE BURGER (до xl) */}
+          {/* MOBILE BURGER (<1200px) */}
           <button
-            className={cx(
-              "xl:hidden justify-self-end inline-flex h-10 w-10 items-center justify-center rounded-xl border border-black/10 bg-white/50 hover:bg-white/70 backdrop-blur",
-              menuOpen && "hidden"
-            )}
+            className="hdr__burger"
             onClick={() => setMenuOpen(true)}
-            aria-label="Menu"
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
             type="button"
+            disabled={menuOpen}
           >
-            <div className="flex flex-col gap-1.5">
-              <span className="w-5 h-0.5 bg-[#0f2238]" />
-              <span className="w-5 h-0.5 bg-[#0f2238]" />
-              <span className="w-5 h-0.5 bg-[#0f2238]" />
-            </div>
+            <span className="hdr__burgerLines" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
           </button>
         </div>
       </div>
 
-      {/* MOBILE MENU OVERLAY */}
+      {/* MOBILE MENU */}
       {menuOpen && (
-        <div className="xl:hidden fixed inset-0 z-[999]">
-          <button
-            aria-label="Close menu"
-            className="absolute inset-0 bg-black/20"
-            onClick={() => setMenuOpen(false)}
-          />
+        <div id="mobile-menu" className="mnav" role="dialog" aria-modal="true" aria-label="Mobile menu">
+          <button className="mnav__overlay" aria-label="Close menu" onClick={() => setMenuOpen(false)} />
 
-          <div
-            className={cx(
-              "absolute right-0 top-0 w-[86%] max-w-sm shadow-2xl",
-              "h-[100dvh] overflow-y-auto overscroll-contain",
-              "bg-white/30 backdrop-blur-md border-l border-black/10"
-            )}
-          >
-            <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-black/10 bg-white/40 backdrop-blur-md">
-              <span className={cx("font-extrabold", INK)}>Dionis Insurance</span>
-
-              <button
-                className="h-10 w-10 rounded-xl border border-black/10 hover:bg-white/40"
-                onClick={() => setMenuOpen(false)}
-                aria-label="Close"
-                type="button"
-              >
+          <div className="mnav__panel">
+            <div className="mnav__top">
+              <span className="mnav__brand">Dionis Insurance</span>
+              <button className="mnav__close" onClick={() => setMenuOpen(false)} aria-label="Close" type="button">
                 ✕
               </button>
             </div>
 
-            <div className="p-4 pb-16">
-              <div className="rounded-2xl bg-white/85 border border-black/10 shadow-sm p-3">
-                <nav className="flex flex-col gap-2 text-base">
-                  <Link
-                    href={base}
-                    className={cx(
-                      "block w-full rounded-xl px-4 py-3",
-                      INK,
-                      "hover:bg-white/40",
-                      isActive(base) && "bg-white/40 font-extrabold"
-                    )}
-                    onClick={() => setMenuOpen(false)}
+            <div className="mnav__content">
+              <nav className="mnav__links" aria-label="Mobile navigation">
+                <Link
+                  href={base}
+                  className={cx("mnav__link", isActive(base) && "is-active")}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {t.home}
+                </Link>
+
+                <Link
+                  href={`${base}/about`}
+                  className={cx("mnav__link", isActive(`${base}/about`) && "is-active")}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {t.about}
+                </Link>
+
+                <div className="mnav__accordion">
+                  <button
+                    type="button"
+                    className="mnav__accBtn"
+                    onClick={() => setInsuranceMobileOpen((p) => !p)}
+                    aria-expanded={insuranceMobileOpen}
                   >
-                    {t.home}
-                  </Link>
+                    <span className="mnav__accTitle">{t.insurances}</span>
+                    <span className={cx("mnav__accCaret", insuranceMobileOpen && "is-open")}>▾</span>
+                  </button>
 
-                  <Link
-                    href={`${base}/about`}
-                    className={cx(
-                      "block w-full rounded-xl px-4 py-3",
-                      INK,
-                      "hover:bg-white/40",
-                      isActive(`${base}/about`) && "bg-white/40 font-extrabold"
-                    )}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {t.about}
-                  </Link>
-
-                  <div className="rounded-xl border border-black/10 overflow-hidden bg-white/40">
-                    <button
-                      type="button"
-                      onClick={() => setInsuranceMobileOpen((p) => !p)}
-                      className={cx(
-                        "w-full px-4 py-3 flex items-center justify-between",
-                        INK,
-                        "hover:bg-white/40"
-                      )}
-                    >
-                      <span className="font-extrabold">{t.insurances}</span>
-                      <span
-                        className={cx(
-                          "transition-transform",
-                          insuranceMobileOpen && "rotate-180"
-                        )}
-                      >
-                        ▾
-                      </span>
-                    </button>
-
-                    {insuranceMobileOpen && (
-                      <div className="px-2 pb-2 pt-1 bg-white/30">
-                        <Link
-                          href={`${base}/green-card`}
-                          className={cx(
-                            "block w-full rounded-lg px-3 py-2",
-                            INK,
-                            "hover:bg-white/40"
-                          )}
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          {t.greenCard}
-                        </Link>
-
-                        <Link
-                          href={`${base}/osago-rf`}
-                          className={cx(
-                            "block w-full rounded-lg px-3 py-2",
-                            INK,
-                            "hover:bg-white/40"
-                          )}
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          {t.osagoRu}
-                        </Link>
-
-                        <Link
-                          href={`${base}/products`}
-                          className={cx(
-                            "block w-full rounded-lg px-3 py-2",
-                            INK,
-                            "hover:bg-white/40"
-                          )}
-                          onClick={() => setMenuOpen(false)}
-                        >
-                          {t.allProducts}
-                        </Link>
-                      </div>
-                    )}
-                  </div>
-
-                  <Link
-                    href={`${base}/blog`}
-                    className={cx(
-                      "block w-full rounded-xl px-4 py-3",
-                      INK,
-                      "hover:bg-white/40"
-                    )}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {t.blog}
-                  </Link>
-
-                  <Link
-                    href={`${base}/contacts`}
-                    className={cx(
-                      "block w-full rounded-xl px-4 py-3",
-                      INK,
-                      "hover:bg-white/40"
-                    )}
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {t.contacts}
-                  </Link>
-                </nav>
-
-                <div className="mt-5 rounded-2xl bg-white/25 border border-black/10 p-4 text-sm">
-                  <a
-                    href="tel:+77273573030"
-                    className={cx("block font-extrabold text-lg", INK)}
-                  >
-                    +7 (727) 357-30-30
-                  </a>
-
-                  <div className="mt-3 flex gap-3 items-center">
-                    <a
-                      href="https://wa.me/77273573030"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Image src="/wa.webp" width={28} height={28} alt="WhatsApp" />
-                    </a>
-                    <a
-                      href="https://t.me/Dionis_insurance_broker_bot"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Image src="/tg.webp" width={28} height={28} alt="Telegram" />
-                    </a>
-
-                    <div className="ml-auto inline-flex items-center gap-2 rounded-full bg-white/35 border border-black/10 px-3 py-1">
-                      <Link
-                        href={buildLangUrl("ru")}
-                        className={cx(
-                          "text-xs font-extrabold",
-                          lang === "ru" ? "text-[#B58A2C]" : INK
-                        )}
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        RU
+                  {insuranceMobileOpen && (
+                    <div className="mnav__accBody">
+                      <Link href={`${base}/green-card`} className="mnav__sublink" onClick={() => setMenuOpen(false)}>
+                        {t.greenCard}
                       </Link>
-                      <Link
-                        href={buildLangUrl("kz")}
-                        className={cx(
-                          "text-xs font-extrabold",
-                          lang === "kz" ? "text-[#B58A2C]" : INK
-                        )}
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        KZ
+                      <Link href={`${base}/osago-rf`} className="mnav__sublink" onClick={() => setMenuOpen(false)}>
+                        {t.osagoRu}
                       </Link>
-                      <Link
-                        href={buildLangUrl("en")}
-                        className={cx(
-                          "text-xs font-extrabold",
-                          lang === "en" ? "text-[#B58A2C]" : INK
-                        )}
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        EN
+                      <Link href={`${base}/products`} className="mnav__sublink" onClick={() => setMenuOpen(false)}>
+                        {t.allProducts}
                       </Link>
                     </div>
+                  )}
+                </div>
+
+                <Link
+                  href={`${base}/blog`}
+                  className={cx("mnav__link", isActive(`${base}/blog`) && "is-active")}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {t.blog}
+                </Link>
+
+                <Link
+                  href={`${base}/contacts`}
+                  className={cx("mnav__link", isActive(`${base}/contacts`) && "is-active")}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {t.contacts}
+                </Link>
+              </nav>
+
+              <div className="mnav__box">
+                <a href="tel:+77273573030" className="mnav__phone">
+                  +7 (727) 357-30-30
+                </a>
+
+                <div className="mnav__icons">
+                  <a href="https://wa.me/77273573030" target="_blank" rel="noopener noreferrer" className="mnav__icon">
+                    <Image src="/wa.webp" width={28} height={28} alt="WhatsApp" />
+                  </a>
+                  <a
+                    href="https://t.me/Dionis_insurance_broker_bot"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mnav__icon"
+                  >
+                    <Image src="/tg.webp" width={28} height={28} alt="Telegram" />
+                  </a>
+
+                  <div className="mnav__langs" aria-label="Language switcher">
+                    <Link
+                      href={buildLangUrl("ru")}
+                      className={cx("mnav__lang", lang === "ru" && "is-active")}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      RU
+                    </Link>
+                    <Link
+                      href={buildLangUrl("kz")}
+                      className={cx("mnav__lang", lang === "kz" && "is-active")}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      KZ
+                    </Link>
+                    <Link
+                      href={buildLangUrl("en")}
+                      className={cx("mnav__lang", lang === "en" && "is-active")}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      EN
+                    </Link>
                   </div>
                 </div>
-                {/* /контакты + языки */}
               </div>
+              {/* /mnav__box */}
             </div>
           </div>
         </div>

@@ -13,133 +13,122 @@ export default function SiteFooter({ lang }: SiteFooterProps) {
   const base = `/${lang}`;
 
   return (
-    <footer className="w-full bg-[#0f2238] text-gray-100 text-sm mt-8">
-      <div className="mx-auto max-w-6xl px-4 py-10 grid gap-8 md:grid-cols-4">
-        {/* ===== Колонка 1 — контакты ===== */}
-        <div>
-          <h3 className="text-xs font-bold tracking-[0.12em] uppercase mb-4">
-            {t.contactsTitle}
-          </h3>
+    <footer className="ftr" aria-label="Site footer">
+      <div className="ftr__container">
+        <div className="ftr__grid">
+          {/* ===== Column 1 — contacts ===== */}
+          <div className="ftr__col">
+            <h3 className="ftr__title">{t.contactsTitle}</h3>
 
-          <ul className="space-y-2">
-            <li>{t.addressLine1}</li>
-            <li>{t.addressLine2}</li>
+            <ul className="ftr__list">
+              <li className="ftr__item">{t.addressLine1}</li>
+              <li className="ftr__item">{t.addressLine2}</li>
 
-            <li>
-              <a
-                href="mailto:info@dionis-insurance.kz"
-                className="hover:text-[#FCD671]"
-              >
-                {t.emailLabel}
-              </a>
-            </li>
+              <li className="ftr__item">
+                <a className="ftr__link" href="mailto:info@dionis-insurance.kz">
+                  {t.emailLabel}
+                </a>
+              </li>
 
-            <li>
-              <a
-                href="tel:+77273573030"
-                className="whitespace-nowrap hover:text-[#FCD671]"
-              >
-                {t.phoneLabel}
-              </a>
-            </li>
-          </ul>
-        </div>
+              <li className="ftr__item">
+                <a className="ftr__link ftr__nowrap" href="tel:+77273573030">
+                  {t.phoneLabel}
+                </a>
+              </li>
+            </ul>
+          </div>
 
-        {/* ===== Колонка 2 — категории ===== */}
-        <div>
-          <h3 className="text-xs font-bold tracking-[0.12em] uppercase mb-4">
-            {t.categoriesTitle}
-          </h3>
+          {/* ===== Column 2 — categories ===== */}
+          <div className="ftr__col">
+            <h3 className="ftr__title">{t.categoriesTitle}</h3>
 
-          <ul className="space-y-2">
-            <li>
-              <Link href={base} className="hover:text-[#FCD671]">
-                {t.homeLabel}
-              </Link>
-            </li>
+            <ul className="ftr__list">
+              <li className="ftr__item">
+                <Link className="ftr__link" href={base}>
+                  {t.homeLabel}
+                </Link>
+              </li>
 
-            <li>
-              <Link href={`${base}/about`} className="hover:text-[#FCD671]">
-                {t.aboutLabel}
-              </Link>
-            </li>
+              <li className="ftr__item">
+                <Link className="ftr__link" href={`${base}/about`}>
+                  {t.aboutLabel}
+                </Link>
+              </li>
 
-            <li>
-              <Link
-                href={`${base}/green-card`}
-                className="hover:text-[#FCD671]"
-              >
-                {t.greenCardLabel}
-              </Link>
-            </li>
+              <li className="ftr__item">
+                <Link className="ftr__link" href={`${base}/green-card`}>
+                  {t.greenCardLabel}
+                </Link>
+              </li>
 
-            <li>
-              <Link
-                href={`${base}/osago-rf`}
-                className="hover:text-[#FCD671]"
-              >
-                {t.osagoLabel}
-              </Link>
-            </li>
+              <li className="ftr__item">
+                <Link className="ftr__link" href={`${base}/osago-rf`}>
+                  {t.osagoLabel}
+                </Link>
+              </li>
 
-            <li>
-              <Link href={`${base}/blog`} className="hover:text-[#FCD671]">
-                {t.blogLabel}
-              </Link>
-            </li>
-          </ul>
-        </div>
+              <li className="ftr__item">
+                <Link className="ftr__link" href={`${base}/blog`}>
+                  {t.blogLabel}
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-        {/* ===== Колонка 3 — поддержка клиентов ===== */}
-        <div>
-          <h3 className="text-xs font-bold tracking-[0.12em] uppercase mb-4">
-            {t.supportTitle}
-          </h3>
+          {/* ===== Column 3 — support ===== */}
+          <div className="ftr__col">
+            <h3 className="ftr__title">{t.supportTitle}</h3>
 
-          <ul className="space-y-2">
-            <li>
-              <a
-                href="https://t.me/Dionis_insurance_broker_bot"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-[#FCD671]"
-              >
-                {t.telegramLabel}
-              </a>
-            </li>
-          </ul>
-        </div>
+            <ul className="ftr__list">
+              <li className="ftr__item">
+                <a
+                  className="ftr__link"
+                  href="https://t.me/Dionis_insurance_broker_bot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t.telegramLabel}
+                </a>
+              </li>
+            </ul>
+          </div>
 
-        {/* ===== Колонка 4 — законодательство ===== */}
-        <div>
-          <h3 className="text-xs font-bold tracking-[0.12em] uppercase mb-4">
-            {t.lawTitle}
-          </h3>
+          {/* ===== Column 4 — law ===== */}
+          <div className="ftr__col">
+            <h3 className="ftr__title">{t.lawTitle}</h3>
 
-          <ul className="space-y-2">
-            <li>
-              <a href={`${base}/privacy/cookies`} className="hover:text-[#FCD671]">
-                {t.cookiePolicy}
-              </a>
-            </li>
-            <li>
-              <a href={`${base}/privacy/regulation`} className="hover:text-[#FCD671]">
-                {t.servicesRegulations}
-              </a>
-            </li>
-            <li>
-              <a href="https://law.gov.kz/client/#!/doc/7832/rus" className="hover:text-[#FCD671]">
-                {t.lawInsurance}
-              </a>
-            </li>
-          </ul>
+            <ul className="ftr__list">
+              <li className="ftr__item">
+                <Link className="ftr__link" href={`${base}/privacy/cookies`}>
+                  {t.cookiePolicy}
+                </Link>
+              </li>
+
+              <li className="ftr__item">
+                <Link className="ftr__link" href={`${base}/privacy/regulation`}>
+                  {t.servicesRegulations}
+                </Link>
+              </li>
+
+              <li className="ftr__item">
+                <a
+                  className="ftr__link"
+                  href="https://law.gov.kz/client/#!/doc/7832/rus"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t.lawInsurance}
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
-      {/* ===== Нижняя полоса ===== */}
-      <div className="border-t border-white/10">
-        <div className="mx-auto max-w-6xl px-4 py-3 text-xs text-gray-300">
-          {t.copyright}
+      {/* ===== Bottom bar ===== */}
+      <div className="ftr__bottom">
+        <div className="ftr__container">
+          <div className="ftr__copy">{t.copyright}</div>
         </div>
       </div>
     </footer>

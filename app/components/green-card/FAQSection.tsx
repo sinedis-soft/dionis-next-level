@@ -20,8 +20,7 @@ export default function FAQSection({ dict }: Props) {
   };
 
   return (
-    <section className="py-12 sm:py-16 bg-white" aria-labelledby="faq-heading">
-      {/* ✅ JSON-LD будет в HTML при SSR */}
+    <section className="gc-section" aria-labelledby="faq-heading">
       <Script
         id="faq-jsonld"
         type="application/ld+json"
@@ -29,17 +28,14 @@ export default function FAQSection({ dict }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
 
-      <div className="max-w-6xl mx-auto px-4">
-        <h2
-          id="faq-heading"
-          className="text-2xl sm:text-3xl font-semibold text-[#1A3A5F] text-center"
-        >
+      <div className="gc-container">
+        <h2 id="faq-heading" className="gc-h2">
           {dict.title}
         </h2>
-        <p className="mt-3 text-center text-gray-600">{dict.intro}</p>
 
-        {/* ✅ Интерактивность отдельно, но сами ответы остаются в DOM */}
-        <div className="mt-8">
+        <p className="gc-text-muted gc-mt-12">{dict.intro}</p>
+
+        <div className="gc-mt-12">
           <FAQAccordion items={dict.items} />
         </div>
       </div>
