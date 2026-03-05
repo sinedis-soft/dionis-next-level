@@ -13,17 +13,19 @@ type Props = {
   disableOnLegacy?: boolean;
 };
 
+type WindowCssSupports = {
+  CSS?: { supports?: (prop: string, value: string) => boolean };
+};
+
 function detectLegacyBrowser(): boolean {
-  if (typeof window === "undefined") return false;
+  // вызывать только в браузере
+  const w = window as unknown as WindowCssSupports;
 
-  // Базовая проверка CSS.supports + grid — надёжнее, чем IO.
-  const css: any = (window as any).CSS;
-  const supports = typeof css?.supports === "function";
-  const hasGrid = supports && css.supports("display", "grid");
+  const supportsFn = w.CSS?.supports;
+  const hasGrid = typeof supportsFn === "function" && supportsFn("display", "grid");
 
-  // Доп. страховки (по желанию можно расширять):
-  const hasFetch = typeof (window as any).fetch === "function";
-  const hasURL = typeof (window as any).URL === "function";
+  const hasFetch = typeof window.fetch === "function";
+  const hasURL = typeof window.URL === "function";
 
   return !hasGrid || !hasFetch || !hasURL;
 }
@@ -40,22 +42,26 @@ export default function DeferredHydration({
 
   const isBrowser = typeof window !== "undefined";
 
-  const isLegacy = useMemo(() => (isBrowser ? detectLegacyBrowser() : false), [isBrowser]);
-
-  // ✅ если просим не показывать в legacy — возвращаем null (и на сервере тоже, чтобы не мигало)
-  if (disableOnLegacy && (!isBrowser || isLegacy)) {
-    return null;
-  }
+  // ✅ хуки всегда вызываются, даже если потом вернём null
+  const isLegacy = useMemo(() => {
+    if (!isBrowser) return false;
+    return detectLegacyBrowser();
+  }, [isBrowser]);
 
   const canUseIO = useMemo(() => {
     if (!isBrowser) return false;
     return "IntersectionObserver" in window;
   }, [isBrowser]);
 
+  const shouldHide = disableOnLegacy && (!isBrowser || isLegacy);
+
   useEffect(() => {
+    // если скрываем — ничего не включаем и ничего не наблюдаем
+    if (shouldHide) return;
+
     if (enabled) return;
 
-    // если IO нет — просто включаем (но это уже не legacy, потому что legacy мы отфильтровали выше)
+    // если IO нет — просто включаем (но это уже не legacy, потому что legacy отфильтрован shouldHide)
     if (!canUseIO) {
       setEnabled(true);
       return;
@@ -88,7 +94,10 @@ export default function DeferredHydration({
       io.disconnect();
       if (timeoutId) window.clearTimeout(timeoutId);
     };
-  }, [enabled, canUseIO, rootMargin, minDelayMs]);
+  }, [enabled, canUseIO, rootMargin, minDelayMs, shouldHide]);
+
+  // ✅ условный return только после хуков
+  if (shouldHide) return null;
 
   return (
     <div ref={ref} className={className} suppressHydrationWarning>

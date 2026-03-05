@@ -12,6 +12,9 @@ import React, {
 import type { GreenCardFormDictionary } from "@/dictionaries/greenCardForm";
 import FilePicker from "@/components/FilePicker";
 
+import { RecaptchaLazy } from "@/components/RecaptchaLazy";
+import { getRecaptchaToken } from "@/lib/recaptcha";
+
 type Props = { dict: GreenCardFormDictionary };
 
 type FormStatus = "idle" | "loading" | "success" | "error";
@@ -42,11 +45,19 @@ function formatEmail(raw: string): string {
 }
 
 function formatIdNumber(raw: string): string {
-  return raw.replace(/\s/g, "").replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 20);
+  return raw
+    .replace(/\s/g, "")
+    .replace(/[^A-Za-z0-9]/g, "")
+    .toUpperCase()
+    .slice(0, 20);
 }
 
 function formatLatinAlnum(raw: string, maxLength = 20): string {
-  return raw.replace(/\s/g, "").replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, maxLength);
+  return raw
+    .replace(/\s/g, "")
+    .replace(/[^A-Za-z0-9]/g, "")
+    .toUpperCase()
+    .slice(0, maxLength);
 }
 
 function tpl(s: string, params: Record<string, string>) {
@@ -127,7 +138,11 @@ function StepCrumbs({
             type="button"
             className={[
               "steps__btn",
-              step === 2 ? "steps__btn--active" : canAttemptStep2 ? "steps__btn--idle" : "steps__btn--disabled",
+              step === 2
+                ? "steps__btn--active"
+                : canAttemptStep2
+                ? "steps__btn--idle"
+                : "steps__btn--disabled",
               isBusy ? "is-disabled" : "",
             ].join(" ")}
             onClick={() => {
@@ -176,10 +191,22 @@ export function GreenCardOrderForm({ dict }: Props) {
   const step2Ref = useRef<HTMLDivElement | null>(null);
 
   const today = useMemo(() => new Date(), []);
-  const minAgeDate = useMemo(() => new Date(today.getTime() - 6570 * 24 * 60 * 60 * 1000), [today]);
-  const maxBirthDate = useMemo(() => minAgeDate.toISOString().split("T")[0], [minAgeDate]);
-  const maxIssuedDate = useMemo(() => today.toISOString().split("T")[0], [today]);
-  const minStartDate = useMemo(() => today.toISOString().split("T")[0], [today]);
+  const minAgeDate = useMemo(
+    () => new Date(today.getTime() - 6570 * 24 * 60 * 60 * 1000),
+    [today]
+  );
+  const maxBirthDate = useMemo(
+    () => minAgeDate.toISOString().split("T")[0],
+    [minAgeDate]
+  );
+  const maxIssuedDate = useMemo(
+    () => today.toISOString().split("T")[0],
+    [today]
+  );
+  const minStartDate = useMemo(
+    () => today.toISOString().split("T")[0],
+    [today]
+  );
 
   const forbiddenTypes = useMemo(
     () => [
@@ -198,12 +225,27 @@ export function GreenCardOrderForm({ dict }: Props) {
   const hasSuccess = formStatus === "success";
   const statusId = `${uid}-green-card-order-status`;
 
+  // ===== reCAPTCHA config =====
+  const isProd =
+    typeof window === "undefined"
+      ? process.env.NODE_ENV === "production"
+      : process.env.NODE_ENV === "production";
+
+  const recaptchaSiteKey =
+    (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "").trim();
+
+  // включаем только если ключ задан
+  const recaptchaEnabled = Boolean(recaptchaSiteKey);
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
+
   const validateFiles = useCallback(
     (files: FileList): boolean => {
       let ok = true;
       Array.from(files || []).forEach((file) => {
         const type = (file?.type || "").toLowerCase();
-        const forbidden = forbiddenTypes.some((t) => (t.endsWith("/") ? type.startsWith(t) : type === t));
+        const forbidden = forbiddenTypes.some((t) =>
+          t.endsWith("/") ? type.startsWith(t) : type === t
+        );
         if (forbidden) {
           ok = false;
           alert(`${file.name}: ${dict.fileForbidden}`);
@@ -214,22 +256,27 @@ export function GreenCardOrderForm({ dict }: Props) {
     [dict.fileForbidden, forbiddenTypes]
   );
 
-  const getLabelForElement = useCallback((root: HTMLElement, el: Element): string => {
-    const aria = (el as HTMLElement).getAttribute?.("aria-label")?.trim();
-    if (aria) return aria;
+  const getLabelForElement = useCallback(
+    (root: HTMLElement, el: Element): string => {
+      const aria = (el as HTMLElement).getAttribute?.("aria-label")?.trim();
+      if (aria) return aria;
 
-    const id = (el as HTMLInputElement).id;
-    if (id) {
-      const lab = root.querySelector(`label[for="${safeCssEscape(id)}"]`) as HTMLLabelElement | null;
-      const t = (lab?.textContent || "").replace(/\*/g, "").trim();
-      if (t) return t;
-    }
+      const id = (el as HTMLInputElement).id;
+      if (id) {
+        const lab = root.querySelector(
+          `label[for="${safeCssEscape(id)}"]`
+        ) as HTMLLabelElement | null;
+        const t = (lab?.textContent || "").replace(/\*/g, "").trim();
+        if (t) return t;
+      }
 
-    const name = (el as HTMLInputElement).getAttribute?.("name")?.trim();
-    if (name) return name;
+      const name = (el as HTMLInputElement).getAttribute?.("name")?.trim();
+      if (name) return name;
 
-    return "Field";
-  }, []);
+      return "Field";
+    },
+    []
+  );
 
   const collectStepErrors = useCallback(
     (s: Step): string[] => {
@@ -239,7 +286,9 @@ export function GreenCardOrderForm({ dict }: Props) {
       const errors: string[] = [];
 
       const fields = Array.from(
-        root.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input, select, textarea")
+        root.querySelectorAll<
+          HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+        >("input, select, textarea")
       ).filter((el) => {
         if (el.disabled) return false;
         if (el instanceof HTMLInputElement && el.type === "hidden") return false;
@@ -263,9 +312,13 @@ export function GreenCardOrderForm({ dict }: Props) {
         if (formEl) {
           const fd = new FormData(formEl);
           const vals = fd.getAll("person_passportFiles");
-          const hasFiles = vals.some((v) => v instanceof File && (v as File).size > 0);
+          const hasFiles = vals.some(
+            (v) => v instanceof File && (v as File).size > 0
+          );
           if (!hasFiles) {
-            errors.push(tpl(dict.errors.requiredFiles, { field: dict.passportFilesLabel }));
+            errors.push(
+              tpl(dict.errors.requiredFiles, { field: dict.passportFilesLabel })
+            );
           }
         }
       }
@@ -278,7 +331,9 @@ export function GreenCardOrderForm({ dict }: Props) {
           vehicles.forEach((_, idx) => {
             const key = `vehicles[${idx}][techPassportFiles]`;
             const vals = fd.getAll(key);
-            const hasFiles = vals.some((v) => v instanceof File && (v as File).size > 0);
+            const hasFiles = vals.some(
+              (v) => v instanceof File && (v as File).size > 0
+            );
             if (!hasFiles) {
               errors.push(
                 tpl(dict.errors.requiredFiles, {
@@ -295,14 +350,24 @@ export function GreenCardOrderForm({ dict }: Props) {
     [dict, getLabelForElement, isCompany, manualEntry, vehicles]
   );
 
-  const refreshStep1Errors = useCallback(() => setStep1Errors(collectStepErrors(1)), [collectStepErrors]);
-  const refreshStep2Errors = useCallback(() => setStep2Errors(collectStepErrors(2)), [collectStepErrors]);
+  const refreshStep1Errors = useCallback(
+    () => setStep1Errors(collectStepErrors(1)),
+    [collectStepErrors]
+  );
+  const refreshStep2Errors = useCallback(
+    () => setStep2Errors(collectStepErrors(2)),
+    [collectStepErrors]
+  );
 
   const goStep1 = useCallback(() => {
     if (isBusy) return;
     setStep(1);
     setStep2Errors([]);
-    setTimeout(() => step1Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    setTimeout(
+      () =>
+        step1Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+      50
+    );
   }, [isBusy]);
 
   const goStep2 = useCallback(() => {
@@ -312,7 +377,11 @@ export function GreenCardOrderForm({ dict }: Props) {
     if (errs.length) {
       setStep1Errors(errs);
       setStep(1);
-      setTimeout(() => step1Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+      setTimeout(
+        () =>
+          step1Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+        50
+      );
       return;
     }
 
@@ -384,7 +453,14 @@ export function GreenCardOrderForm({ dict }: Props) {
       const errs2 = collectStepErrors(2);
       if (errs2.length) {
         setStep2Errors(errs2);
-        setTimeout(() => step2Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+        setTimeout(
+          () =>
+            step2Ref.current?.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            }),
+          50
+        );
         return;
       }
       setStep2Errors([]);
@@ -404,6 +480,7 @@ export function GreenCardOrderForm({ dict }: Props) {
       try {
         const fd = new FormData(formEl);
 
+        // meta
         try {
           fd.append("pageUrl", window.location.href);
           const utm = localStorage.getItem("utm_data");
@@ -412,7 +489,24 @@ export function GreenCardOrderForm({ dict }: Props) {
           // ignore
         }
 
-        const res = await fetch("/api/green-card-order", { method: "POST", body: fd });
+        // reCAPTCHA v3 token (в PROD — обязателен, если включено)
+        if (recaptchaEnabled) {
+          // небольшая защита от "кнопка нажата до загрузки API"
+          const token = await getRecaptchaToken(recaptchaSiteKey, "green_card_order");
+
+          if (isProd && !token) {
+            setFormStatus("error");
+            setFormMessage("Не удалось подтвердить, что вы не робот. Обновите страницу и попробуйте ещё раз.");
+            return;
+          }
+
+          if (token) fd.set("recaptchaToken", token);
+        }
+
+        const res = await fetch("/api/green-card-order", {
+          method: "POST",
+          body: fd,
+        });
 
         const data: unknown = await res.json().catch(() => null);
         const ok = Boolean((data as { ok?: boolean } | null)?.ok);
@@ -433,7 +527,17 @@ export function GreenCardOrderForm({ dict }: Props) {
         setFormMessage("Ошибка на сервере при отправке заявки на Зеленую карту");
       }
     },
-    [collectStepErrors, dict.successMessage, goStep2, isBusy, resetAll, step]
+    [
+      collectStepErrors,
+      dict.successMessage,
+      goStep2,
+      isBusy,
+      resetAll,
+      step,
+      recaptchaEnabled,
+      recaptchaSiteKey,
+      isProd,
+    ]
   );
 
   return (
@@ -453,12 +557,23 @@ export function GreenCardOrderForm({ dict }: Props) {
           labels={dict.stepLabels}
         />
 
-        <form ref={formRef} className="gc-form__inner" onSubmit={handleSubmit} aria-describedby={formStatus !== "idle" ? statusId : undefined}>
+        {/* reCAPTCHA v3 loader (не требует действий пользователя) */}
+        <RecaptchaLazy
+          siteKey={recaptchaSiteKey}
+          enabled={recaptchaEnabled}
+          onReady={() => setRecaptchaReady(true)}
+        />
+
+        <form
+          ref={formRef}
+          className="gc-form__inner"
+          onSubmit={handleSubmit}
+          aria-describedby={formStatus !== "idle" ? statusId : undefined}
+        >
           {/* ===================== STEP 1 ===================== */}
           <div ref={step1Ref} hidden={step !== 1}>
             <ErrorSummary title={dict.errors.title} items={step1Errors} />
 
-            {/* CONTACT */}
             <div className="gc-block">
               <div className="gc-block__hd">
                 <h3 className="gc-block__title">{dict.contact.legend}</h3>
@@ -568,16 +683,20 @@ export function GreenCardOrderForm({ dict }: Props) {
                     setTimeout(() => refreshStep1Errors(), 0);
                   }}
                 />
-                <label htmlFor={`${uid}-order-isCompany`} className="gc-checkrow__label">
+                <label
+                  htmlFor={`${uid}-order-isCompany`}
+                  className="gc-checkrow__label"
+                >
                   {dict.contact.isCompanyLabel}
                 </label>
               </div>
             </div>
 
-            {/* PERSON / COMPANY */}
             <div className="gc-block">
               <div className="gc-block__hd">
-                <h3 className="gc-block__title">{isCompany ? dict.company.legend : dict.person.legend}</h3>
+                <h3 className="gc-block__title">
+                  {isCompany ? dict.company.legend : dict.person.legend}
+                </h3>
               </div>
 
               {isCompany ? (
@@ -629,7 +748,10 @@ export function GreenCardOrderForm({ dict }: Props) {
                         setTimeout(() => refreshStep1Errors(), 0);
                       }}
                     />
-                    <label htmlFor={`${uid}-person-manualEntry`} className="gc-checkrow__label">
+                    <label
+                      htmlFor={`${uid}-person-manualEntry`}
+                      className="gc-checkrow__label"
+                    >
                       {dict.manualEntryLabel}
                     </label>
                   </div>
@@ -865,7 +987,14 @@ export function GreenCardOrderForm({ dict }: Props) {
                   const errs = collectStepErrors(1);
                   if (errs.length) {
                     setStep1Errors(errs);
-                    setTimeout(() => step1Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+                    setTimeout(
+                      () =>
+                        step1Ref.current?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        }),
+                      50
+                    );
                     return;
                   }
                   goStep2();
@@ -911,7 +1040,10 @@ export function GreenCardOrderForm({ dict }: Props) {
                         <button
                           type="button"
                           onClick={() => handleRemoveVehicle(v.id)}
-                          className={["link link--danger", isBusy ? "is-disabled" : ""].join(" ")}
+                          className={[
+                            "link link--danger",
+                            isBusy ? "is-disabled" : "",
+                          ].join(" ")}
                           disabled={isBusy}
                         >
                           {dict.vehicles.removeButton}
@@ -933,7 +1065,10 @@ export function GreenCardOrderForm({ dict }: Props) {
                           required
                           disabled={isBusy}
                           onChange={(e) => {
-                            e.currentTarget.value = formatLatinAlnum(e.currentTarget.value, 12);
+                            e.currentTarget.value = formatLatinAlnum(
+                              e.currentTarget.value,
+                              12
+                            );
                             if (step2Errors.length) setStep2Errors([]);
                           }}
                         />
@@ -1048,19 +1183,45 @@ export function GreenCardOrderForm({ dict }: Props) {
                   id={statusId}
                   role="status"
                   aria-live="polite"
-                  className={hasSuccess ? "status status--ok" : hasError ? "status status--err" : "status"}
+                  className={
+                    hasSuccess
+                      ? "status status--ok"
+                      : hasError
+                      ? "status status--err"
+                      : "status"
+                  }
                 >
-                  {formStatus === "loading" ? "Отправка..." : formMessage}
+                  {formStatus === "loading"
+                    ? "Отправка..."
+                    : formMessage || dict.successMessage}
                 </div>
               )}
 
+              {/* Короткий техтекст, чтобы “как подтвердить” было понятно */}
+              {recaptchaEnabled && (
+                <p className="hint" style={{ marginTop: 12 }}>
+                  Защита от ботов включена{recaptchaReady ? "" : " (загружается)"}.
+                  Подтверждать ничего не нужно.
+                </p>
+              )}
+
               <div className="row-between mt-4 gc-actions">
-                <button type="button" className={["btn btn-secondary", isBusy ? "is-disabled" : ""].join(" ")} onClick={goStep1} disabled={isBusy}>
+                <button
+                  type="button"
+                  className={["btn btn-secondary", isBusy ? "is-disabled" : ""].join(" ")}
+                  onClick={goStep1}
+                  disabled={isBusy}
+                >
                   ← {dict.prevStep}
                 </button>
 
                 <div className="row-center gc-actions__right">
-                  <button type="button" className={["btn btn-secondary", isBusy ? "is-disabled" : ""].join(" ")} onClick={handleAddVehicle} disabled={isBusy}>
+                  <button
+                    type="button"
+                    className={["btn btn-secondary", isBusy ? "is-disabled" : ""].join(" ")}
+                    onClick={handleAddVehicle}
+                    disabled={isBusy}
+                  >
                     {dict.vehicles.addButton}
                   </button>
 

@@ -1,9 +1,8 @@
-//app/components/RecaptchaLazy.tsx
-
+// app/components/RecaptchaLazy.tsx
 "use client";
 
 import Script from "next/script";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 type Props = {
   siteKey: string;
@@ -16,34 +15,50 @@ type Grecaptcha = {
   execute: (siteKey: string, options: { action: string }) => Promise<string>;
 };
 
-function hasRecaptchaScript(): boolean {
-  if (typeof document === "undefined") return false;
-  return document.getElementById("recaptcha-v3") !== null;
-}
-
 function getGrecaptcha(): Grecaptcha | null {
   if (typeof window === "undefined") return null;
   const w = window as Window & { grecaptcha?: Grecaptcha };
   return w.grecaptcha ?? null;
 }
 
+function hasRecaptchaScript(): boolean {
+  if (typeof document === "undefined") return false;
+  return document.getElementById("recaptcha-v3") !== null;
+}
+
+async function waitForGrecaptcha(timeoutMs = 8000): Promise<Grecaptcha | null> {
+  const start = Date.now();
+
+  while (Date.now() - start < timeoutMs) {
+    const api = getGrecaptcha();
+    if (api) return api;
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  return null;
+}
+
 export function RecaptchaLazy({ siteKey, enabled, onReady }: Props) {
   const [shouldRender, setShouldRender] = useState(false);
+
+  const notifyReadyIfPossible = useCallback(async () => {
+    if (!enabled || !siteKey) return;
+    const api = await waitForGrecaptcha(8000);
+    if (!api) return; // НЕ сигналим "ready", пока реально не поднялось
+    api.ready(() => onReady?.());
+  }, [enabled, siteKey, onReady]);
 
   useEffect(() => {
     if (!enabled || !siteKey) return;
 
-    // 1) Скрипт уже есть → НЕ рендерим Script второй раз, но ждём готовность API
+    // Скрипт уже есть — просто ждём появления grecaptcha
     if (hasRecaptchaScript()) {
-      const api = getGrecaptcha();
-      if (api) api.ready(() => onReady?.());
-      else onReady?.(); // если API ещё не поднялось, всё равно сигналим
+      void notifyReadyIfPossible();
       return;
     }
 
-    // 2) Скрипта ещё нет → разрешаем рендер Script
+    // Скрипта ещё нет — рендерим Script
     setShouldRender(true);
-  }, [enabled, siteKey, onReady]);
+  }, [enabled, siteKey, notifyReadyIfPossible]);
 
   if (!enabled || !siteKey) return null;
   if (!shouldRender) return null;
@@ -54,9 +69,7 @@ export function RecaptchaLazy({ siteKey, enabled, onReady }: Props) {
       src={`https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(siteKey)}`}
       strategy="lazyOnload"
       onLoad={() => {
-        const api = getGrecaptcha();
-        if (api) api.ready(() => onReady?.());
-        else onReady?.();
+        void notifyReadyIfPossible();
       }}
     />
   );

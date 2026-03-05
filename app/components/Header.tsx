@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,12 +12,10 @@ function cx(...c: Array<string | false | null | undefined>) {
   return c.filter(Boolean).join(" ");
 }
 
-// ✅ считаем, что статья блога — это /{lang}/blog/{slug}
 function isBlogArticlePath(pathname: string) {
   return /^\/(ru|kz|en)\/blog\/[^\/]+\/?$/.test(pathname);
 }
 
-// Закрытие по клику вне элемента
 function useClickOutside<T extends HTMLElement>(
   refs: Array<RefObject<T | null>>,
   onOutside: () => void,
@@ -56,7 +54,6 @@ export default function Header({ lang }: { lang: Lang }) {
   const desktopDdWrapRef = useRef<HTMLDivElement | null>(null);
   const desktopDdBtnRef = useRef<HTMLButtonElement | null>(null);
 
-  // ✅ query-string берём из window.location.search (без useSearchParams)
   const [qs, setQs] = useState("");
 
   useEffect(() => {
@@ -69,40 +66,39 @@ export default function Header({ lang }: { lang: Lang }) {
     return () => window.removeEventListener("popstate", update);
   }, [pathname]);
 
-  // ✅ сборка URL для языка:
-  // - на blog/[slug] -> /{targetLang}/blog
-  // - иначе -> тот же pathname с заменой lang + query-string
-  const buildLangUrl = (targetLang: Lang) => {
-    if (isBlogArticlePath(pathname)) return `/${targetLang}/blog`;
+  const buildLangUrl = useCallback(
+    (targetLang: Lang) => {
+      if (isBlogArticlePath(pathname)) return `/${targetLang}/blog`;
 
-    const parts = pathname.split("/");
-    if (parts.length > 1) parts[1] = targetLang;
+      const parts = pathname.split("/");
+      if (parts.length > 1) parts[1] = targetLang;
 
-    const nextPath = parts.join("/").replace(/\/+$/, "") || "/";
-    return `${nextPath}${qs}`;
-  };
+      const nextPath = parts.join("/").replace(/\/+$/, "") || "/";
+      return `${nextPath}${qs}`;
+    },
+    [pathname, qs]
+  );
 
-  const isActive = (target: string) => {
-    if (target === base) return pathname === base || pathname === `${base}/`;
-    return pathname === target || pathname.startsWith(`${target}/`);
-  };
+  const isActive = useCallback(
+    (target: string) => {
+      if (target === base) return pathname === base || pathname === `${base}/`;
+      return pathname === target || pathname.startsWith(`${target}/`);
+    },
+    [base, pathname]
+  );
 
-  const activeInsurance = useMemo(() => {
-    return (
-      isActive(`${base}/green-card`) ||
-      isActive(`${base}/osago-rf`) ||
-      isActive(`${base}/products`)
-    );
-  }, [base, pathname]);
+  // без useMemo: это решает preserve-manual-memoization и missing deps
+  const activeInsurance =
+    isActive(`${base}/green-card`) ||
+    isActive(`${base}/osago-rf`) ||
+    isActive(`${base}/products`);
 
-  // закрытие на смене страницы
   useEffect(() => {
     setInsuranceDesktopOpen(false);
     setInsuranceMobileOpen(false);
     setMenuOpen(false);
   }, [pathname]);
 
-  // блокировка скролла body при открытом мобильном меню
   useEffect(() => {
     if (!menuOpen) return;
     const prev = document.body.style.overflow;
@@ -112,7 +108,6 @@ export default function Header({ lang }: { lang: Lang }) {
     };
   }, [menuOpen]);
 
-  // Esc закрывает dropdown/меню
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
@@ -123,13 +118,11 @@ export default function Header({ lang }: { lang: Lang }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [insuranceDesktopOpen, menuOpen]);
 
-  // Стабильный список refs, чтобы не пересоздавать effect каждый рендер
   const desktopOutsideRefs = useMemo(
     () => [desktopDdWrapRef, desktopDdBtnRef] as Array<RefObject<HTMLElement | null>>,
     []
   );
 
-  // клик вне dropdown закрывает
   useClickOutside(desktopOutsideRefs, () => setInsuranceDesktopOpen(false), insuranceDesktopOpen);
 
   const ddMenuId = "hdr-insurance-menu";
@@ -138,12 +131,10 @@ export default function Header({ lang }: { lang: Lang }) {
     <header className="hdr">
       <div className="hdr__container">
         <div className="hdr__row">
-          {/* LOGO */}
           <Link href={base} className="hdr__logo" aria-label="Dionis Insurance">
             <Image src="/logo_1.webp" alt="Dionis Insurance" width={56} height={56} priority />
           </Link>
 
-          {/* DESKTOP NAV (>=1200px) */}
           <nav className="hdr__nav" aria-label="Primary navigation">
             <Link href={base} className={cx("hdr__link", isActive(base) && "is-active")}>
               {t.home}
@@ -153,7 +144,6 @@ export default function Header({ lang }: { lang: Lang }) {
               {t.about}
             </Link>
 
-            {/* INSURANCE DROPDOWN */}
             <div className="hdr__dd" ref={desktopDdWrapRef}>
               <button
                 ref={desktopDdBtnRef}
@@ -164,7 +154,8 @@ export default function Header({ lang }: { lang: Lang }) {
                 aria-expanded={insuranceDesktopOpen}
                 aria-controls={ddMenuId}
               >
-                {t.insurances} <span className={cx("hdr__caret", insuranceDesktopOpen && "is-open")}>▾</span>
+                {t.insurances}{" "}
+                <span className={cx("hdr__caret", insuranceDesktopOpen && "is-open")}>▾</span>
               </button>
 
               {insuranceDesktopOpen && (
@@ -208,7 +199,6 @@ export default function Header({ lang }: { lang: Lang }) {
             </Link>
           </nav>
 
-          {/* RIGHT (desktop) */}
           <div className="hdr__right">
             <a href="tel:+77273573030" className="hdr__phone">
               +7 (727) 357-30-30
@@ -242,7 +232,6 @@ export default function Header({ lang }: { lang: Lang }) {
             </div>
           </div>
 
-          {/* MOBILE BURGER (<1200px) */}
           <button
             className="hdr__burger"
             onClick={() => setMenuOpen(true)}
@@ -261,7 +250,6 @@ export default function Header({ lang }: { lang: Lang }) {
         </div>
       </div>
 
-      {/* MOBILE MENU */}
       {menuOpen && (
         <div id="mobile-menu" className="mnav" role="dialog" aria-modal="true" aria-label="Mobile menu">
           <button className="mnav__overlay" aria-label="Close menu" onClick={() => setMenuOpen(false)} />
@@ -276,19 +264,11 @@ export default function Header({ lang }: { lang: Lang }) {
 
             <div className="mnav__content">
               <nav className="mnav__links" aria-label="Mobile navigation">
-                <Link
-                  href={base}
-                  className={cx("mnav__link", isActive(base) && "is-active")}
-                  onClick={() => setMenuOpen(false)}
-                >
+                <Link href={base} className={cx("mnav__link", isActive(base) && "is-active")} onClick={() => setMenuOpen(false)}>
                   {t.home}
                 </Link>
 
-                <Link
-                  href={`${base}/about`}
-                  className={cx("mnav__link", isActive(`${base}/about`) && "is-active")}
-                  onClick={() => setMenuOpen(false)}
-                >
+                <Link href={`${base}/about`} className={cx("mnav__link", isActive(`${base}/about`) && "is-active")} onClick={() => setMenuOpen(false)}>
                   {t.about}
                 </Link>
 
@@ -318,19 +298,11 @@ export default function Header({ lang }: { lang: Lang }) {
                   )}
                 </div>
 
-                <Link
-                  href={`${base}/blog`}
-                  className={cx("mnav__link", isActive(`${base}/blog`) && "is-active")}
-                  onClick={() => setMenuOpen(false)}
-                >
+                <Link href={`${base}/blog`} className={cx("mnav__link", isActive(`${base}/blog`) && "is-active")} onClick={() => setMenuOpen(false)}>
                   {t.blog}
                 </Link>
 
-                <Link
-                  href={`${base}/contacts`}
-                  className={cx("mnav__link", isActive(`${base}/contacts`) && "is-active")}
-                  onClick={() => setMenuOpen(false)}
-                >
+                <Link href={`${base}/contacts`} className={cx("mnav__link", isActive(`${base}/contacts`) && "is-active")} onClick={() => setMenuOpen(false)}>
                   {t.contacts}
                 </Link>
               </nav>
@@ -344,41 +316,23 @@ export default function Header({ lang }: { lang: Lang }) {
                   <a href="https://wa.me/77273573030" target="_blank" rel="noopener noreferrer" className="mnav__icon">
                     <Image src="/wa.webp" width={28} height={28} alt="WhatsApp" />
                   </a>
-                  <a
-                    href="https://t.me/Dionis_insurance_broker_bot"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mnav__icon"
-                  >
+                  <a href="https://t.me/Dionis_insurance_broker_bot" target="_blank" rel="noopener noreferrer" className="mnav__icon">
                     <Image src="/tg.webp" width={28} height={28} alt="Telegram" />
                   </a>
 
                   <div className="mnav__langs" aria-label="Language switcher">
-                    <Link
-                      href={buildLangUrl("ru")}
-                      className={cx("mnav__lang", lang === "ru" && "is-active")}
-                      onClick={() => setMenuOpen(false)}
-                    >
+                    <Link href={buildLangUrl("ru")} className={cx("mnav__lang", lang === "ru" && "is-active")} onClick={() => setMenuOpen(false)}>
                       RU
                     </Link>
-                    <Link
-                      href={buildLangUrl("kz")}
-                      className={cx("mnav__lang", lang === "kz" && "is-active")}
-                      onClick={() => setMenuOpen(false)}
-                    >
+                    <Link href={buildLangUrl("kz")} className={cx("mnav__lang", lang === "kz" && "is-active")} onClick={() => setMenuOpen(false)}>
                       KZ
                     </Link>
-                    <Link
-                      href={buildLangUrl("en")}
-                      className={cx("mnav__lang", lang === "en" && "is-active")}
-                      onClick={() => setMenuOpen(false)}
-                    >
+                    <Link href={buildLangUrl("en")} className={cx("mnav__lang", lang === "en" && "is-active")} onClick={() => setMenuOpen(false)}>
                       EN
                     </Link>
                   </div>
                 </div>
               </div>
-              {/* /mnav__box */}
             </div>
           </div>
         </div>

@@ -4,6 +4,10 @@
 import React, { useCallback, useMemo, useRef, useState, useId } from "react";
 import type { OsagoRfFormDictionary } from "@/dictionaries/osagoRfForm";
 
+// ✅ reCAPTCHA (v3 invisible)
+import { RecaptchaLazy } from "@/components/RecaptchaLazy";
+import { getRecaptchaToken } from "@/lib/recaptcha";
+
 // Имя/фамилия/отчество: кириллица + латиница, пробел, дефис, апостроф
 function formatPersonName(raw: string): string {
   return raw.replace(/[^A-Za-z\u0400-\u04FF\s'-]/g, "");
@@ -194,7 +198,9 @@ function FilePickerPro({
       const accepted: File[] = [];
       Array.from(files).forEach((file) => {
         const type = (file?.type || "").toLowerCase();
-        const forbidden = forbiddenTypes.some((t) => (t.endsWith("/") ? type.startsWith(t) : type === t));
+        const forbidden = forbiddenTypes.some((t) =>
+          t.endsWith("/") ? type.startsWith(t) : type === t
+        );
         if (forbidden) {
           alert(`${file.name}: ${dict.fileForbidden}`);
           return;
@@ -237,7 +243,12 @@ function FilePickerPro({
       />
 
       <div className="fp__row">
-        <button type="button" className="btn btn-secondary" onClick={openDialog} disabled={disabled}>
+        <button
+          type="button"
+          className="btn btn-secondary"
+          onClick={openDialog}
+          disabled={disabled}
+        >
           {dict.filePicker.choose}
         </button>
 
@@ -248,7 +259,12 @@ function FilePickerPro({
         </div>
 
         {valueFiles.length > 0 && (
-          <button type="button" className="link link--danger" onClick={clear} disabled={disabled}>
+          <button
+            type="button"
+            className="link link--danger"
+            onClick={clear}
+            disabled={disabled}
+          >
             {dict.filePicker.clear}
           </button>
         )}
@@ -312,14 +328,24 @@ export function OsagoOrderForm({ dict }: Props) {
 
   const todayLocal = useMemo(() => new Date(), []);
   const maxBirthDate = useMemo(
-    () => toLocalDateString(new Date(todayLocal.getFullYear() - 18, todayLocal.getMonth(), todayLocal.getDate())),
+    () =>
+      toLocalDateString(
+        new Date(todayLocal.getFullYear() - 18, todayLocal.getMonth(), todayLocal.getDate())
+      ),
     [todayLocal]
   );
   const maxPassDate = useMemo(() => toLocalDateString(todayLocal), [todayLocal]);
   const minStartDate = useMemo(() => toLocalDateString(todayLocal), [todayLocal]);
 
   const forbiddenTypes = useMemo(
-    () => ["application/zip", "application/x-rar-compressed", "application/x-7z-compressed", "application/x-tar", "audio/", "video/"],
+    () => [
+      "application/zip",
+      "application/x-rar-compressed",
+      "application/x-7z-compressed",
+      "application/x-tar",
+      "audio/",
+      "video/",
+    ],
     []
   );
 
@@ -328,6 +354,11 @@ export function OsagoOrderForm({ dict }: Props) {
       "image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     []
   );
+
+  // ✅ reCAPTCHA config (v3 = invisible, подтверждать “галочкой” нечего)
+  const recaptchaSiteKey = (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "").trim();
+  const recaptchaEnabled = Boolean(recaptchaSiteKey) && process.env.NODE_ENV === "production";
+  const [recaptchaReady, setRecaptchaReady] = useState(!recaptchaEnabled);
 
   const getLabelForElement = useCallback((root: HTMLElement, el: Element): string => {
     const aria = (el as HTMLElement).getAttribute?.("aria-label")?.trim();
@@ -352,7 +383,9 @@ export function OsagoOrderForm({ dict }: Props) {
       const errors: string[] = [];
 
       const fields = Array.from(
-        root.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>("input, select, textarea")
+        root.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
+          "input, select, textarea"
+        )
       ).filter((el) => {
         if (el.disabled) return false;
 
@@ -603,6 +636,23 @@ export function OsagoOrderForm({ dict }: Props) {
         }
       }
 
+      // ✅ reCAPTCHA token (v3 invisible)
+      if (recaptchaEnabled) {
+        if (!recaptchaReady) {
+          setFormStatus("error");
+          setFormMessage("Инициализация защиты от роботов не завершена. Повторите попытку через секунду.");
+          return;
+        }
+
+        const token = await getRecaptchaToken(recaptchaSiteKey, "osago_rf_order");
+        if (!token) {
+          setFormStatus("error");
+          setFormMessage("Не удалось подтвердить, что вы не робот. Обновите страницу и попробуйте ещё раз.");
+          return;
+        }
+        fd.set("recaptchaToken", token);
+      }
+
       const res = await fetch("/api/osago-rf-order", { method: "POST", body: fd });
 
       const data: unknown = await res.json().catch(() => null);
@@ -648,6 +698,13 @@ export function OsagoOrderForm({ dict }: Props) {
 
   return (
     <section id="osago-rf-order" className="gc-form">
+      {/* ✅ reCAPTCHA script loader (v3 invisible) */}
+      <RecaptchaLazy
+        siteKey={recaptchaSiteKey}
+        enabled={recaptchaEnabled}
+        onReady={() => setRecaptchaReady(true)}
+      />
+
       <div className="card card--pad">
         <div className="gc-form__head">
           <h2 className="gc-form__title">{dict.title}</h2>
@@ -790,7 +847,9 @@ export function OsagoOrderForm({ dict }: Props) {
 
             <div className="gc-block">
               <div className="gc-block__hd">
-                <h3 className="gc-block__title">{isCompany ? dict.company.legend : dict.person.legend}</h3>
+                <h3 className="gc-block__title">
+                  {isCompany ? dict.company.legend : dict.person.legend}
+                </h3>
               </div>
 
               {isCompany ? (
@@ -1059,7 +1118,12 @@ export function OsagoOrderForm({ dict }: Props) {
                   {dict.vehicles.description}
                 </p>
 
-                <button type="button" className={["link", isBusy ? "is-disabled" : ""].join(" ")} onClick={handleAddVehicle} disabled={isBusy}>
+                <button
+                  type="button"
+                  className={["link", isBusy ? "is-disabled" : ""].join(" ")}
+                  onClick={handleAddVehicle}
+                  disabled={isBusy}
+                >
                   {dict.vehicles.addButton}
                 </button>
               </div>
@@ -1077,7 +1141,12 @@ export function OsagoOrderForm({ dict }: Props) {
                         </p>
 
                         {vehicleBlocks.length > 1 && (
-                          <button type="button" onClick={() => handleRemoveVehicle(vehicleId)} className={["link link--danger", isBusy ? "is-disabled" : ""].join(" ")} disabled={isBusy}>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveVehicle(vehicleId)}
+                            className={["link link--danger", isBusy ? "is-disabled" : ""].join(" ")}
+                            disabled={isBusy}
+                          >
                             {dict.vehicles.removeButton}
                           </button>
                         )}
@@ -1213,7 +1282,10 @@ export function OsagoOrderForm({ dict }: Props) {
                             setTimeout(() => refreshStep2Errors(), 0);
                           }}
                         />
-                        <label htmlFor={`${uid}-driversLimited-${vehicleId}`} className="gc-checkrow__label">
+                        <label
+                          htmlFor={`${uid}-driversLimited-${vehicleId}`}
+                          className="gc-checkrow__label"
+                        >
                           {dict.vehicles.driversLimitedLabel}
                         </label>
                       </div>
@@ -1223,7 +1295,12 @@ export function OsagoOrderForm({ dict }: Props) {
                           <div className="row-between">
                             <p className="panel-muted__title">{dict.vehicles.driversTitle}</p>
 
-                            <button type="button" className="btn btn-secondary" onClick={() => addDriver(vehicleId)} disabled={isBusy}>
+                            <button
+                              type="button"
+                              className="btn btn-secondary"
+                              onClick={() => addDriver(vehicleId)}
+                              disabled={isBusy}
+                            >
                               {dict.vehicles.addDriverButton}
                             </button>
                           </div>
@@ -1253,7 +1330,10 @@ export function OsagoOrderForm({ dict }: Props) {
 
                                     <div className="grid grid-2 mt-4">
                                       <div className="field">
-                                        <label htmlFor={`${uid}-vehicles_${idx}_drivers_${j}_fullName`} className="lbl">
+                                        <label
+                                          htmlFor={`${uid}-vehicles_${idx}_drivers_${j}_fullName`}
+                                          className="lbl"
+                                        >
                                           {dict.vehicles.driverFullName} #{j + 1}
                                           <RequiredMark />
                                         </label>
@@ -1272,7 +1352,10 @@ export function OsagoOrderForm({ dict }: Props) {
                                       </div>
 
                                       <div className="field">
-                                        <label htmlFor={`${uid}-vehicles_${idx}_drivers_${j}_experienceYears`} className="lbl">
+                                        <label
+                                          htmlFor={`${uid}-vehicles_${idx}_drivers_${j}_experienceYears`}
+                                          className="lbl"
+                                        >
                                           {dict.vehicles.driverExperienceYears}
                                           <RequiredMark />
                                         </label>
@@ -1323,18 +1406,35 @@ export function OsagoOrderForm({ dict }: Props) {
               </div>
 
               {formStatus !== "idle" && (
-                <div id={statusId} role="status" aria-live="polite" className={hasSuccess ? "status status--ok" : hasError ? "status status--err" : "status"}>
+                <div
+                  id={statusId}
+                  role="status"
+                  aria-live="polite"
+                  className={
+                    hasSuccess ? "status status--ok" : hasError ? "status status--err" : "status"
+                  }
+                >
                   {formStatus === "loading" ? dict.loading : formMessage || dict.submit}
                 </div>
               )}
 
               <div className="row-between mt-4 gc-actions">
-                <button type="button" className={["btn btn-secondary", isBusy ? "is-disabled" : ""].join(" ")} onClick={goStep1} disabled={isBusy}>
+                <button
+                  type="button"
+                  className={["btn btn-secondary", isBusy ? "is-disabled" : ""].join(" ")}
+                  onClick={goStep1}
+                  disabled={isBusy}
+                >
                   ← {dict.buttons.back}
                 </button>
 
                 <div className="row-center gc-actions__right">
-                  <button type="button" className={["btn btn-secondary", isBusy ? "is-disabled" : ""].join(" ")} onClick={handleAddVehicle} disabled={isBusy}>
+                  <button
+                    type="button"
+                    className={["btn btn-secondary", isBusy ? "is-disabled" : ""].join(" ")}
+                    onClick={handleAddVehicle}
+                    disabled={isBusy}
+                  >
                     {dict.vehicles.addButton}
                   </button>
 
