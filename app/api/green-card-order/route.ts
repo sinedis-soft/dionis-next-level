@@ -2,11 +2,10 @@
 import { Buffer } from "buffer";
 import nodemailer from "nodemailer";
 
-export const runtime = "nodejs"; // важно: нужен node, не edge
+export const runtime = "nodejs";
 
 const BITRIX_BASE = process.env.BITRIX_WEBHOOK_URL;
 
-// задержка
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -23,22 +22,18 @@ function getErrorMessage(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
 }
 
-// универсальный вызов Bitrix с retry + timeout + mandatory delay
 async function bitrix<T = unknown>(
   method: string,
   payload: BitrixPayload,
   attempt = 1
 ): Promise<T> {
-  if (!BITRIX_BASE) {
-    throw new Error("BITRIX_WEBHOOK_URL is not set");
-  }
+  if (!BITRIX_BASE) throw new Error("BITRIX_WEBHOOK_URL is not set");
 
   const MAX_ATTEMPTS = 3;
 
   // обязательная пауза (Bitrix иначе режет соединение)
   await sleep(1500);
 
-  // тайм-аут на сам запрос (иногда Bitrix молчит 20+ секунд)
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 15000);
 
@@ -78,7 +73,6 @@ async function bitrix<T = unknown>(
         `Bitrix ${method} failed on attempt ${attempt}, retrying...`,
         getErrorMessage(err)
       );
-
       await sleep(1500 * attempt);
       return bitrix<T>(method, payload, attempt + 1);
     }
@@ -95,7 +89,6 @@ function parseDateToDDMMYYYY(dateStr: string | null): string | null {
   return `${d}.${m}.${y}`;
 }
 
-// Bitrix для дат контакта обычно принимает YYYY-MM-DD.
 function parseDateISO(dateStr: string | null): string | null {
   if (!dateStr) return null;
   const s = String(dateStr).trim();
@@ -103,7 +96,6 @@ function parseDateISO(dateStr: string | null): string | null {
   return s;
 }
 
-// конвертация File → [filename, base64] для fileData
 async function fileToBitrixFileData(file: File): Promise<[string, string]> {
   const arrayBuffer = await file.arrayBuffer();
   const base64 = Buffer.from(arrayBuffer).toString("base64");
@@ -113,7 +105,7 @@ async function fileToBitrixFileData(file: File): Promise<[string, string]> {
 type VehicleInput = {
   plate?: string;
   type?: string;
-  startDate?: string | null; // DD.MM.YYYY (для сделки)
+  startDate?: string | null;
   period?: string;
   techPassportFiles: File[];
 };
@@ -168,16 +160,31 @@ function buildMailer(): Mailer | null {
   };
 }
 
+/**
+ * reCAPTCHA: в PROD при наличии RECAPTCHA_SECRET_KEY:
+ * - token обязателен
+ * - ошибки verify считаем FAIL (а не ok:true)
+ * - score порог по умолчанию 0.5
+ * - (опционально) hostname check
+ */
 async function verifyRecaptchaIfNeeded(opts: {
   isProd: boolean;
   token: string | null;
-}): Promise<{ ok: boolean }> {
-  const { isProd, token } = opts;
+  minScore?: number;
+  expectedHostnames?: string[]; // напр. ["dionis-insurance.kz", "www.dionis-insurance.kz"]
+}): Promise<{ ok: boolean; reason?: string }> {
+  const { isProd, token, minScore = 0.5, expectedHostnames } = opts;
   const secret = process.env.RECAPTCHA_SECRET_KEY;
 
   if (!isProd) return { ok: true };
-  if (!secret) return { ok: true };
-  if (!token) return { ok: true };
+
+  // В проде это должна быть ошибка конфигурации (иначе защиты нет)
+  if (!secret) {
+    console.error("reCAPTCHA: RECAPTCHA_SECRET_KEY is not set in production");
+    return { ok: false, reason: "secret_missing" };
+  }
+
+  if (!token) return { ok: false, reason: "token_missing" };
 
   try {
     const verifyRes = await fetch(
@@ -191,20 +198,39 @@ async function verifyRecaptchaIfNeeded(opts: {
       }
     );
 
+    if (!verifyRes.ok) {
+      console.error("reCAPTCHA: verify http error", verifyRes.status);
+      return { ok: false, reason: "verify_http_error" };
+    }
+
     const verifyData = (await verifyRes.json()) as {
       success?: boolean;
       score?: number;
+      hostname?: string;
+      action?: string;
+      "error-codes"?: string[];
     };
 
-    if (!verifyData.success) return { ok: false };
-    if (typeof verifyData.score === "number" && verifyData.score < 0.3) {
-      return { ok: false };
+    if (!verifyData.success) {
+      console.error("reCAPTCHA: not success", verifyData["error-codes"]);
+      return { ok: false, reason: "not_success" };
+    }
+
+    if (expectedHostnames?.length) {
+      const host = String(verifyData.hostname || "").toLowerCase();
+      const okHost = expectedHostnames.some((h) => host === h.toLowerCase());
+      if (!okHost) return { ok: false, reason: `bad_hostname_${host || "empty"}` };
+    }
+
+    // v3: score может быть undefined (если не v3) — тогда не режем
+    if (typeof verifyData.score === "number" && verifyData.score < minScore) {
+      return { ok: false, reason: `low_score_${verifyData.score}` };
     }
 
     return { ok: true };
   } catch (e) {
     console.error("reCAPTCHA verification error:", e);
-    return { ok: true }; // при ошибке — пропускаем, как у тебя
+    return { ok: false, reason: "verify_exception" };
   }
 }
 
@@ -214,26 +240,28 @@ export async function POST(req: Request): Promise<Response> {
 
     // --- anti-bot honeypot ---
     const website = String(formData.get("website") || "").trim();
-    if (website) {
-      return Response.json({ ok: true }, { status: 200 });
-    }
+    if (website) return Response.json({ ok: true }, { status: 200 });
 
     // --- reCAPTCHA ---
     const isProd = process.env.NODE_ENV === "production";
     const recaptchaToken =
       String(formData.get("recaptchaToken") || "").trim() || null;
+
     const recaptcha = await verifyRecaptchaIfNeeded({
       isProd,
       token: recaptchaToken,
+      minScore: 0.5,
+      expectedHostnames: ["dionis-insurance.kz", "www.dionis-insurance.kz"],
     });
+
     if (!recaptcha.ok) {
       return Response.json(
-        { ok: false, message: "Подтвердите, что вы не робот." },
+        { ok: false, message: "Подтвердите, что вы не робот.", reason: recaptcha.reason },
         { status: 400 }
       );
     }
 
-    // --- 1. Контакты и базовые данные ---
+    // --- 1. Контакты ---
     const contact_email = String(formData.get("contact_email") || "").trim();
     const contact_firstNameLat = String(
       formData.get("contact_firstNameLat") || ""
@@ -250,8 +278,13 @@ export async function POST(req: Request): Promise<Response> {
       );
     }
 
+    // ✅ FIX: поддержка обоих имён чекбокса
     const order_isCompany =
-      String(formData.get("order-isCompany") || "") === "on";
+      String(
+        formData.get("order_isCompany") ??
+          formData.get("order-isCompany") ??
+          ""
+      ) === "on";
 
     const company_bin = String(formData.get("company_bin") || "").trim();
     const company_email = String(formData.get("company_email") || "").trim();
@@ -260,7 +293,7 @@ export async function POST(req: Request): Promise<Response> {
       formData.get("insurance_territory") || ""
     ).trim();
 
-    // --- 1b. Данные физлица (для обновления контакта) ---
+    // --- 1b. Данные физлица ---
     const person_middleName = String(
       formData.get("person_middleName") || ""
     ).trim();
@@ -271,14 +304,14 @@ export async function POST(req: Request): Promise<Response> {
         ? "45"
         : person_gender_raw === "female"
         ? "47"
-        : person_gender_raw; // если уже ID
+        : person_gender_raw;
 
     const person_birthDate = parseDateISO(
       String(formData.get("person_birthDate") || "") || null
     );
 
     const person_idNumber = String(formData.get("person_idNumber") || "").trim();
-    const person_country = String(formData.get("person_country") || "").trim(); // enum ID
+    const person_country = String(formData.get("person_country") || "").trim();
     const person_address = String(formData.get("person_address") || "").trim();
 
     const person_passportNumber = String(
@@ -294,7 +327,14 @@ export async function POST(req: Request): Promise<Response> {
       String(formData.get("person_passportValidTo") || "") || null
     );
 
-    // UTM и URL страницы (если переданы)
+    // ✅ файлы паспорта (если форма присылает person_passportFiles)
+    const person_passportFiles: File[] = [];
+    for (const [k, v] of formData.entries()) {
+      if (k === "person_passportFiles" && v instanceof File && v.size > 0) {
+        person_passportFiles.push(v);
+      }
+    }
+
     const pageUrlRaw = String(formData.get("pageUrl") || "").trim();
     const pageUrl = pageUrlRaw || undefined;
 
@@ -308,12 +348,11 @@ export async function POST(req: Request): Promise<Response> {
       }
     }
 
-    // meta (IP / UA)
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     const userAgent = req.headers.get("user-agent") || "unknown";
 
-    // --- 2. Парсим транспортные средства ---
+    // --- 2. ТС ---
     const vehiclesMap = new Map<number, VehicleInput>();
 
     for (const [key, value] of formData.entries()) {
@@ -330,9 +369,7 @@ export async function POST(req: Request): Promise<Response> {
       const v = vehiclesMap.get(index)!;
 
       if (field === "techPassportFiles") {
-        if (value instanceof File && value.size > 0) {
-          v.techPassportFiles.push(value);
-        }
+        if (value instanceof File && value.size > 0) v.techPassportFiles.push(value);
       } else if (field === "startDate") {
         v.startDate = parseDateToDDMMYYYY(String(value));
       } else {
@@ -351,7 +388,6 @@ export async function POST(req: Request): Promise<Response> {
       );
     }
 
-    // Минимальная серверная проверка (чтобы не прилетали пустые ТС)
     for (const [idx, v] of vehicles.entries()) {
       const missing =
         !v.plate ||
@@ -372,16 +408,12 @@ export async function POST(req: Request): Promise<Response> {
       }
     }
 
-    // --- 3. Контакт: поиск по EMAIL, либо создание ---
+    // --- 3. Контакт ---
     let contactId: number | null = null;
 
     const foundContacts = await bitrix<Array<{ ID: string }>>(
       "crm.contact.list",
-      {
-        filter: { EMAIL: contact_email },
-        select: ["ID"],
-        start: 0,
-      }
+      { filter: { EMAIL: contact_email }, select: ["ID"], start: 0 }
     );
 
     if (Array.isArray(foundContacts) && foundContacts.length > 0) {
@@ -391,9 +423,7 @@ export async function POST(req: Request): Promise<Response> {
         fields: {
           NAME: contact_firstNameLat,
           LAST_NAME: contact_lastNameLat,
-          PHONE: contact_phone
-            ? [{ VALUE: contact_phone, VALUE_TYPE: "WORK" }]
-            : [],
+          PHONE: contact_phone ? [{ VALUE: contact_phone, VALUE_TYPE: "WORK" }] : [],
           EMAIL: [{ VALUE: contact_email, VALUE_TYPE: "WORK" }],
         },
       });
@@ -404,33 +434,24 @@ export async function POST(req: Request): Promise<Response> {
       throw new Error("Не удалось определить ID контакта (search/add)");
     }
 
-    // --- 3b. Обновление контакта (физлицо) ---
+    // --- 3b. Контакт update (физлицо) ---
     if (!order_isCompany) {
       const contactUpdateFields: Record<string, unknown> = {};
 
       if (person_middleName) contactUpdateFields.SECOND_NAME = person_middleName;
       if (person_birthDate) contactUpdateFields.BIRTHDATE = person_birthDate;
 
-      if (person_idNumber)
-        contactUpdateFields.UF_CRM_1694347707628 = person_idNumber;
-
-      if (person_gender)
-        contactUpdateFields.UF_CRM_1686138296718 = person_gender;
-
-      if (person_country)
-        contactUpdateFields.UF_CRM_1686138527330 = person_country;
-
+      if (person_idNumber) contactUpdateFields.UF_CRM_1694347707628 = person_idNumber;
+      if (person_gender) contactUpdateFields.UF_CRM_1686138296718 = person_gender;
+      if (person_country) contactUpdateFields.UF_CRM_1686138527330 = person_country;
       if (person_address) contactUpdateFields.ADDRESS = person_address;
 
       if (person_passportNumber)
         contactUpdateFields.UF_CRM_CONTACT_1686145698592 = person_passportNumber;
-
       if (person_passportIssuer)
         contactUpdateFields.UF_CRM_1694347754648 = person_passportIssuer;
-
       if (person_passportIssuedAt)
         contactUpdateFields.UF_CRM_1694347737519 = person_passportIssuedAt;
-
       if (person_passportValidTo)
         contactUpdateFields.UF_CRM_1696422396430 = person_passportValidTo;
 
@@ -442,27 +463,20 @@ export async function POST(req: Request): Promise<Response> {
       }
     }
 
-    // --- 4. Компания: либо по UF_CRM_COMPANY_1692911328252, либо фикс ID=1817 ---
+    // --- 4. Компания ---
     let companyId: number;
 
     if (order_isCompany) {
       if (!company_bin) {
         return Response.json(
-          {
-            ok: false,
-            message: "Отмечено 'договор на юрлицо', но не указан БИН компании.",
-          },
+          { ok: false, message: "Отмечено 'договор на юрлицо', но не указан БИН компании." },
           { status: 400 }
         );
       }
 
       const foundCompanies = await bitrix<Array<{ ID: string }>>(
         "crm.company.list",
-        {
-          filter: { UF_CRM_COMPANY_1692911328252: company_bin },
-          select: ["ID"],
-          start: 0,
-        }
+        { filter: { UF_CRM_COMPANY_1692911328252: company_bin }, select: ["ID"], start: 0 }
       );
 
       if (Array.isArray(foundCompanies) && foundCompanies.length > 0) {
@@ -472,29 +486,33 @@ export async function POST(req: Request): Promise<Response> {
           fields: {
             TITLE: company_bin,
             UF_CRM_COMPANY_1692911328252: company_bin,
-            EMAIL: company_email
-              ? [{ VALUE: company_email, VALUE_TYPE: "WORK" }]
-              : [],
+            EMAIL: company_email ? [{ VALUE: company_email, VALUE_TYPE: "WORK" }] : [],
           },
         });
         companyId = Number(newCompanyId);
       }
     } else {
       companyId = 1817;
-
       await bitrix<boolean>("crm.contact.update", {
         id: contactId,
         fields: { COMPANY_ID: companyId },
       });
     }
 
-    // --- 5. Письмо: готовим один transporter на весь запрос ---
+    // --- 5. Почта (НЕ ждём отправку) ---
     const mailer = buildMailer();
     const mailTo = process.env.MAIL_TO || "info@ibb.expert";
     const mailFrom =
       process.env.MAIL_FROM || process.env.MAIL_USER || "no-reply@localhost";
 
-    // --- 6. Сделки по каждому авто + письмо по каждому авто ---
+    // если env не настроены — один лог на запрос, а не на каждый авто
+    if (!mailer) {
+      console.error(
+        "Mail env vars are not fully set (MAIL_HOST/MAIL_USER/MAIL_PASS/MAIL_FROM)"
+      );
+    }
+
+    // --- 6. Сделки ---
     const createdDeals: number[] = [];
 
     const commonCommentParts: string[] = [];
@@ -510,6 +528,20 @@ export async function POST(req: Request): Promise<Response> {
         : `Договор на физлицо (компания ID=1817)`
     );
 
+    // паспортные метаданные
+    if (!order_isCompany) {
+      commonCommentParts.push(
+        [
+          "Паспорт (данные):",
+          `- Номер: ${person_passportNumber || "-"}`,
+          `- Кем выдан: ${person_passportIssuer || "-"}`,
+          `- Дата выдачи: ${person_passportIssuedAt || "-"}`,
+          `- Действителен до: ${person_passportValidTo || "-"}`,
+          `- Файлов паспорта: ${person_passportFiles.length}`,
+        ].join("\n")
+      );
+    }
+
     const commonComment = commonCommentParts.join("\n");
 
     for (let i = 0; i < vehicles.length; i++) {
@@ -520,14 +552,11 @@ export async function POST(req: Request): Promise<Response> {
         CONTACT_ID: contactId,
         COMPANY_ID: companyId,
 
-        // vehicle fields
-
         UF_CRM_1686152485641: vehicle.plate || null,
         UF_CRM_1686152567597: vehicle.type || null,
         UF_CRM_1686152209741: vehicle.period || null,
         UF_CRM_1686152149204: vehicle.startDate || null,
 
-        // common deal fields (green card)
         UF_CRM_1690539097: 429,
         UF_CRM_1686152306664: 385,
         UF_CRM_1700656576088: insurance_territory || null,
@@ -537,21 +566,30 @@ export async function POST(req: Request): Promise<Response> {
         COMMENTS: commonComment,
       };
 
-      if (vehicle.techPassportFiles.length > 0) {
-        const filesData = await Promise.all(
-          vehicle.techPassportFiles.map((f) => fileToBitrixFileData(f))
-        );
+      // техпаспорт авто
+      const techFilesData = await Promise.all(
+        vehicle.techPassportFiles.map((f) => fileToBitrixFileData(f))
+      );
 
-        dealFields.UF_CRM_1686154280439 = filesData.map((fd) => ({
-          fileData: fd,
-        }));
+      const allFiles: Array<{ fileData: [string, string] }> = techFilesData.map((fd) => ({
+        fileData: fd,
+      }));
+
+      // паспорт физлица — в то же файловое поле сделки
+      if (!order_isCompany && person_passportFiles.length > 0) {
+        const passFilesData = await Promise.all(
+          person_passportFiles.map((f) => fileToBitrixFileData(f))
+        );
+        allFiles.push(...passFilesData.map((fd) => ({ fileData: fd })));
       }
+
+      dealFields.UF_CRM_1686154280439 = allFiles;
 
       const dealIdStr = await bitrix<string>("crm.deal.add", { fields: dealFields });
       const dealId = Number(dealIdStr);
       createdDeals.push(dealId);
 
-      // --- ПИСЬМО: по каждому авто отдельно ---
+      // --- email: запускаем и НЕ ждём ---
       if (mailer) {
         const subject = `Зеленая карта - ДИОНИС - новая заявка (сделка #${dealId}) - ${
           vehicle.plate || "ТС"
@@ -564,12 +602,19 @@ export async function POST(req: Request): Promise<Response> {
           `Контакт: ${contact_firstNameLat} ${contact_lastNameLat}`,
           `Email: ${contact_email}`,
           contact_phone ? `Телефон: ${contact_phone}` : `Телефон: -`,
-          order_isCompany
-            ? `Юрлицо (БИН): ${company_bin}`
-            : `Физлицо (компания ID=1817)`,
-          `Contact ID: ${contactId}`,
-          `Company ID: ${companyId}`,
+          order_isCompany ? `Юрлицо (БИН): ${company_bin}` : `Физлицо (компания ID=1817)`,
           "",
+          !order_isCompany
+            ? [
+                "Паспорт (данные):",
+                `- Номер: ${person_passportNumber || "-"}`,
+                `- Кем выдан: ${person_passportIssuer || "-"}`,
+                `- Дата выдачи: ${person_passportIssuedAt || "-"}`,
+                `- Действителен до: ${person_passportValidTo || "-"}`,
+                `- Файлов паспорта: ${person_passportFiles.length}`,
+                "",
+              ].join("\n")
+            : "",
           "Параметры страхования:",
           `- Территория: ${insurance_territory || "-"}`,
           "",
@@ -585,33 +630,27 @@ export async function POST(req: Request): Promise<Response> {
           `UTM: ${utm ? safeJsonStringify(utm) : "none"}`,
           `IP: ${ip}`,
           `User-Agent: ${userAgent}`,
-        ].join("\n");
+        ]
+          .filter(Boolean)
+          .join("\n");
 
         const html = `
           <div style="max-width: 600px; margin: 0 auto; background-color: #FFFFFF; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-            <img
-              src="https://dionis-insurance.com/logo_1.webp"
-              width="56"
-              height="56"
-              alt="Dionis Insurance"
-              style="display:block; border:0; outline:none; text-decoration:none;"
-            >
+            <img src="https://dionis-insurance.com/logo_1.webp" width="56" height="56" alt="Dionis Insurance"
+              style="display:block; border:0; outline:none; text-decoration:none;">
             <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">
               Новая заявка на ЗЕЛЕНУЮ КАРТУ с сайта DIONIS Insurance
             </h2>
+
             <p style="font-size: 14px; line-height: 1.6; color: #707070; margin: 0 0 20px;">
               <strong>Сделка:</strong> #${escapeHtml(String(dealId))}<br>
-              <strong>Авто:</strong> ${escapeHtml(String(i + 1))} из ${escapeHtml(
-                String(vehicles.length)
-              )}
+              <strong>Авто:</strong> ${escapeHtml(String(i + 1))} из ${escapeHtml(String(vehicles.length))}
             </p>
 
             <div style="margin-top: 12px; padding: 12px; border: 1px solid #eee; border-radius: 8px;">
               <h3 style="margin: 0 0 8px; font-size: 14px;">Контакт</h3>
               <div style="font-size: 13px; color: #333;">
-                <strong>${escapeHtml(contact_firstNameLat)} ${escapeHtml(
-          contact_lastNameLat
-        )}</strong><br>
+                <strong>${escapeHtml(contact_firstNameLat)} ${escapeHtml(contact_lastNameLat)}</strong><br>
                 Email: ${escapeHtml(contact_email)}<br>
                 Телефон: ${escapeHtml(contact_phone || "-")}<br>
                 ${
@@ -623,6 +662,23 @@ export async function POST(req: Request): Promise<Response> {
                 Company ID: ${escapeHtml(String(companyId))}
               </div>
             </div>
+
+            ${
+              !order_isCompany
+                ? `
+              <div style="margin-top: 12px; padding: 12px; border: 1px solid #eee; border-radius: 8px;">
+                <h3 style="margin: 0 0 8px; font-size: 14px;">Паспорт (данные)</h3>
+                <div style="font-size: 13px; color: #333;">
+                  Номер: <strong>${escapeHtml(person_passportNumber || "-")}</strong><br>
+                  Кем выдан: ${escapeHtml(person_passportIssuer || "-")}<br>
+                  Дата выдачи: ${escapeHtml(person_passportIssuedAt || "-")}<br>
+                  Действителен до: ${escapeHtml(person_passportValidTo || "-")}<br>
+                  Файлов паспорта: ${escapeHtml(String(person_passportFiles.length))}
+                </div>
+              </div>
+            `
+                : ""
+            }
 
             <div style="margin-top: 12px; padding: 12px; border: 1px solid #eee; border-radius: 8px;">
               <h3 style="margin: 0 0 8px; font-size: 14px;">Параметры страхования</h3>
@@ -638,46 +694,23 @@ export async function POST(req: Request): Promise<Response> {
                 Тип: ${escapeHtml(vehicle.type || "-")}<br>
                 Дата начала: ${escapeHtml(vehicle.startDate || "-")}<br>
                 Период: ${escapeHtml(vehicle.period || "-")}<br>
-                Файлов техпаспорта: ${escapeHtml(
-                  String(vehicle.techPassportFiles.length)
-                )}
+                Файлов техпаспорта: ${escapeHtml(String(vehicle.techPassportFiles.length))}
               </div>
             </div>
 
-            <div style="font-size: 14px; line-height: 1.6; color: #707070; margin: 0 0 20px;">
+            <div style="font-size: 14px; line-height: 1.6; color: #707070; margin: 12px 0 0;">
               <h3 style="margin: 0 0 8px; font-size: 14px; color: #111;">Мета</h3>
               Страница: ${escapeHtml(pageUrl || "unknown")}<br>
               UTM: ${escapeHtml(utm ? safeJsonStringify(utm) : "none")}<br>
               IP: ${escapeHtml(ip)}<br>
               User-Agent: ${escapeHtml(userAgent)}
             </div>
-
-            <h2 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #C19A6B; margin: 0 0 20px;">
-              С уважением, Денис БОРОВОЙ
-            </h2>
-            <span style="color: #707070;">директор<br>
-              <a href="http://dionis-insurance.kz" target="_blank" style="color: #C19A6B; text-decoration: none;">
-                ТОО страховой брокер ДИОНИС
-              </a>
-            </span>
           </div>
         `;
 
-        try {
-          await mailer.send({
-            from: mailFrom,
-            to: mailTo,
-            subject,
-            text,
-            html,
-          });
-        } catch (e) {
-          console.error("Mail send error:", e);
-        }
-      } else {
-        console.error(
-          "Mail env vars are not fully set (MAIL_HOST/MAIL_USER/MAIL_PASS/MAIL_FROM)"
-        );
+        void mailer
+          .send({ from: mailFrom, to: mailTo, subject, text, html })
+          .catch((e) => console.error("Mail send error:", e));
       }
     }
 
