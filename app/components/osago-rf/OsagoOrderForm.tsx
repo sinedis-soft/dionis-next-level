@@ -1,25 +1,29 @@
 // components/osago-rf/OsagoOrderForm.tsx
 "use client";
 
-import React, { useCallback, useMemo, useRef, useState, useId } from "react";
+import React, {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useId,
+  type FormEvent,
+} from "react";
 import type { OsagoRfFormDictionary } from "@/dictionaries/osagoRfForm";
+import FilePicker from "@/components/FilePicker";
 
-// ✅ reCAPTCHA (v3 invisible)
 import { RecaptchaLazy } from "@/components/RecaptchaLazy";
 import { getRecaptchaToken } from "@/lib/recaptcha";
 
-// Имя/фамилия/отчество: кириллица + латиница, пробел, дефис, апостроф
 function formatPersonName(raw: string): string {
   return raw.replace(/[^A-Za-z\u0400-\u04FF\s'-]/g, "");
 }
 
-// Телефон: только цифры, с плюсом в начале
 function formatPhone(raw: string): string {
   const digits = raw.replace(/\D/g, "");
   return digits ? "+" + digits : "";
 }
 
-// E-mail
 function formatEmail(raw: string): string {
   let value = raw.replace(/\s/g, "");
   value = value.replace(/[^A-Za-z0-9.@_-]/g, "");
@@ -44,6 +48,7 @@ function formatLatinAlnum(raw: string, maxLength = 20): string {
 type Props = { dict: OsagoRfFormDictionary };
 type FormStatus = "idle" | "loading" | "success" | "error";
 type Step = 1 | 2;
+type Driver = { id: number };
 
 function RequiredMark() {
   return (
@@ -58,6 +63,13 @@ function tpl(s: string, params: Record<string, string>) {
   return s.replace(/\{(\w+)\}/g, (_, k) => params[k] ?? "");
 }
 
+function safeCssEscape(value: string): string {
+  const esc = (globalThis as { CSS?: { escape?: (v: string) => string } })?.CSS
+    ?.escape;
+  if (typeof esc === "function") return esc(value);
+  return value.replace(/["\\]/g, "\\$&");
+}
+
 function ErrorSummary({ title, items }: { title: string; items: string[] }) {
   if (!items.length) return null;
   return (
@@ -65,7 +77,7 @@ function ErrorSummary({ title, items }: { title: string; items: string[] }) {
       <p className="err-box__title">{title}</p>
       <ul className="err-box__list">
         {items.map((m, i) => (
-          <li key={i}>{m}</li>
+          <li key={`${m}-${i}`}>{m}</li>
         ))}
       </ul>
     </div>
@@ -120,8 +132,8 @@ function StepCrumbs({
               step === 2
                 ? "steps__btn--active"
                 : canAttemptStep2
-                ? "steps__btn--idle"
-                : "steps__btn--disabled",
+                  ? "steps__btn--idle"
+                  : "steps__btn--disabled",
               isBusy ? "is-disabled" : "",
             ].join(" ")}
             onClick={() => {
@@ -144,143 +156,16 @@ function StepCrumbs({
 
 function prefersReducedMotion(): boolean {
   if (typeof window === "undefined") return false;
-  return window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+  return (
+    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false
+  );
 }
-
-type Driver = { id: number };
 
 function toLocalDateString(date: Date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
-}
-
-function cssEscapeFallback(value: string): string {
-  const css = (globalThis as any).CSS;
-  if (css && typeof css.escape === "function") return css.escape(value);
-  return value.replace(/["\\]/g, "\\$&");
-}
-
-/** FilePickerPro: НЕ участвует в native validation, ошибки контролируем сами */
-function FilePickerPro({
-  dict,
-  id,
-  name,
-  label,
-  hint,
-  required,
-  multiple,
-  accept,
-  disabled,
-  forbiddenTypes,
-  valueFiles,
-  onChangeFiles,
-}: {
-  dict: OsagoRfFormDictionary;
-  id: string;
-  name: string;
-  label: string;
-  hint?: string;
-  required?: boolean;
-  multiple?: boolean;
-  accept?: string;
-  disabled?: boolean;
-  forbiddenTypes: string[];
-  valueFiles: File[];
-  onChangeFiles: (files: File[]) => void;
-}) {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
-  const validateAndNormalize = useCallback(
-    (files: FileList | null): File[] => {
-      if (!files) return [];
-      const accepted: File[] = [];
-      Array.from(files).forEach((file) => {
-        const type = (file?.type || "").toLowerCase();
-        const forbidden = forbiddenTypes.some((t) =>
-          t.endsWith("/") ? type.startsWith(t) : type === t
-        );
-        if (forbidden) {
-          alert(`${file.name}: ${dict.fileForbidden}`);
-          return;
-        }
-        accepted.push(file);
-      });
-      return accepted;
-    },
-    [dict.fileForbidden, forbiddenTypes]
-  );
-
-  const openDialog = useCallback(() => {
-    if (disabled) return;
-    inputRef.current?.click();
-  }, [disabled]);
-
-  const clear = useCallback(() => {
-    if (disabled) return;
-    if (inputRef.current) inputRef.current.value = "";
-    onChangeFiles([]);
-  }, [disabled, onChangeFiles]);
-
-  return (
-    <div className="fp">
-      <label htmlFor={id} className="lbl">
-        {label}
-        {required ? <RequiredMark /> : null}
-      </label>
-
-      <input
-        ref={inputRef}
-        id={id}
-        name={name}
-        type="file"
-        multiple={multiple}
-        accept={accept}
-        disabled={disabled}
-        className="sr-only"
-        onChange={(e) => onChangeFiles(validateAndNormalize(e.currentTarget.files))}
-      />
-
-      <div className="fp__row">
-        <button
-          type="button"
-          className="btn btn-secondary"
-          onClick={openDialog}
-          disabled={disabled}
-        >
-          {dict.filePicker.choose}
-        </button>
-
-        <div className="fp__meta hint">
-          {valueFiles.length > 0
-            ? tpl(dict.filePicker.selectedCount, { count: String(valueFiles.length) })
-            : dict.filePicker.noFiles}
-        </div>
-
-        {valueFiles.length > 0 && (
-          <button
-            type="button"
-            className="link link--danger"
-            onClick={clear}
-            disabled={disabled}
-          >
-            {dict.filePicker.clear}
-          </button>
-        )}
-      </div>
-
-      {valueFiles.length > 0 && (
-        <ul className="fp__list">
-          {valueFiles.map((f, i) => (
-            <li key={`${f.name}-${f.size}-${i}`}>{f.name}</li>
-          ))}
-        </ul>
-      )}
-
-      {hint ? <p className="hint fp__hint">{hint}</p> : null}
-    </div>
-  );
 }
 
 export function OsagoOrderForm({ dict }: Props) {
@@ -293,25 +178,25 @@ export function OsagoOrderForm({ dict }: Props) {
 
   const [vehicleBlocks, setVehicleBlocks] = useState<number[]>([0]);
 
-  // контакт
   const [contactFirstNameLat, setContactFirstNameLat] = useState("");
   const [contactLastNameLat, setContactLastNameLat] = useState("");
   const [contactPhone, setContactPhone] = useState("");
   const [contactEmail, setContactEmail] = useState("");
 
-  // физлицо (ручной ввод)
   const [personMiddleName, setPersonMiddleName] = useState("");
   const [passportNumber, setPassportNumber] = useState("");
 
-  // водители
-  const [driversLimitedByVehicleId, setDriversLimitedByVehicleId] = useState<Record<number, boolean>>({});
-  const [driversByVehicleId, setDriversByVehicleId] = useState<Record<number, Driver[]>>({});
+  const [driversLimitedByVehicleId, setDriversLimitedByVehicleId] = useState<
+    Record<number, boolean>
+  >({});
+  const [driversByVehicleId, setDriversByVehicleId] = useState<
+    Record<number, Driver[]>
+  >({});
   const driverIdSeqRef = useRef(0);
 
   const [formStatus, setFormStatus] = useState<FormStatus>("idle");
-  const [formMessage, setFormMessage] = useState<string>("");
+  const [formMessage, setFormMessage] = useState("");
 
-  // ошибки по шагам
   const [step1Errors, setStep1Errors] = useState<string[]>([]);
   const [step2Errors, setStep2Errors] = useState<string[]>([]);
 
@@ -319,18 +204,15 @@ export function OsagoOrderForm({ dict }: Props) {
   const step1Ref = useRef<HTMLDivElement | null>(null);
   const step2Ref = useRef<HTMLDivElement | null>(null);
 
-  // файлы
-  const [passportFiles, setPassportFiles] = useState<File[]>([]);
-  const [techPassportFilesByIdx, setTechPassportFilesByIdx] = useState<Record<number, File[]>>({});
-  const [licenseFilesByKey, setLicenseFilesByKey] = useState<Record<string, File[]>>({});
-
-  const isBusy = formStatus === "loading";
-
   const todayLocal = useMemo(() => new Date(), []);
   const maxBirthDate = useMemo(
     () =>
       toLocalDateString(
-        new Date(todayLocal.getFullYear() - 18, todayLocal.getMonth(), todayLocal.getDate())
+        new Date(
+          todayLocal.getFullYear() - 18,
+          todayLocal.getMonth(),
+          todayLocal.getDate()
+        )
       ),
     [todayLocal]
   );
@@ -355,25 +237,58 @@ export function OsagoOrderForm({ dict }: Props) {
     []
   );
 
-  // ✅ reCAPTCHA config (v3 = invisible, подтверждать “галочкой” нечего)
-  const recaptchaSiteKey = (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "").trim();
-  const recaptchaEnabled = Boolean(recaptchaSiteKey) && process.env.NODE_ENV === "production";
+  const recaptchaSiteKey = (
+    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""
+  ).trim();
+  const recaptchaEnabled =
+    Boolean(recaptchaSiteKey) && process.env.NODE_ENV === "production";
   const [recaptchaReady, setRecaptchaReady] = useState(!recaptchaEnabled);
 
-  const getLabelForElement = useCallback((root: HTMLElement, el: Element): string => {
-    const aria = (el as HTMLElement).getAttribute?.("aria-label")?.trim();
-    if (aria) return aria;
+  const isBusy = formStatus === "loading";
+  const hasError = formStatus === "error";
+  const hasSuccess = formStatus === "success";
+  const statusId = `${uid}-osago-rf-order-status`;
 
-    const id = (el as HTMLInputElement).id;
-    if (id) {
-      const lab = root.querySelector(`label[for="${cssEscapeFallback(id)}"]`);
-      const t = (lab?.textContent || "").replace(/\*/g, "").trim();
-      if (t) return t;
-    }
+  const validateFiles = useCallback(
+    (files: FileList): boolean => {
+      let ok = true;
 
-    const name = (el as HTMLInputElement).getAttribute?.("name")?.trim();
-    return name || "Field";
-  }, []);
+      Array.from(files || []).forEach((file) => {
+        const type = (file?.type || "").toLowerCase();
+        const forbidden = forbiddenTypes.some((t) =>
+          t.endsWith("/") ? type.startsWith(t) : type === t
+        );
+
+        if (forbidden) {
+          ok = false;
+          alert(`${file.name}: ${dict.fileForbidden}`);
+        }
+      });
+
+      return ok;
+    },
+    [dict.fileForbidden, forbiddenTypes]
+  );
+
+  const getLabelForElement = useCallback(
+    (root: HTMLElement, el: Element): string => {
+      const aria = (el as HTMLElement).getAttribute?.("aria-label")?.trim();
+      if (aria) return aria;
+
+      const id = (el as HTMLInputElement).id;
+      if (id) {
+        const lab = root.querySelector(
+          `label[for="${safeCssEscape(id)}"]`
+        ) as HTMLLabelElement | null;
+        const t = (lab?.textContent || "").replace(/\*/g, "").trim();
+        if (t) return t;
+      }
+
+      const name = (el as HTMLInputElement).getAttribute?.("name")?.trim();
+      return name || "Field";
+    },
+    []
+  );
 
   const collectStepErrors = useCallback(
     (s: Step): string[] => {
@@ -383,17 +298,19 @@ export function OsagoOrderForm({ dict }: Props) {
       const errors: string[] = [];
 
       const fields = Array.from(
-        root.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
-          "input, select, textarea"
-        )
+        root.querySelectorAll<
+          HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+        >("input, select, textarea")
       ).filter((el) => {
         if (el.disabled) return false;
 
         const style = window.getComputedStyle(el);
-        if (style.display === "none" || style.visibility === "hidden") return false;
+        if (style.display === "none" || style.visibility === "hidden") {
+          return false;
+        }
 
         if (el instanceof HTMLInputElement && el.type === "hidden") return false;
-        if (el instanceof HTMLInputElement && el.type === "file") return false; // файлы валидируем отдельно
+
         return true;
       });
 
@@ -404,18 +321,31 @@ export function OsagoOrderForm({ dict }: Props) {
         }
       }
 
-      // Step 1: паспорт файлами, если физлицо и не ручной ввод
-      if (s === 1 && !isCompany && !manualPassportEntry) {
-        if (passportFiles.length === 0) {
-          errors.push(tpl(dict.errors.requiredFiles, { field: dict.person.passportFilesLabel }));
+      const formEl = formRef.current;
+
+      if (s === 1 && !isCompany && !manualPassportEntry && formEl) {
+        const fd = new FormData(formEl);
+        const vals = fd.getAll("person_passportFiles");
+        const hasFiles = vals.some((v) => v instanceof File && v.size > 0);
+
+        if (!hasFiles) {
+          errors.push(
+            tpl(dict.errors.requiredFiles, {
+              field: dict.person.passportFilesLabel,
+            })
+          );
         }
       }
 
-      // Step 2: техпаспорт по каждому ТС
-      if (s === 2) {
+      if (s === 2 && formEl) {
+        const fd = new FormData(formEl);
+
         vehicleBlocks.forEach((_, idx) => {
-          const files = techPassportFilesByIdx[idx] ?? [];
-          if (files.length === 0) {
+          const key = `vehicles[${idx}][techPassportFiles]`;
+          const vals = fd.getAll(key);
+          const hasFiles = vals.some((v) => v instanceof File && v.size > 0);
+
+          if (!hasFiles) {
             errors.push(
               tpl(dict.errors.requiredFiles, {
                 field: `${dict.vehicles.techPassportFilesLabel} (${dict.vehicles.blockTitle} #${idx + 1})`,
@@ -424,7 +354,6 @@ export function OsagoOrderForm({ dict }: Props) {
           }
         });
 
-        // если ограниченный список водителей — у каждого должны быть права файлами
         vehicleBlocks.forEach((vehicleId, idx) => {
           const limited = Boolean(driversLimitedByVehicleId[vehicleId]);
           if (!limited) return;
@@ -439,10 +368,12 @@ export function OsagoOrderForm({ dict }: Props) {
             return;
           }
 
-          drivers.forEach((d, j) => {
-            const key = `${vehicleId}:${d.id}`;
-            const files = licenseFilesByKey[key] ?? [];
-            if (files.length === 0) {
+          drivers.forEach((driver, j) => {
+            const key = `vehicles[${idx}][drivers][${j}][licenseFiles]`;
+            const vals = fd.getAll(key);
+            const hasFiles = vals.some((v) => v instanceof File && v.size > 0);
+
+            if (!hasFiles) {
               errors.push(
                 tpl(dict.errors.requiredFiles, {
                   field: `${dict.vehicles.driverLicenseFilesLabel} (${dict.vehicles.driverBlockTitle} #${j + 1}, ${dict.vehicles.blockTitle} #${idx + 1})`,
@@ -462,23 +393,33 @@ export function OsagoOrderForm({ dict }: Props) {
       getLabelForElement,
       isCompany,
       manualPassportEntry,
-      passportFiles.length,
-      techPassportFilesByIdx,
       vehicleBlocks,
-      licenseFilesByKey,
     ]
   );
 
-  const refreshStep1Errors = useCallback(() => setStep1Errors(collectStepErrors(1)), [collectStepErrors]);
-  const refreshStep2Errors = useCallback(() => setStep2Errors(collectStepErrors(2)), [collectStepErrors]);
+  const refreshStep1Errors = useCallback(
+    () => setStep1Errors(collectStepErrors(1)),
+    [collectStepErrors]
+  );
+
+  const refreshStep2Errors = useCallback(
+    () => setStep2Errors(collectStepErrors(2)),
+    [collectStepErrors]
+  );
+
+  const scrollToStep = useCallback((ref: React.RefObject<HTMLDivElement | null>) => {
+    const behavior: ScrollBehavior = prefersReducedMotion() ? "auto" : "smooth";
+    setTimeout(() => {
+      ref.current?.scrollIntoView({ behavior, block: "start" });
+    }, 50);
+  }, []);
 
   const goStep1 = useCallback(() => {
     if (isBusy) return;
     setStep(1);
     setStep2Errors([]);
-    const behavior: ScrollBehavior = prefersReducedMotion() ? "auto" : "smooth";
-    setTimeout(() => step1Ref.current?.scrollIntoView({ behavior, block: "start" }), 50);
-  }, [isBusy]);
+    scrollToStep(step1Ref);
+  }, [isBusy, scrollToStep]);
 
   const goStep2 = useCallback(() => {
     if (isBusy) return;
@@ -487,26 +428,28 @@ export function OsagoOrderForm({ dict }: Props) {
     if (errs.length) {
       setStep1Errors(errs);
       setStep(1);
-      const behavior: ScrollBehavior = prefersReducedMotion() ? "auto" : "smooth";
-      setTimeout(() => step1Ref.current?.scrollIntoView({ behavior, block: "start" }), 50);
+      scrollToStep(step1Ref);
       return;
     }
 
     setStep1Errors([]);
     setStep(2);
-    const behavior: ScrollBehavior = prefersReducedMotion() ? "auto" : "smooth";
+
     setTimeout(() => {
-      step2Ref.current?.scrollIntoView({ behavior, block: "start" });
+      scrollToStep(step2Ref);
       refreshStep2Errors();
     }, 50);
-  }, [collectStepErrors, isBusy, refreshStep2Errors]);
+  }, [collectStepErrors, isBusy, refreshStep2Errors, scrollToStep]);
 
   const handleAddVehicle = useCallback(() => {
     setVehicleBlocks((prev) => {
       const lastId = prev.length ? prev[prev.length - 1] : 0;
       return [...prev, lastId + 1];
     });
-    if (step === 2) setTimeout(() => refreshStep2Errors(), 0);
+
+    if (step === 2) {
+      setTimeout(() => refreshStep2Errors(), 0);
+    }
   }, [refreshStep2Errors, step]);
 
   const handleRemoveVehicle = useCallback(
@@ -530,15 +473,9 @@ export function OsagoOrderForm({ dict }: Props) {
         return next;
       });
 
-      setLicenseFilesByKey((prev) => {
-        const next = { ...prev };
-        Object.keys(next).forEach((k) => {
-          if (k.startsWith(`${id}:`)) delete next[k];
-        });
-        return next;
-      });
-
-      if (step === 2) setTimeout(() => refreshStep2Errors(), 0);
+      if (step === 2) {
+        setTimeout(() => refreshStep2Errors(), 0);
+      }
     },
     [refreshStep2Errors, step]
   );
@@ -546,11 +483,15 @@ export function OsagoOrderForm({ dict }: Props) {
   const addDriver = useCallback(
     (vehicleId: number) => {
       const newId = ++driverIdSeqRef.current;
+
       setDriversByVehicleId((prev) => {
         const list = prev[vehicleId] ?? [];
         return { ...prev, [vehicleId]: [...list, { id: newId }] };
       });
-      if (step === 2) setTimeout(() => refreshStep2Errors(), 0);
+
+      if (step === 2) {
+        setTimeout(() => refreshStep2Errors(), 0);
+      }
     },
     [refreshStep2Errors, step]
   );
@@ -561,19 +502,13 @@ export function OsagoOrderForm({ dict }: Props) {
         const list = prev[vehicleId] ?? [];
         return { ...prev, [vehicleId]: list.filter((d) => d.id !== driverId) };
       });
-      setLicenseFilesByKey((prev) => {
-        const next = { ...prev };
-        delete next[`${vehicleId}:${driverId}`];
-        return next;
-      });
-      if (step === 2) setTimeout(() => refreshStep2Errors(), 0);
+
+      if (step === 2) {
+        setTimeout(() => refreshStep2Errors(), 0);
+      }
     },
     [refreshStep2Errors, step]
   );
-
-  const statusId = `${uid}-osago-rf-order-status`;
-  const hasError = formStatus === "error";
-  const hasSuccess = formStatus === "success";
 
   const canAttemptStep2 = useMemo(() => {
     if (!contactFirstNameLat.trim()) return false;
@@ -583,122 +518,136 @@ export function OsagoOrderForm({ dict }: Props) {
     return true;
   }, [contactFirstNameLat, contactLastNameLat, contactPhone, contactEmail]);
 
-  async function handleOrderSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (isBusy) return;
+  const resetAll = useCallback((formEl: HTMLFormElement) => {
+    formEl.reset();
 
-    if (step !== 2) {
-      goStep2();
-      return;
-    }
+    setContactFirstNameLat("");
+    setContactLastNameLat("");
+    setContactPhone("");
+    setContactEmail("");
+    setPersonMiddleName("");
+    setPassportNumber("");
 
-    const errs2 = collectStepErrors(2);
-    if (errs2.length) {
-      setStep2Errors(errs2);
-      const behavior: ScrollBehavior = prefersReducedMotion() ? "auto" : "smooth";
-      setTimeout(() => step2Ref.current?.scrollIntoView({ behavior, block: "start" }), 50);
-      return;
-    }
+    setManualPassportEntry(false);
+    setIsCompany(false);
+
+    setDriversLimitedByVehicleId({});
+    setDriversByVehicleId({});
+    setVehicleBlocks([0]);
+
+    setStep1Errors([]);
     setStep2Errors([]);
+    setStep(1);
+  }, []);
 
-    setFormStatus("loading");
-    setFormMessage("");
+  const handleOrderSubmit = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (isBusy) return;
 
-    try {
-      const formEl = e.currentTarget;
-      const fd = new FormData(formEl);
-
-      passportFiles.forEach((f) => fd.append("person_passportFiles", f));
-
-      vehicleBlocks.forEach((_, idx) => {
-        const key = `vehicles[${idx}][techPassportFiles]`;
-        (techPassportFilesByIdx[idx] ?? []).forEach((f) => fd.append(key, f));
-      });
-
-      vehicleBlocks.forEach((vehicleId, idx) => {
-        if (!Boolean(driversLimitedByVehicleId[vehicleId])) return;
-
-        const drivers = driversByVehicleId[vehicleId] ?? [];
-        drivers.forEach((d, j) => {
-          const files = licenseFilesByKey[`${vehicleId}:${d.id}`] ?? [];
-          const fdKey = `vehicles[${idx}][drivers][${j}][licenseFiles]`;
-          files.forEach((f) => fd.append(fdKey, f));
-        });
-      });
-
-      if (typeof window !== "undefined") {
-        try {
-          fd.append("pageUrl", window.location.href);
-          const utm = localStorage.getItem("utm_data");
-          if (utm) fd.append("utm", utm);
-        } catch {
-          // ignore
-        }
-      }
-
-      // ✅ reCAPTCHA token (v3 invisible)
-      if (recaptchaEnabled) {
-        if (!recaptchaReady) {
-          setFormStatus("error");
-          setFormMessage("Инициализация защиты от роботов не завершена. Повторите попытку через секунду.");
-          return;
-        }
-
-        const token = await getRecaptchaToken(recaptchaSiteKey, "osago_rf_order");
-        if (!token) {
-          setFormStatus("error");
-          setFormMessage("Не удалось подтвердить, что вы не робот. Обновите страницу и попробуйте ещё раз.");
-          return;
-        }
-        fd.set("recaptchaToken", token);
-      }
-
-      const res = await fetch("/api/osago-rf-order", { method: "POST", body: fd });
-
-      const data: unknown = await res.json().catch(() => null);
-      const ok = Boolean((data as { ok?: boolean } | null)?.ok);
-      const message = (data as { message?: string } | null)?.message;
-
-      if (!res.ok || !ok) {
-        setFormStatus("error");
-        setFormMessage(message || dict.messages.submitError);
+      if (step !== 2) {
+        goStep2();
         return;
       }
 
-      setFormStatus("success");
-      setFormMessage(dict.successMessage);
+      const errs2 = collectStepErrors(2);
+      if (errs2.length) {
+        setStep2Errors(errs2);
+        scrollToStep(step2Ref);
+        return;
+      }
 
-      // reset
-      formEl.reset();
-      setContactFirstNameLat("");
-      setContactLastNameLat("");
-      setContactPhone("");
-      setContactEmail("");
-      setPersonMiddleName("");
-      setPassportNumber("");
-      setManualPassportEntry(false);
-      setDriversLimitedByVehicleId({});
-      setDriversByVehicleId({});
-      setVehicleBlocks([0]);
-      setIsCompany(false);
-
-      setPassportFiles([]);
-      setTechPassportFilesByIdx({});
-      setLicenseFilesByKey({});
-
-      setStep1Errors([]);
       setStep2Errors([]);
-      setStep(1);
-    } catch (err) {
-      console.error("OSAGO RF ORDER ERROR:", err);
-      setFormStatus("error");
-      setFormMessage(dict.messages.serverError);
-    }
-  }
+      setFormStatus("idle");
+      setFormMessage("");
+
+      const formEl = e.currentTarget;
+
+      if (!formEl.checkValidity()) {
+        formEl.reportValidity();
+        return;
+      }
+
+      setFormStatus("loading");
+
+      try {
+        const fd = new FormData(formEl);
+
+        try {
+          fd.set("pageUrl", window.location.href);
+          const utm = localStorage.getItem("utm_data");
+          if (utm) fd.set("utm", utm);
+        } catch {
+          // ignore
+        }
+
+        if (recaptchaEnabled) {
+          if (!recaptchaReady) {
+            setFormStatus("error");
+            setFormMessage(
+              "Инициализация защиты от роботов не завершена. Повторите попытку через секунду."
+            );
+            return;
+          }
+
+          const token = await getRecaptchaToken(
+            recaptchaSiteKey,
+            "osago_rf_order"
+          );
+
+          if (!token) {
+            setFormStatus("error");
+            setFormMessage(
+              "Не удалось подтвердить, что вы не робот. Обновите страницу и попробуйте ещё раз."
+            );
+            return;
+          }
+
+          fd.set("recaptchaToken", token);
+        }
+
+        const res = await fetch("/api/osago-rf-order", {
+          method: "POST",
+          body: fd,
+        });
+
+        const data: unknown = await res.json().catch(() => null);
+        const ok = Boolean((data as { ok?: boolean } | null)?.ok);
+        const message = (data as { message?: string } | null)?.message;
+
+        if (!res.ok || !ok) {
+          setFormStatus("error");
+          setFormMessage(message || dict.messages.submitError);
+          return;
+        }
+
+        setFormStatus("success");
+        setFormMessage(dict.successMessage);
+        resetAll(formEl);
+      } catch (err) {
+        console.error("OSAGO RF ORDER ERROR:", err);
+        setFormStatus("error");
+        setFormMessage(dict.messages.serverError);
+      }
+    },
+    [
+      collectStepErrors,
+      dict.messages.serverError,
+      dict.messages.submitError,
+      dict.successMessage,
+      goStep2,
+      isBusy,
+      recaptchaEnabled,
+      recaptchaReady,
+      recaptchaSiteKey,
+      resetAll,
+      scrollToStep,
+      step,
+    ]
+  );
 
   return (
     <section id="osago-rf-order" className="gc-form">
-      {/* ✅ reCAPTCHA script loader (v3 invisible) */}
       <RecaptchaLazy
         siteKey={recaptchaSiteKey}
         enabled={recaptchaEnabled}
@@ -726,7 +675,6 @@ export function OsagoOrderForm({ dict }: Props) {
           onSubmit={handleOrderSubmit}
           aria-describedby={formStatus !== "idle" ? statusId : undefined}
         >
-          {/* ===================== STEP 1 ===================== */}
           <div ref={step1Ref} hidden={step !== 1}>
             <ErrorSummary title={dict.errors.title} items={step1Errors} />
 
@@ -839,7 +787,10 @@ export function OsagoOrderForm({ dict }: Props) {
                     setTimeout(() => refreshStep1Errors(), 0);
                   }}
                 />
-                <label htmlFor={`${uid}-order-isCompany`} className="gc-checkrow__label">
+                <label
+                  htmlFor={`${uid}-order-isCompany`}
+                  className="gc-checkrow__label"
+                >
                   {dict.contact.isCompanyLabel}
                 </label>
               </div>
@@ -901,7 +852,10 @@ export function OsagoOrderForm({ dict }: Props) {
                         setTimeout(() => refreshStep1Errors(), 0);
                       }}
                     />
-                    <label htmlFor={`${uid}-manual-passport-entry`} className="gc-checkrow__label">
+                    <label
+                      htmlFor={`${uid}-manual-passport-entry`}
+                      className="gc-checkrow__label"
+                    >
                       {dict.person.manualPassportEntryLabel}
                     </label>
                   </div>
@@ -922,11 +876,13 @@ export function OsagoOrderForm({ dict }: Props) {
                         onChange={() => step1Errors.length && setStep1Errors([])}
                       >
                         <option value="">{dict.notSelected}</option>
-                        {Object.entries(dict.person.countries).map(([id, label]) => (
-                          <option key={id} value={id}>
-                            {label}
-                          </option>
-                        ))}
+                        {Object.entries(dict.person.countries).map(
+                          ([id, label]) => (
+                            <option key={id} value={id}>
+                              {label}
+                            </option>
+                          )
+                        )}
                       </select>
                     </div>
 
@@ -949,23 +905,21 @@ export function OsagoOrderForm({ dict }: Props) {
 
                   {!manualPassportEntry ? (
                     <div className="field field--full mt-4">
-                      <FilePickerPro
-                        dict={dict}
+                      <FilePicker
                         id={`${uid}-person_passportFiles`}
                         name="person_passportFiles"
                         label={dict.person.passportFilesLabel}
-                        hint={dict.person.passportFilesHint}
                         required
                         multiple
-                        accept={acceptDocs}
                         disabled={isBusy}
-                        forbiddenTypes={forbiddenTypes}
-                        valueFiles={passportFiles}
-                        onChangeFiles={(files) => {
-                          setPassportFiles(files);
+                        accept={acceptDocs}
+                        onValidate={(files) => {
+                          const ok = validateFiles(files);
                           setTimeout(() => refreshStep1Errors(), 0);
+                          return ok;
                         }}
                       />
+                      <p className="hint fp__hint">{dict.person.passportFilesHint}</p>
                     </div>
                   ) : (
                     <div className="grid grid-2 mt-4">
@@ -1025,7 +979,10 @@ export function OsagoOrderForm({ dict }: Props) {
                       </div>
 
                       <div className="field">
-                        <label htmlFor={`${uid}-person_passportNumber`} className="lbl">
+                        <label
+                          htmlFor={`${uid}-person_passportNumber`}
+                          className="lbl"
+                        >
                           {dict.person.passportNumber}
                           <RequiredMark />
                         </label>
@@ -1035,7 +992,9 @@ export function OsagoOrderForm({ dict }: Props) {
                           name="person_passportNumber"
                           value={passportNumber}
                           onChange={(e) => {
-                            setPassportNumber(formatLatinAlnum(e.target.value, 20));
+                            setPassportNumber(
+                              formatLatinAlnum(e.target.value, 20)
+                            );
                             if (step1Errors.length) setStep1Errors([]);
                           }}
                           className="control"
@@ -1045,7 +1004,10 @@ export function OsagoOrderForm({ dict }: Props) {
                       </div>
 
                       <div className="field">
-                        <label htmlFor={`${uid}-person_passportIssuer`} className="lbl">
+                        <label
+                          htmlFor={`${uid}-person_passportIssuer`}
+                          className="lbl"
+                        >
                           {dict.person.passportIssuer}
                           <RequiredMark />
                         </label>
@@ -1061,7 +1023,10 @@ export function OsagoOrderForm({ dict }: Props) {
                       </div>
 
                       <div className="field">
-                        <label htmlFor={`${uid}-person_passportIssuedAt`} className="lbl">
+                        <label
+                          htmlFor={`${uid}-person_passportIssuedAt`}
+                          className="lbl"
+                        >
                           {dict.person.passportIssuedAt}
                           <RequiredMark />
                         </label>
@@ -1086,13 +1051,14 @@ export function OsagoOrderForm({ dict }: Props) {
               <span />
               <button
                 type="button"
-                className={["btn btn-primary", isBusy ? "is-disabled" : ""].join(" ")}
+                className={["btn btn-primary", isBusy ? "is-disabled" : ""].join(
+                  " "
+                )}
                 onClick={() => {
                   const errs = collectStepErrors(1);
                   if (errs.length) {
                     setStep1Errors(errs);
-                    const behavior: ScrollBehavior = prefersReducedMotion() ? "auto" : "smooth";
-                    setTimeout(() => step1Ref.current?.scrollIntoView({ behavior, block: "start" }), 50);
+                    scrollToStep(step1Ref);
                     return;
                   }
                   goStep2();
@@ -1104,7 +1070,6 @@ export function OsagoOrderForm({ dict }: Props) {
             </div>
           </div>
 
-          {/* ===================== STEP 2 ===================== */}
           <div ref={step2Ref} hidden={step !== 2}>
             <ErrorSummary title={dict.errors.title} items={step2Errors} />
 
@@ -1130,7 +1095,9 @@ export function OsagoOrderForm({ dict }: Props) {
 
               <div className="stack gap-14 mt-4">
                 {vehicleBlocks.map((vehicleId, idx) => {
-                  const driversLimited = Boolean(driversLimitedByVehicleId[vehicleId]);
+                  const driversLimited = Boolean(
+                    driversLimitedByVehicleId[vehicleId]
+                  );
                   const drivers = driversByVehicleId[vehicleId] ?? [];
 
                   return (
@@ -1144,7 +1111,10 @@ export function OsagoOrderForm({ dict }: Props) {
                           <button
                             type="button"
                             onClick={() => handleRemoveVehicle(vehicleId)}
-                            className={["link link--danger", isBusy ? "is-disabled" : ""].join(" ")}
+                            className={[
+                              "link link--danger",
+                              isBusy ? "is-disabled" : "",
+                            ].join(" ")}
                             disabled={isBusy}
                           >
                             {dict.vehicles.removeButton}
@@ -1154,7 +1124,10 @@ export function OsagoOrderForm({ dict }: Props) {
 
                       <div className="grid grid-2 mt-4">
                         <div className="field">
-                          <label htmlFor={`${uid}-vehicles_${idx}_plate`} className="lbl">
+                          <label
+                            htmlFor={`${uid}-vehicles_${idx}_plate`}
+                            className="lbl"
+                          >
                             {dict.vehicles.plate}
                             <RequiredMark />
                           </label>
@@ -1163,7 +1136,10 @@ export function OsagoOrderForm({ dict }: Props) {
                             type="text"
                             name={`vehicles[${idx}][plate]`}
                             onChange={(e) => {
-                              e.currentTarget.value = formatLatinAlnum(e.currentTarget.value, 12);
+                              e.currentTarget.value = formatLatinAlnum(
+                                e.currentTarget.value,
+                                12
+                              );
                               if (step2Errors.length) setStep2Errors([]);
                             }}
                             className="control"
@@ -1173,7 +1149,10 @@ export function OsagoOrderForm({ dict }: Props) {
                         </div>
 
                         <div className="field">
-                          <label htmlFor={`${uid}-vehicles_${idx}_type`} className="lbl">
+                          <label
+                            htmlFor={`${uid}-vehicles_${idx}_type`}
+                            className="lbl"
+                          >
                             {dict.vehicles.vehicleTypeLabel}
                             <RequiredMark />
                           </label>
@@ -1184,20 +1163,33 @@ export function OsagoOrderForm({ dict }: Props) {
                             defaultValue=""
                             required
                             disabled={isBusy}
-                            onChange={() => step2Errors.length && setStep2Errors([])}
+                            onChange={() =>
+                              step2Errors.length && setStep2Errors([])
+                            }
                           >
                             <option value="">{dict.notSelected}</option>
-                            <option value="127">{dict.vehicles.vehicleTypePassenger}</option>
+                            <option value="127">
+                              {dict.vehicles.vehicleTypePassenger}
+                            </option>
                             <option value="131">{dict.vehicles.vehicleTypeBus}</option>
                             <option value="453">{dict.vehicles.vehicleTypeTruck}</option>
-                            <option value="217">{dict.vehicles.vehicleTypeMotorcycle}</option>
-                            <option value="457">{dict.vehicles.vehicleTypeSpecial}</option>
-                            <option value="249">{dict.vehicles.vehicleTypeTruckTractor}</option>
+                            <option value="217">
+                              {dict.vehicles.vehicleTypeMotorcycle}
+                            </option>
+                            <option value="457">
+                              {dict.vehicles.vehicleTypeSpecial}
+                            </option>
+                            <option value="249">
+                              {dict.vehicles.vehicleTypeTruckTractor}
+                            </option>
                           </select>
                         </div>
 
                         <div className="field">
-                          <label htmlFor={`${uid}-vehicles_${idx}_startDate`} className="lbl">
+                          <label
+                            htmlFor={`${uid}-vehicles_${idx}_startDate`}
+                            className="lbl"
+                          >
                             {dict.vehicles.startDate}
                             <RequiredMark />
                           </label>
@@ -1209,12 +1201,17 @@ export function OsagoOrderForm({ dict }: Props) {
                             className="control"
                             required
                             disabled={isBusy}
-                            onChange={() => step2Errors.length && setStep2Errors([])}
+                            onChange={() =>
+                              step2Errors.length && setStep2Errors([])
+                            }
                           />
                         </div>
 
                         <div className="field">
-                          <label htmlFor={`${uid}-vehicles_${idx}_period`} className="lbl">
+                          <label
+                            htmlFor={`${uid}-vehicles_${idx}_period`}
+                            className="lbl"
+                          >
                             {dict.vehicles.periodLabel}
                             <RequiredMark />
                           </label>
@@ -1225,7 +1222,9 @@ export function OsagoOrderForm({ dict }: Props) {
                             defaultValue=""
                             required
                             disabled={isBusy}
-                            onChange={() => step2Errors.length && setStep2Errors([])}
+                            onChange={() =>
+                              step2Errors.length && setStep2Errors([])
+                            }
                           >
                             <option value="">{dict.notSelected}</option>
                             <option value="585">{dict.vehicles.period15d}</option>
@@ -1238,20 +1237,18 @@ export function OsagoOrderForm({ dict }: Props) {
                         </div>
 
                         <div className="field field--full mt-4">
-                          <FilePickerPro
-                            dict={dict}
+                          <FilePicker
                             id={`${uid}-vehicles_${idx}_techPassportFiles`}
                             name={`vehicles[${idx}][techPassportFiles]`}
                             label={dict.vehicles.techPassportFilesLabel}
                             required
                             multiple
-                            accept={acceptDocs}
                             disabled={isBusy}
-                            forbiddenTypes={forbiddenTypes}
-                            valueFiles={techPassportFilesByIdx[idx] ?? []}
-                            onChangeFiles={(files) => {
-                              setTechPassportFilesByIdx((prev) => ({ ...prev, [idx]: files }));
+                            accept={acceptDocs}
+                            onValidate={(files) => {
+                              const ok = validateFiles(files);
                               setTimeout(() => refreshStep2Errors(), 0);
+                              return ok;
                             }}
                           />
                         </div>
@@ -1266,17 +1263,17 @@ export function OsagoOrderForm({ dict }: Props) {
                           disabled={isBusy}
                           onChange={(e) => {
                             const checked = e.target.checked;
-                            setDriversLimitedByVehicleId((prev) => ({ ...prev, [vehicleId]: checked }));
+
+                            setDriversLimitedByVehicleId((prev) => ({
+                              ...prev,
+                              [vehicleId]: checked,
+                            }));
 
                             if (!checked) {
-                              setDriversByVehicleId((prev) => ({ ...prev, [vehicleId]: [] }));
-                              setLicenseFilesByKey((prev) => {
-                                const next = { ...prev };
-                                Object.keys(next).forEach((k) => {
-                                  if (k.startsWith(`${vehicleId}:`)) delete next[k];
-                                });
-                                return next;
-                              });
+                              setDriversByVehicleId((prev) => ({
+                                ...prev,
+                                [vehicleId]: [],
+                              }));
                             }
 
                             setTimeout(() => refreshStep2Errors(), 0);
@@ -1293,7 +1290,9 @@ export function OsagoOrderForm({ dict }: Props) {
                       {driversLimited && (
                         <div className="panel-muted mt-4">
                           <div className="row-between">
-                            <p className="panel-muted__title">{dict.vehicles.driversTitle}</p>
+                            <p className="panel-muted__title">
+                              {dict.vehicles.driversTitle}
+                            </p>
 
                             <button
                               type="button"
@@ -1306,96 +1305,104 @@ export function OsagoOrderForm({ dict }: Props) {
                           </div>
 
                           {drivers.length === 0 ? (
-                            <p className="hint mt-4">{dict.vehicles.driversEmptyHint}</p>
+                            <p className="hint mt-4">
+                              {dict.vehicles.driversEmptyHint}
+                            </p>
                           ) : (
                             <div className="stack gap-14 mt-4">
-                              {drivers.map((d, j) => {
-                                const licenseKey = `${vehicleId}:${d.id}`;
-                                return (
-                                  <div key={d.id} className="card card--pad">
-                                    <div className="row-between">
-                                      <p className="card-title" style={{ margin: 0 }}>
-                                        {dict.vehicles.driverBlockTitle} #{j + 1}
-                                      </p>
+                              {drivers.map((driver, j) => (
+                                <div key={driver.id} className="card card--pad">
+                                  <div className="row-between">
+                                    <p className="card-title" style={{ margin: 0 }}>
+                                      {dict.vehicles.driverBlockTitle} #{j + 1}
+                                    </p>
 
-                                      <button
-                                        type="button"
-                                        className={["link link--danger", isBusy ? "is-disabled" : ""].join(" ")}
-                                        onClick={() => removeDriver(vehicleId, d.id)}
-                                        disabled={isBusy}
+                                    <button
+                                      type="button"
+                                      className={[
+                                        "link link--danger",
+                                        isBusy ? "is-disabled" : "",
+                                      ].join(" ")}
+                                      onClick={() =>
+                                        removeDriver(vehicleId, driver.id)
+                                      }
+                                      disabled={isBusy}
+                                    >
+                                      {dict.vehicles.removeDriverButton} #{j + 1}
+                                    </button>
+                                  </div>
+
+                                  <div className="grid grid-2 mt-4">
+                                    <div className="field">
+                                      <label
+                                        htmlFor={`${uid}-vehicles_${idx}_drivers_${j}_fullName`}
+                                        className="lbl"
                                       >
-                                        {dict.vehicles.removeDriverButton} #{j + 1}
-                                      </button>
+                                        {dict.vehicles.driverFullName} #{j + 1}
+                                        <RequiredMark />
+                                      </label>
+                                      <input
+                                        id={`${uid}-vehicles_${idx}_drivers_${j}_fullName`}
+                                        type="text"
+                                        name={`vehicles[${idx}][drivers][${j}][fullName]`}
+                                        className="control"
+                                        disabled={isBusy}
+                                        onChange={(e) => {
+                                          e.currentTarget.value = formatPersonName(
+                                            e.currentTarget.value
+                                          );
+                                          if (step2Errors.length) {
+                                            setStep2Errors([]);
+                                          }
+                                        }}
+                                        required
+                                      />
                                     </div>
 
-                                    <div className="grid grid-2 mt-4">
-                                      <div className="field">
-                                        <label
-                                          htmlFor={`${uid}-vehicles_${idx}_drivers_${j}_fullName`}
-                                          className="lbl"
-                                        >
-                                          {dict.vehicles.driverFullName} #{j + 1}
-                                          <RequiredMark />
-                                        </label>
-                                        <input
-                                          id={`${uid}-vehicles_${idx}_drivers_${j}_fullName`}
-                                          type="text"
-                                          name={`vehicles[${idx}][drivers][${j}][fullName]`}
-                                          className="control"
-                                          disabled={isBusy}
-                                          onChange={(e) => {
-                                            e.currentTarget.value = formatPersonName(e.currentTarget.value);
-                                            if (step2Errors.length) setStep2Errors([]);
-                                          }}
-                                          required
-                                        />
-                                      </div>
+                                    <div className="field">
+                                      <label
+                                        htmlFor={`${uid}-vehicles_${idx}_drivers_${j}_experienceYears`}
+                                        className="lbl"
+                                      >
+                                        {dict.vehicles.driverExperienceYears}
+                                        <RequiredMark />
+                                      </label>
+                                      <input
+                                        id={`${uid}-vehicles_${idx}_drivers_${j}_experienceYears`}
+                                        type="number"
+                                        inputMode="numeric"
+                                        min={0}
+                                        step={1}
+                                        name={`vehicles[${idx}][drivers][${j}][experienceYears]`}
+                                        className="control"
+                                        required
+                                        disabled={isBusy}
+                                        onChange={() =>
+                                          step2Errors.length && setStep2Errors([])
+                                        }
+                                      />
+                                    </div>
 
-                                      <div className="field">
-                                        <label
-                                          htmlFor={`${uid}-vehicles_${idx}_drivers_${j}_experienceYears`}
-                                          className="lbl"
-                                        >
-                                          {dict.vehicles.driverExperienceYears}
-                                          <RequiredMark />
-                                        </label>
-                                        <input
-                                          id={`${uid}-vehicles_${idx}_drivers_${j}_experienceYears`}
-                                          type="number"
-                                          inputMode="numeric"
-                                          min={0}
-                                          step={1}
-                                          name={`vehicles[${idx}][drivers][${j}][experienceYears]`}
-                                          className="control"
-                                          required
-                                          disabled={isBusy}
-                                          onChange={() => step2Errors.length && setStep2Errors([])}
-                                        />
-                                      </div>
-
-                                      <div className="field field--full mt-4">
-                                        <FilePickerPro
-                                          dict={dict}
-                                          id={`${uid}-vehicles_${idx}_drivers_${j}_licenseFiles`}
-                                          name={`vehicles[${idx}][drivers][${j}][licenseFiles]`}
-                                          label={`${dict.vehicles.driverLicenseFilesLabel} (#${j + 1})`}
-                                          hint={dict.vehicles.driverLicenseHint}
-                                          required
-                                          multiple
-                                          accept={acceptDocs}
-                                          disabled={isBusy}
-                                          forbiddenTypes={forbiddenTypes}
-                                          valueFiles={licenseFilesByKey[licenseKey] ?? []}
-                                          onChangeFiles={(files) => {
-                                            setLicenseFilesByKey((prev) => ({ ...prev, [licenseKey]: files }));
-                                            setTimeout(() => refreshStep2Errors(), 0);
-                                          }}
-                                        />
-                                      </div>
+                                    <div className="field field--full mt-4">
+                                      <FilePicker
+                                        id={`${uid}-vehicles_${idx}_drivers_${j}_licenseFiles`}
+                                        name={`vehicles[${idx}][drivers][${j}][licenseFiles]`}
+                                        label={`${dict.vehicles.driverLicenseFilesLabel} (#${j + 1})`}
+                                        required
+                                        multiple
+                                        disabled={isBusy}
+                                        accept={acceptDocs}
+                                        onValidate={(files) => {
+                                          const ok = validateFiles(files);
+                                          setTimeout(() => refreshStep2Errors(), 0);
+                                          return ok;
+                                        }}
+                                      />
+                                      <p className="hint fp__hint">{dict.vehicles.driverLicenseHint}</p>
                                     </div>
                                   </div>
-                                );
-                              })}
+                                </div>
+                              ))}
                             </div>
                           )}
                         </div>
@@ -1411,17 +1418,26 @@ export function OsagoOrderForm({ dict }: Props) {
                   role="status"
                   aria-live="polite"
                   className={
-                    hasSuccess ? "status status--ok" : hasError ? "status status--err" : "status"
+                    hasSuccess
+                      ? "status status--ok"
+                      : hasError
+                        ? "status status--err"
+                        : "status"
                   }
                 >
-                  {formStatus === "loading" ? dict.loading : formMessage || dict.submit}
+                  {formStatus === "loading"
+                    ? dict.loading
+                    : formMessage || dict.submit}
                 </div>
               )}
 
               <div className="row-between mt-4 gc-actions">
                 <button
                   type="button"
-                  className={["btn btn-secondary", isBusy ? "is-disabled" : ""].join(" ")}
+                  className={[
+                    "btn btn-secondary",
+                    isBusy ? "is-disabled" : "",
+                  ].join(" ")}
                   onClick={goStep1}
                   disabled={isBusy}
                 >
@@ -1431,7 +1447,10 @@ export function OsagoOrderForm({ dict }: Props) {
                 <div className="row-center gc-actions__right">
                   <button
                     type="button"
-                    className={["btn btn-secondary", isBusy ? "is-disabled" : ""].join(" ")}
+                    className={[
+                      "btn btn-secondary",
+                      isBusy ? "is-disabled" : "",
+                    ].join(" ")}
                     onClick={handleAddVehicle}
                     disabled={isBusy}
                   >
@@ -1440,12 +1459,10 @@ export function OsagoOrderForm({ dict }: Props) {
 
                   <button
                     type="submit"
-                    className={["btn btn-primary", isBusy ? "is-disabled" : ""].join(" ")}
+                    className={["btn btn-primary", isBusy ? "is-disabled" : ""].join(
+                      " "
+                    )}
                     disabled={isBusy}
-                    onClick={() => {
-                      const errs = collectStepErrors(2);
-                      if (errs.length) setStep2Errors(errs);
-                    }}
                   >
                     {isBusy ? dict.loading : dict.submit}
                   </button>

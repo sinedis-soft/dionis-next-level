@@ -313,7 +313,7 @@ export default function Header({ lang }: { lang: Lang }) {
                 </a>
 
                 <div className="mnav__icons">
-                  <a href="https://wa.me/77273573030" target="_blank" rel="noopener noreferrer" className="mnav__icon">
+                  <a href="https://wa.me/77765275553" target="_blank" rel="noopener noreferrer" className="mnav__icon">
                     <Image src="/wa.webp" width={28} height={28} alt="WhatsApp" />
                   </a>
                   <a href="https://t.me/Dionis_insurance_broker_bot" target="_blank" rel="noopener noreferrer" className="mnav__icon">
