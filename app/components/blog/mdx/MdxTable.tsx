@@ -10,10 +10,10 @@ export function MdxTable(
   props: React.TableHTMLAttributes<HTMLTableElement>
 ) {
   return (
-    <div className="my-6 w-full overflow-x-auto rounded-xl border border-gray-200">
+    <div className="u-my-6 u-w-full u-overflow-x-auto u-rounded-xl u-border u-border-gray-200">
       <table
         {...props}
-        className={`min-w-max w-full border-collapse text-sm ${props.className ?? ""}`.trim()}
+        className={`u-min-w-max u-w-full u-border-collapse u-text-sm ${props.className ?? ""}`.trim()}
       />
     </div>
   );
@@ -37,7 +37,7 @@ export function MdxTr(
   return (
     <tr
       {...props}
-      className={`border-b border-gray-200 ${props.className ?? ""}`.trim()}
+      className={`u-border-b u-border-gray-200 ${props.className ?? ""}`.trim()}
     />
   );
 }
@@ -48,7 +48,7 @@ export function MdxTh(
   return (
     <th
       {...props}
-      className={`bg-gray-50 px-3 py-2 text-left font-semibold text-gray-900 ${props.className ?? ""}`.trim()}
+      className={`u-bg-gray-50 u-px-3 u-py-2 u-text-left u-font-semibold u-text-gray-900 ${props.className ?? ""}`.trim()}
     />
   );
 }
@@ -59,7 +59,7 @@ export function MdxTd(
   return (
     <td
       {...props}
-      className={`px-3 py-2 align-top text-gray-800 ${props.className ?? ""}`.trim()}
+      className={`u-px-3 u-py-2 u-align-top u-text-gray-800 ${props.className ?? ""}`.trim()}
     />
   );
 }

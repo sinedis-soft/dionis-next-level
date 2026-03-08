@@ -57,22 +57,22 @@ export default function BlogFilters({
 
   return (
     <>
-      <div className="mt-6 flex flex-col gap-4">
-        <div className="relative max-w-xl">
+      <div className="u-mt-6 u-flex u-flex-col u-gap-4">
+        <div className="u-relative u-max-w-xl">
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={ui.searchPlaceholder}
-            className="w-full rounded-xl border px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#1A3A5F]/20"
+            className="u-w-full u-rounded-xl u-border u-px-4 u-py-3 u-text-sm u-outline-none u-focus-ring-2 u-focus-ring--1a3a5f-20"
           />
 
           {suggestions.length ? (
-            <div className="absolute z-10 mt-2 w-full rounded-xl border bg-white shadow-sm overflow-hidden">
+            <div className="u-absolute u-z-10 u-mt-2 u-w-full u-rounded-xl u-border u-bg-white u-shadow-sm u-overflow-hidden">
               {suggestions.map((s) => (
                 <a
                   key={s.slug}
                   href={`/${lang}/blog/${s.slug}`}
-                  className="block px-4 py-3 text-sm hover:bg-gray-50"
+                  className="u-block u-px-4 u-py-3 u-text-sm u-hover-bg-gray-50"
                 >
                   {s.title}
                 </a>
@@ -81,7 +81,7 @@ export default function BlogFilters({
           ) : null}
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="u-flex u-flex-wrap u-gap-2">
           {allTags.map((item) => {
             const active = item.key === tag;
             return (
@@ -91,8 +91,8 @@ export default function BlogFilters({
                 onClick={() => setTag(item.key)}
                 className={
                   active
-                    ? "rounded-full bg-[#1A3A5F] text-white px-4 py-2 text-sm"
-                    : "rounded-full border px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    ? "u-rounded-full u-bg--1a3a5f u-text-white u-px-4 u-py-2 u-text-sm"
+                    : "u-rounded-full u-border u-px-4 u-py-2 u-text-sm u-text-gray-700 u-hover-bg-gray-50"
                 }
               >
                 #{item.label}

@@ -5,7 +5,7 @@ export default function Section({
   title,
   subtitle,
   children,
-  className = "",
+  className="",
 }: {
   title?: string;
   subtitle?: string;
@@ -16,12 +16,12 @@ export default function Section({
     <section className={className}>
       <Container>
         {title ? (
-          <div className="mb-6 sm:mb-8">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900">
+          <div className="u-mb-6 u-sm-mb-8">
+            <h2 className="u-text-2xl u-sm-text-3xl u-font-extrabold u-tracking-tight u-text-gray-900">
               {title}
             </h2>
             {subtitle ? (
-              <p className="mt-2 text-sm sm:text-base text-gray-600 leading-relaxed">
+              <p className="u-mt-2 u-text-sm u-sm-text-base u-text-gray-600 u-leading-relaxed">
                 {subtitle}
               </p>
             ) : null}

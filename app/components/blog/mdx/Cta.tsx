@@ -10,10 +10,10 @@ export default function Cta({
   button?: string;
 }) {
   return (
-    <div className="not-prose my-8 rounded-2xl border bg-[#F4F6FA] p-6">
-      <div className="text-lg font-semibold text-[#1A3A5F]">{title}</div>
-      <div className="mt-1 text-sm text-gray-700">{text}</div>
-      <div className="mt-4">
+    <div className="u-not-prose u-my-8 u-rounded-2xl u-border u-bg--f4f6fa u-p-6">
+      <div className="u-text-lg u-font-semibold u-text--1a3a5f">{title}</div>
+      <div className="u-mt-1 u-text-sm u-text-gray-700">{text}</div>
+      <div className="u-mt-4">
         <a className="btn" href={href}>
           {button}
         </a>

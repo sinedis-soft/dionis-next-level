@@ -9,9 +9,9 @@ export default function KeyTakeaway({ title = "Ключевая мысль", chi
   if (!children) return null;
 
   return (
-    <aside className="my-6 rounded-2xl border border-[#1A3A5F]/15 bg-[#1A3A5F]/[0.04] p-5">
-      <div className="text-sm font-semibold text-[#1A3A5F]">{title}</div>
-      <div className="mt-2 text-base leading-relaxed text-gray-700">{children}</div>
+    <aside className="u-my-6 u-rounded-2xl u-border u-border--1a3a5f-15 u-bg--1a3a5f-0-04 u-p-5">
+      <div className="u-text-sm u-font-semibold u-text--1a3a5f">{title}</div>
+      <div className="u-mt-2 u-text-base u-leading-relaxed u-text-gray-700">{children}</div>
     </aside>
   );
 }

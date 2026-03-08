@@ -45,11 +45,11 @@ export default async function LangLayout({
         `}
       </Script>
 
-      <Suspense fallback={<div className="h-16 xl:h-20" />}>
+      <Suspense fallback={<div className="u-h-16 u-xl-h-20" />}>
         <Header lang={lang} />
       </Suspense>
 
-      <main className="flex-1">{children}</main>
+      <main className="u-flex-1">{children}</main>
       <SiteFooter lang={lang} />
       <CookieConsent lang={lang} />
     </>

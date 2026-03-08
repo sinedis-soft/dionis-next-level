@@ -47,35 +47,35 @@ export default function AuthorBox({
   return (
     <section
       className={[
-        "rounded-2xl border border-slate-200 bg-white p-4 shadow-sm",
+        "u-rounded-2xl u-border u-border-slate-200 u-bg-white u-p-4 shadow-sm",
         className ?? "",
       ].join(" ")}
       aria-label="Об авторе"
     >
-      <div className="flex items-start gap-4">
-        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
+      <div className="u-flex u-items-start u-gap-4">
+        <div className="u-relative u-h-14 u-w-14 shrink-0 u-overflow-hidden u-rounded-full u-border u-border-slate-200 u-bg-slate-100">
           <Image
             src={photoSrc}
             alt={author.name}
             fill
             sizes="56px"
-            className="object-cover"
+            className="u-object-cover"
           />
         </div>
 
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <div className="font-semibold text-slate-900">{author.name}</div>
+        <div className="u-min-w-0 u-flex-1">
+          <div className="u-flex u-flex-wrap u-items-center u-gap-x-3 u-gap-y-1">
+            <div className="u-font-semibold u-text-slate-900">{author.name}</div>
             {author.title ? (
-              <div className="text-sm text-slate-600">{author.title}</div>
+              <div className="u-text-sm u-text-slate-600">{author.title}</div>
             ) : null}
           </div>
 
           {text ? (
             <p
               className={[
-                "mt-1 text-sm text-slate-700",
-                variant === "article" ? "line-clamp-2" : "leading-relaxed",
+                "u-mt-1 u-text-sm u-text-slate-700",
+                variant === "article" ? "line-clamp-2" : "u-leading-relaxed",
               ].join(" ")}
             >
               {text}
@@ -84,10 +84,10 @@ export default function AuthorBox({
 
           {/* ✅ ссылка включается/выключается явно */}
           {shouldShowLink ? (
-            <div className="mt-2">
+            <div className="u-mt-2">
               <Link
                 href={authorHref}
-                className="text-sm font-medium text-slate-900 underline underline-offset-4 hover:opacity-80"
+                className="u-text-sm u-font-medium u-text-slate-900 u-underline u-underline-offset-4 u-hover-opacity-80"
               >
                 Профиль автора
               </Link>
