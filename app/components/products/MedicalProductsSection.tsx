@@ -25,13 +25,13 @@ function SectionTitle({
   sub?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 flex-wrap">
-      <div className="max-w-4xl">
-        <h3 className="text-xl sm:text-2xl font-bold text-[#0f2238]">
+    <div className="u-flex u-items-start u-justify-between u-gap-4 u-flex-wrap">
+      <div className="u-max-w-4xl">
+        <h3 className="u-text-xl u-sm-text-2xl u-font-bold u-text--0f2238">
           {children}
         </h3>
         {sub ? (
-          <p className="mt-2 text-sm sm:text-base text-gray-700">{sub}</p>
+          <p className="u-mt-2 u-text-sm u-sm-text-base u-text-gray-700">{sub}</p>
         ) : null}
       </div>
     </div>
@@ -40,10 +40,10 @@ function SectionTitle({
 
 function BulletList({ items }: { items: string[] }) {
   return (
-    <ul className="space-y-2 text-sm text-gray-700">
+    <ul className="u-space-y-2 u-text-sm u-text-gray-700">
       {items.map((x) => (
-        <li key={x} className="flex gap-2">
-          <span aria-hidden className="mt-[2px]">
+        <li key={x} className="u-flex u-gap-2">
+          <span aria-hidden className="u-mt--2px">
             •
           </span>
           <span>{x}</span>
@@ -62,18 +62,18 @@ function KeyValueList({
 }) {
   return (
     <div>
-      <div className="space-y-3 text-sm">
+      <div className="u-space-y-3 u-text-sm">
         {rows.map((row) => (
           <div
             key={row.k}
-            className="flex items-start justify-between gap-4 border-b border-black/5 pb-3 last:border-b-0 last:pb-0"
+            className="u-flex u-items-start u-justify-between u-gap-4 u-border-b u-border-black-5 u-pb-3 u-last-border-b-0 u-last-pb-0"
           >
-            <div className="font-medium text-[#0f2238]">{row.k}</div>
-            <div className="text-gray-700 text-right max-w-[70%]">{row.v}</div>
+            <div className="u-font-medium u-text--0f2238">{row.k}</div>
+            <div className="u-text-gray-700 u-text-right u-max-w--70">{row.v}</div>
           </div>
         ))}
       </div>
-      {note ? <p className="mt-4 text-xs text-gray-500">{note}</p> : null}
+      {note ? <p className="u-mt-4 u-text-xs u-text-gray-500">{note}</p> : null}
     </div>
   );
 }
@@ -92,16 +92,16 @@ function CardShell({
   actions?: React.ReactNode;
 }) {
   return (
-    <article className="rounded-2xl border border-black/10 bg-white shadow-sm p-6 sm:p-8">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+    <article className="u-rounded-2xl u-border u-border-black-10 u-bg-white u-shadow-sm u-p-6 u-sm-p-8">
+      <div className="u-flex u-items-start u-justify-between u-gap-4 u-flex-wrap">
         <SectionTitle sub={subtitle}>{title}</SectionTitle>
 
         {badges?.length ? (
-          <div className="flex gap-2 flex-wrap">
+          <div className="u-flex u-gap-2 u-flex-wrap">
             {badges.map((b) => (
               <span
                 key={b}
-                className="text-xs px-2 py-1 rounded-full bg-[#F4F6FA] text-[#1A3A5F] border border-black/5"
+                className="u-text-xs u-px-2 u-py-1 u-rounded-full u-bg--f4f6fa u-text--1a3a5f u-border u-border-black-5"
               >
                 {b}
               </span>
@@ -110,10 +110,10 @@ function CardShell({
         ) : null}
       </div>
 
-      <div className="mt-6 space-y-6">{children}</div>
+      <div className="u-mt-6 u-space-y-6">{children}</div>
 
       {actions ? (
-        <div className="mt-6 flex flex-col sm:flex-row gap-3">{actions}</div>
+        <div className="u-mt-6 u-flex u-flex-col u-sm-flex-row u-gap-3">{actions}</div>
       ) : null}
     </article>
   );
@@ -131,17 +131,17 @@ function SectionHeader({
   ui: ProductsPageUI;
 }) {
   return (
-    <div className="flex items-end justify-between gap-6 flex-wrap">
-      <div className="max-w-4xl">
-        <h2 className="text-2xl sm:text-3xl font-bold text-[#1A3A5F]">
+    <div className="u-flex u-items-end u-justify-between u-gap-6 u-flex-wrap">
+      <div className="u-max-w-4xl">
+        <h2 className="u-text-2xl u-sm-text-3xl u-font-bold u-text--1a3a5f">
           {title}
         </h2>
-        <p className="mt-2 text-gray-700">{lead}</p>
+        <p className="u-mt-2 u-text-gray-700">{lead}</p>
       </div>
 
-      <div className="text-sm text-gray-600">
-        <span className="mr-2">{ui.quick}:</span>
-        <span className="font-mono">#{anchor}</span>
+      <div className="u-text-sm u-text-gray-600">
+        <span className="u-mr-2">{ui.quick}:</span>
+        <span className="u-font-mono">#{anchor}</span>
       </div>
     </div>
   );
@@ -152,8 +152,8 @@ export default function MedicalProductsSection({ lang, base, ui }: Props) {
     getMedicalProductsSectionDictionary(lang);
 
   return (
-    <section id={dict.anchor} className="py-10 sm:py-14 bg-[#F7F7F7]">
-      <div className="max-w-6xl mx-auto px-4">
+    <section id={dict.anchor} className="u-py-10 u-sm-py-14 u-bg--f7f7f7">
+      <div className="u-max-w-6xl u-mx-auto u-px-4">
         {/* HEADER */}
         <SectionHeader
           title={dict.top.title}
@@ -163,15 +163,15 @@ export default function MedicalProductsSection({ lang, base, ui }: Props) {
         />
 
         {/* OSMS vs DMS */}
-        <div className="mt-6 rounded-2xl border border-black/10 bg-white p-5 sm:p-6">
-          <h3 className="text-base sm:text-lg font-semibold text-[#1A3A5F] mb-3">
+        <div className="u-mt-6 u-rounded-2xl u-border u-border-black-10 u-bg-white u-p-5 u-sm-p-6">
+          <h3 className="u-text-base u-sm-text-lg u-font-semibold u-text--1a3a5f u-mb-3">
             {dict.top.diffTitle}
           </h3>
           <KeyValueList rows={dict.top.diffRows} />
         </div>
 
         {/* CARDS */}
-        <div className="mt-7 space-y-6">
+        <div className="u-mt-7 u-space-y-6">
           {/* DMS */}
           <CardShell
             title={dict.cards.dms.title}
@@ -182,9 +182,9 @@ export default function MedicalProductsSection({ lang, base, ui }: Props) {
                 <Link
                   href={`${base}/contacts`}
                   className={cx(
-                    "inline-flex items-center justify-center rounded-xl px-4 py-2",
-                    "bg-[#23376C] text-white hover:opacity-95 transition",
-                    "text-sm font-medium"
+                    "u-inline-flex u-items-center u-justify-center u-rounded-xl u-px-4 u-py-2",
+                    "u-bg--23376c u-text-white u-hover-opacity-95 u-transition",
+                    "u-text-sm u-font-medium"
                   )}
                 >
                   {dict.cards.dms.actions.primary}
@@ -193,9 +193,9 @@ export default function MedicalProductsSection({ lang, base, ui }: Props) {
                 <Link
                   href={`${base}/contacts`}
                   className={cx(
-                    "inline-flex items-center justify-center rounded-xl px-4 py-2",
-                    "border border-black/10 bg-white hover:bg-white/70 transition",
-                    "text-sm font-medium text-[#0f2238]"
+                    "u-inline-flex u-items-center u-justify-center u-rounded-xl u-px-4 u-py-2",
+                    "u-border u-border-black-10 u-bg-white u-hover-bg-white-70 u-transition",
+                    "u-text-sm u-font-medium u-text--0f2238"
                   )}
                 >
                   {dict.cards.dms.actions.secondary}
@@ -203,16 +203,16 @@ export default function MedicalProductsSection({ lang, base, ui }: Props) {
               </>
             }
           >
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className="rounded-2xl border border-black/10 p-5">
-                <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
+            <div className="u-grid u-gap-6 u-lg-grid-cols-2">
+              <div className="u-rounded-2xl u-border u-border-black-10 u-p-5">
+                <h4 className="u-text-base u-font-semibold u-text--1a3a5f u-mb-3">
                   {dict.cards.dms.clinicsTitle}
                 </h4>
                 <BulletList items={dict.cards.dms.clinics} />
               </div>
 
-              <div className="rounded-2xl border border-black/10 p-5">
-                <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
+              <div className="u-rounded-2xl u-border u-border-black-10 u-p-5">
+                <h4 className="u-text-base u-font-semibold u-text--1a3a5f u-mb-3">
                   {dict.cards.dms.includedTitle}
                 </h4>
                 <KeyValueList
@@ -222,8 +222,8 @@ export default function MedicalProductsSection({ lang, base, ui }: Props) {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-black/10 p-5">
-              <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
+            <div className="u-rounded-2xl u-border u-border-black-10 u-p-5">
+              <h4 className="u-text-base u-font-semibold u-text--1a3a5f u-mb-3">
                 {dict.cards.dms.brokerTitle}
               </h4>
               <BulletList items={dict.cards.dms.brokerBullets} />
@@ -240,9 +240,9 @@ export default function MedicalProductsSection({ lang, base, ui }: Props) {
                 <Link
                   href={`${base}/contacts`}
                   className={cx(
-                    "inline-flex items-center justify-center rounded-xl px-4 py-2",
-                    "bg-[#23376C] text-white hover:opacity-95 transition",
-                    "text-sm font-medium"
+                    "u-inline-flex u-items-center u-justify-center u-rounded-xl u-px-4 u-py-2",
+                    "u-bg--23376c u-text-white u-hover-opacity-95 u-transition",
+                    "u-text-sm u-font-medium"
                   )}
                 >
                   {dict.cards.accident.actions.primary}
@@ -251,9 +251,9 @@ export default function MedicalProductsSection({ lang, base, ui }: Props) {
                 <Link
                   href={`${base}/contacts`}
                   className={cx(
-                    "inline-flex items-center justify-center rounded-xl px-4 py-2",
-                    "border border-black/10 bg-white hover:bg-white/70 transition",
-                    "text-sm font-medium text-[#0f2238]"
+                    "u-inline-flex u-items-center u-justify-center u-rounded-xl u-px-4 u-py-2",
+                    "u-border u-border-black-10 u-bg-white u-hover-bg-white-70 u-transition",
+                    "u-text-sm u-font-medium u-text--0f2238"
                   )}
                 >
                   {dict.cards.accident.actions.secondary}
@@ -261,16 +261,16 @@ export default function MedicalProductsSection({ lang, base, ui }: Props) {
               </>
             }
           >
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className="rounded-2xl border border-black/10 p-5">
-                <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
+            <div className="u-grid u-gap-6 u-lg-grid-cols-2">
+              <div className="u-rounded-2xl u-border u-border-black-10 u-p-5">
+                <h4 className="u-text-base u-font-semibold u-text--1a3a5f u-mb-3">
                   {dict.cards.accident.whoTitle}
                 </h4>
                 <BulletList items={dict.cards.accident.whoBullets} />
               </div>
 
-              <div className="rounded-2xl border border-black/10 p-5">
-                <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
+              <div className="u-rounded-2xl u-border u-border-black-10 u-p-5">
+                <h4 className="u-text-base u-font-semibold u-text--1a3a5f u-mb-3">
                   {dict.cards.accident.howTitle}
                 </h4>
                 <KeyValueList
@@ -280,11 +280,11 @@ export default function MedicalProductsSection({ lang, base, ui }: Props) {
               </div>
             </div>
 
-            <div className="rounded-2xl border border-black/10 p-5">
-              <h4 className="text-base font-semibold text-[#1A3A5F] mb-2">
+            <div className="u-rounded-2xl u-border u-border-black-10 u-p-5">
+              <h4 className="u-text-base u-font-semibold u-text--1a3a5f u-mb-2">
                 {dict.cards.accident.scheduleTitle}
               </h4>
-              <p className="text-sm text-gray-700">
+              <p className="u-text-sm u-text-gray-700">
                 {dict.cards.accident.scheduleText}
               </p>
             </div>
@@ -300,9 +300,9 @@ export default function MedicalProductsSection({ lang, base, ui }: Props) {
                 <Link
                   href={`${base}/contacts`}
                   className={cx(
-                    "inline-flex items-center justify-center rounded-xl px-4 py-2",
-                    "bg-[#23376C] text-white hover:opacity-95 transition",
-                    "text-sm font-medium"
+                    "u-inline-flex u-items-center u-justify-center u-rounded-xl u-px-4 u-py-2",
+                    "u-bg--23376c u-text-white u-hover-opacity-95 u-transition",
+                    "u-text-sm u-font-medium"
                   )}
                 >
                   {dict.cards.travel.actions.primary}
@@ -311,9 +311,9 @@ export default function MedicalProductsSection({ lang, base, ui }: Props) {
                 <Link
                   href={`${base}/contacts`}
                   className={cx(
-                    "inline-flex items-center justify-center rounded-xl px-4 py-2",
-                    "border border-black/10 bg-white hover:bg-white/70 transition",
-                    "text-sm font-medium text-[#0f2238]"
+                    "u-inline-flex u-items-center u-justify-center u-rounded-xl u-px-4 u-py-2",
+                    "u-border u-border-black-10 u-bg-white u-hover-bg-white-70 u-transition",
+                    "u-text-sm u-font-medium u-text--0f2238"
                   )}
                 >
                   {dict.cards.travel.actions.secondary}
@@ -321,24 +321,24 @@ export default function MedicalProductsSection({ lang, base, ui }: Props) {
               </>
             }
           >
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className="rounded-2xl border border-black/10 p-5">
-                <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
+            <div className="u-grid u-gap-6 u-lg-grid-cols-2">
+              <div className="u-rounded-2xl u-border u-border-black-10 u-p-5">
+                <h4 className="u-text-base u-font-semibold u-text--1a3a5f u-mb-3">
                   {dict.cards.travel.whoTitle}
                 </h4>
                 <BulletList items={dict.cards.travel.whoBullets} />
               </div>
 
-              <div className="rounded-2xl border border-black/10 p-5">
-                <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
+              <div className="u-rounded-2xl u-border u-border-black-10 u-p-5">
+                <h4 className="u-text-base u-font-semibold u-text--1a3a5f u-mb-3">
                   {dict.cards.travel.howTitle}
                 </h4>
                 <BulletList items={dict.cards.travel.steps} />
               </div>
             </div>
 
-            <div className="rounded-2xl border border-black/10 p-5">
-              <h4 className="text-base font-semibold text-[#1A3A5F] mb-3">
+            <div className="u-rounded-2xl u-border u-border-black-10 u-p-5">
+              <h4 className="u-text-base u-font-semibold u-text--1a3a5f u-mb-3">
                 {dict.cards.travel.optionsTitle}
               </h4>
               <KeyValueList

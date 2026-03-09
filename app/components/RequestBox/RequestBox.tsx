@@ -31,21 +31,21 @@ export default function RequestBox({
   return (
     <div
       className={[
-        "rounded-3xl border border-black/10 bg-[#F4F6FA] p-6 sm:p-8",
+        "u-rounded-3xl u-border u-border-black-10 u-bg--f4f6fa u-p-6 u-sm-p-8",
         className ?? "",
       ]
         .filter(Boolean)
         .join(" ")}
     >
-      <h3 className="text-lg sm:text-xl font-semibold text-[#1A3A5F]">
+      <h3 className="u-text-lg u-sm-text-xl u-font-semibold u-text--1a3a5f">
         {title}
       </h3>
 
-      <p className="mt-2 text-sm sm:text-base text-gray-700 max-w-3xl">
+      <p className="u-mt-2 u-text-sm u-sm-text-base u-text-gray-700 u-max-w-3xl">
         {text}
       </p>
 
-      <div className="mt-5 flex flex-wrap gap-3">
+      <div className="u-mt-5 u-flex u-flex-wrap u-gap-3">
         {actions.map((a, idx) => {
           const variant = a.variant ?? "primary";
           const btnClass = variant === "primary" ? "btn btn-primary" : "btn btn-secondary";
@@ -82,7 +82,7 @@ export default function RequestBox({
       </div>
 
       {footnote ? (
-        <p className="mt-3 text-xs text-gray-600">{footnote}</p>
+        <p className="u-mt-3 u-text-xs u-text-gray-600">{footnote}</p>
       ) : null}
     </div>
   );

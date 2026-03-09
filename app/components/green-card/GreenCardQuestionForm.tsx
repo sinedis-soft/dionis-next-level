@@ -268,13 +268,13 @@ export default function GreenCardQuestionForm({ homeContact, agreement, dict }: 
       )}
 
       <div className="card card--pad">
-        <div className="stack gap-10">
+        <div className="stack u-gap-10">
           <h2 className="h2">{dict.title}</h2>
           <p className="muted">{dict.text1}</p>
           <p className="muted">{dict.text2}</p>
         </div>
 
-        <form className="stack gap-14 mt-4" onSubmit={handleSubmit}>
+        <form className="stack u-gap-14 u-mt-4" onSubmit={handleSubmit}>
           {/* honeypot: скрываем корректно */}
           <div className="sr-only" aria-hidden="true">
             <label htmlFor={ids.honeypot}>
@@ -291,7 +291,7 @@ export default function GreenCardQuestionForm({ homeContact, agreement, dict }: 
             </label>
           </div>
 
-          <div className="grid grid-2">
+          <div className="u-grid grid-2">
             <div className="field">
               <label className="lbl" htmlFor={ids.firstName}>
                 {homeContact.fields.firstName} <span className="req">{homeContact.requiredMark}</span>
@@ -407,7 +407,7 @@ export default function GreenCardQuestionForm({ homeContact, agreement, dict }: 
             </div>
           )}
 
-          <div className="row-between mt-3">
+          <div className="row-between u-mt-3">
             <span />
             <button type="submit" className="btn btn-secondary" disabled={isBusy}>
               {isBusy ? homeContact.submitLoading : homeContact.submitDefault}

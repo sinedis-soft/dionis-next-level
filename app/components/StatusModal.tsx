@@ -28,16 +28,16 @@ export default function StatusModal({
       onClose={onClose}
       title={title}
       // делаем подложку как у тебя: bg-black/40
-      overlayClassName="bg-black/40"
+      overlayClassName="u-bg-black-40"
       // делаем панель как у тебя: белая карточка, max-w-sm, центр
-      panelClassName="max-w-sm bg-white rounded-2xl shadow-xl"
+      panelClassName="u-max-w-sm u-bg-white u-rounded-2xl u-shadow-xl"
       // чтобы не было лишней шапки с крестиком (у тебя её нет)
       showClose={false}
     >
-      <div className="text-center">
-        <p className="text-sm text-gray-700 mb-5">{message}</p>
+      <div className="u-text-center">
+        <p className="u-text-sm u-text-gray-700 u-mb-5">{message}</p>
 
-        <button type="button" className="btn w-full" onClick={onClose}>
+        <button type="button" className="btn u-w-full" onClick={onClose}>
           {closeText}
         </button>
       </div>

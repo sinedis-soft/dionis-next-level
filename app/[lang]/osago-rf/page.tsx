@@ -50,7 +50,7 @@ function AdvantageIcon({ index }: { index: number }) {
     width: 20,
     height: 20,
     className: "gc-adv-icon",
-    style: { width: 20, height: 20, display: "block" } as CSSProperties,
+    style: { width: 20, height: 20, display: "u-block" } as CSSProperties,
     fill: "none" as const,
     "aria-hidden": true as const,
     focusable: "false" as const,

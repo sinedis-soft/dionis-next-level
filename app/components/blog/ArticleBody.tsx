@@ -45,35 +45,13 @@ function injectLang(node: ReactNode, lang: Lang): ReactNode {
   return node;
 }
 
-export default function ArticleBody({ children, className = "", lang }: Props) {
+export default function ArticleBody({ children, className="", lang }: Props) {
   const patched = injectLang(children, lang);
 
   return (
-    <div className={`mx-auto w-full max-w-3xl ${className}`}>
+    <div className={`u-mx-auto u-w-full u-max-w-3xl ${className}`}>
       <article
-        className={[
-          "prose prose-slate max-w-none",
-          "prose-p:my-4 prose-li:my-1",
-          "prose-h2:mt-10 prose-h2:mb-3",
-          "prose-h3:mt-7 prose-h3:mb-2",
-          "prose-hr:my-10",
-          "prose-a:text-[#23376C] prose-a:font-medium prose-a:no-underline hover:prose-a:underline",
-          "prose-a:underline-offset-4",
-          "prose-blockquote:border-l-[#EBCA45] prose-blockquote:bg-[#F8FAFF] prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-xl",
-          "prose-blockquote:not-italic prose-blockquote:text-slate-700",
-          "prose-code:rounded-md prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5",
-          "prose-code:text-slate-800",
-          "prose-pre:rounded-2xl prose-pre:bg-slate-950 prose-pre:text-slate-100",
-          "prose-pre:px-4 prose-pre:py-3 prose-pre:overflow-x-auto",
-          "prose-table:text-sm",
-          "prose-th:bg-slate-50 prose-th:text-slate-900",
-          "prose-td:align-top",
-          "prose-img:rounded-2xl prose-img:shadow-sm",
-          "prose-p:leading-7",
-          "dark:prose-invert dark:prose-a:text-[#EBCA45]",
-          "dark:prose-blockquote:bg-slate-900/40 dark:prose-code:bg-slate-800",
-          "dark:prose-pre:bg-black",
-        ].join(" ")}
+        className="ab-prose"
       >
         {patched}
       </article>

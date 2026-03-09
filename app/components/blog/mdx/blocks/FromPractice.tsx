@@ -12,9 +12,9 @@ export default function FromPractice({
   if (!children) return null;
 
   return (
-    <section className="my-6 rounded-2xl border border-gray-200 bg-gray-50 p-5">
-      <div className="text-sm font-semibold text-gray-900">{title}</div>
-      <div className="mt-2 text-sm leading-relaxed text-gray-700">{children}</div>
+    <section className="u-my-6 u-rounded-2xl u-border u-border-gray-200 u-bg-gray-50 u-p-5">
+      <div className="u-text-sm u-font-semibold u-text-gray-900">{title}</div>
+      <div className="u-mt-2 u-text-sm u-leading-relaxed u-text-gray-700">{children}</div>
     </section>
   );
 }

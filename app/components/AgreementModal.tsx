@@ -14,12 +14,12 @@ export default function AgreementModal({
 }) {
   return (
     <ModalShell open={open} onClose={onClose} title={agreement.title}>
-      <div className="text-sm text-gray-700 space-y-4">
+      <div className="u-text-sm u-text-gray-700 u-space-y-4">
         <p>{agreement.intro1}</p>
 
         <p>{agreement.personalDataDefinition}</p>
 
-        <ul className="list-disc pl-6 space-y-1">
+        <ul className="u-list-disc u-pl-6 u-space-y-1">
           <li>{agreement.dataList.firstName}</li>
           <li>{agreement.dataList.lastName}</li>
           <li>{agreement.dataList.email}</li>
@@ -30,7 +30,7 @@ export default function AgreementModal({
         <p>{agreement.processingIntro}</p>
         <p>{agreement.purposesIntro}</p>
 
-        <ul className="list-disc pl-6 space-y-1">
+        <ul className="u-list-disc u-pl-6 u-space-y-1">
           {agreement.purposesList.map((item) => (
             <li key={item}>{item}</li>
           ))}
@@ -38,20 +38,20 @@ export default function AgreementModal({
 
         <p>{agreement.consentText}</p>
 
-        <h4 className="font-semibold text-[#1A3A5F] mt-4">
+        <h4 className="u-font-semibold u-text--1a3a5f u-mt-4">
           {agreement.contactsTitle}
         </h4>
 
-        <ul className="list-disc pl-6 space-y-1">
+        <ul className="u-list-disc u-pl-6 u-space-y-1">
           {agreement.contactsList.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>
 
-        <div className="pt-4 flex justify-end">
+        <div className="u-pt-4 u-flex u-justify-end">
           <button
             type="button"
-            className="px-4 py-2 rounded-xl border border-black/10 bg-white/60 hover:bg-white/80 text-sm font-semibold text-[#0f2238]"
+            className="u-px-4 u-py-2 u-rounded-xl u-border u-border-black-10 u-bg-white-60 u-hover-bg-white-80 u-text-sm u-font-semibold u-text--0f2238"
             onClick={onClose}
           >
             {agreement.closeBtn}

@@ -19,7 +19,7 @@ export default function BlogGrid({
   ui: BlogGridUi;
 }) {
   return (
-    <section className="mt-6">
+    <section className="u-mt-6">
       <BlogFilters lang={lang} articles={articles} ui={ui} />
     </section>
   );

@@ -118,38 +118,38 @@ export default function InlineCta({
   return (
     <section
       className={cx(
-        "my-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-sm",
+        "u-my-6 u-rounded-2xl u-border u-border-slate-200 u-bg-slate-50 u-p-4 u-shadow-sm",
         // Hover/Focus state: очень мягкий
-        "transition-colors hover:bg-slate-100 focus-within:bg-slate-100",
+        "transition-colors u-hover-bg-slate-100 u-focus-within-bg-slate-100",
         className
       )}
       data-article-slug={articleSlug}
       data-block-id={blockId}
       data-variant={variant}
     >
-      <div className="flex items-start gap-3">
+      <div className="u-flex u-items-start u-gap-3">
         <div
           aria-hidden="true"
-          className="mt-0.5 grid h-9 w-9 place-items-center rounded-xl border border-slate-200 bg-white"
+          className="u-mt-0-5 u-grid u-h-9 u-w-9 u-place-items-center u-rounded-xl u-border u-border-slate-200 u-bg-white"
         >
           {/* спокойная иконка */}
-          <span className="text-base">💬</span>
+          <span className="u-text-base">💬</span>
         </div>
 
-        <div className="min-w-0 flex-1">
-          <h3 className="text-base font-semibold text-slate-900">{uiTitle}</h3>
-          <p className="mt-1 text-sm leading-6 text-slate-700">{uiText}</p>
+        <div className="u-min-w-0 u-flex-1">
+          <h3 className="u-text-base u-font-semibold u-text-slate-900">{uiTitle}</h3>
+          <p className="u-mt-1 u-text-sm u-leading-6 u-text-slate-700">{uiText}</p>
 
           {/* Actions */}
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+          <div className="u-mt-3 u-flex u-flex-wrap u-items-center u-gap-2">
             {isLink ? (
               <a
                 href={href}
                 className={cx(
-                  "inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium",
-                  "border border-slate-300 bg-white text-slate-900",
-                  "hover:border-slate-400 hover:bg-slate-50",
-                  "focus:outline-none focus:ring-2 focus:ring-slate-300"
+                  "u-inline-flex u-items-center u-justify-center u-rounded-xl u-px-3 u-py-2 u-text-sm u-font-medium",
+                  "u-border u-border-slate-300 u-bg-white u-text-slate-900",
+                  "u-hover-border-slate-400 u-hover-bg-slate-50",
+                  "u-focus-outline-none u-focus-ring-2 u-focus-ring-slate-300"
                 )}
               >
                 {uiButton}
@@ -159,10 +159,10 @@ export default function InlineCta({
                 type="button"
                 onClick={() => setOpen((v) => !v)}
                 className={cx(
-                  "inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium",
-                  "border border-slate-300 bg-white text-slate-900",
-                  "hover:border-slate-400 hover:bg-slate-50",
-                  "focus:outline-none focus:ring-2 focus:ring-slate-300"
+                  "u-inline-flex u-items-center u-justify-center u-rounded-xl u-px-3 u-py-2 u-text-sm u-font-medium",
+                  "u-border u-border-slate-300 u-bg-white u-text-slate-900",
+                  "u-hover-border-slate-400 u-hover-bg-slate-50",
+                  "u-focus-outline-none u-focus-ring-2 u-focus-ring-slate-300"
                 )}
                 aria-expanded={open}
                 aria-controls={`inline-cta-form-${uid}`}
@@ -172,7 +172,7 @@ export default function InlineCta({
             )}
 
             {/* micro-trust line */}
-            <span className="text-xs text-slate-500">
+            <span className="u-text-xs u-text-slate-500">
               Без звонков и навязывания
             </span>
           </div>
@@ -181,25 +181,25 @@ export default function InlineCta({
           {!isLink && open && (
             <div
               id={`inline-cta-form-${uid}`}
-              className="mt-4 rounded-2xl border border-slate-200 bg-white p-4"
+              className="u-mt-4 u-rounded-2xl u-border u-border-slate-200 u-bg-white u-p-4"
             >
               {sent ? (
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-slate-900">
+                <div className="u-space-y-1">
+                  <p className="u-text-sm u-font-medium u-text-slate-900">
                     Спасибо. Мы посмотрим ситуацию и вернёмся с комментарием.
                   </p>
-                  <p className="text-xs text-slate-600">
+                  <p className="u-text-xs u-text-slate-600">
                     Обычно отвечаем в течение рабочего дня.
                   </p>
                 </div>
               ) : (
-                <form onSubmit={onSubmit} className="space-y-3">
+                <form onSubmit={onSubmit} className="u-space-y-3">
                   <div>
                     <label
                       htmlFor={`msg-${uid}`}
-                      className="block text-xs font-medium text-slate-700"
+                      className="u-block u-text-xs u-font-medium u-text-slate-700"
                     >
-                      Опишите вопрос или ситуацию <span className="text-slate-400">(обязательно)</span>
+                      Опишите вопрос или ситуацию <span className="u-text-slate-400">(обязательно)</span>
                     </label>
                     <textarea
                       id={`msg-${uid}`}
@@ -207,8 +207,8 @@ export default function InlineCta({
                       onChange={(e) => setMessage(e.target.value)}
                       rows={4}
                       className={cx(
-                        "mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm",
-                        "focus:outline-none focus:ring-2 focus:ring-slate-300"
+                        "u-mt-1 u-w-full u-rounded-xl u-border u-border-slate-200 u-bg-white u-px-3 u-py-2 u-text-sm",
+                        "u-focus-outline-none u-focus-ring-2 u-focus-ring-slate-300"
                       )}
                       placeholder="Например: авто 2021 года, кредит, интересует дилерский ремонт и франшиза…"
                     />
@@ -217,32 +217,32 @@ export default function InlineCta({
                   <div>
                     <label
                       htmlFor={`contact-${uid}`}
-                      className="block text-xs font-medium text-slate-700"
+                      className="u-block u-text-xs u-font-medium u-text-slate-700"
                     >
-                      Контакт (email или WhatsApp) <span className="text-slate-400">(необязательно)</span>
+                      Контакт (email или WhatsApp) <span className="u-text-slate-400">(необязательно)</span>
                     </label>
                     <input
                       id={`contact-${uid}`}
                       value={contact}
                       onChange={(e) => setContact(e.target.value)}
                       className={cx(
-                        "mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm",
-                        "focus:outline-none focus:ring-2 focus:ring-slate-300"
+                        "u-mt-1 u-w-full u-rounded-xl u-border u-border-slate-200 u-bg-white u-px-3 u-py-2 u-text-sm",
+                        "u-focus-outline-none u-focus-ring-2 u-focus-ring-slate-300"
                       )}
                       placeholder="name@email.com или +48..."
                       inputMode="text"
                     />
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="u-flex u-flex-wrap u-items-center u-gap-2">
                     <button
                       type="submit"
                       disabled={sending || !message.trim()}
                       className={cx(
-                        "inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium",
-                        "bg-slate-900 text-white",
-                        "hover:bg-slate-800",
-                        "disabled:cursor-not-allowed disabled:opacity-60"
+                        "u-inline-flex u-items-center u-justify-center u-rounded-xl u-px-3 u-py-2 u-text-sm u-font-medium",
+                        "u-bg-slate-900 u-text-white",
+                        "u-hover-bg-slate-800",
+                        "u-disabled-cursor-not-allowed u-disabled-opacity-60"
                       )}
                     >
                       {sending ? "Отправляем…" : "Отправить"}
@@ -252,15 +252,15 @@ export default function InlineCta({
                       type="button"
                       onClick={() => setOpen(false)}
                       className={cx(
-                        "inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium",
-                        "border border-slate-300 bg-white text-slate-900",
-                        "hover:border-slate-400 hover:bg-slate-50"
+                        "u-inline-flex u-items-center u-justify-center u-rounded-xl u-px-3 u-py-2 u-text-sm u-font-medium",
+                        "u-border u-border-slate-300 u-bg-white u-text-slate-900",
+                        "u-hover-border-slate-400 u-hover-bg-slate-50"
                       )}
                     >
                       Отмена
                     </button>
 
-                    <p className="text-xs text-slate-500">
+                    <p className="u-text-xs u-text-slate-500">
                       Нажимая «Отправить», вы соглашаетесь на обработку данных для ответа.
                     </p>
                   </div>

@@ -72,7 +72,7 @@ export default function ModalShell({
   return (
     <div
       className={cx(
-        "fixed inset-0 z-[999] flex items-center justify-center p-4",
+        "u-fixed u-inset-0 u-z--999 u-flex u-items-center u-justify-center u-p-4",
         overlayClassName
       )}
       role="dialog"
@@ -82,7 +82,7 @@ export default function ModalShell({
       onMouseDown={onClose} // клик по фону закрывает
     >
       {/* подложка */}
-      <div className="absolute inset-0 bg-black/20" />
+      <div className="u-absolute u-inset-0 u-bg-black-20" />
 
       {/* панель */}
       <div
@@ -90,17 +90,17 @@ export default function ModalShell({
         tabIndex={-1}
         onMouseDown={(e) => e.stopPropagation()} // чтобы клик внутри не закрывал
         className={cx(
-          "relative w-full max-w-2xl",
-          "bg-white/85 backdrop-blur-md border border-black/10 shadow-2xl",
-          "rounded-2xl",
-          "max-h-[85vh] overflow-y-auto overscroll-contain",
+          "u-relative u-w-full u-max-w-2xl",
+          "u-bg-white-85 u-backdrop-blur-md u-border u-border-black-10 u-shadow-2xl",
+          "u-rounded-2xl",
+          "u-max-h--85vh u-overflow-y-auto overscroll-contain",
           panelClassName
         )}
       >
         {(title || showClose) && (
-          <div className="sticky top-0 z-10 flex items-center justify-between gap-3 px-5 py-4 border-b border-black/10 bg-white/70 backdrop-blur-md">
+          <div className="u-sticky u-top-0 u-z-10 u-flex u-items-center u-justify-between u-gap-3 u-px-5 u-py-4 u-border-b u-border-black-10 u-bg-white-70 u-backdrop-blur-md">
             {title ? (
-              <h3 id={titleId} className="text-lg font-extrabold text-[#1A3A5F]">
+              <h3 id={titleId} className="u-text-lg u-font-extrabold u-text--1a3a5f">
                 {title}
               </h3>
             ) : (
@@ -112,7 +112,7 @@ export default function ModalShell({
                 type="button"
                 aria-label="Close"
                 onClick={onClose}
-                className="h-10 w-10 rounded-xl border border-black/10 bg-white/40 hover:bg-white/70"
+                className="u-h-10 u-w-10 u-rounded-xl u-border u-border-black-10 u-bg-white-40 u-hover-bg-white-70"
               >
                 ✕
               </button>
@@ -120,7 +120,7 @@ export default function ModalShell({
           </div>
         )}
 
-        <div className="px-5 py-5">{children}</div>
+        <div className="u-px-5 u-py-5">{children}</div>
       </div>
     </div>
   );

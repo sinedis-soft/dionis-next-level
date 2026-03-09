@@ -57,15 +57,15 @@ function statusUi(status: Status) {
   switch (status) {
     case "actual":
       return {
-        classes: "border-emerald-200 bg-emerald-50 text-emerald-900",
+        classes: "u-border-emerald-200 u-bg-emerald-50 u-text-emerald-900",
       };
     case "needs-check":
       return {
-        classes: "border-amber-200 bg-amber-50 text-amber-900",
+        classes: "u-border-amber-200 u-bg-amber-50 u-text-amber-900",
       };
     case "archived":
       return {
-        classes: "border-gray-200 bg-gray-50 text-gray-800",
+        classes: "u-border-gray-200 u-bg-gray-50 u-text-gray-800",
       };
   }
 }
@@ -77,14 +77,14 @@ export default function ContentStatus({ status, reason, lang }: Props) {
   const t = STATUS_DICTIONARY[safeLang] ?? STATUS_DICTIONARY[DEFAULT_LANG];
 
   return (
-    <div className={`my-6 rounded-2xl border p-5 ${ui.classes}`}>
-      <div className="text-sm font-semibold">
-        {t.title}: <span className="font-bold">{t.statuses[status]}</span>
+    <div className={`u-my-6 u-rounded-2xl u-border u-p-5 ${ui.classes}`}>
+      <div className="u-text-sm u-font-semibold">
+        {t.title}: <span className="u-font-bold">{t.statuses[status]}</span>
       </div>
       
 
       {reason ? (
-        <div className="mt-2 text-sm leading-relaxed opacity-80">{reason}</div>
+        <div className="u-mt-2 u-text-sm u-leading-relaxed u-opacity-80">{reason}</div>
       ) : null}
     </div>
   );

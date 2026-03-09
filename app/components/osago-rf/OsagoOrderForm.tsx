@@ -904,7 +904,7 @@ export function OsagoOrderForm({ dict }: Props) {
                   </div>
 
                   {!manualPassportEntry ? (
-                    <div className="field field--full mt-4">
+                    <div className="field field--full u-mt-4">
                       <FilePicker
                         id={`${uid}-person_passportFiles`}
                         name="person_passportFiles"
@@ -922,7 +922,7 @@ export function OsagoOrderForm({ dict }: Props) {
                       <p className="hint fp__hint">{dict.person.passportFilesHint}</p>
                     </div>
                   ) : (
-                    <div className="grid grid-2 mt-4">
+                    <div className="grid grid-2 u-mt-4">
                       <div className="field">
                         <label htmlFor={`${uid}-person_gender`} className="lbl">
                           {dict.person.gender}
@@ -1047,7 +1047,7 @@ export function OsagoOrderForm({ dict }: Props) {
               )}
             </div>
 
-            <div className="row-between mt-4">
+            <div className="row-between u-mt-4">
               <span />
               <button
                 type="button"
@@ -1093,7 +1093,7 @@ export function OsagoOrderForm({ dict }: Props) {
                 </button>
               </div>
 
-              <div className="stack gap-14 mt-4">
+              <div className="stack u-gap-14 u-mt-4">
                 {vehicleBlocks.map((vehicleId, idx) => {
                   const driversLimited = Boolean(
                     driversLimitedByVehicleId[vehicleId]
@@ -1122,7 +1122,7 @@ export function OsagoOrderForm({ dict }: Props) {
                         )}
                       </div>
 
-                      <div className="grid grid-2 mt-4">
+                      <div className="grid grid-2 u-mt-4">
                         <div className="field">
                           <label
                             htmlFor={`${uid}-vehicles_${idx}_plate`}
@@ -1236,7 +1236,7 @@ export function OsagoOrderForm({ dict }: Props) {
                           </select>
                         </div>
 
-                        <div className="field field--full mt-4">
+                        <div className="field field--full u-mt-4">
                           <FilePicker
                             id={`${uid}-vehicles_${idx}_techPassportFiles`}
                             name={`vehicles[${idx}][techPassportFiles]`}
@@ -1254,7 +1254,7 @@ export function OsagoOrderForm({ dict }: Props) {
                         </div>
                       </div>
 
-                      <div className="gc-checkrow mt-4">
+                      <div className="gc-checkrow u-mt-4">
                         <input
                           id={`${uid}-driversLimited-${vehicleId}`}
                           type="checkbox"
@@ -1288,7 +1288,7 @@ export function OsagoOrderForm({ dict }: Props) {
                       </div>
 
                       {driversLimited && (
-                        <div className="panel-muted mt-4">
+                        <div className="panel-muted u-mt-4">
                           <div className="row-between">
                             <p className="panel-muted__title">
                               {dict.vehicles.driversTitle}
@@ -1305,11 +1305,11 @@ export function OsagoOrderForm({ dict }: Props) {
                           </div>
 
                           {drivers.length === 0 ? (
-                            <p className="hint mt-4">
+                            <p className="hint u-mt-4">
                               {dict.vehicles.driversEmptyHint}
                             </p>
                           ) : (
-                            <div className="stack gap-14 mt-4">
+                            <div className="stack u-gap-14 u-mt-4">
                               {drivers.map((driver, j) => (
                                 <div key={driver.id} className="card card--pad">
                                   <div className="row-between">
@@ -1332,7 +1332,7 @@ export function OsagoOrderForm({ dict }: Props) {
                                     </button>
                                   </div>
 
-                                  <div className="grid grid-2 mt-4">
+                                  <div className="grid grid-2 u-mt-4">
                                     <div className="field">
                                       <label
                                         htmlFor={`${uid}-vehicles_${idx}_drivers_${j}_fullName`}
@@ -1383,7 +1383,7 @@ export function OsagoOrderForm({ dict }: Props) {
                                       />
                                     </div>
 
-                                    <div className="field field--full mt-4">
+                                    <div className="field field--full u-mt-4">
                                       <FilePicker
                                         id={`${uid}-vehicles_${idx}_drivers_${j}_licenseFiles`}
                                         name={`vehicles[${idx}][drivers][${j}][licenseFiles]`}
@@ -1431,7 +1431,7 @@ export function OsagoOrderForm({ dict }: Props) {
                 </div>
               )}
 
-              <div className="row-between mt-4 gc-actions">
+              <div className="row-between u-mt-4 gc-actions">
                 <button
                   type="button"
                   className={[
