@@ -73,18 +73,18 @@ export default function ProductsDirectory({ categories, lang, base, ui }: Props)
   };
 
   return (
-    <section className="u-py-10 u-sm-py-14">
-      <div className="u-max-w-6xl u-mx-auto u-px-4">
+    <section className="py-10 sm:py-14">
+      <div className="max-w-6xl mx-auto px-4">
         {/* MOBILE MENU */}
-        <div className="u-lg-hidden">
-          <label className="u-block u-text-sm u-font-medium u-text-gray-700 u-mb-2">
+        <div className="lg:hidden">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             {dict.mobileLabel}
           </label>
 
           <select
             value={active}
             onChange={(e) => onPick(coerceKey(e.target.value))}
-            className="u-w-full u-rounded-xl u-border u-border-black-10 u-bg-white u-px-4 u-py-3 u-text-sm"
+            className="w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm"
           >
             {safe.map((c) => (
               <option key={c.key} value={c.key}>
@@ -94,15 +94,15 @@ export default function ProductsDirectory({ categories, lang, base, ui }: Props)
           </select>
         </div>
 
-        <div className="u-mt-6 u-grid u-grid-cols-1 u-lg-grid-cols--280px_minmax-0-1fr u-gap-8">
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-8">
           {/* LEFT NAV (DESKTOP) */}
-          <aside className="u-hidden u-lg-block">
-            <div className="u-sticky u-top-24 u-rounded-2xl u-border u-border-black-10 u-bg-white">
-              <div className="u-px-4 u-py-3 u-border-b u-border-black-10">
-                <div className="u-text-sm u-font-semibold u-text--1a3a5f">{ui.quick}</div>
+          <aside className="hidden lg:block">
+            <div className="sticky top-24 rounded-2xl border border-black/10 bg-white">
+              <div className="px-4 py-3 border-b border-black/10">
+                <div className="text-sm font-semibold text-[#1A3A5F]">{ui.quick}</div>
               </div>
 
-              <nav className="u-p-2">
+              <nav className="p-2">
                 {safe.map((c) => {
                   const isActive = c.key === active;
 
@@ -112,17 +112,17 @@ export default function ProductsDirectory({ categories, lang, base, ui }: Props)
                       type="button"
                       onClick={() => onPick(c.key)}
                       className={cx(
-                        "u-w-full u-text-left u-rounded-xl u-px-3 u-py-3 u-transition",
-                        "u-border u-border-transparent",
+                        "w-full text-left rounded-xl px-3 py-3 transition",
+                        "border border-transparent",
                         isActive
-                          ? "u-bg--f4f6fa u-border-black-10"
-                          : "u-hover-bg-black-0-03"
+                          ? "bg-[#F4F6FA] border-black/10"
+                          : "hover:bg-black/[0.03]"
                       )}
                     >
-                      <div className="u-text-sm u-font-semibold u-text--0f2238">
+                      <div className="text-sm font-semibold text-[#0f2238]">
                         {c.title[lang]}
                       </div>
-                      <div className="u-mt-1 u-text-xs u-text-gray-600 u-line-clamp-2">
+                      <div className="mt-1 text-xs text-gray-600 line-clamp-2">
                         {c.lead[lang]}
                       </div>
                     </button>
@@ -133,7 +133,7 @@ export default function ProductsDirectory({ categories, lang, base, ui }: Props)
           </aside>
 
           {/* RIGHT CONTENT */}
-          <div className="u-space-y-6">
+          <div className="space-y-6">
             {safe.map((c) => {
               const isOpen = c.key === active;
 
@@ -142,51 +142,51 @@ export default function ProductsDirectory({ categories, lang, base, ui }: Props)
                   key={c.key}
                   id={c.key}
                   className={cx(
-                    "u-rounded-2xl u-border u-border-black-10 u-bg-white",
-                    isOpen ? "u-shadow-sm" : ""
+                    "rounded-2xl border border-black/10 bg-white",
+                    isOpen ? "shadow-sm" : ""
                   )}
                 >
                   <button
                     type="button"
                     onClick={() => onPick(c.key)}
                     className={cx(
-                      "u-w-full u-text-left u-px-5 u-sm-px-6 u-py-5 u-sm-py-6",
-                      "u-flex u-items-start u-justify-between u-gap-4"
+                      "w-full text-left px-5 sm:px-6 py-5 sm:py-6",
+                      "flex items-start justify-between gap-4"
                     )}
                     aria-expanded={isOpen}
                   >
-                    <div className="u-min-w-0">
-                      <div className="u-text-base u-sm-text-lg u-font-bold u-text--0f2238">
+                    <div className="min-w-0">
+                      <div className="text-base sm:text-lg font-bold text-[#0f2238]">
                         {c.title[lang]}
                       </div>
-                      <p className="u-mt-2 u-text-sm u-text-gray-700">{c.lead[lang]}</p>
+                      <p className="mt-2 text-sm text-gray-700">{c.lead[lang]}</p>
 
-                      <div className="u-mt-3 u-text-sm u-text-gray-700">
+                      <div className="mt-3 text-sm text-gray-700">
                         {(c.bullets?.[lang] ?? []).join(" • ")}
                       </div>
                     </div>
 
-                    <div className="shrink-0 u-text-xs u-text-gray-500 u-pt-1">
+                    <div className="shrink-0 text-xs text-gray-500 pt-1">
                       {isOpen ? dict.hide : dict.open}
                     </div>
                   </button>
 
                   {isOpen ? (
-                    <div className="u-px-5 u-sm-px-6 u-pb-6">
+                    <div className="px-5 sm:px-6 pb-6">
                       {c.key === "auto" ? (
                         <AutoProductsSection lang={lang} base={base} ui={ui} />
                       ) : c.key === "property" ? (
                         <PropertyProductsSection lang={lang} base={base} ui={ui} />
                       ) : (
-                        <div className="u-rounded-2xl u-border u-border-black-10 u-bg--f7f7f7 u-p-5">
-                          <div className="u-text-sm u-font-semibold u-text--1a3a5f">
+                        <div className="rounded-2xl border border-black/10 bg-[#F7F7F7] p-5">
+                          <div className="text-sm font-semibold text-[#1A3A5F]">
                             {dict.inProgressTitle}
                           </div>
-                          <p className="u-mt-2 u-text-sm u-text-gray-700">
+                          <p className="mt-2 text-sm text-gray-700">
                             {dict.inProgressText}
                           </p>
 
-                          <div className="u-mt-4">
+                          <div className="mt-4">
                             <a href={`${base}/contacts`} className="btn btn-secondary">
                               {ui.btnRequest}
                             </a>

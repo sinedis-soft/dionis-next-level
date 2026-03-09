@@ -27,20 +27,20 @@ export default function ArticleMeta({
     actualISO && actualISO.length > 0 ? formatDateISO(actualISO, locale) : null;
 
   return (
-    <div className="u-flex u-flex-wrap u-items-center u-gap-x-4 u-gap-y-1 u-text-sm u-text-slate-600">
+    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-600">
       <span>
-        Опубликовано: <span className="u-text-slate-800">{published}</span>
+        Опубликовано: <span className="text-slate-800">{published}</span>
       </span>
 
       {updated && (
         <span>
-          Обновлено: <span className="u-text-slate-800">{updated}</span>
+          Обновлено: <span className="text-slate-800">{updated}</span>
         </span>
       )}
 
       {actual && (
-        <span className="u-rounded-full u-border u-border-slate-200 u-bg-slate-50 u-px-3 u-py-1 u-text-slate-700">
-          Актуально на <span className="u-text-slate-900">{actual}</span>
+        <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-slate-700">
+          Актуально на <span className="text-slate-900">{actual}</span>
         </span>
       )}
     </div>

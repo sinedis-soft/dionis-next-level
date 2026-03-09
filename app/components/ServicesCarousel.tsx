@@ -31,15 +31,15 @@ export default function ServicesCarousel({
 
   return (
     <>
-      <div className="u-flex u-items-center u-justify-between u-mb-4">
-        <h3 className="u-text-lg u-sm-text-xl u-font-semibold u-text--1a3a5f">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg sm:text-xl font-semibold text-[#1A3A5F]">
           {heading}
         </h3>
 
-        <div className="u-hidden u-lg-flex u-gap-2">
+        <div className="hidden lg:flex gap-2">
           <button
             type="button"
-            className="u-w-8 u-h-8 u-rounded-full u-border u-border-gray-300 u-flex u-items-center u-justify-center u-text--1a3a5f u-hover-bg-gray-100 u-transition"
+            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-[#1A3A5F] hover:bg-gray-100 transition"
             onClick={() => scrollServices("left")}
             aria-label="Прокрутить услуги влево"
           >
@@ -47,7 +47,7 @@ export default function ServicesCarousel({
           </button>
           <button
             type="button"
-            className="u-w-8 u-h-8 u-rounded-full u-border u-border-gray-300 u-flex u-items-center u-justify-center u-text--1a3a5f u-hover-bg-gray-100 u-transition"
+            className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center text-[#1A3A5F] hover:bg-gray-100 transition"
             onClick={() => scrollServices("right")}
             aria-label="Прокрутить услуги вправо"
           >
@@ -59,37 +59,37 @@ export default function ServicesCarousel({
       {/* Desktop carousel */}
       <div
         ref={servicesScrollRef}
-        className="u-hidden u-lg-flex u-gap-6 u-overflow-x-auto u-scrollbar-hide u-pb-2"
+        className="hidden lg:flex gap-6 overflow-x-auto scrollbar-hide pb-2"
       >
         {items.map((service) => (
           <article
             key={service.key}
             data-service-card
-            className="card u-min-w--260px u-max-w--260px u-flex-shrink-0 u-flex u-flex-col"
+            className="card min-w-[260px] max-w-[260px] flex-shrink-0 flex flex-col"
           >
-            <div className="u-aspect-square u-w-full u-overflow-hidden u-rounded-lg">
+            <div className="aspect-square w-full overflow-hidden rounded-lg">
               <Image
                 src={service.image}
                 alt={service.title}
                 width={400}
                 height={400}
-                className="u-h-full u-w-full u-object-cover"
+                className="h-full w-full object-cover"
               />
             </div>
 
-            <div className="u-px-5 u-py-4 u-flex u-flex-col u-flex-1">
-              <h4 className="u-text-sm u-font-semibold u-text--1a3a5f u-mb-2">
+            <div className="px-5 py-4 flex flex-col flex-1">
+              <h4 className="text-sm font-semibold text-[#1A3A5F] mb-2">
                 {service.title}
               </h4>
 
-              <ul className="u-text-sm u-text-gray-700 u-mb-4 u-list-disc u-pl-4 u-space-y-1">
+              <ul className="text-sm text-gray-700 mb-4 list-disc pl-4 space-y-1">
                 {service.items.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
 
-              <div className="u-mt-auto">
-                <a href={service.link} className="btn u-w-full u-text-center">
+              <div className="mt-auto">
+                <a href={service.link} className="btn w-full text-center">
                   {moreBtnText}
                 </a>
               </div>
@@ -99,31 +99,31 @@ export default function ServicesCarousel({
       </div>
 
       {/* Mobile list */}
-      <div className="u-grid u-gap-6 u-mt-4 u-lg-hidden">
+      <div className="grid gap-6 mt-4 lg:hidden">
         {items.map((service) => (
-          <article key={service.key} className="card u-flex u-flex-col u-overflow-hidden">
-            <div className="u-aspect-square u-w-full u-overflow-hidden u-rounded-lg">
+          <article key={service.key} className="card flex flex-col overflow-hidden">
+            <div className="aspect-square w-full overflow-hidden rounded-lg">
               <Image
                 src={service.image}
                 alt={service.title}
                 width={400}
                 height={400}
-                className="u-h-full u-w-full u-object-cover"
+                className="h-full w-full object-cover"
               />
             </div>
 
-            <div className="u-px-5 u-py-4 u-flex u-flex-col">
-              <h4 className="u-text-sm u-font-semibold u-text--1a3a5f u-mb-2">
+            <div className="px-5 py-4 flex flex-col">
+              <h4 className="text-sm font-semibold text-[#1A3A5F] mb-2">
                 {service.title}
               </h4>
 
-              <ul className="u-text-sm u-text-gray-700 u-mb-4 u-list-disc u-pl-4 u-space-y-1">
+              <ul className="text-sm text-gray-700 mb-4 list-disc pl-4 space-y-1">
                 {service.items.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
 
-              <a href={service.link} className="btn u-w-full u-text-center">
+              <a href={service.link} className="btn w-full text-center">
                 {moreBtnText}
               </a>
             </div>

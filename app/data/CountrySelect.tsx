@@ -57,8 +57,8 @@ export function CountrySelect({
       : "";
 
   return (
-    <div className="u-w-full">
-      <label className="u-block u-text-sm u-font-medium u-text-gray-700 u-mb-1">
+    <div className="w-full">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
 
@@ -74,22 +74,24 @@ export function CountrySelect({
         value={selectedCode}
         onChange={(value) => setSelectedCode(value)}
       >
-        <div className="u-relative">
+        <div className="relative">
           <Combobox.Input
-            className="u-w-full u-border u-border-gray-300 u-rounded-md u-px-3 u-py-2 u-text-sm u-focus-ring-2 u-focus-ring--c89f4a u-focus-outline-none"
+            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#C89F4A] focus:outline-none"
             placeholder={ui.placeholder}
             onChange={(e) => setQuery(e.target.value)}
             displayValue={() => selectedName}
           />
 
           {filtered.length > 0 && (
-            <Combobox.Options className="u-absolute u-z-10 u-mt-1 u-max-h-60 u-w-full u-overflow-auto u-rounded-md u-bg-white u-border u-border-gray-200 u-shadow-lg">
+            <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white border border-gray-200 shadow-lg">
               {filtered.map((c) => (
                 <Combobox.Option
                   key={c.code}
                   value={c.code}
                   className={({ active }) =>
-                    `u-cursor-pointer u-px-3 u-py-2 u-text-sm ${ active ? "u-bg--c89f4a-20" : "" }`
+                    `cursor-pointer px-3 py-2 text-sm ${
+                      active ? "bg-[#C89F4A]/20" : ""
+                    }`
                   }
                 >
                   {c.names[locale]}
@@ -99,7 +101,7 @@ export function CountrySelect({
           )}
 
           {filtered.length === 0 && query !== "" && (
-            <div className="u-absolute u-z-10 u-mt-1 u-w-full u-rounded-md u-bg-white u-border u-border-gray-200 u-shadow-lg u-px-3 u-py-2 u-text-gray-500 u-text-sm">
+            <div className="absolute z-10 mt-1 w-full rounded-md bg-white border border-gray-200 shadow-lg px-3 py-2 text-gray-500 text-sm">
               {ui.noResults}
             </div>
           )}

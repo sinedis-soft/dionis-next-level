@@ -11,8 +11,8 @@ type Props = {
 
 export default function ContentTypeBadge({ type, size = "md", className }: Props) {
   const base =
-    "u-inline-flex u-items-center u-rounded-full u-border u-border-gray-200 u-bg-white-70 u-text-gray-800 u-backdrop-blur-md";
-  const paddings = size === "sm" ? "u-px-2 u-py-0-5 u-text--11px" : "u-px-3 u-py-1 u-text-xs";
+    "inline-flex items-center rounded-full border border-gray-200 bg-white/70 text-gray-800 backdrop-blur";
+  const paddings = size === "sm" ? "px-2 py-0.5 text-[11px]" : "px-3 py-1 text-xs";
   return (
     <span className={[base, paddings, className].filter(Boolean).join(" ")}>
       {CONTENT_TYPE_LABEL[type]}

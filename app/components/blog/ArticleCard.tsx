@@ -8,13 +8,13 @@ export default function ArticleCard({ article }: Props) {
   return (
     <a
       href={`/${article.lang}/blog/${article.slug}`}
-      className="u-group u-rounded-lg u-border u-p-4 u-hover-border-slate-400 u-transition"
+      className="group rounded-lg border p-4 hover:border-slate-400 transition"
     >
-      <h4 className="u-font-medium u-group-hover-underline">{article.title}</h4>
+      <h4 className="font-medium group-hover:underline">{article.title}</h4>
 
-      <p className="u-mt-1 u-text-sm u-text-gray-600">{article.excerpt}</p>
+      <p className="mt-1 text-sm text-gray-600">{article.excerpt}</p>
 
-      <div className="u-mt-3 u-text-xs u-text-gray-500 u-flex u-gap-2">
+      <div className="mt-3 text-xs text-gray-500 flex gap-2">
         <span>{article.publishedAt}</span>
         <span>•</span>
         <span>{article.readingTime}</span>

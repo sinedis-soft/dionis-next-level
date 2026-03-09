@@ -102,11 +102,11 @@ export default async function ProductsPage({
   return (
     <main className="pr-page">
       {/* HERO */}
-      <section className="u-pr-hero">
-        <div className="u-pr-hero__bg" aria-hidden="true" />
+      <section className="pr-hero">
+        <div className="pr-hero__bg" aria-hidden="true" />
         <div className="gc-container">
-          <div className="u-pr-hero__inner">
-            <div className="u-pr-hero__copy">
+          <div className="pr-hero__inner">
+            <div className="pr-hero__copy">
               <h1 className="pr-hero__title">{ui.h1}</h1>
               <p className="pr-hero__sub">{ui.sub}</p>
             </div>
@@ -144,7 +144,7 @@ export default async function ProductsPage({
       ) : null}
 
       {/* REQUEST BOX */}
-      <section className="u-pr-request">
+      <section className="pr-request">
         <div className="gc-container">
           <RequestBox
             title={ui.requestTitle}

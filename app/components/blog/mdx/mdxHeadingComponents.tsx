@@ -33,7 +33,7 @@ function getText(children: React.ReactNode): string {
 
 function headingClass(level: "h2" | "h3", className?: string) {
   const base = "scroll-mt-24";
-  const spacing = level === "h2" ? "u-mt-10 u-mb-4" : "u-mt-8 u-mb-3";
+  const spacing = level === "h2" ? "mt-10 mb-4" : "mt-8 mb-3";
   return [base, spacing, className].filter(Boolean).join(" ");
 }
 
@@ -61,21 +61,21 @@ export const mdxHeadingComponents = {
   ul: (props: HTMLAttributes<HTMLUListElement>) => (
     <ul
       {...props}
-      className={`u-my-4 u-ml-6 u-list-disc u-space-y-2 ${props.className ?? ""}`.trim()}
+      className={`my-4 ml-6 list-disc space-y-2 ${props.className ?? ""}`.trim()}
     />
   ),
 
   ol: (props: OlHTMLAttributes<HTMLOListElement>) => (
     <ol
       {...props}
-      className={`u-my-4 u-ml-6 u-list-decimal u-space-y-2 ${props.className ?? ""}`.trim()}
+      className={`my-4 ml-6 list-decimal space-y-2 ${props.className ?? ""}`.trim()}
     />
   ),
 
   li: (props: LiHTMLAttributes<HTMLLIElement>) => (
     <li
       {...props}
-      className={`u-leading-relaxed ${props.className ?? ""}`.trim()}
+      className={`leading-relaxed ${props.className ?? ""}`.trim()}
     />
   ),
 
@@ -86,7 +86,7 @@ export const mdxHeadingComponents = {
       return (
         <input
           {...props}
-          className={`u-mr-2 u-h-4 u-w-4 align-middle accent-[#1A3A5F] ${props.className ?? ""}`.trim()}
+          className={`mr-2 h-4 w-4 align-middle accent-[#1A3A5F] ${props.className ?? ""}`.trim()}
         />
       );
     }

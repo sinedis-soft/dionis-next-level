@@ -112,7 +112,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
 
-      <body className="u-min-h-screen u-flex u-flex-col">
+      <body className="min-h-screen flex flex-col">
         <AnalyticsScripts />
         <AnalyticsManager />
         {children}

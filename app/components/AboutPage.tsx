@@ -16,11 +16,11 @@ type Props = {
 
 function FeatureCard({ title, text }: { title: string; text: string }) {
   return (
-    <div className="u-rounded-2xl u-bg-white u-border u-border-gray-100 u-shadow-sm u-p-6">
-      <h3 className="u-text-sm u-sm-text-base u-font-extrabold u-tracking-wide u-text-gray-900">
+    <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6">
+      <h3 className="text-sm sm:text-base font-extrabold tracking-wide text-gray-900">
         {title}
       </h3>
-      <p className="u-mt-3 u-text-sm u-sm-text-base u-leading-relaxed u-text-gray-600">
+      <p className="mt-3 text-sm sm:text-base leading-relaxed text-gray-600">
         {text}
       </p>
     </div>
@@ -67,15 +67,15 @@ function LegalBody({ lines }: { lines: string[] }) {
   flushBuf("end");
 
   return (
-    <div className="u-text-sm u-sm-text-base u-text-gray-700 u-leading-relaxed">
+    <div className="text-sm sm:text-base text-gray-700 leading-relaxed">
       {blocks.map((b) => {
-        if (b.type === "spacer") return <div key={b.key} className="u-h-3" />;
+        if (b.type === "spacer") return <div key={b.key} className="h-3" />;
 
         if (b.type === "ul") {
           return (
-            <ul key={b.key} className="u-list-disc u-pl-5 u-text-gray-700 u-my-2">
+            <ul key={b.key} className="list-disc pl-5 text-gray-700 my-2">
               {b.items.map((it, idx) => (
-                <li key={`${b.key}-${idx}`} className="u-text-left">
+                <li key={`${b.key}-${idx}`} className="text-left">
                   {it}
                 </li>
               ))}
@@ -86,7 +86,7 @@ function LegalBody({ lines }: { lines: string[] }) {
         return (
           <p
             key={b.key}
-            className="u-my-2 u-text-justify u-hyphens-auto"
+            className="my-2 text-justify [hyphens:auto]"
             style={{ textAlign: "justify", textJustify: "inter-word" }}
           >
             {b.text}
@@ -100,20 +100,20 @@ function LegalBody({ lines }: { lines: string[] }) {
 export default function AboutPage({ t, lang, contact, agreement }: Props) {
   return (
     <>
-      <section className="u-py-10 u-sm-py-14 u-bg-gray-50">
-        <div className="u-max-w-6xl u-mx-auto u-px-4">
-          <h1 className="u-text-3xl u-sm-text-4xl u-font-bold u-text--1a3a5f">
+      <section className="py-10 sm:py-14 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#1A3A5F]">
             {t.pageTitle}
           </h1>
 
-          <div className="u-mt-10 u-sm-mt-12">
-            <div className="u-grid u-grid-cols-1 u-lg-grid-cols-12 u-gap-6 u-lg-gap-10 u-items-start">
-              <div className="u-lg-col-span-3">
-                <h2 className="u-text-2xl u-sm-text-3xl u-font-extrabold u-text-gray-900">
+          <div className="mt-10 sm:mt-12">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
+              <div className="lg:col-span-3">
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
                   {t.about.leadTitle}
                 </h2>
 
-                <div className="u-mt-6 u-flex u-justify-center u-lg-justify-start u-lg-mt-12">
+                <div className="mt-6 flex justify-center lg:justify-start lg:mt-12">
                   <Image
                     src="/dionis-crkl_2_960x960.webp"
                     alt="Dionis Insurance emblem"
@@ -122,13 +122,13 @@ export default function AboutPage({ t, lang, contact, agreement }: Props) {
                     quality={70}
                     loading="lazy"
                     sizes="(max-width: 1024px) 160px, 220px"
-                    className="u-opacity-90"
+                    className="opacity-90"
                   />
                 </div>
               </div>
 
-              <div className="u-lg-col-span-9">
-                <div className="u-grid u-grid-cols-1 u-md-grid-cols-2 u-gap-6">
+              <div className="lg:col-span-9">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {t.about.features.map((f, idx) => (
                     <FeatureCard
                       key={`${f.title}-${idx}`}
@@ -138,8 +138,8 @@ export default function AboutPage({ t, lang, contact, agreement }: Props) {
                   ))}
                 </div>
 
-                <div className="u-mt-8">
-                  <p className="u-text-base u-sm-text-lg u-font-semibold u-text-gray-900">
+                <div className="mt-8">
+                  <p className="text-base sm:text-lg font-semibold text-gray-900">
                     {t.about.cta}
                   </p>
                 </div>
@@ -147,19 +147,19 @@ export default function AboutPage({ t, lang, contact, agreement }: Props) {
             </div>
           </div>
 
-          <div className="u-mt-12 u-sm-mt-16">
-            <div className="u-rounded-2xl u-bg-white u-border u-border-gray-100 u-shadow-sm u-p-6 u-sm-p-8">
-              <h2 className="u-text-xl u-sm-text-2xl u-font-extrabold u-text-gray-900">
+          <div className="mt-12 sm:mt-16">
+            <div className="rounded-2xl bg-white border border-gray-100 shadow-sm p-6 sm:p-8">
+              <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900">
                 {t.legal.orgTitle}
               </h2>
 
-              <div className="u-mt-5 u-text-sm u-sm-text-base u-text-gray-700 u-leading-relaxed">
+              <div className="mt-5 text-sm sm:text-base text-gray-700 leading-relaxed">
                 {t.legal.headerLines.map((line, i) => (
                   <p key={i}>{line}</p>
                 ))}
               </div>
 
-              <hr className="u-my-6 u-border-gray-200" />
+              <hr className="my-6 border-gray-200" />
 
               <LegalBody lines={t.legal.body} />
             </div>

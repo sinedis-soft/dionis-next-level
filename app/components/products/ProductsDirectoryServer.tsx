@@ -29,15 +29,15 @@ export default function ProductsDirectoryServer({
   active: ProductsSectionKey;
 }) {
   return (
-    <section className="u-py-8">
-      <div className="u-max-w-6xl u-mx-auto u-px-4">
-        <h2 className="u-text-lg u-sm-text-xl u-font-semibold u-text--1a3a5f u-mb-4">
+    <section className="py-8">
+      <div className="max-w-6xl mx-auto px-4">
+        <h2 className="text-lg sm:text-xl font-semibold text-[#1A3A5F] mb-4">
           {ui.quick}
         </h2>
 
         {/* GRID: 2 rows × 3 columns */}
         <nav aria-label={ui.quick}>
-          <div className="u-grid u-gap-3 u-sm-grid-cols-2 u-lg-grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {categories.map((c) => {
               const isActive = c.sectionKey === active;
 
@@ -48,9 +48,9 @@ export default function ProductsDirectoryServer({
                   scroll={false}
                   aria-current={isActive ? "page" : undefined}
                   className={cx(
-                    "btn btn-wide u-justify-center u-text-center",
+                    "btn btn-wide justify-center text-center",
                     isActive
-                      ? "btn-primary u-pointer-events-none"
+                      ? "btn-primary pointer-events-none"
                       : "btn-secondary"
                   )}
                 >

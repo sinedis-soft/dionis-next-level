@@ -12,7 +12,7 @@ type Props = {
 
 function SectionTitle({ children }: { children: string }) {
   return (
-    <h2 className="u-text-xl u-sm-text-2xl u-font-extrabold u-text-gray-900 u-mt-10">
+    <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 mt-10">
       {children}
     </h2>
   );
@@ -20,12 +20,12 @@ function SectionTitle({ children }: { children: string }) {
 
 function RegulationTableView({ table }: { table: RegulationTable }) {
   return (
-    <div className="u-mt-4 u-overflow-x-auto u-rounded-2xl u-border u-border-gray-200 u-bg-white">
-      <table className="u-min-w-full u-text-left u-text-sm">
-        <thead className="u-bg-gray-50">
+    <div className="mt-4 overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+      <table className="min-w-full text-left text-sm">
+        <thead className="bg-gray-50">
           <tr>
             {table.headers.map((h, idx) => (
-              <th key={idx} className="u-px-4 u-py-3 u-font-semibold u-text-gray-900">
+              <th key={idx} className="px-4 py-3 font-semibold text-gray-900">
                 {h}
               </th>
             ))}
@@ -33,9 +33,9 @@ function RegulationTableView({ table }: { table: RegulationTable }) {
         </thead>
         <tbody>
           {table.rows.map((row, rIdx) => (
-            <tr key={rIdx} className="u-border-t u-border-gray-200">
+            <tr key={rIdx} className="border-t border-gray-200">
               {row.map((cell, cIdx) => (
-                <td key={cIdx} className="u-px-4 u-py-3 u-text-gray-700 u-align-top">
+                <td key={cIdx} className="px-4 py-3 text-gray-700 align-top">
                   {cell}
                 </td>
               ))}
@@ -49,16 +49,16 @@ function RegulationTableView({ table }: { table: RegulationTable }) {
 
 function Paragraphs({ items }: { items: string[] }) {
   return (
-    <div className="u-mt-4 u-text-sm u-sm-text-base u-text-gray-700 u-leading-relaxed">
+    <div className="mt-4 text-sm sm:text-base text-gray-700 leading-relaxed">
       {items.map((line, i) => {
         const trimmed = line.trim();
-        if (!trimmed) return <div key={i} className="u-h-3" />;
+        if (!trimmed) return <div key={i} className="h-3" />;
 
         const isBullet = trimmed.startsWith("• ");
         if (isBullet) {
           return (
-            <ul key={i} className="u-list-disc u-pl-5 u-text-gray-700 u-my-2">
-              <li className="u-text-left">{trimmed.replace(/^•\s*/, "")}</li>
+            <ul key={i} className="list-disc pl-5 text-gray-700 my-2">
+              <li className="text-left">{trimmed.replace(/^•\s*/, "")}</li>
             </ul>
           );
         }
@@ -66,7 +66,7 @@ function Paragraphs({ items }: { items: string[] }) {
         return (
           <p
             key={i}
-            className="u-my-2 u-text-justify u-hyphens-auto"
+            className="my-2 text-justify [hyphens:auto]"
             style={{ textAlign: "justify", textJustify: "inter-word" }}
           >
             {line}
@@ -79,19 +79,19 @@ function Paragraphs({ items }: { items: string[] }) {
 
 export default function RegulationPage({ t }: Props) {
   return (
-    <section className="u-py-10 u-sm-py-14 u-bg-gray-50">
-      <div className="u-max-w-6xl u-mx-auto u-px-4">
-        <h1 className="u-text-3xl u-sm-text-4xl u-font-bold u-text--1a3a5f">
+    <section className="py-10 sm:py-14 bg-gray-50">
+      <div className="max-w-6xl mx-auto px-4">
+        <h1 className="text-3xl sm:text-4xl font-bold text-[#1A3A5F]">
           {t.pageTitle}
         </h1>
 
         {t.updatedAt ? (
-          <p className="u-mt-3 u-text-xs u-sm-text-sm u-text-gray-500">
+          <p className="mt-3 text-xs sm:text-sm text-gray-500">
             {t.updatedLabel}: {t.updatedAt}
           </p>
         ) : null}
 
-        <div className="u-mt-6 u-rounded-2xl u-bg-white u-border u-border-gray-100 u-shadow-sm u-p-6 u-sm-p-8">
+        <div className="mt-6 rounded-2xl bg-white border border-gray-100 shadow-sm p-6 sm:p-8">
           {t.sections.map((s, idx) => (
             <div key={idx}>
               <SectionTitle>{s.title}</SectionTitle>
@@ -103,13 +103,13 @@ export default function RegulationPage({ t }: Props) {
               ))}
 
               {s.links?.length ? (
-                <div className="u-mt-4 u-text-sm u-text-gray-700">
+                <div className="mt-4 text-sm text-gray-700">
                   {s.links.map((l, i) => (
-                    <p key={i} className="u-my-1">
+                    <p key={i} className="my-1">
                       {l.label}{" "}
                       <a
                         href={l.href}
-                        className="u-text--1a3a5f u-underline u-underline-offset-2"
+                        className="text-[#1A3A5F] underline underline-offset-2"
                       >
                         {l.text}
                       </a>

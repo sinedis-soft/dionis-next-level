@@ -7,18 +7,18 @@ export default function Changelog({ version, changes }: Props) {
   if (!version && (!changes || changes.length === 0)) return null;
 
   return (
-    <section className="u-mt-16 u-rounded-2xl u-border u-border-slate-200 u-bg-slate-50 u-p-6">
-      <div className="u-mb-3 u-text-sm u-font-semibold u-text-slate-700">
+    <section className="mt-16 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+      <div className="mb-3 text-sm font-semibold text-slate-700">
         История обновлений
         {version && (
-          <span className="u-ml-2 u-rounded u-bg-slate-200 u-px-2 u-py-0-5 u-text-xs">
+          <span className="ml-2 rounded bg-slate-200 px-2 py-0.5 text-xs">
             v{version}
           </span>
         )}
       </div>
 
       {changes && changes.length > 0 && (
-        <ul className="u-list-disc u-space-y-1 u-pl-5 u-text-sm u-text-slate-700">
+        <ul className="list-disc space-y-1 pl-5 text-sm text-slate-700">
           {changes.map((item, i) => (
             <li key={i}>{item}</li>
           ))}

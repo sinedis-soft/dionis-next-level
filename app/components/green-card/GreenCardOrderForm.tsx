@@ -901,7 +901,7 @@ export function GreenCardOrderForm({ dict }: Props) {
                         </div>
                       </div>
 
-                      <div className="grid grid-2 u-mt-4">
+                      <div className="grid grid-2 mt-4">
                         <div className="field">
                           <label htmlFor={`${uid}-person_passportNumber`} className="lbl">
                             {dict.person.passportNumber}
@@ -978,7 +978,7 @@ export function GreenCardOrderForm({ dict }: Props) {
               )}
             </div>
 
-            <div className="row-between u-mt-4">
+            <div className="row-between mt-4">
               <span />
               <button
                 type="button"
@@ -1028,7 +1028,7 @@ export function GreenCardOrderForm({ dict }: Props) {
                 </button>
               </div>
 
-              <div className="stack u-gap-14 u-mt-4">
+              <div className="stack gap-14 mt-4">
                 {vehicles.map((v, idx) => (
                   <div key={v.id} className="card card--pad gc-vehicle">
                     <div className="row-between">
@@ -1051,7 +1051,7 @@ export function GreenCardOrderForm({ dict }: Props) {
                       )}
                     </div>
 
-                    <div className="grid grid-2 u-mt-4">
+                    <div className="grid grid-2 mt-4">
                       <div className="field">
                         <label htmlFor={`${uid}-vehicles_${idx}_plate`} className="lbl">
                           {dict.vehicles.plate}
@@ -1205,7 +1205,7 @@ export function GreenCardOrderForm({ dict }: Props) {
                 </p>
               )}
 
-              <div className="row-between u-mt-4 gc-actions">
+              <div className="row-between mt-4 gc-actions">
                 <button
                   type="button"
                   className={["btn btn-secondary", isBusy ? "is-disabled" : ""].join(" ")}

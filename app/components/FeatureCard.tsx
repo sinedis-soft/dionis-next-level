@@ -10,12 +10,12 @@ export default function FeatureCard({
   icon?: ReactNode;
 }) {
   return (
-    <div className="u-rounded-2xl u-border u-border-gray-100 u-bg-white u-p-6 u-shadow-sm">
-      {icon ? <div className="u-mb-3">{icon}</div> : null}
-      <h3 className="u-text-sm u-sm-text-base u-font-extrabold u-text-gray-900">
+    <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+      {icon ? <div className="mb-3">{icon}</div> : null}
+      <h3 className="text-sm sm:text-base font-extrabold text-gray-900">
         {title}
       </h3>
-      <p className="u-mt-3 u-text-sm u-sm-text-base u-leading-relaxed u-text-gray-600">
+      <p className="mt-3 text-sm sm:text-base leading-relaxed text-gray-600">
         {text}
       </p>
     </div>

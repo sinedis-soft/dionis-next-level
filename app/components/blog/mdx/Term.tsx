@@ -22,28 +22,28 @@ export default function Term({ id, children, className }: Props) {
   return (
     <span
       className={[
-        "u-relative u-inline-flex u-align-baseline u-group u-cursor-help",
+        "relative inline-flex align-baseline group cursor-help",
         className ?? "",
       ].join(" ")}
     >
       {/* подчёркнутый термин */}
-      <span className="u-underline u-decoration-dotted u-underline-offset-4">
+      <span className="underline decoration-dotted underline-offset-4">
         {children ?? term.title}
       </span>
 
       {/* tooltip по hover */}
       <span
         className={[
-          "u-pointer-events-none u-absolute u-left-0 u-top-full u-z-50 u-mt-2 u-w--18rem",
-          "u-opacity-0 u-translate-y-1 u-group-hover-opacity-100 u-group-hover-translate-y-0",
-          "u-transition u-duration-150",
+          "pointer-events-none absolute left-0 top-full z-50 mt-2 w-[18rem]",
+          "opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0",
+          "transition duration-150",
         ].join(" ")}
       >
-        <span className="u-block u-rounded-xl u-border u-border-gray-200 u-bg-white u-shadow-lg u-p-3">
-          <span className="u-block u-text-sm u-font-semibold u-text--1a3a5f">
+        <span className="block rounded-xl border border-gray-200 bg-white shadow-lg p-3">
+          <span className="block text-sm font-semibold text-[#1A3A5F]">
             {term.title}
           </span>
-          <span className="u-mt-1 u-block u-text-sm u-text-gray-700 u-leading-snug">
+          <span className="mt-1 block text-sm text-gray-700 leading-snug">
             {term.text}
           </span>
         </span>

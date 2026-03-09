@@ -14,28 +14,28 @@ export default function FeaturedProducts({ lang, base }: Props) {
   const d = getFeaturedProductsDictionary(lang);
 
   return (
-    <div className="u-mt-8">
-      <div className="u-flex u-items-center u-justify-between u-mb-3">
-        <h2 className="u-text-lg u-sm-text-xl u-font-semibold u-text--1a3a5f">
+    <div className="mt-8">
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-lg sm:text-xl font-semibold text-[#1A3A5F]">
           {d.heading}
         </h2>
       </div>
 
-      <div className="u-grid u-gap-6 u-sm-grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-2">
         {d.items.map((p) => {
           const href = `${base}${p.hrefSuffix}`;
           return (
             <article
               key={href}
-              className="u-rounded-3xl u-border u-border-black-10 u-bg-white u-shadow-sm u-p-6"
+              className="rounded-3xl border border-black/10 bg-white shadow-sm p-6"
             >
-              <h3 className="u-text-base u-sm-text-lg u-font-semibold u-text--1a3a5f">
+              <h3 className="text-base sm:text-lg font-semibold text-[#1A3A5F]">
                 {p.title}
               </h3>
 
-              <p className="u-mt-2 u-text-sm u-text-gray-700">{p.desc}</p>
+              <p className="mt-2 text-sm text-gray-700">{p.desc}</p>
 
-              <div className="u-mt-4 u-flex u-gap-3 u-flex-wrap">
+              <div className="mt-4 flex gap-3 flex-wrap">
                 <Link href={href} className="btn btn-primary" role="button">
                   {p.btn}
                 </Link>
@@ -49,7 +49,7 @@ export default function FeaturedProducts({ lang, base }: Props) {
                 </Link>
               </div>
 
-              <p className="u-mt-4 u-text-xs u-text-gray-600">{d.onlineNote}</p>
+              <p className="mt-4 text-xs text-gray-600">{d.onlineNote}</p>
             </article>
           );
         })}

@@ -10,16 +10,16 @@ export default function ScopeNote({
   children,
 }: Props) {
   return (
-    <div className="u-my-6 u-rounded-2xl u-border u-border-amber-200 u-bg-amber-50 u-p-5">
-      <div className="u-text-sm u-font-semibold u-text-amber-900">
+    <div className="my-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+      <div className="text-sm font-semibold text-amber-900">
         Область применимости
       </div>
-      <div className="u-mt-1 u-text-sm u-text-amber-900-80">
-        Актуально для: <span className="u-font-semibold">{region}</span>
+      <div className="mt-1 text-sm text-amber-900/80">
+        Актуально для: <span className="font-semibold">{region}</span>
       </div>
 
       {children ? (
-        <div className="u-mt-3 u-text-sm u-leading-relaxed u-text-amber-900-80">
+        <div className="mt-3 text-sm leading-relaxed text-amber-900/80">
           {children}
         </div>
       ) : null}
