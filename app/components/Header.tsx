@@ -205,7 +205,7 @@ export default function Header({ lang }: { lang: Lang }) {
             </a>
 
             <div className="hdr__rightRow">
-              <a href="https://wa.me/77273573030" target="_blank" rel="noopener noreferrer" className="hdr__icon">
+              <a href="https://wa.me/77765275553" target="_blank" rel="noopener noreferrer" className="hdr__icon">
                 <Image src="/wa.webp" alt="WhatsApp" width={26} height={26} />
               </a>
 
