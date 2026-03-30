@@ -40,11 +40,13 @@ export function WhatsAppCall({ dict }: Props) {
     e.preventDefault();
     if (isBusy) return;
 
+    const formEl = e.currentTarget;
+
     setFormStatus("loading");
     setFormMessage("");
 
     try {
-      const fd = new FormData(e.currentTarget);
+      const fd = new FormData(formEl);
 
       try {
         fd.set("pageUrl", window.location.href);
@@ -89,7 +91,7 @@ export function WhatsAppCall({ dict }: Props) {
       setFormMessage(message || dict.successMessage);
       setName("");
       setWhatsapp("");
-      e.currentTarget.reset();
+      formEl.reset();
     } catch (error) {
       console.error("WHATSAPP CALL FORM ERROR:", error);
       setFormStatus("error");
@@ -98,7 +100,7 @@ export function WhatsAppCall({ dict }: Props) {
   }
 
   return (
-    <section className="gc-form">
+    <div className="gc-form">
       <div className="card card--pad">
         <div className="gc-form__head">
           <h2 className="gc-form__title">{dict.title}</h2>
@@ -182,8 +184,8 @@ export function WhatsAppCall({ dict }: Props) {
                   hasSuccess
                     ? "status status--ok"
                     : hasError
-                    ? "status status--err"
-                    : "status"
+                      ? "status status--err"
+                      : "status"
                 }
               >
                 {formStatus === "loading" ? dict.loadingMessage : formMessage}
@@ -210,6 +212,6 @@ export function WhatsAppCall({ dict }: Props) {
           </div>
         </form>
       </div>
-    </section>
+    </div>
   );
 }

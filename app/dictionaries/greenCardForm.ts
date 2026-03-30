@@ -98,7 +98,7 @@ export type GreenCardFormDictionary = {
 };
 
 const ru: GreenCardFormDictionary = {
-  title: "Заявка на оформление Зеленой карты",
+  title: "Заявка на оформление Зеленой карты. Мы не взимаем брокерскую комиссию за данный вид страхования",
   intro:
     "Заполните данные ниже. Вы можете указать несколько автомобилей и разные даты начала действия полиса.",
   notSelected: "Не выбрано",
@@ -214,7 +214,7 @@ const ru: GreenCardFormDictionary = {
 };
 
 const en: GreenCardFormDictionary = {
-  title: "Green Card insurance application",
+  title: "Green Card insurance application. We do not charge a broker commission for this type of insurance.",
   intro:
     "Fill in the details below. You can specify several vehicles and different policy start dates.",
   notSelected: "Not selected",
@@ -330,7 +330,7 @@ const en: GreenCardFormDictionary = {
 };
 
 const kz: GreenCardFormDictionary = {
-  title: "Жасыл карта сақтандыруына өтінім",
+  title: "Жасыл карта сақтандыруына өтінім. Сақтандырудың осы түрі бойынша брокерлік комиссия алынбайды.",
   intro:
     "Төмендегі өрістерді толтырыңыз. Бірнеше көлік құралын және полистің әр түрлі басталу күндерін көрсете аласыз.",
   notSelected: "Таңдалмаған",

@@ -124,7 +124,7 @@ export type OsagoRfFormDictionary = {
 };
 
 const ru: OsagoRfFormDictionary = {
-  title: "Заявка на оформление ОСАГО РФ",
+  title: "Заявка на оформление ОСАГО РФ. Мы не взимаем брокерскую комиссию за данный вид страхования",
   intro:
     "Заполните данные ниже. Полис оформляется дистанционно для нерезидентов, въезжающих на территорию Российской Федерации.",
   notSelected: "Не выбрано",
@@ -268,7 +268,7 @@ const ru: OsagoRfFormDictionary = {
 };
 
 const en: OsagoRfFormDictionary = {
-  title: "Russian MTPL (OSAGO RF) application",
+  title: "Russian MTPL (OSAGO RF) application. No broker fee is charged for this type of insurance.",
   intro:
     "Fill in the details below. The policy is issued remotely for non-residents entering the territory of the Russian Federation.",
   notSelected: "Not selected",
@@ -412,7 +412,7 @@ const en: OsagoRfFormDictionary = {
 };
 
 const kz: OsagoRfFormDictionary = {
-  title: "РФ ОСАҒО полисіне өтінім",
+  title: "РФ ОСАҒО полисіне өтінім. Сақтандырудың осы түрі бойынша брокерлік комиссия алынбайды.",
   intro:
     "Төмендегі деректерді толтырыңыз. Полис Ресей Федерациясына кіретін резидент еместер үшін қашықтан рәсімделеді.",
   notSelected: "Таңдалмаған",
