@@ -1,0 +1,5 @@
+[33mcd6c3bf[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Reapply "Migrate Tailwind classes to global CSS utilities"
+[33m5b9e424[m Revert "Migrate Tailwind classes to global CSS utilities"
+[33m96203cb[m[33m ([m[1;31morigin/codex/analyze-project-for-tailwind-css-removal[m[33m, [m[1;32mcodex/analyze-project-for-tailwind-css-removal[m[33m)[m Migrate Tailwind classes to global CSS utilities
+[33m70f94d2[m[33m ([m[1;32mbefore-tailwind[m[33m)[m Fix order forms
+[33m4f4800c[m Ремонт капчи
