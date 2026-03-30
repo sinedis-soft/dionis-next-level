@@ -13,6 +13,8 @@ import {
   type OsagoRfPageDictionary,
 } from "@/dictionaries/osagoRfPage";
 import { getOsagoRfCalculatorDictionary } from "@/dictionaries/osagoRfCalculator";
+import { getWhatsAppCallDictionary } from "@/dictionaries/whatsappcall";
+import { WhatsAppCall } from "@/components/WhatsAppCall";
 
 import { BrokerSection } from "@/components/BrokerSection";
 import OsagoRfCalculator from "@/components/osago-rf/OsagoRfCalculator";
@@ -304,6 +306,7 @@ export default async function OsagoRfPage({
   const osagoFormDict = getOsagoRfFormDictionary(lang);
   const osagoPageDict: OsagoRfPageDictionary = getOsagoRfPageDictionary(lang);
   const osagoCalcDict = getOsagoRfCalculatorDictionary(lang);
+    const whatsappCallDict = getWhatsAppCallDictionary(lang);
 
   const pageUrl = `${SITE_URL}/${lang}/osago-rf`;
 
@@ -439,6 +442,14 @@ export default async function OsagoRfPage({
             </div>
           </div>
         </section>
+
+        <section className="gc-section">
+          <div className="gc-container">
+            <div className="legacy-form-scope legacy-form-card">
+              <WhatsAppCall dict={whatsappCallDict} />
+            </div>
+          </div>
+        </section>        
 
         {/* INFO BLOCKS */}
         <OsagoInfoBlocks dict={osagoPageDict} />

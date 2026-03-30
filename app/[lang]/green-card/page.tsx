@@ -12,6 +12,8 @@ import {
   getGreenCardPageDictionary,
   type GreenCardPageDictionary,
 } from "@/dictionaries/greenCardPage";
+import { getWhatsAppCallDictionary } from "@/dictionaries/whatsappcall";
+import { WhatsAppCall } from "@/components/WhatsAppCall";
 
 import GreenCardInfoBlocks from "@/components/green-card/GreenCardInfoBlocks";
 import { GreenCardOrderForm } from "@/components/green-card/GreenCardOrderForm";
@@ -180,6 +182,7 @@ export default async function GreenCardPage({
   const agreement = getAgreementDictionary(lang);
   const gcFormDict = getGreenCardFormDictionary(lang);
   const gcPageDict: GreenCardPageDictionary = getGreenCardPageDictionary(lang);
+  const whatsappCallDict = getWhatsAppCallDictionary(lang);
 
   const pageUrl = `${SITE_URL}/${lang}/green-card`;
 
@@ -321,6 +324,14 @@ export default async function GreenCardPage({
                   </div>
                 </noscript>
               </div>
+            </div>
+          </div>
+        </section>
+        
+        <section className="gc-section">
+          <div className="gc-container">
+            <div className="legacy-form-scope legacy-form-card">
+              <WhatsAppCall dict={whatsappCallDict} />
             </div>
           </div>
         </section>
