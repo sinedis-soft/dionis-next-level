@@ -12,9 +12,6 @@ import React, {
 import type { GreenCardFormDictionary } from "@/dictionaries/greenCardForm";
 import FilePicker from "@/components/FilePicker";
 
-import { RecaptchaLazy } from "@/components/RecaptchaLazy";
-import { getRecaptchaToken } from "@/lib/recaptcha";
-
 type Props = { dict: GreenCardFormDictionary };
 
 type FormStatus = "idle" | "loading" | "success" | "error";
@@ -65,9 +62,31 @@ function tpl(s: string, params: Record<string, string>) {
 }
 
 function safeCssEscape(value: string): string {
-  const esc = (globalThis as any)?.CSS?.escape;
+  const esc = (globalThis as { CSS?: { escape?: (v: string) => string } })?.CSS
+    ?.escape;
   if (typeof esc === "function") return esc(value);
   return value.replace(/["\\]/g, "\\$&");
+}
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === "undefined") return false;
+  return (
+    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false
+  );
+}
+
+function scrollIntoViewSafe(ref: React.RefObject<HTMLDivElement | null>) {
+  const behavior: ScrollBehavior = prefersReducedMotion() ? "auto" : "smooth";
+  setTimeout(() => {
+    ref.current?.scrollIntoView({ behavior, block: "start" });
+  }, 50);
+}
+
+function toLocalDateString(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
 function RequiredMark() {
@@ -86,7 +105,7 @@ function ErrorSummary({ title, items }: { title: string; items: string[] }) {
       <p className="err-box__title">{title}</p>
       <ul className="err-box__list">
         {items.map((m, i) => (
-          <li key={i}>{m}</li>
+          <li key={`${m}-${i}`}>{m}</li>
         ))}
       </ul>
     </div>
@@ -141,8 +160,8 @@ function StepCrumbs({
               step === 2
                 ? "steps__btn--active"
                 : canAttemptStep2
-                ? "steps__btn--idle"
-                : "steps__btn--disabled",
+                  ? "steps__btn--idle"
+                  : "steps__btn--disabled",
               isBusy ? "is-disabled" : "",
             ].join(" ")}
             onClick={() => {
@@ -191,22 +210,19 @@ export function GreenCardOrderForm({ dict }: Props) {
   const step2Ref = useRef<HTMLDivElement | null>(null);
 
   const today = useMemo(() => new Date(), []);
-  const minAgeDate = useMemo(
-    () => new Date(today.getTime() - 6570 * 24 * 60 * 60 * 1000),
-    [today]
-  );
   const maxBirthDate = useMemo(
-    () => minAgeDate.toISOString().split("T")[0],
-    [minAgeDate]
-  );
-  const maxIssuedDate = useMemo(
-    () => today.toISOString().split("T")[0],
+    () =>
+      toLocalDateString(
+        new Date(
+          today.getFullYear() - 18,
+          today.getMonth(),
+          today.getDate()
+        )
+      ),
     [today]
   );
-  const minStartDate = useMemo(
-    () => today.toISOString().split("T")[0],
-    [today]
-  );
+  const maxIssuedDate = useMemo(() => toLocalDateString(today), [today]);
+  const minStartDate = useMemo(() => toLocalDateString(today), [today]);
 
   const forbiddenTypes = useMemo(
     () => [
@@ -220,23 +236,16 @@ export function GreenCardOrderForm({ dict }: Props) {
     []
   );
 
+  const acceptDocs = useMemo(
+    () =>
+      "image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    []
+  );
+
   const isBusy = formStatus === "loading";
   const hasError = formStatus === "error";
   const hasSuccess = formStatus === "success";
   const statusId = `${uid}-green-card-order-status`;
-
-  // ===== reCAPTCHA config =====
-  const isProd =
-    typeof window === "undefined"
-      ? process.env.NODE_ENV === "production"
-      : process.env.NODE_ENV === "production";
-
-  const recaptchaSiteKey =
-    (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "").trim();
-
-  // включаем только если ключ задан
-  const recaptchaEnabled = Boolean(recaptchaSiteKey);
-  const [recaptchaReady, setRecaptchaReady] = useState(false);
 
   const validateFiles = useCallback(
     (files: FileList): boolean => {
@@ -294,7 +303,9 @@ export function GreenCardOrderForm({ dict }: Props) {
         if (el instanceof HTMLInputElement && el.type === "hidden") return false;
 
         const style = window.getComputedStyle(el);
-        if (style.display === "none" || style.visibility === "hidden") return false;
+        if (style.display === "none" || style.visibility === "hidden") {
+          return false;
+        }
 
         return true;
       });
@@ -306,15 +317,12 @@ export function GreenCardOrderForm({ dict }: Props) {
         }
       }
 
-      // Step 1: passport files required when person + auto mode
       if (s === 1 && !isCompany && !manualEntry) {
         const formEl = formRef.current;
         if (formEl) {
           const fd = new FormData(formEl);
           const vals = fd.getAll("person_passportFiles");
-          const hasFiles = vals.some(
-            (v) => v instanceof File && (v as File).size > 0
-          );
+          const hasFiles = vals.some((v) => v instanceof File && v.size > 0);
           if (!hasFiles) {
             errors.push(
               tpl(dict.errors.requiredFiles, { field: dict.passportFilesLabel })
@@ -323,7 +331,6 @@ export function GreenCardOrderForm({ dict }: Props) {
         }
       }
 
-      // Step 2: tech passport files for each vehicle
       if (s === 2) {
         const formEl = formRef.current;
         if (formEl) {
@@ -331,9 +338,7 @@ export function GreenCardOrderForm({ dict }: Props) {
           vehicles.forEach((_, idx) => {
             const key = `vehicles[${idx}][techPassportFiles]`;
             const vals = fd.getAll(key);
-            const hasFiles = vals.some(
-              (v) => v instanceof File && (v as File).size > 0
-            );
+            const hasFiles = vals.some((v) => v instanceof File && v.size > 0);
             if (!hasFiles) {
               errors.push(
                 tpl(dict.errors.requiredFiles, {
@@ -354,6 +359,7 @@ export function GreenCardOrderForm({ dict }: Props) {
     () => setStep1Errors(collectStepErrors(1)),
     [collectStepErrors]
   );
+
   const refreshStep2Errors = useCallback(
     () => setStep2Errors(collectStepErrors(2)),
     [collectStepErrors]
@@ -363,11 +369,7 @@ export function GreenCardOrderForm({ dict }: Props) {
     if (isBusy) return;
     setStep(1);
     setStep2Errors([]);
-    setTimeout(
-      () =>
-        step1Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
-      50
-    );
+    scrollIntoViewSafe(step1Ref);
   }, [isBusy]);
 
   const goStep2 = useCallback(() => {
@@ -377,18 +379,15 @@ export function GreenCardOrderForm({ dict }: Props) {
     if (errs.length) {
       setStep1Errors(errs);
       setStep(1);
-      setTimeout(
-        () =>
-          step1Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
-        50
-      );
+      scrollIntoViewSafe(step1Ref);
       return;
     }
 
     setStep1Errors([]);
     setStep(2);
+
     setTimeout(() => {
-      step2Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      scrollIntoViewSafe(step2Ref);
       refreshStep2Errors();
     }, 50);
   }, [collectStepErrors, isBusy, refreshStep2Errors]);
@@ -398,6 +397,7 @@ export function GreenCardOrderForm({ dict }: Props) {
       const lastId = prev.length ? prev[prev.length - 1].id : 0;
       return [...prev, { id: lastId + 1 }];
     });
+
     if (step === 2) setTimeout(() => refreshStep2Errors(), 0);
   }, [refreshStep2Errors, step]);
 
@@ -407,6 +407,7 @@ export function GreenCardOrderForm({ dict }: Props) {
         if (prev.length === 1) return prev;
         return prev.filter((v) => v.id !== id);
       });
+
       if (step === 2) setTimeout(() => refreshStep2Errors(), 0);
     },
     [refreshStep2Errors, step]
@@ -453,14 +454,7 @@ export function GreenCardOrderForm({ dict }: Props) {
       const errs2 = collectStepErrors(2);
       if (errs2.length) {
         setStep2Errors(errs2);
-        setTimeout(
-          () =>
-            step2Ref.current?.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            }),
-          50
-        );
+        scrollIntoViewSafe(step2Ref);
         return;
       }
       setStep2Errors([]);
@@ -480,27 +474,12 @@ export function GreenCardOrderForm({ dict }: Props) {
       try {
         const fd = new FormData(formEl);
 
-        // meta
         try {
           fd.append("pageUrl", window.location.href);
           const utm = localStorage.getItem("utm_data");
           if (utm) fd.append("utm", utm);
         } catch {
           // ignore
-        }
-
-        // reCAPTCHA v3 token (в PROD — обязателен, если включено)
-        if (recaptchaEnabled) {
-          // небольшая защита от "кнопка нажата до загрузки API"
-          const token = await getRecaptchaToken(recaptchaSiteKey, "green_card_order");
-
-          if (isProd && !token) {
-            setFormStatus("error");
-            setFormMessage("Не удалось подтвердить, что вы не робот. Обновите страницу и попробуйте ещё раз.");
-            return;
-          }
-
-          if (token) fd.set("recaptchaToken", token);
         }
 
         const res = await fetch("/api/green-card-order", {
@@ -527,17 +506,7 @@ export function GreenCardOrderForm({ dict }: Props) {
         setFormMessage("Ошибка на сервере при отправке заявки на Зеленую карту");
       }
     },
-    [
-      collectStepErrors,
-      dict.successMessage,
-      goStep2,
-      isBusy,
-      resetAll,
-      step,
-      recaptchaEnabled,
-      recaptchaSiteKey,
-      isProd,
-    ]
+    [collectStepErrors, dict.successMessage, goStep2, isBusy, resetAll, step]
   );
 
   return (
@@ -557,20 +526,12 @@ export function GreenCardOrderForm({ dict }: Props) {
           labels={dict.stepLabels}
         />
 
-        {/* reCAPTCHA v3 loader (не требует действий пользователя) */}
-        <RecaptchaLazy
-          siteKey={recaptchaSiteKey}
-          enabled={recaptchaEnabled}
-          onReady={() => setRecaptchaReady(true)}
-        />
-
         <form
           ref={formRef}
           className="gc-form__inner"
           onSubmit={handleSubmit}
           aria-describedby={formStatus !== "idle" ? statusId : undefined}
         >
-          {/* ===================== STEP 1 ===================== */}
           <div ref={step1Ref} hidden={step !== 1}>
             <ErrorSummary title={dict.errors.title} items={step1Errors} />
 
@@ -987,14 +948,7 @@ export function GreenCardOrderForm({ dict }: Props) {
                   const errs = collectStepErrors(1);
                   if (errs.length) {
                     setStep1Errors(errs);
-                    setTimeout(
-                      () =>
-                        step1Ref.current?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        }),
-                      50
-                    );
+                    scrollIntoViewSafe(step1Ref);
                     return;
                   }
                   goStep2();
@@ -1006,7 +960,6 @@ export function GreenCardOrderForm({ dict }: Props) {
             </div>
           </div>
 
-          {/* ===================== STEP 2 ===================== */}
           <div ref={step2Ref} hidden={step !== 2}>
             <ErrorSummary title={dict.errors.title} items={step2Errors} />
 
@@ -1165,7 +1118,7 @@ export function GreenCardOrderForm({ dict }: Props) {
                           required
                           multiple
                           disabled={isBusy}
-                          accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                          accept={acceptDocs}
                           onValidate={(files) => {
                             const ok = validateFiles(files);
                             setTimeout(() => refreshStep2Errors(), 0);
@@ -1187,22 +1140,14 @@ export function GreenCardOrderForm({ dict }: Props) {
                     hasSuccess
                       ? "status status--ok"
                       : hasError
-                      ? "status status--err"
-                      : "status"
+                        ? "status status--err"
+                        : "status"
                   }
                 >
                   {formStatus === "loading"
                     ? "Отправка..."
                     : formMessage || dict.successMessage}
                 </div>
-              )}
-
-              {/* Короткий техтекст, чтобы “как подтвердить” было понятно */}
-              {recaptchaEnabled && (
-                <p className="hint" style={{ marginTop: 12 }}>
-                  Защита от ботов включена{recaptchaReady ? "" : " (загружается)"}.
-                  Подтверждать ничего не нужно.
-                </p>
               )}
 
               <div className="row-between u-mt-4 gc-actions">

@@ -4,7 +4,6 @@ import {
   parseGreenCardOrder,
   processGreenCardOrder,
 } from "@/lib/green-card-order";
-import { verifyRecaptchaIfNeeded } from "@/lib/recaptcha";
 
 export const runtime = "nodejs";
 
@@ -16,27 +15,6 @@ export async function POST(req: Request): Promise<Response> {
     if (website) {
       return Response.json({ ok: true }, { status: 200 });
     }
-
-    const isProd = process.env.NODE_ENV === "production";
-    const recaptchaToken = String(formData.get("recaptchaToken") || "").trim() || null;
-
-    const recaptcha = await verifyRecaptchaIfNeeded({
-      isProd,
-      token: recaptchaToken,
-      minScore: 0.5,
-      expectedHostnames: ["dionis-insurance.kz", "www.dionis-insurance.kz"],
-    });
-
-    /*if (!recaptcha.ok) {
-      return Response.json(
-        {
-          ok: false,
-          message: "Подтвердите, что вы не робот.",
-          reason: recaptcha.reason,
-        },
-        { status: 400 }
-      );
-    }*/
 
     let order;
     try {

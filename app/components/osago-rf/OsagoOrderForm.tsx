@@ -12,9 +12,6 @@ import React, {
 import type { OsagoRfFormDictionary } from "@/dictionaries/osagoRfForm";
 import FilePicker from "@/components/FilePicker";
 
-import { RecaptchaLazy } from "@/components/RecaptchaLazy";
-import { getRecaptchaToken } from "@/lib/recaptcha";
-
 function formatPersonName(raw: string): string {
   return raw.replace(/[^A-Za-z\u0400-\u04FF\s'-]/g, "");
 }
@@ -236,13 +233,6 @@ export function OsagoOrderForm({ dict }: Props) {
       "image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     []
   );
-
-  const recaptchaSiteKey = (
-    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""
-  ).trim();
-  const recaptchaEnabled =
-    Boolean(recaptchaSiteKey) && process.env.NODE_ENV === "production";
-  const [recaptchaReady, setRecaptchaReady] = useState(!recaptchaEnabled);
 
   const isBusy = formStatus === "loading";
   const hasError = formStatus === "error";
@@ -581,31 +571,6 @@ export function OsagoOrderForm({ dict }: Props) {
           // ignore
         }
 
-        if (recaptchaEnabled) {
-          if (!recaptchaReady) {
-            setFormStatus("error");
-            setFormMessage(
-              "Инициализация защиты от роботов не завершена. Повторите попытку через секунду."
-            );
-            return;
-          }
-
-          const token = await getRecaptchaToken(
-            recaptchaSiteKey,
-            "osago_rf_order"
-          );
-
-          if (!token) {
-            setFormStatus("error");
-            setFormMessage(
-              "Не удалось подтвердить, что вы не робот. Обновите страницу и попробуйте ещё раз."
-            );
-            return;
-          }
-
-          fd.set("recaptchaToken", token);
-        }
-
         const res = await fetch("/api/osago-rf-order", {
           method: "POST",
           body: fd,
@@ -637,9 +602,6 @@ export function OsagoOrderForm({ dict }: Props) {
       dict.successMessage,
       goStep2,
       isBusy,
-      recaptchaEnabled,
-      recaptchaReady,
-      recaptchaSiteKey,
       resetAll,
       scrollToStep,
       step,
@@ -648,12 +610,6 @@ export function OsagoOrderForm({ dict }: Props) {
 
   return (
     <section id="osago-rf-order" className="gc-form">
-      <RecaptchaLazy
-        siteKey={recaptchaSiteKey}
-        enabled={recaptchaEnabled}
-        onReady={() => setRecaptchaReady(true)}
-      />
-
       <div className="card card--pad">
         <div className="gc-form__head">
           <h2 className="gc-form__title">{dict.title}</h2>
