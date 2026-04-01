@@ -29,7 +29,7 @@ export async function POST(req: Request): Promise<Response> {
       expectedAction: "osago_rf_order",
     });
 
-    if (!recaptcha.ok) {
+    /* if (!recaptcha.ok) {
       return Response.json(
         {
           ok: false,
@@ -38,7 +38,7 @@ export async function POST(req: Request): Promise<Response> {
         },
         { status: 400 }
       );
-    }
+    }*/
 
     let order;
     try {

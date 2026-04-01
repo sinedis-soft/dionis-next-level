@@ -27,7 +27,7 @@ export async function POST(req: Request): Promise<Response> {
       expectedHostnames: ["dionis-insurance.kz", "www.dionis-insurance.kz"],
     });
 
-    if (!recaptcha.ok) {
+    /*if (!recaptcha.ok) {
       return Response.json(
         {
           ok: false,
@@ -36,7 +36,7 @@ export async function POST(req: Request): Promise<Response> {
         },
         { status: 400 }
       );
-    }
+    }*/
 
     let order;
     try {
