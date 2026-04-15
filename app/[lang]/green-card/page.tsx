@@ -332,7 +332,7 @@ export default async function GreenCardPage({
                 href="https://wa.me/77765275553"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-secondary"
+                className="btn btn-whatsapp"
                 role="button"
               >
                 {gcPageDict.writeUs.whatsapp}
@@ -342,7 +342,7 @@ export default async function GreenCardPage({
                 href="https://t.me/Dionis_insurance_broker_bot"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary"
+                className="btn btn-telegram"
                 role="button"
               >
                 {gcPageDict.writeUs.telegram}

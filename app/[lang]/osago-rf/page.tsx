@@ -426,7 +426,7 @@ export default async function OsagoRfPage({
                 href="https://wa.me/77765275553"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary"
+                className="btn btn-whatsapp"
                 role="button"
               >
                 {osagoPageDict.writeUs.whatsapp}
@@ -436,7 +436,7 @@ export default async function OsagoRfPage({
                 href="https://t.me/Dionis_insurance_broker_bot"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-secondary"
+                className="btn btn-telegram"
                 role="button"
               >
                 {osagoPageDict.writeUs.telegram}
