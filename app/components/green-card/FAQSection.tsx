@@ -1,5 +1,4 @@
 // app/components/green-card/FAQSection.tsx
-import Script from "next/script";
 import type { GreenCardPageDictionary } from "@/dictionaries/greenCardPage";
 import FAQAccordion from "./FAQAccordion";
 
@@ -21,10 +20,9 @@ export default function FAQSection({ dict }: Props) {
 
   return (
     <section className="gc-section" aria-labelledby="faq-heading">
-      <Script
+      <script
         id="faq-jsonld"
         type="application/ld+json"
-        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
 

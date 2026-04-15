@@ -2,7 +2,6 @@
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
 import Image from "next/image";
-import Script from "next/script";
 import type { CSSProperties } from "react";
 
 import { getHomeDictionary } from "@/dictionaries/home";
@@ -45,14 +44,12 @@ function langToIana(lang: Lang): string {
   return lang === "ru" ? "ru" : lang === "kz" ? "kk-KZ" : "en";
 }
 
-/* ---- local helper ---- */
 function AdvantageIcon({ index }: { index: number }) {
-  // по образцу green-card: без tailwind-классов на svg
   const baseSvgProps = {
     width: 20,
     height: 20,
     className: "gc-adv-icon",
-    style: { width: 20, height: 20, display: "u-block" } as CSSProperties,
+    style: { width: 20, height: 20, display: "block" } as CSSProperties,
     fill: "none" as const,
     "aria-hidden": true as const,
     focusable: "false" as const,
@@ -126,23 +123,6 @@ function AdvantageIcon({ index }: { index: number }) {
   }
 }
 
-/**
- * ВАЖНО:
- * Карту РФ НЕ грузим через <Image/> в блоке benefits.
- * Вместо этого используем div с background-image, который включается ТОЛЬКО в современных браузерах через @supports(display:grid).
- *
- * Добавь в app/globals.css:
- *
- * @supports (display: grid) {
- *   .osago-map-bg {
- *     background-image: url("/osago-rf/Виды_субъектов_России_на_политической_карте.webp");
- *     background-size: cover;
- *     background-position: center;
- *     opacity: 0.9;
- *     will-change: opacity;
- *   }
- * }
- */
 function OsagoInfoBlocks({
   dict,
 }: {
@@ -150,7 +130,6 @@ function OsagoInfoBlocks({
 }) {
   return (
     <>
-      {/* HOW IT WORKS */}
       <DeferredHydration rootMargin="800px" minDelayMs={150}>
         <section className="gc-hiw gc-no-anchor" aria-labelledby="how-it-works-heading">
           <div className="gc-container">
@@ -161,7 +140,6 @@ function OsagoInfoBlocks({
             <p className="gc-section-intro">{dict.howItWorks.subtitle}</p>
 
             <div className="gc-hiw__content">
-              {/* desktop view */}
               <div className="gc-hiw__desktop">
                 <div className="gc-hiw__line" aria-hidden="true" />
                 <div className="gc-hiw__grid">
@@ -175,7 +153,6 @@ function OsagoInfoBlocks({
                 </div>
               </div>
 
-              {/* mobile view */}
               <div className="gc-hiw__mobile">
                 {dict.howItWorks.steps.map((s, idx) => (
                   <article key={idx} className="card gc-hiw-card">
@@ -196,13 +173,11 @@ function OsagoInfoBlocks({
         </section>
       </DeferredHydration>
 
-      {/* BENEFITS (по образцу COVERAGE, но без <Image/>, фон через .osago-map-bg) */}
       <DeferredHydration rootMargin="800px" minDelayMs={150}>
         <section className="gc-coverage gc-no-anchor" aria-labelledby="benefits-heading">
           <div className="gc-container">
             <article className="gc-coverage__card">
               <div className="gc-coverage__grid">
-                {/* left */}
                 <div className="gc-coverage__left">
                   <h2 id="benefits-heading" className="gc-coverage__title">
                     {dict.benefits.title}
@@ -224,11 +199,10 @@ function OsagoInfoBlocks({
                   </div>
                 </div>
 
-                {/* right */}
                 <div className="gc-coverage__right">
                   <div className="gc-coverage__imgWrap">
                     <Image
-                      src="/osago-rf/Виды_субъектов_России_на_политической_карте.png"   // проверь путь к файлу
+                      src="/osago-rf/Виды_субъектов_России_на_политической_карте.png"
                       alt={dict.benefits.imageAlt}
                       fill
                       className="gc-coverage__img"
@@ -306,7 +280,7 @@ export default async function OsagoRfPage({
   const osagoFormDict = getOsagoRfFormDictionary(lang);
   const osagoPageDict: OsagoRfPageDictionary = getOsagoRfPageDictionary(lang);
   const osagoCalcDict = getOsagoRfCalculatorDictionary(lang);
-    const whatsappCallDict = getWhatsAppCallDictionary(lang);
+  const whatsappCallDict = getWhatsAppCallDictionary(lang);
 
   const pageUrl = `${SITE_URL}/${lang}/osago-rf`;
 
@@ -337,15 +311,13 @@ export default async function OsagoRfPage({
 
   return (
     <>
-      <Script
+      <script
         id="webpage-jsonld"
         type="application/ld+json"
-        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
       />
 
       <main className="gc-page">
-        {/* HERO (по образцу green-card: контейнер/сетка/visual wrap) */}
         <section className="gc-hero">
           <div className="gc-hero__bg" aria-hidden="true" />
           <div className="gc-container gc-hero__grid">
@@ -371,6 +343,7 @@ export default async function OsagoRfPage({
                       height={320}
                       sizes="(min-width: 1280px) 620px, (min-width: 1024px) 520px, 0px"
                       className="gc-hero__car gc-anim-car"
+                      style={{ height: "auto" }}
                       priority
                     />
 
@@ -400,7 +373,6 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
-        {/* CALCULATOR */}
         <section className="gc-section" id="osago-rf-calculator">
           <div className="gc-container">
             <div className="legacy-form-scope legacy-form-card">
@@ -443,18 +415,38 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
-        <section className="gc-section">
+        <section id="write-us" className="gc-section">
           <div className="gc-container">
-            <div className="legacy-form-scope legacy-form-card">
-              <WhatsAppCall dict={whatsappCallDict} />
+            <h3 className="writeus__title">{osagoPageDict.writeUs.title}</h3>
+
+            <p className="writeus__text">{osagoPageDict.writeUs.text}</p>
+
+            <div className="writeus__actions">
+              <a
+                href="https://wa.me/77765275553"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                role="button"
+              >
+                {osagoPageDict.writeUs.whatsapp}
+              </a>
+
+              <a
+                href="https://t.me/Dionis_insurance_broker_bot"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary"
+                role="button"
+              >
+                {osagoPageDict.writeUs.telegram}
+              </a>
             </div>
           </div>
-        </section>        
+        </section>
 
-        {/* INFO BLOCKS */}
         <OsagoInfoBlocks dict={osagoPageDict} />
 
-        {/* ADVANTAGES (по образцу green-card: секция + сетка) */}
         <DeferredHydration rootMargin="800px" minDelayMs={150}>
           <section className="gc-advantages" aria-labelledby="advantages-heading">
             <div className="gc-container">
@@ -480,7 +472,6 @@ export default async function OsagoRfPage({
           </section>
         </DeferredHydration>
 
-        {/* ORDER FORM */}
         <section id="osago-rf-order" className="gc-section">
           <div className="gc-container">
             <div className="legacy-form-scope legacy-form-card">
@@ -489,7 +480,6 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
-        {/* UPSALE GREEN CARD (по образцу gc-upsell) */}
         <section className="gc-section gc-section--muted">
           <div className="gc-container">
             <article className="card gc-upsell">
@@ -528,11 +518,17 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
-        {/* FAQ + BROKER */}
+        <section className="gc-section">
+          <div className="gc-container">
+            <div className="legacy-form-scope legacy-form-card">
+              <WhatsAppCall dict={whatsappCallDict} />
+            </div>
+          </div>
+        </section>
+
         <FAQSection dict={osagoPageDict.faq} />
         <BrokerSection broker={homeDict.broker} />
 
-        {/* QUESTION BLOCK (по образцу gc-question) */}
         <section className="gc-question gc-section--muted">
           <div className="gc-container gc-question__grid">
             <div className="gc-question__media">

@@ -1,5 +1,4 @@
 // components/osago-rf/FAQSection.tsx
-import Script from "next/script";
 import type { OsagoRfPageDictionary } from "@/dictionaries/osagoRfPage";
 import FAQAccordion from "./FAQAccordion";
 
@@ -21,10 +20,9 @@ export default function FAQSection({ dict }: Props) {
 
   return (
     <section className="gc-faq" aria-labelledby="faq-heading">
-      <Script
+      <script
         id="faq-jsonld"
         type="application/ld+json"
-        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
 

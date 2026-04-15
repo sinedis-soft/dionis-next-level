@@ -39,6 +39,39 @@ const RATES_USD: Record<
 type Props = { dict: GreenCardPageDictionary["calculator"] };
 type NbkRateResponse = { ok: boolean; rate?: number | string; message?: string };
 
+type MarkupMode = "weekday" | "holiday";
+const MARKUP: Record<MarkupMode, number> = { weekday: 1.015, holiday: 1.02 };
+
+const REGION_ITEMS: Array<{
+  key: RegionKey;
+  labelKey: keyof Props["dict"]["regionOptions"];
+}> = [
+  { key: "group1", labelKey: "group1" },
+  { key: "group2", labelKey: "group2" },
+];
+
+const VEHICLE_ITEMS: Array<{
+  key: VehicleKey;
+  labelKey: keyof Props["dict"]["vehicleOptions"];
+}> = [
+  { key: "passenger", labelKey: "passenger" },
+  { key: "bus", labelKey: "bus" },
+  { key: "truck", labelKey: "truck" },
+  { key: "trailer", labelKey: "trailer" },
+  { key: "motorcycle", labelKey: "motorcycle" },
+  { key: "tractor", labelKey: "tractor" },
+];
+
+const PERIOD_ITEMS: Array<{
+  key: PeriodKey;
+  labelKey: keyof Props["dict"]["periodOptions"];
+}> = [
+  { key: "12", labelKey: "12" },
+  { key: "6", labelKey: "6" },
+  { key: "3", labelKey: "3" },
+  { key: "1", labelKey: "1" },
+];
+
 function formatKzt(value: number): string {
   const rounded = Math.round(value * 100) / 100;
   return new Intl.NumberFormat("ru-RU", {
@@ -46,9 +79,6 @@ function formatKzt(value: number): string {
     maximumFractionDigits: 2,
   }).format(rounded);
 }
-
-type MarkupMode = "weekday" | "holiday";
-const MARKUP: Record<MarkupMode, number> = { weekday: 1.015, holiday: 1.02 };
 
 function applyNewMarkup(legacyPrice: number, mode: MarkupMode): number {
   const updated = legacyPrice * MARKUP[mode];
@@ -60,6 +90,54 @@ function parseRateSafe(raw: string): number {
   if (!cleaned) return NaN;
   const normalized = cleaned.replace(",", ".");
   return Number(normalized);
+}
+
+type SegmentedOption<T extends string> = {
+  key: T;
+  label: string;
+};
+
+function SegmentedButtons<T extends string>({
+  legend,
+  value,
+  onChange,
+  options,
+  variant = "default",
+}: {
+  legend: string;
+  value: T;
+  onChange: (value: T) => void;
+  options: Array<SegmentedOption<T>>;
+  variant?: "default" | "region" | "vehicle" | "period";
+}) {
+  return (
+    <div className={`field gc-calc__field gc-calc__field--${variant}`}>
+      <div className="label">{legend}</div>
+
+      <div
+        className={`gc-seg gc-seg--${variant}`}
+        role="radiogroup"
+        aria-label={legend}
+      >
+        {options.map((option) => {
+          const active = option.key === value;
+
+          return (
+            <button
+              key={option.key}
+              type="button"
+              className={`gc-seg__btn ${active ? "gc-seg__btn--active" : ""}`}
+              onClick={() => onChange(option.key)}
+              role="radio"
+              aria-checked={active}
+            >
+              <span className="gc-seg__text">{option.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 export default function GreenCardCalculator({ dict }: Props) {
@@ -128,58 +206,40 @@ export default function GreenCardCalculator({ dict }: Props) {
           </div>
 
           <div className="gc-calc__form">
-            <div className="field">
-              <label htmlFor="gc-region" className="label">
-                {dict.labels.region}
-              </label>
-              <select
-                id="gc-region"
-                className="control"
-                value={region}
-                onChange={(e) => setRegion(e.target.value as RegionKey)}
-              >
-                <option value="group1">{dict.regionOptions.group1}</option>
-                <option value="group2">{dict.regionOptions.group2}</option>
-              </select>
-            </div>
+            <SegmentedButtons
+              legend={dict.labels.region}
+              value={region}
+              onChange={setRegion}
+              variant="region"
+              options={REGION_ITEMS.map((item) => ({
+                key: item.key,
+                label: dict.regionOptions[item.labelKey],
+              }))}
+            />
 
-            <div className="field">
-              <label htmlFor="gc-vehicle" className="label">
-                {dict.labels.vehicle}
-              </label>
-              <select
-                id="gc-vehicle"
-                className="control"
-                value={vehicle}
-                onChange={(e) => setVehicle(e.target.value as VehicleKey)}
-              >
-                <option value="passenger">{dict.vehicleOptions.passenger}</option>
-                <option value="bus">{dict.vehicleOptions.bus}</option>
-                <option value="truck">{dict.vehicleOptions.truck}</option>
-                <option value="trailer">{dict.vehicleOptions.trailer}</option>
-                <option value="motorcycle">{dict.vehicleOptions.motorcycle}</option>
-                <option value="tractor">{dict.vehicleOptions.tractor}</option>
-              </select>
-            </div>
+            <SegmentedButtons
+              legend={dict.labels.vehicle}
+              value={vehicle}
+              onChange={setVehicle}
+              variant="vehicle"
+              options={VEHICLE_ITEMS.map((item) => ({
+                key: item.key,
+                label: dict.vehicleOptions[item.labelKey],
+              }))}
+            />
 
-            <div className="field">
-              <label htmlFor="gc-period" className="label">
-                {dict.labels.period}
-              </label>
-              <select
-                id="gc-period"
-                className="control"
-                value={period}
-                onChange={(e) => setPeriod(e.target.value as PeriodKey)}
-              >
-                <option value="12">{dict.periodOptions["12"]}</option>
-                <option value="6">{dict.periodOptions["6"]}</option>
-                <option value="3">{dict.periodOptions["3"]}</option>
-                <option value="1">{dict.periodOptions["1"]}</option>
-              </select>
-            </div>
+            <SegmentedButtons
+              legend={dict.labels.period}
+              value={period}
+              onChange={setPeriod}
+              variant="period"
+              options={PERIOD_ITEMS.map((item) => ({
+                key: item.key,
+                label: dict.periodOptions[item.labelKey],
+              }))}
+            />
 
-            <div className="field">
+            <div className="field gc-calc__field">
               <label htmlFor="gc-exchangeRate" className="label">
                 {dict.labels.rate}
               </label>
@@ -195,7 +255,7 @@ export default function GreenCardCalculator({ dict }: Props) {
               />
             </div>
 
-            <div id={statusId} aria-live="polite" className="status">
+            <div id={statusId} aria-live="polite" className="status gc-calc__status">
               {autoRateNote}
             </div>
 
@@ -216,7 +276,7 @@ export default function GreenCardCalculator({ dict }: Props) {
             <div className="gc-calc__cta">
               <Link
                 href={dict.labels.orderEuropeHref}
-                className="btn btn-secondary btn-wide"
+                className="btn btn-primary btn-wide"
                 aria-label={dict.labels.orderEuropeLabel}
               >
                 {dict.labels.orderEuropeLabel}

@@ -34,6 +34,13 @@ export type OsagoRfPageDictionary = {
     }[];
   };
 
+  writeUs: {
+    title: string;
+    text: string;
+    whatsapp: string;
+    telegram: string;
+  };
+
   info: {
     title: string;
     paragraphs: string[];
@@ -141,6 +148,13 @@ const ru: OsagoRfPageDictionary = {
           "Готовый электронный полис отправляем на e-mail. Обычно в течение 15–20 минут.",
       },
     ],
+  },
+
+  writeUs: {
+    title: "Быстрое оформление",
+    text: "Напишите нам — оформим полис за 20 минут",
+    whatsapp: "Написать нам в WhatsApp",
+    telegram: "Написать нам в Telegram",
   },
 
   info: {
@@ -354,6 +368,13 @@ const en: OsagoRfPageDictionary = {
     ],
   },
 
+  writeUs: {
+    title: "Quick application",
+    text: "Write to us — we will issue the policy in 20 minutes",
+    whatsapp: "Message us on WhatsApp",
+    telegram: "Message us on Telegram",
+  },
+
   benefits: {
     title: "Key benefits of MTPL in Russia",
     imageAlt: "Online MTPL for foreign vehicles in Russia",
@@ -512,6 +533,13 @@ const kz: OsagoRfPageDictionary = {
       "Шетелдік тіркеудегі автокөлікпен РФ аумағында жүру үшін жарамды полис міндетті.",
       "Электрондық полис РФ бақылаушы органдарымен ресми түрде танылады.",
     ],
+  },
+
+  writeUs: {
+    title: "Жылдам рәсімдеу",
+    text: "Бізге жазыңыз — полисті 20 минут ішінде рәсімдейміз",
+    whatsapp: "WhatsApp арқылы жазу",
+    telegram: "Telegram арқылы жазу",
   },
 
   benefits: {

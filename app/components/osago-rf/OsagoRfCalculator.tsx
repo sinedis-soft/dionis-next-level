@@ -97,20 +97,30 @@ const KVS_TABLE: Array<Array<number | null>> = [
 function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
+
 function clamp(n: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, n));
 }
+
 function parseRate(raw: string): number {
   const normalized = raw.replace(",", ".").trim();
   return Number(normalized);
 }
+
 function formatKzt(value: number): string {
   const rounded = round2(value);
-  return new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(rounded);
+  return new Intl.NumberFormat("ru-RU", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(rounded);
 }
+
 function formatRub(value: number): string {
   const rounded = round2(value);
-  return new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(rounded);
+  return new Intl.NumberFormat("ru-RU", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(rounded);
 }
 
 function kmByHpPassenger(hp: number): number {
@@ -161,12 +171,14 @@ function kvsByAgeExp(driverAge: number, expYears: number): number {
   const c = expBandIndex(expYears);
   const row = KVS_TABLE[r];
   const v = row[c];
+
   if (typeof v === "number") return v;
 
   for (let i = c; i >= 0; i--) {
     const vv = row[i];
     if (typeof vv === "number") return vv;
   }
+
   return 1.0;
 }
 
@@ -174,7 +186,12 @@ function koMultidriveByPolicyholder(policyholderType: PolicyholderType): number 
   return policyholderType === "legal" ? KO_MULTIDRIVE_LEGAL : KO_MULTIDRIVE_INDIVIDUAL;
 }
 
-function bstByRules(args: { policyholderType: PolicyholderType; vehicleKind: VehicleKind; term: number; useExp: boolean }): number {
+function bstByRules(args: {
+  policyholderType: PolicyholderType;
+  vehicleKind: VehicleKind;
+  term: number;
+  useExp: boolean;
+}): number {
   const isLegal = args.policyholderType === "legal";
   const isTruck = args.vehicleKind === "truck";
   const isShort = args.term <= 3;
@@ -184,6 +201,7 @@ function bstByRules(args: { policyholderType: PolicyholderType; vehicleKind: Veh
   if (isLegal && !isTruck) {
     if (args.useExp) return 6580;
   }
+
   if (isLegal && isTruck) {
     if (args.useExp) return 17201;
   }
@@ -198,7 +216,7 @@ function bstByRules(args: { policyholderType: PolicyholderType; vehicleKind: Veh
 }
 
 function replaceTokensCompat(tpl: string, vars: Record<string, string>): string {
-  return tpl.replace(/\{(\w+)\}/g, (_m, k: string) => (vars[k] ?? ""));
+  return tpl.replace(/\{(\w+)\}/g, (_m, k: string) => vars[k] ?? "");
 }
 
 function normalizeTerm(raw: number, termMax: number): number {
@@ -229,6 +247,25 @@ function NumField(props: {
   sliderStep?: number;
 }) {
   const step = props.step ?? 1;
+  const [inputValue, setInputValue] = useState<string>(String(props.value));
+
+  useEffect(() => {
+    setInputValue(String(props.value));
+  }, [props.value]);
+
+  const applyInputValue = (raw: string) => {
+    const normalized = raw.trim().replace(",", ".");
+    const parsed = Number(normalized);
+
+    if (!Number.isFinite(parsed)) {
+      setInputValue(String(props.value));
+      return;
+    }
+
+    const next = clamp(Math.round(parsed), props.min, props.max);
+    props.onChange(next);
+    setInputValue(String(next));
+  };
 
   return (
     <div className="os-calc__num">
@@ -249,10 +286,33 @@ function NumField(props: {
         <input
           className="control"
           inputMode="numeric"
-          value={String(props.value)}
+          value={inputValue}
           onChange={(e) => {
-            const n = Number(e.target.value);
-            if (Number.isFinite(n)) props.onChange(clamp(Math.round(n), props.min, props.max));
+            const raw = e.target.value;
+
+            if (raw === "") {
+              setInputValue("");
+              return;
+            }
+
+            if (!/^\d+$/.test(raw)) {
+              return;
+            }
+
+            setInputValue(raw);
+
+            const parsed = Number(raw);
+            if (Number.isFinite(parsed)) {
+              props.onChange(clamp(Math.round(parsed), props.min, props.max));
+            }
+          }}
+          onBlur={() => {
+            if (inputValue === "") {
+              setInputValue(String(props.value));
+              return;
+            }
+
+            applyInputValue(inputValue);
           }}
         />
 
@@ -345,12 +405,17 @@ export default function OsagoRfCalculator({ dict }: Props) {
     () => bstByRules({ policyholderType, vehicleKind, term, useExp: true }),
     [policyholderType, vehicleKind, term]
   );
+
   const bstMulti = useMemo(
     () => bstByRules({ policyholderType, vehicleKind, term, useExp: false }),
     [policyholderType, vehicleKind, term]
   );
 
-  const premiumLimitedRub = useMemo(() => round2(bstLimited * KT * KBM * KM * kvs * KP), [bstLimited, KM, kvs, KP]);
+  const premiumLimitedRub = useMemo(
+    () => round2(bstLimited * KT * KBM * KM * kvs * KP),
+    [bstLimited, KM, kvs, KP]
+  );
+
   const premiumMultiRub = useMemo(() => {
     const KO = koMultidriveByPolicyholder(policyholderType);
     return round2(bstMulti * KT * KBM * KM * KO * KP);
@@ -436,7 +501,6 @@ export default function OsagoRfCalculator({ dict }: Props) {
           </div>
 
           <div className="os-calc__form">
-            {/* Сегменты */}
             <div className="os-calc__row2">
               <div className="field">
                 <div className="label">{dict.labels.policyholderType}</div>
@@ -487,7 +551,6 @@ export default function OsagoRfCalculator({ dict }: Props) {
               </div>
             </div>
 
-            {/* Режим */}
             <div className="field">
               <div className="os-calc__mode">
                 <div className="label">{dict.labels.calcMode}</div>
@@ -516,7 +579,6 @@ export default function OsagoRfCalculator({ dict }: Props) {
               <div className="hint">{modeHintText}</div>
             </div>
 
-            {/* Параметры */}
             <div className="os-calc__blockTitle">{dict.labels.paramsTitle}</div>
 
             <div className="os-calc__grid3">
@@ -530,7 +592,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                     step={1}
                     suffix="л.с."
                     hint={dict.hints.hp}
-                    onChange={(v) => setHp(v)}
+                    onChange={setHp}
                     showSlider={true}
                     sliderStep={1}
                   />
@@ -550,7 +612,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                   step={1}
                   suffix="лет"
                   hint={dict.hints.carAge}
-                  onChange={(v) => setCarAge(v)}
+                  onChange={setCarAge}
                   showSlider={true}
                   sliderStep={1}
                 />
@@ -596,65 +658,51 @@ export default function OsagoRfCalculator({ dict }: Props) {
               </div>
             </div>
 
-            {/* Блок водителей (только limited) */}
-            <div className={`panel-muted os-calc__drivers ${isLimited ? "" : "os-calc__drivers--hidden"}`} aria-hidden={!isLimited}>
+            <div
+              className={`panel-muted os-calc__drivers ${isLimited ? "" : "os-calc__drivers--hidden"}`}
+              aria-hidden={!isLimited}
+            >
               <div className="os-calc__driversTitle">{dict.hints.modeLimited}</div>
               <div className="hint">{dict.hints.useExp}</div>
 
               <div className="os-calc__grid2">
-                <div className="field">
-                  <div className="label">{dict.labels.driverAge}</div>
-                  <div className="os-calc__termRow">
-                    <button type="button" className="btn-square" onClick={() => setDriverAge((v) => clamp(v - 1, 18, 80))}>
-                      −
-                    </button>
-                    <input
-                      className="control"
-                      inputMode="numeric"
-                      value={String(driverAge)}
-                      onChange={(e) => {
-                        const n = Number(e.target.value);
-                        if (Number.isFinite(n)) setDriverAge(clamp(Math.round(n), 18, 80));
-                      }}
-                    />
-                    <button type="button" className="btn-square" onClick={() => setDriverAge((v) => clamp(v + 1, 18, 80))}>
-                      +
-                    </button>
-                  </div>
-                  <input className="range" type="range" min={18} max={80} step={1} value={driverAge} onChange={(e) => setDriverAge(Number(e.currentTarget.value))} />
+                <div>
+                  <NumField
+                    label={dict.labels.driverAge}
+                    value={driverAge}
+                    min={18}
+                    max={80}
+                    step={1}
+                    onChange={setDriverAge}
+                    showSlider={true}
+                    sliderStep={1}
+                  />
                 </div>
 
-                <div className="field">
-                  <div className="label">{dict.labels.driverExp}</div>
-                  <div className="os-calc__termRow">
-                    <button type="button" className="btn-square" onClick={() => setDriverExp((v) => clamp(v - 1, 0, 60))}>
-                      −
-                    </button>
-                    <input
-                      className="control"
-                      inputMode="numeric"
-                      value={String(driverExp)}
-                      onChange={(e) => {
-                        const n = Number(e.target.value);
-                        if (Number.isFinite(n)) setDriverExp(clamp(Math.round(n), 0, 60));
-                      }}
-                    />
-                    <button type="button" className="btn-square" onClick={() => setDriverExp((v) => clamp(v + 1, 0, 60))}>
-                      +
-                    </button>
-                  </div>
-                  <input className="range" type="range" min={0} max={60} step={1} value={driverExp} onChange={(e) => setDriverExp(Number(e.currentTarget.value))} />
+                <div>
+                  <NumField
+                    label={dict.labels.driverExp}
+                    value={driverExp}
+                    min={0}
+                    max={60}
+                    step={1}
+                    onChange={setDriverExp}
+                    showSlider={true}
+                    sliderStep={1}
+                  />
                 </div>
               </div>
 
               <div className="hint os-calc__kvsNote">
-                {replaceTokensCompat(dict.hints.kvsUsed, { age: String(driverAge), exp: String(driverExp) })}
+                {replaceTokensCompat(dict.hints.kvsUsed, {
+                  age: String(driverAge),
+                  exp: String(driverExp),
+                })}
               </div>
 
               {betterHint ? <div className="hint hint--danger">{betterHint}</div> : null}
             </div>
 
-            {/* Курс */}
             <div className="os-calc__rateBox">
               <div className="os-calc__rateTop">
                 <div>
@@ -665,7 +713,12 @@ export default function OsagoRfCalculator({ dict }: Props) {
                   </div>
                 </div>
 
-                <button type="button" className="link" onClick={() => setShowRateInput((v) => !v)} aria-controls={statusId}>
+                <button
+                  type="button"
+                  className="link"
+                  onClick={() => setShowRateInput((v) => !v)}
+                  aria-controls={statusId}
+                >
                   {showRateInput ? "Скрыть" : "Изменить"}
                 </button>
               </div>
@@ -685,7 +738,6 @@ export default function OsagoRfCalculator({ dict }: Props) {
               ) : null}
             </div>
 
-            {/* Итог + CTA (как в образце) */}
             <div className="os-calc__result" role="status" aria-live="polite">
               <div className="os-calc__resultLabel">{dict.result.title}</div>
 

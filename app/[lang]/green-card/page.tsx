@@ -2,7 +2,6 @@
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
 import Image from "next/image";
-import Script from "next/script";
 import type { CSSProperties } from "react";
 
 import { getHomeDictionary } from "@/dictionaries/home";
@@ -45,13 +44,12 @@ function langToIana(lang: Lang): string {
   return lang === "ru" ? "ru" : lang === "kz" ? "kk-KZ" : "en";
 }
 
-/* ---- local helper ---- */
 function AdvantageIcon({ index }: { index: number }) {
   const baseSvgProps = {
     width: 20,
     height: 20,
     className: "gc-adv-icon",
-    style: { width: 20, height: 20, display: "u-block" } as CSSProperties,
+    style: { width: 20, height: 20, display: "block" } as CSSProperties,
     fill: "none" as const,
     "aria-hidden": true as const,
     focusable: "false" as const,
@@ -213,15 +211,13 @@ export default async function GreenCardPage({
 
   return (
     <>
-      <Script
+      <script
         id="webpage-jsonld"
         type="application/ld+json"
-        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
       />
 
       <main className="gc-page">
-        {/* HERO */}
         <section className="gc-hero">
           <div className="gc-hero__bg" aria-hidden="true" />
           <div className="gc-container gc-hero__grid">
@@ -230,7 +226,6 @@ export default async function GreenCardPage({
               <p className="gc-hero__subtitle">{gcPageDict.hero.subtitle}</p>
 
               <div className="gc-hero__cta">
-                {/* В новой CSS: обязательно указывать intent-класс */}
                 <a
                   href={orderAnchor}
                   role="button"
@@ -252,6 +247,7 @@ export default async function GreenCardPage({
                       height={320}
                       sizes="(min-width: 1280px) 620px, (min-width: 1024px) 520px, 0px"
                       className="gc-hero__car gc-anim-car"
+                      style={{ height: "auto" }}
                       priority
                     />
 
@@ -281,11 +277,8 @@ export default async function GreenCardPage({
           </div>
         </section>
 
-        {/* CALCULATOR */}
         <section className="gc-section" id="green-card-calculator">
           <div className="gc-container">
-            {/* оставляем твои legacy/modern обёртки — если они есть в проекте.
-                Если их больше нет в новой CSS, просто замени на .card/.card-body в компонентах */}
             <div className="legacy-form-scope legacy-form-card">
               <div className="modern-only">
                 <DeferredHydration rootMargin="800px" minDelayMs={150}>
@@ -327,19 +320,47 @@ export default async function GreenCardPage({
             </div>
           </div>
         </section>
-        
-        <section className="gc-section">
+
+        <section id="write-us" className="gc-section">
           <div className="gc-container">
-            <div className="legacy-form-scope legacy-form-card">
-              <WhatsAppCall dict={whatsappCallDict} />
+            <h3 className="writeus__title">{gcPageDict.writeUs.title}</h3>
+
+            <p className="writeus__text">{gcPageDict.writeUs.text}</p>
+
+            <div className="writeus__actions">
+              <a
+                href="https://wa.me/77765275553"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary"
+                role="button"
+              >
+                {gcPageDict.writeUs.whatsapp}
+              </a>
+
+              <a
+                href="https://t.me/Dionis_insurance_broker_bot"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-primary"
+                role="button"
+              >
+                {gcPageDict.writeUs.telegram}
+              </a>
             </div>
           </div>
         </section>
 
-        {/* INFO BLOCKS */}
         <GreenCardInfoBlocks dict={gcPageDict} />
 
-        {/* ADVANTAGES */}
+        <section id="green-card-order" className="gc-section">
+          <div className="gc-container">
+            <div className="legacy-form-scope legacy-form-card">
+              <GreenCardOrderForm dict={gcFormDict} />
+            </div>
+          </div>
+        </section>
+
         <DeferredHydration rootMargin="800px" minDelayMs={150}>
           <section className="gc-advantages" aria-labelledby="advantages-heading">
             <div className="gc-container">
@@ -369,16 +390,14 @@ export default async function GreenCardPage({
           </section>
         </DeferredHydration>
 
-        {/* ORDER FORM */}
-        <section id="green-card-order" className="gc-section">
+        <section className="gc-section">
           <div className="gc-container">
             <div className="legacy-form-scope legacy-form-card">
-              <GreenCardOrderForm dict={gcFormDict} />
+              <WhatsAppCall dict={whatsappCallDict} />
             </div>
           </div>
         </section>
 
-        {/* UPSALE OSAGO RF */}
         <section className="gc-section gc-section--muted">
           <div className="gc-container">
             <article className="card gc-upsell">
@@ -406,7 +425,6 @@ export default async function GreenCardPage({
                 </div>
 
                 <div className="gc-upsell__cta">
-                  {/* для апсейла логичнее вторичная (синяя) */}
                   <a href={osagoLink} className="btn btn-secondary" role="button">
                     {gcPageDict.osagoUpsell.btn}
                   </a>
@@ -416,11 +434,9 @@ export default async function GreenCardPage({
           </div>
         </section>
 
-        {/* FAQ + BROKER */}
         <FAQSection dict={gcPageDict.faq} />
         <BrokerSection broker={homeDict.broker} />
 
-        {/* QUESTION BLOCK */}
         <section className="gc-question gc-section--muted">
           <div className="gc-container gc-question__grid">
             <div className="gc-question__media">

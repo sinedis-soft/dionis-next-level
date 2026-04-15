@@ -32,6 +32,12 @@ export type GreenCardPageDictionary = {
       }>;
       imageAlt: string;
     };
+  writeUs: {
+    title: string;
+    text: string;
+    whatsapp: string;
+    telegram: string;
+  };
   calculator: {
     title: string;
     subtitle: string;
@@ -115,8 +121,8 @@ const ru: GreenCardPageDictionary = {
       orderEuropeHref: "/ru/green-card#green-card-order",
     },
     regionOptions: {
-      group1: "Только страны: Турция, Молдова, Украина",
-      group2: "Все страны системы «Зелёная карта»",
+      group1: "Турция + Молдова + Украина",
+      group2: "Европа + Турция (за исключением России и Беларуси)",
     },
     vehicleOptions: {
       passenger: "Легковые и на их базе",
@@ -216,6 +222,12 @@ const ru: GreenCardPageDictionary = {
       },
     ],
   },
+  writeUs: {
+    title: "Быстрое оформление",
+    text: "Напишите нам — оформим полис за 20 минут",
+    whatsapp: "Написать нам в WhatsApp",
+    telegram: "Написать нам в Telegram",
+  },
   osagoUpsell: {
     title: "Российское ОСАГО (Зеленая карта в РФ)",
     text1:
@@ -312,8 +324,8 @@ const en: GreenCardPageDictionary = {
 
     },
     regionOptions: {
-      group1: "Only Türkiye, Moldova, Ukraine",
-      group2: "All Green Card system countries",
+      group1: "Turkey + Moldova + Ukraine",
+      group2: "Europe + Turkey (excluding Russia and Belarus)",
     },
     vehicleOptions: {
       passenger: "Passenger cars and derivatives",
@@ -337,6 +349,12 @@ const en: GreenCardPageDictionary = {
     errorInvalidRate: "⚠️ Please enter a valid KZT rate.",
     resultPrefix: "Policy price:",
     resultApprox: "≈",
+  },
+  writeUs: {
+    title: "Quick application",
+    text: "Write to us — we will issue the policy in 20 minutes",
+    whatsapp: "Message us on WhatsApp",
+    telegram: "Message us on Telegram",
   },
   howItWorks: {
   title: "How it works",
@@ -510,8 +528,8 @@ const kz: GreenCardPageDictionary = {
       orderEuropeHref: "/kz/green-card#green-card-order",
     },
     regionOptions: {
-      group1: "Тек Түркия, Молдова, Украина",
-      group2: "«Жасыл карта» жүйесінің барлық елдері",
+      group1: "Түркия + Молдова + Украина",
+      group2: "Еуропа + Түркия (Ресей мен Беларусьтен басқа)",
     },
     vehicleOptions: {
       passenger: "Жеңіл автомобильдер және олардың базасында",
@@ -535,6 +553,12 @@ const kz: GreenCardPageDictionary = {
     errorInvalidRate: "⚠️ Дұрыс теңге курсын енгізіңіз.",
     resultPrefix: "Полис құны:",
     resultApprox: "≈",
+  },
+  writeUs: {
+    title: "Жылдам рәсімдеу",
+    text: "Бізге жазыңыз — полисті 20 минут ішінде рәсімдейміз",
+    whatsapp: "WhatsApp арқылы жазу",
+    telegram: "Telegram арқылы жазу",
   },
   howItWorks: {
   title: "Бұл қалай жұмыс істейді",

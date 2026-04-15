@@ -1,15 +1,12 @@
-// app/components/DeferredHydration.tsx
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import React, { useEffect, useRef, useState, type ReactNode } from "react";
 
 type Props = {
   children: ReactNode;
   rootMargin?: string;
   minDelayMs?: number;
   className?: string;
-
-  // ✅ если true — в legacy (по feature-detect) вообще не рендерим children
   disableOnLegacy?: boolean;
 };
 
@@ -18,12 +15,10 @@ type WindowCssSupports = {
 };
 
 function detectLegacyBrowser(): boolean {
-  // вызывать только в браузере
   const w = window as unknown as WindowCssSupports;
 
   const supportsFn = w.CSS?.supports;
   const hasGrid = typeof supportsFn === "function" && supportsFn("display", "grid");
-
   const hasFetch = typeof window.fetch === "function";
   const hasURL = typeof window.URL === "function";
 
@@ -38,70 +33,83 @@ export default function DeferredHydration({
   disableOnLegacy = false,
 }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
+
+  // Сервер и первый клиентский рендер должны быть одинаковыми.
   const [enabled, setEnabled] = useState(false);
-
-  const isBrowser = typeof window !== "undefined";
-
-  // ✅ хуки всегда вызываются, даже если потом вернём null
-  const isLegacy = useMemo(() => {
-    if (!isBrowser) return false;
-    return detectLegacyBrowser();
-  }, [isBrowser]);
-
-  const canUseIO = useMemo(() => {
-    if (!isBrowser) return false;
-    return "IntersectionObserver" in window;
-  }, [isBrowser]);
-
-  const shouldHide = disableOnLegacy && (!isBrowser || isLegacy);
+  const [blockedByLegacy, setBlockedByLegacy] = useState(false);
 
   useEffect(() => {
-    // если скрываем — ничего не включаем и ничего не наблюдаем
-    if (shouldHide) return;
+    let cancelled = false;
+    let observer: IntersectionObserver | null = null;
+    let timeoutId: number | undefined;
 
-    if (enabled) return;
+    const cleanup = () => {
+      if (observer) observer.disconnect();
+      if (timeoutId) window.clearTimeout(timeoutId);
+    };
 
-    // если IO нет — просто включаем (но это уже не legacy, потому что legacy отфильтрован shouldHide)
-    if (!canUseIO) {
-      setEnabled(true);
-      return;
+    if (disableOnLegacy) {
+      const isLegacy = detectLegacyBrowser();
+      if (isLegacy) {
+        setBlockedByLegacy(true);
+        return cleanup;
+      }
+    }
+
+    if (typeof window === "undefined") {
+      return cleanup;
+    }
+
+    const enable = () => {
+      if (cancelled) return;
+
+      if (minDelayMs > 0) {
+        timeoutId = window.setTimeout(() => {
+          if (!cancelled) setEnabled(true);
+        }, minDelayMs);
+      } else {
+        setEnabled(true);
+      }
+    };
+
+    if (!("IntersectionObserver" in window)) {
+      enable();
+      return () => {
+        cancelled = true;
+        cleanup();
+      };
     }
 
     const el = ref.current;
-    if (!el) return;
+    if (!el) {
+      enable();
+      return () => {
+        cancelled = true;
+        cleanup();
+      };
+    }
 
-    let timeoutId: number | undefined;
-
-    const enable = () => {
-      if (timeoutId) window.clearTimeout(timeoutId);
-      if (minDelayMs > 0) timeoutId = window.setTimeout(() => setEnabled(true), minDelayMs);
-      else setEnabled(true);
-    };
-
-    const io = new IntersectionObserver(
+    observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
+          observer?.disconnect();
           enable();
-          io.disconnect();
         }
       },
       { rootMargin }
     );
 
-    io.observe(el);
+    observer.observe(el);
 
     return () => {
-      io.disconnect();
-      if (timeoutId) window.clearTimeout(timeoutId);
+      cancelled = true;
+      cleanup();
     };
-  }, [enabled, canUseIO, rootMargin, minDelayMs, shouldHide]);
+  }, [disableOnLegacy, rootMargin, minDelayMs]);
 
-  // ✅ условный return только после хуков
-  if (shouldHide) return null;
+  // Не возвращаем null на сервере.
+  // Изначально и сервер, и клиент отдают одинаковый контейнер.
+  if (blockedByLegacy) return null;
 
-  return (
-    <div ref={ref} className={className} suppressHydrationWarning>
-      {enabled ? children : null}
-    </div>
-  );
+  return <div ref={ref} className={className}>{enabled ? children : null}</div>;
 }
