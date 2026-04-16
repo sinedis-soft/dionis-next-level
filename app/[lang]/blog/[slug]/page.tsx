@@ -24,6 +24,9 @@ import {
 } from "@/lib/blog";
 
 export const dynamicParams = false;
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+  "https://dionis-insurance.kz";
 
 function localeByLang(lang: Lang) {
   if (lang === "kz") return "kk-KZ";
@@ -49,14 +52,35 @@ export async function generateMetadata({
 
   const title = a.seoTitle || a.title;
   const description = a.seoDescription;
+  const localizedCandidates = await Promise.all(
+    (["ru", "kz", "en"] as const).map(async (l) => ({
+      lang: l,
+      exists: Boolean(await getArticleBySlug(l, slug)),
+    }))
+  );
+
+  const languages: Record<string, string> = {};
+  for (const candidate of localizedCandidates) {
+    if (!candidate.exists) continue;
+    languages[candidate.lang] = `${SITE_URL}/${candidate.lang}/blog/${slug}`;
+  }
+
+  languages["x-default"] =
+    languages.ru ??
+    Object.values(languages)[0] ??
+    `${SITE_URL}/${lang}/blog/${slug}`;
 
   return {
     title,
     description,
-    alternates: { canonical: `/${lang}/blog/${slug}` },
+    alternates: {
+      canonical: `${SITE_URL}/${lang}/blog/${slug}`,
+      languages,
+    },
     openGraph: {
       title,
       description,
+      url: `${SITE_URL}/${lang}/blog/${slug}`,
       images: [{ url: a.image, alt: a.imageAlt }],
       type: "article",
     },

@@ -12,6 +12,9 @@ import { getAgreementDictionary } from "@/dictionaries/agreement";
 import AboutPage from "@/components/AboutPage";
 
 const ALLOWED_LANGS: Lang[] = ["ru", "kz", "en"];
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+  "https://dionis-insurance.kz";
 
 function normalizeLang(value: string): Lang {
   return (ALLOWED_LANGS as readonly string[]).includes(value)
@@ -35,6 +38,15 @@ export async function generateMetadata({
   return {
     title: t.seo.title,
     description: t.seo.description,
+    alternates: {
+      canonical: `${SITE_URL}/${lang}/about`,
+      languages: {
+        ru: `${SITE_URL}/ru/about`,
+        "kk-KZ": `${SITE_URL}/kz/about`,
+        en: `${SITE_URL}/en/about`,
+        "x-default": `${SITE_URL}/ru/about`,
+      },
+    },
   };
 }
 

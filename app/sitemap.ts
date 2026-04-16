@@ -1,65 +1,104 @@
-// app/sitemap.ts
 import type { MetadataRoute } from "next";
 import type { Lang } from "@/dictionaries/header";
+import { AUTHORS } from "@/data/blog/authors";
 import { getAllArticleSlugs, getArticleBySlug } from "@/lib/blog";
+import { getFastApiLastmodMap } from "@/lib/seoLastmod";
 
 const BASE_URL =
   (process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.com").replace(/\/$/, "");
 
 const SUPPORTED_LANGS: Lang[] = ["ru", "kz", "en"];
 
+const STATIC_SECTIONS = [
+  "",
+  "about",
+  "contacts",
+  "green-card",
+  "osago-rf",
+  "products",
+  "insurance-comparison",
+  "blog",
+  "blog/",
+  "authors",
+  "authors/",
+  "privacy/cookies",
+  "cookie-policy",
+  "privacy/regulation",
+] as const;
+
+type RouteDef = {
+  path: string;
+  changeFrequency: NonNullable<MetadataRoute.Sitemap[number]["changeFrequency"]>;
+  priority: number;
+};
+
+function toPath(lang: Lang, section: string): string {
+  if (!section) return `/${lang}`;
+  return `/${lang}/${section}`;
+}
+
+function staticRouteDefs(): RouteDef[] {
+  return STATIC_SECTIONS.map((section) => ({
+    path: section,
+    changeFrequency: section.startsWith("blog") ? "weekly" : "monthly",
+    priority: section === "" ? 1.0 : section.startsWith("blog") ? 0.8 : 0.7,
+  }));
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const urls: MetadataRoute.Sitemap = [];
-  const now = new Date().toISOString();
+  const staticDefs = staticRouteDefs();
 
-  // ---- Основные страницы
+  const staticPaths: string[] = [];
   for (const lang of SUPPORTED_LANGS) {
-    const prefix = `/${lang}`;
+    for (const route of staticDefs) {
+      staticPaths.push(toPath(lang, route.path));
+    }
 
-    urls.push(
-      {
-        url: `${BASE_URL}${prefix}`,
-        lastModified: now,
-        changeFrequency: "weekly",
-        priority: 1.0,
-      },
-      {
-        url: `${BASE_URL}${prefix}/green-card`,
-        lastModified: now,
-        changeFrequency: "weekly",
-        priority: 0.9,
-      },
-      {
-        url: `${BASE_URL}${prefix}/osago-rf`,
-        lastModified: now,
-        changeFrequency: "weekly",
-        priority: 0.8,
-      },
-      {
-        url: `${BASE_URL}${prefix}/products`,
-        lastModified: now,
-        changeFrequency: "monthly",
-        priority: 0.6,
-      },
-      {
-        url: `${BASE_URL}${prefix}/blog`,
-        lastModified: now,
-        changeFrequency: "weekly",
-        priority: 0.7,
-      }
-    );
+    for (const author of AUTHORS) {
+      staticPaths.push(`/${lang}/authors/${author.slug}`);
+    }
   }
 
-  // ---- Статьи блога (из MDX)
-  const slugs = await getAllArticleSlugs();
+  const articleSlugs = await getAllArticleSlugs();
+  const articlePaths = articleSlugs.map(({ lang, slug }) => `/${lang}/blog/${slug}`);
 
-  for (const { lang, slug } of slugs) {
+  const fastApiLastmod = await getFastApiLastmodMap([...staticPaths, ...articlePaths]);
+  const defaultLastmod = new Date().toISOString();
+
+  const urls: MetadataRoute.Sitemap = [];
+
+  for (const lang of SUPPORTED_LANGS) {
+    for (const route of staticDefs) {
+      const path = toPath(lang, route.path);
+      urls.push({
+        url: `${BASE_URL}${path}`,
+        lastModified: fastApiLastmod[path] ?? defaultLastmod,
+        changeFrequency: route.changeFrequency,
+        priority: route.priority,
+      });
+    }
+
+    for (const author of AUTHORS) {
+      const path = `/${lang}/authors/${author.slug}`;
+      urls.push({
+        url: `${BASE_URL}${path}`,
+        lastModified: fastApiLastmod[path] ?? defaultLastmod,
+        changeFrequency: "monthly",
+        priority: 0.6,
+      });
+    }
+  }
+
+  for (const { lang, slug } of articleSlugs) {
     const article = await getArticleBySlug(lang, slug);
     if (!article) continue;
 
+    const path = `/${lang}/blog/${slug}`;
+
     urls.push({
-      url: `${BASE_URL}/${lang}/blog/${slug}`,
-      lastModified: article.modifiedAt ?? article.publishedAt,
+      url: `${BASE_URL}${path}`,
+      lastModified:
+        fastApiLastmod[path] ?? article.modifiedAt ?? article.publishedAt ?? defaultLastmod,
       changeFrequency: "monthly",
       priority: 0.6,
     });

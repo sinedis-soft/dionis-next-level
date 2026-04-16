@@ -58,7 +58,15 @@ export async function generateMetadata({
   return {
     title: titles[lang],
     description: descriptions[lang],
-    alternates: { canonical: `/${lang}/contacts` },
+    alternates: {
+      canonical: `${SITE_URL}/${lang}/contacts`,
+      languages: {
+        ru: `${SITE_URL}/ru/contacts`,
+        "kk-KZ": `${SITE_URL}/kz/contacts`,
+        en: `${SITE_URL}/en/contacts`,
+        "x-default": `${SITE_URL}/ru/contacts`,
+      },
+    },
     openGraph: {
       title: titles[lang],
       description: descriptions[lang],

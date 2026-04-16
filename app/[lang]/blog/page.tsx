@@ -7,6 +7,9 @@ import BlogGrid from "@/components/blog/BlogGrid";
 import { getBlogDictionary } from "@/dictionaries/blog";
 
 const ALLOWED_LANGS: Lang[] = ["ru", "kz", "en"];
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+  "https://dionis-insurance.kz";
 
 function normalizeLang(value: string): Lang {
   return (ALLOWED_LANGS as readonly string[]).includes(value)
@@ -32,6 +35,22 @@ export async function generateMetadata({
   return {
     title: dict.title,
     description: dict.description,
+    alternates: {
+      canonical: `${SITE_URL}/${lang}/blog`,
+      languages: {
+        ru: `${SITE_URL}/ru/blog`,
+        "kk-KZ": `${SITE_URL}/kz/blog`,
+        en: `${SITE_URL}/en/blog`,
+        "x-default": `${SITE_URL}/ru/blog`,
+      },
+    },
+    openGraph: {
+      title: dict.title,
+      description: dict.description,
+      url: `${SITE_URL}/${lang}/blog`,
+      siteName: "Dionis Insurance Broker",
+      type: "website",
+    },
   };
 }
 
