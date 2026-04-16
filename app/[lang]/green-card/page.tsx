@@ -347,6 +347,16 @@ export default async function GreenCardPage({
               >
                 {gcPageDict.writeUs.telegram}
               </a>
+
+              <a
+                href="tel:+77273573030"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary"
+                role="button"
+              >
+                {gcPageDict.writeUs.phone}
+              </a>
             </div>
           </div>
         </section>

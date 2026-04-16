@@ -441,6 +441,15 @@ export default async function OsagoRfPage({
               >
                 {osagoPageDict.writeUs.telegram}
               </a>
+                            <a
+                href="tel:+77273573030"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-secondary"
+                role="button"
+              >
+                {osagoPageDict.writeUs.phone}
+              </a>
             </div>
           </div>
         </section>

@@ -39,7 +39,8 @@ export type OsagoRfPageDictionary = {
     text: string;
     whatsapp: string;
     telegram: string;
-  };
+    phone: string;
+  }
 
   info: {
     title: string;
@@ -155,6 +156,7 @@ const ru: OsagoRfPageDictionary = {
     text: "Напишите нам — оформим полис за 20 минут",
     whatsapp: "Написать нам в WhatsApp",
     telegram: "Написать нам в Telegram",
+    phone: "Позвонить нам: +7 (727) 357-30-30",
   },
 
   info: {
@@ -373,6 +375,7 @@ const en: OsagoRfPageDictionary = {
     text: "Write to us — we will issue the policy in 20 minutes",
     whatsapp: "Message us on WhatsApp",
     telegram: "Message us on Telegram",
+    phone: "Call us: +7 (727) 357-30-30",
   },
 
   benefits: {
@@ -540,6 +543,7 @@ const kz: OsagoRfPageDictionary = {
     text: "Бізге жазыңыз — полисті 20 минут ішінде рәсімдейміз",
     whatsapp: "WhatsApp арқылы жазу",
     telegram: "Telegram арқылы жазу",
+    phone: "Бізге қоңырау шалу: +7 (727) 357-30-30",
   },
 
   benefits: {

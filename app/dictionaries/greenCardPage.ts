@@ -37,6 +37,7 @@ export type GreenCardPageDictionary = {
     text: string;
     whatsapp: string;
     telegram: string;
+    phone: string;
   };
   calculator: {
     title: string;
@@ -227,6 +228,7 @@ const ru: GreenCardPageDictionary = {
     text: "Напишите нам — оформим полис за 20 минут",
     whatsapp: "Написать нам в WhatsApp",
     telegram: "Написать нам в Telegram",
+    phone: "Позвонить нам: +7 (727) 357-30-30",
   },
   osagoUpsell: {
     title: "Российское ОСАГО (Зеленая карта в РФ)",
@@ -355,6 +357,7 @@ const en: GreenCardPageDictionary = {
     text: "Write to us — we will issue the policy in 20 minutes",
     whatsapp: "Message us on WhatsApp",
     telegram: "Message us on Telegram",
+    phone: "Call us: +7 (727) 357-30-30",
   },
   howItWorks: {
   title: "How it works",
@@ -559,6 +562,7 @@ const kz: GreenCardPageDictionary = {
     text: "Бізге жазыңыз — полисті 20 минут ішінде рәсімдейміз",
     whatsapp: "WhatsApp арқылы жазу",
     telegram: "Telegram арқылы жазу",
+    phone: "Бізге қоңырау шалу: +7 (727) 357-30-30",
   },
   howItWorks: {
   title: "Бұл қалай жұмыс істейді",
