@@ -35,16 +35,17 @@ export async function generateMetadata({
   const lang = normalizeLang(rawLang);
 
   const t = getAboutDictionary(lang);
+  const canonical = `${SITE_URL}/about`;
   return {
     title: t.seo.title,
     description: t.seo.description,
     alternates: {
-      canonical: `${SITE_URL}/${lang}/about`,
+      canonical,
       languages: {
-        ru: `${SITE_URL}/ru/about`,
+        ru: canonical,
         "kk-KZ": `${SITE_URL}/kz/about`,
         en: `${SITE_URL}/en/about`,
-        "x-default": `${SITE_URL}/ru/about`,
+        "x-default": canonical,
       },
     },
   };

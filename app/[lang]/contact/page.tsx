@@ -36,17 +36,18 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang: rawLang } = await params;
   const lang = normalizeLang(rawLang);
+  const canonical = `${SITE_URL}/contacts`;
 
   return {
     title: titles[lang],
     description: descriptions[lang],
     alternates: {
-      canonical: `${SITE_URL}/${lang}/contacts`,
+      canonical,
       languages: {
-        ru: `${SITE_URL}/ru/contacts`,
+        ru: canonical,
         "kk-KZ": `${SITE_URL}/kz/contacts`,
         en: `${SITE_URL}/en/contacts`,
-        "x-default": `${SITE_URL}/ru/contacts`,
+        "x-default": canonical,
       },
     },
   };

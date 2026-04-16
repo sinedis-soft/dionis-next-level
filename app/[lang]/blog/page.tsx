@@ -31,23 +31,24 @@ export async function generateMetadata({
   const { lang: rawLang } = await params;
   const lang = normalizeLang(rawLang);
   const dict = getBlogDictionary(lang);
+  const canonical = `${SITE_URL}/blog`;
 
   return {
     title: dict.title,
     description: dict.description,
     alternates: {
-      canonical: `${SITE_URL}/${lang}/blog`,
+      canonical,
       languages: {
-        ru: `${SITE_URL}/ru/blog`,
+        ru: canonical,
         "kk-KZ": `${SITE_URL}/kz/blog`,
         en: `${SITE_URL}/en/blog`,
-        "x-default": `${SITE_URL}/ru/blog`,
+        "x-default": canonical,
       },
     },
     openGraph: {
       title: dict.title,
       description: dict.description,
-      url: `${SITE_URL}/${lang}/blog`,
+      url: canonical,
       siteName: "Dionis Insurance Broker",
       type: "website",
     },

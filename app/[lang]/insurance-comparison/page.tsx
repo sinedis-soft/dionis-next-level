@@ -50,17 +50,18 @@ export async function generateMetadata({
   const { lang: rawLang } = await params;
   const lang = normalizeLang(rawLang);
   const ui = UI[lang];
+  const canonical = `${SITE_URL}/insurance-comparison`;
 
   return {
     title: ui.title,
     description: ui.description,
     alternates: {
-      canonical: `${SITE_URL}/${lang}/insurance-comparison`,
+      canonical,
       languages: {
-        ru: `${SITE_URL}/ru/insurance-comparison`,
+        ru: canonical,
         "kk-KZ": `${SITE_URL}/kz/insurance-comparison`,
         en: `${SITE_URL}/en/insurance-comparison`,
-        "x-default": `${SITE_URL}/ru/insurance-comparison`,
+        "x-default": canonical,
       },
     },
   };

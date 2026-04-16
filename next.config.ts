@@ -2,25 +2,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async redirects() {
-    return [
-      {
-        source: "/about",
-        destination: "/ru/about",
-        permanent: true,
-      },
-      {
-        source: "/green-card",
-        destination: "/ru/green-card",
-        permanent: true,
-      },
-      {
-        source: "/osago-rf",
-        destination: "/ru/osago-rf",
-        permanent: true,
-      },
-    ];
-  },
   images: {
     // ВАЖНО: добавляем мелкие ширины сюда (deviceSizes), не только в imageSizes
     deviceSizes: [

@@ -229,7 +229,7 @@ export async function generateMetadata({
   const { lang: rawLang } = await params;
   const lang = normalizeLang(rawLang);
 
-  const url = `${SITE_URL}/${lang}/osago-rf`;
+  const url = `${SITE_URL}/osago-rf`;
 
   const titles: Record<Lang, string> = {
     ru: "ОСАГО РФ для нерезидентов — оформить онлайн | Dionis Insurance Broker",
@@ -249,10 +249,10 @@ export async function generateMetadata({
     alternates: {
       canonical: url,
       languages: {
-        ru: `${SITE_URL}/ru/osago-rf`,
+        ru: `${SITE_URL}/osago-rf`,
         "kk-KZ": `${SITE_URL}/kz/osago-rf`,
         en: `${SITE_URL}/en/osago-rf`,
-        "x-default": `${SITE_URL}/ru/osago-rf`,
+        "x-default": `${SITE_URL}/osago-rf`,
       },
     },
     openGraph: {

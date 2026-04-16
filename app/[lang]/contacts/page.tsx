@@ -52,6 +52,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const p = await params;
   const lang = getLangSafe(p?.lang);
+  const canonical = `${SITE_URL}/contacts`;
 
   const baseUrl = new URL(SITE_URL);
 
@@ -59,12 +60,12 @@ export async function generateMetadata({
     title: titles[lang],
     description: descriptions[lang],
     alternates: {
-      canonical: `${SITE_URL}/${lang}/contacts`,
+      canonical,
       languages: {
-        ru: `${SITE_URL}/ru/contacts`,
+        ru: canonical,
         "kk-KZ": `${SITE_URL}/kz/contacts`,
         en: `${SITE_URL}/en/contacts`,
-        "x-default": `${SITE_URL}/ru/contacts`,
+        "x-default": canonical,
       },
     },
     openGraph: {

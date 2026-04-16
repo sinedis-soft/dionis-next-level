@@ -52,6 +52,7 @@ export async function generateMetadata({
 
   const title = a.seoTitle || a.title;
   const description = a.seoDescription;
+  const canonical = `${SITE_URL}/blog/${slug}`;
   const localizedCandidates = await Promise.all(
     (["ru", "kz", "en"] as const).map(async (l) => ({
       lang: l,
@@ -62,25 +63,31 @@ export async function generateMetadata({
   const languages: Record<string, string> = {};
   for (const candidate of localizedCandidates) {
     if (!candidate.exists) continue;
-    languages[candidate.lang] = `${SITE_URL}/${candidate.lang}/blog/${slug}`;
+    if (candidate.lang === "ru") {
+      languages.ru = canonical;
+      continue;
+    }
+    languages[candidate.lang === "kz" ? "kk-KZ" : candidate.lang] =
+      `${SITE_URL}/${candidate.lang}/blog/${slug}`;
   }
 
   languages["x-default"] =
+    canonical ??
     languages.ru ??
     Object.values(languages)[0] ??
-    `${SITE_URL}/${lang}/blog/${slug}`;
+    canonical;
 
   return {
     title,
     description,
     alternates: {
-      canonical: `${SITE_URL}/${lang}/blog/${slug}`,
+      canonical,
       languages,
     },
     openGraph: {
       title,
       description,
-      url: `${SITE_URL}/${lang}/blog/${slug}`,
+      url: canonical,
       images: [{ url: a.image, alt: a.imageAlt }],
       type: "article",
     },

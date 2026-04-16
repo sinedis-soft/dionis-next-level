@@ -130,7 +130,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang: rawLang } = await params;
   const lang = normalizeLang(rawLang);
-  const url = `${SITE_URL}/${lang}/green-card`;
+  const url = `${SITE_URL}/green-card`;
 
   const titles: Record<Lang, string> = {
     ru: "Зелёная карта для авто из Казахстана — оформить онлайн | Dionis Insurance Broker",
@@ -150,10 +150,10 @@ export async function generateMetadata({
     alternates: {
       canonical: url,
       languages: {
-        ru: `${SITE_URL}/ru/green-card`,
+        ru: `${SITE_URL}/green-card`,
         "kk-KZ": `${SITE_URL}/kz/green-card`,
         en: `${SITE_URL}/en/green-card`,
-        "x-default": `${SITE_URL}/ru/green-card`,
+        "x-default": `${SITE_URL}/green-card`,
       },
     },
     openGraph: {
