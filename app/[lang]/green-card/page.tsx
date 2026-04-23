@@ -1,4 +1,3 @@
-// app/[lang]/green-card/page.tsx
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
 import Image from "next/image";
@@ -27,6 +26,8 @@ export const dynamicParams = false;
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
   "https://dionis-insurance.kz";
+
+const GREEN_CARD_CHECK_LINK = "https://isb.az/en/greencard/check/serial/no";
 
 export function generateStaticParams(): Array<{ lang: Lang }> {
   return [{ lang: "ru" }, { lang: "kz" }, { lang: "en" }];
@@ -362,6 +363,52 @@ export default async function GreenCardPage({
         </section>
 
         <GreenCardInfoBlocks dict={gcPageDict} />
+
+        <section className="gc-section gc-section--muted">
+          <div className="gc-container">
+            <article className="card gc-upsell">
+              <div className="gc-upsell__media">
+                <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+                  <Image
+                    src="/services/green_card_check.svg"
+                    alt={gcPageDict.greenCardCheckUpsell.imageAlt}
+                    width={400}
+                    height={260}
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="gc-upsell__img"
+                    loading="lazy"
+                  />
+                </DeferredHydration>
+              </div>
+
+              <div className="gc-upsell__body">
+                <div>
+                  <h3 className="gc-upsell__title">
+                    {gcPageDict.greenCardCheckUpsell.title}
+                  </h3>
+                  <p className="gc-upsell__p">
+                    {gcPageDict.greenCardCheckUpsell.text1}
+                  </p>
+                  <p className="gc-upsell__p gc-text-muted">
+                    {gcPageDict.greenCardCheckUpsell.text2}
+                  </p>
+                </div>
+
+                <div className="gc-upsell__cta">
+                  <a
+                    href={GREEN_CARD_CHECK_LINK}
+                    className="btn btn-secondary"
+                    role="button"
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                  >
+                    {gcPageDict.greenCardCheckUpsell.btn}
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
 
         <section id="green-card-order" className="gc-section">
           <div className="gc-container">

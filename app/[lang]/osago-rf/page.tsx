@@ -1,4 +1,3 @@
-// app/[lang]/osago-rf/page.tsx
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
 import Image from "next/image";
@@ -27,6 +26,8 @@ export const dynamicParams = false;
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
   "https://dionis-insurance.kz";
+
+const OSAGO_CHECK_LINK = "https://nsis.ru/";
 
 export function generateStaticParams(): Array<{ lang: Lang }> {
   return [{ lang: "ru" }, { lang: "kz" }, { lang: "en" }];
@@ -131,7 +132,10 @@ function OsagoInfoBlocks({
   return (
     <>
       <DeferredHydration rootMargin="800px" minDelayMs={150}>
-        <section className="gc-hiw gc-no-anchor" aria-labelledby="how-it-works-heading">
+        <section
+          className="gc-hiw gc-no-anchor"
+          aria-labelledby="how-it-works-heading"
+        >
           <div className="gc-container">
             <h2 id="how-it-works-heading" className="gc-section-title">
               {dict.howItWorks.title}
@@ -157,7 +161,9 @@ function OsagoInfoBlocks({
                 {dict.howItWorks.steps.map((s, idx) => (
                   <article key={idx} className="card gc-hiw-card">
                     <div className="gc-hiw-card__row">
-                      <div className="gc-hiw__num gc-hiw__num--mobile">{idx + 1}</div>
+                      <div className="gc-hiw__num gc-hiw__num--mobile">
+                        {idx + 1}
+                      </div>
                       <div className="gc-hiw-card__body">
                         <div className="gc-hiw__stepTitle">{s.title}</div>
                         <p className="gc-hiw__stepText gc-hiw__stepText--mobile">
@@ -174,7 +180,10 @@ function OsagoInfoBlocks({
       </DeferredHydration>
 
       <DeferredHydration rootMargin="800px" minDelayMs={150}>
-        <section className="gc-coverage gc-no-anchor" aria-labelledby="benefits-heading">
+        <section
+          className="gc-coverage gc-no-anchor"
+          aria-labelledby="benefits-heading"
+        >
           <div className="gc-container">
             <article className="gc-coverage__card">
               <div className="gc-coverage__grid">
@@ -388,7 +397,8 @@ export default async function OsagoRfPage({
 
                 <div className="gc-legacy-note">
                   <p className="gc-text-muted">
-                    Ваш браузер устарел. Калькулятор может работать медленно или не работать.
+                    Ваш браузер устарел. Калькулятор может работать медленно или не
+                    работать.
                   </p>
                   <p className="gc-text-muted">
                     Оформите заявку — мы рассчитаем стоимость и пришлём предложение.
@@ -407,7 +417,8 @@ export default async function OsagoRfPage({
 
                 <noscript>
                   <div className="gc-mt-12 gc-text-muted">
-                    JavaScript отключён. Оформите заявку ниже — мы рассчитаем стоимость вручную.
+                    JavaScript отключён. Оформите заявку ниже — мы рассчитаем стоимость
+                    вручную.
                   </div>
                 </noscript>
               </div>
@@ -441,7 +452,8 @@ export default async function OsagoRfPage({
               >
                 {osagoPageDict.writeUs.telegram}
               </a>
-                            <a
+
+              <a
                 href="tel:+77273573030"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -456,6 +468,52 @@ export default async function OsagoRfPage({
 
         <OsagoInfoBlocks dict={osagoPageDict} />
 
+        <section className="gc-section gc-section--muted">
+          <div className="gc-container">
+            <article className="card gc-upsell">
+              <div className="gc-upsell__media">
+                <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+                  <Image
+                    src="/services/osago_check.png"
+                    alt={osagoPageDict.osagoCheckUpsell.imageAlt}
+                    width={400}
+                    height={260}
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="gc-upsell__img"
+                    loading="lazy"
+                  />
+                </DeferredHydration>
+              </div>
+
+              <div className="gc-upsell__body">
+                <div>
+                  <h3 className="gc-upsell__title">
+                    {osagoPageDict.osagoCheckUpsell.title}
+                  </h3>
+                  <p className="gc-upsell__p">
+                    {osagoPageDict.osagoCheckUpsell.text1}
+                  </p>
+                  <p className="gc-upsell__p gc-text-muted">
+                    {osagoPageDict.osagoCheckUpsell.text2}
+                  </p>
+                </div>
+
+                <div className="gc-upsell__cta">
+                  <a
+                    href={OSAGO_CHECK_LINK}
+                    className="btn btn-secondary"
+                    role="button"
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                  >
+                    {osagoPageDict.osagoCheckUpsell.btn}
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
         <DeferredHydration rootMargin="800px" minDelayMs={150}>
           <section className="gc-advantages" aria-labelledby="advantages-heading">
             <div className="gc-container">
@@ -467,7 +525,11 @@ export default async function OsagoRfPage({
                 {osagoPageDict.advantages.items.map((item, idx) => (
                   <article key={`${item.title}-${idx}`} className="gc-adv-card">
                     <div className="gc-adv-card__iconWrap">
-                      <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+                      <DeferredHydration
+                        disableOnLegacy
+                        rootMargin="1200px"
+                        minDelayMs={0}
+                      >
                         <AdvantageIcon index={idx} />
                       </DeferredHydration>
                     </div>

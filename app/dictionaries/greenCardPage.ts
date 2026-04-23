@@ -1,4 +1,3 @@
-// app/dictionaries/greenCardPage.ts
 import type { Lang } from "./header";
 
 export type GreenCardPageDictionary = {
@@ -16,22 +15,21 @@ export type GreenCardPageDictionary = {
     text2: string;
   };
   howItWorks: {
+    title: string;
+    subtitle: string;
+    steps: Array<{
       title: string;
-      subtitle: string;
-      steps: Array<{
-        title: string;
-        text: string;
-      }>;
-    };
-
-    coverage: {
+      text: string;
+    }>;
+  };
+  coverage: {
+    title: string;
+    items: Array<{
       title: string;
-      items: Array<{
-        title: string;
-        text: string;
-      }>;
-      imageAlt: string;
-    };
+      text: string;
+    }>;
+    imageAlt: string;
+  };
   writeUs: {
     title: string;
     text: string;
@@ -64,8 +62,8 @@ export type GreenCardPageDictionary = {
     autoRateError: string;
     calcButton: string;
     errorInvalidRate: string;
-    resultPrefix: string; // до: "Стоимость полиса:"
-    resultApprox: string; // "≈" / "~"
+    resultPrefix: string;
+    resultApprox: string;
   };
   advantages: {
     title: string;
@@ -74,6 +72,13 @@ export type GreenCardPageDictionary = {
       title: string;
       text: string;
     }[];
+  };
+  greenCardCheckUpsell: {
+    title: string;
+    text1: string;
+    text2: string;
+    btn: string;
+    imageAlt: string;
   };
   osagoUpsell: {
     title: string;
@@ -103,21 +108,22 @@ const ru: GreenCardPageDictionary = {
     policyAlt: "Полис Зеленой карты",
     logoAlt: "Логотип Dionis Insurance Broker",
   },
+
   questionBlock: {
     title: "Есть вопросы по Зеленой карте?",
     text1:
       "Напишите нам — и мы подберём оптимальный вариант страхования под ваш маршрут.",
-    text2:
-      "Для заказа самой Зеленой карты заполните заявку выше.",
+    text2: "Для заказа самой Зеленой карты заполните заявку выше.",
   },
+
   calculator: {
     title: "Расчёт стоимости Green Card",
     subtitle: "Онлайн расчет за 20 секунд! Не является публичной офертой.",
     labels: {
-      region: "Направление    ",
-      vehicle: "Категория ТС    ",
-      period: "Срок действия    ",
-      rate: "Курс тенге за $    ",
+      region: "Направление",
+      vehicle: "Категория ТС",
+      period: "Срок действия",
+      rate: "Курс тенге за $",
       orderEuropeLabel: "ЗАКАЗАТЬ ЗЕЛЕНУЮ КАРТУ В ЕВРОПУ",
       orderEuropeHref: "/ru/green-card#green-card-order",
     },
@@ -148,6 +154,7 @@ const ru: GreenCardPageDictionary = {
     resultPrefix: "Стоимость полиса (справочно):",
     resultApprox: "≈",
   },
+
   howItWorks: {
     title: "Как это работает",
     subtitle: "Простой процесс получения полиса онлайн",
@@ -185,8 +192,8 @@ const ru: GreenCardPageDictionary = {
           "Словения, Тунис, Турция, Венгрия, Украина, Финляндия, Франция, Хорватия, " +
           "Чешская Республика, Черногория, Швейцария, Швеция.\n\n" +
           "ВАЖНО: «Зелёная карта» выдаётся страховой компанией Азербайджана, " +
-          "поэтому на территории Азербайджана она НЕ действует."
-},
+          "поэтому на территории Азербайджана она НЕ действует.",
+      },
       {
         title: "Типы транспортных средств",
         text: "Легковые автомобили, мотоциклы, грузовой транспорт, прицепы, автобусы.",
@@ -198,6 +205,7 @@ const ru: GreenCardPageDictionary = {
     ],
     imageAlt: "Зона покрытия и условия Green Card",
   },
+
   advantages: {
     title: "«ДИОНИС» ПРЕДЛАГАЕТ СЛЕДУЮЩИЕ ПРЕИМУЩЕСТВА:",
     items: [
@@ -223,6 +231,7 @@ const ru: GreenCardPageDictionary = {
       },
     ],
   },
+
   writeUs: {
     title: "Быстрое оформление",
     text: "Напишите нам — оформим полис за 20 минут",
@@ -230,6 +239,17 @@ const ru: GreenCardPageDictionary = {
     telegram: "Написать нам в Telegram",
     phone: "Позвонить нам: +7 (727) 357-30-30",
   },
+
+  greenCardCheckUpsell: {
+    title: "Проверить полис «Зелёная карта»",
+    text1:
+      "Если у вас уже есть оформленный полис, вы можете самостоятельно проверить его на сайте Бюро Зеленая карта.",
+    text2:
+      "Проверка доступна по номеру полиса или регистрационным данным транспортного средства.",
+    btn: "Проверить полис",
+    imageAlt: "Проверка полиса Зеленая карта",
+  },
+
   osagoUpsell: {
     title: "Российское ОСАГО (Зеленая карта в РФ)",
     text1:
@@ -239,6 +259,7 @@ const ru: GreenCardPageDictionary = {
     btn: "Подробнее об ОСАГО РФ",
     imageAlt: "Российское ОСАГО для нерезидентов",
   },
+
   faq: {
     title: "Часто задаваемые вопросы о «Зелёной карте»",
     intro:
@@ -294,36 +315,36 @@ const ru: GreenCardPageDictionary = {
       },
     ],
   },
-  
 };
 
 const en: GreenCardPageDictionary = {
   hero: {
-  title: "GREEN CARD",
-  subtitle:
-    "International motor third-party liability insurance for vehicles registered in Kazakhstan. Required when entering EU countries, Turkey, and other states.",
+    title: "GREEN CARD",
+    subtitle:
+      "International motor third-party liability insurance for vehicles registered in Kazakhstan. Required when entering EU countries, Turkey, and other states.",
     ctaOrder: "Order a Green Card",
     carAlt: "Car with Green Card insurance",
     policyAlt: "Green Card policy sample",
     logoAlt: "Dionis Insurance Broker logo",
   },
+
   questionBlock: {
     title: "Questions about the Green Card?",
     text1:
       "Write to us — we will answer and select the optimal insurance solution for your route.",
     text2: "To order the Green Card itself, please fill out the application form above.",
   },
+
   calculator: {
     title: "Green Card price calculator",
     subtitle: "Online quote in 20 seconds!",
     labels: {
-      region: "Destination    ",
-      vehicle: "Vehicle category    ",
-      period: "Policy period     ",
-      rate: "KZT per 1 USD    ",
+      region: "Destination",
+      vehicle: "Vehicle category",
+      period: "Policy period",
+      rate: "KZT per 1 USD",
       orderEuropeLabel: "ORDER A GREEN CARD FOR EUROPE",
       orderEuropeHref: "/en/green-card#green-card-order",
-
     },
     regionOptions: {
       group1: "Turkey + Moldova + Ukraine",
@@ -352,6 +373,7 @@ const en: GreenCardPageDictionary = {
     resultPrefix: "Policy price:",
     resultApprox: "≈",
   },
+
   writeUs: {
     title: "Quick application",
     text: "Write to us — we will issue the policy in 20 minutes",
@@ -359,56 +381,57 @@ const en: GreenCardPageDictionary = {
     telegram: "Message us on Telegram",
     phone: "Call us: +7 (727) 357-30-30",
   },
-  howItWorks: {
-  title: "How it works",
-  subtitle: "A simple process to obtain your policy online",
-  steps: [
-    {
-      title: "Submit a request",
-      text: "Fill in a short form on the website or contact our manager.",
-    },
-    {
-      title: "We verify the details",
-      text: "We уточняем details and select the most suitable tariff for your route.",
-    },
-    {
-      title: "Make a payment",
-      text: "Payment by card or bank transfer — suitable for both individuals and legal entities.",
-    },
-    {
-      title: "Receive your policy",
-      text: "We send the completed document by e-mail, usually within 15 minutes after payment.",
-    },
-  ],
-},
 
-coverage: {
-  title: "Coverage area and terms",
-  items: [
-    {
-      title: "Territorial coverage",
-      text:
-        "The policy is valid in the countries of the Green Card system:\n\n" +
-        "Austria, Albania, Andorra, Belgium, Bulgaria, Bosnia and Herzegovina, " +
-        "United Kingdom, Greece, Denmark, Estonia, Ireland, Iceland, Spain, Italy, " +
-        "Cyprus, Lithuania, Latvia, Luxembourg, Malta, Morocco, Moldova, Netherlands, Germany, " +
-        "Norway, North Macedonia, Poland, Portugal, Romania, Serbia, Slovakia, " +
-        "Slovenia, Tunisia, Türkiye, Hungary, Ukraine, Finland, France, Croatia, " +
-        "Czech Republic, Montenegro, Switzerland, Sweden.\n\n" +
-        "IMPORTANT: The Green Card policy is issued by an insurance company in Azerbaijan; " +
-        "therefore, it is NOT valid within the territory of Azerbaijan.",
-    },
-    {
-      title: "Types of vehicles",
-      text: "Passenger cars, motorcycles, trucks, trailers, and buses.",
-    },
-    {
-      title: "Policy validity period",
-      text: "Minimum period — 1 month. Maximum period — 1 year.",
-    },
-  ],
-  imageAlt: "Green Card coverage area and terms",
-},
+  howItWorks: {
+    title: "How it works",
+    subtitle: "A simple process to obtain your policy online",
+    steps: [
+      {
+        title: "Submit a request",
+        text: "Fill in a short form on the website or contact our manager.",
+      },
+      {
+        title: "We verify the details",
+        text: "We clarify the details and select the most suitable tariff for your route.",
+      },
+      {
+        title: "Make a payment",
+        text: "Payment by card or bank transfer — suitable for both individuals and legal entities.",
+      },
+      {
+        title: "Receive your policy",
+        text: "We send the completed document by e-mail, usually within 15 minutes after payment.",
+      },
+    ],
+  },
+
+  coverage: {
+    title: "Coverage area and terms",
+    items: [
+      {
+        title: "Territorial coverage",
+        text:
+          "The policy is valid in the countries of the Green Card system:\n\n" +
+          "Austria, Albania, Andorra, Belgium, Bulgaria, Bosnia and Herzegovina, " +
+          "United Kingdom, Greece, Denmark, Estonia, Ireland, Iceland, Spain, Italy, " +
+          "Cyprus, Lithuania, Latvia, Luxembourg, Malta, Morocco, Moldova, Netherlands, Germany, " +
+          "Norway, North Macedonia, Poland, Portugal, Romania, Serbia, Slovakia, " +
+          "Slovenia, Tunisia, Türkiye, Hungary, Ukraine, Finland, France, Croatia, " +
+          "Czech Republic, Montenegro, Switzerland, Sweden.\n\n" +
+          "IMPORTANT: The Green Card policy is issued by an insurance company in Azerbaijan; " +
+          "therefore, it is NOT valid within the territory of Azerbaijan.",
+      },
+      {
+        title: "Types of vehicles",
+        text: "Passenger cars, motorcycles, trucks, trailers, and buses.",
+      },
+      {
+        title: "Policy validity period",
+        text: "Minimum period — 1 month. Maximum period — 1 year.",
+      },
+    ],
+    imageAlt: "Green Card coverage area and terms",
+  },
 
   advantages: {
     title: "DIONIS OFFERS THE FOLLOWING BENEFITS:",
@@ -435,6 +458,17 @@ coverage: {
       },
     ],
   },
+
+  greenCardCheckUpsell: {
+    title: "Check your Green Card policy",
+    text1:
+      "If you already have an issued policy, you can verify it yourself on the Green Card Bureau website.",
+    text2:
+      "The check is available by policy number or vehicle registration details.",
+    btn: "Check policy",
+    imageAlt: "Green Card policy verification",
+  },
+
   osagoUpsell: {
     title: "Russian MTPL (Green Card in Russia)",
     text1:
@@ -444,74 +478,75 @@ coverage: {
     btn: "More about Russian MTPL",
     imageAlt: "Russian MTPL insurance for non-residents",
   },
-faq: {
-  title: "Frequently Asked Questions About the Green Card",
-  intro:
-    "Answers to key questions about international motor third-party liability insurance.",
-  items: [
-    {
-      id: "what-is",
-      question: "What is a Green Card?",
-      answer:
-        "A Green Card is an international insurance document that provides third-party liability coverage for vehicle owners when they cause damage to others in a road accident outside the country of registration. It is mandatory when entering countries participating in the international motor insurance system and guarantees that victims receive compensation according to the laws of the country where the accident occurred.",
-    },
-    {
-      id: "vs-border",
-      question: "How is a Green Card different from border insurance?",
-      answer:
-        "First, it is a unified international standard recognized in dozens of countries. Second, the Green Card provides broader and more reliable coverage: property damage, bodily injury, and death of third parties. Third, the policy is issued in advance by a broker, avoiding queues at the border—faster and more convenient than purchasing border insurance upon entry.",
-    },
-    {
-      id: "bureaux",
-      question: "What are Green Card Bureaux?",
-      answer:
-        "Each country in the Green Card system has its own National Bureau. It guarantees payments to victims of accidents caused by foreign vehicles on its territory and later recovers these amounts from the Bureau of the country where the liable driver was insured. The Bureaux unite motor insurers and operate under harmonized internal regulations.",
-    },
-    {
-      id: "territory",
-      question: "In which countries is the Green Card valid?",
-      answer:
-        "The policy covers most European countries, as well as several states in North Africa and the Middle East. The exact list of countries and exclusions is printed on the policy form and depends on the issuing country. Countries whose codes are crossed out are not included in the coverage.",
-    },
-    {
-      id: "covers",
-      question: "What does the Green Card cover?",
-      answer:
-        "The policy covers bodily injury and death of third parties, as well as damage to their property caused during the operation of the insured vehicle abroad, within the liability limits of the destination country.",
-    },
-    {
-      id: "not-cover",
-      question: "What does the Green Card not cover?",
-      answer:
-        "It does not cover damage to the policyholder’s own vehicle, medical expenses of the driver or passengers, intentional acts, damage during competitions or training runs, nor losses incurred while driving under the influence of alcohol or drugs.",
-    },
-    {
-      id: "limits",
-      question: "What are the liability limits under the policy?",
-      answer:
-        "The limits are defined by the legislation of the country you enter. For example, in Poland, the limit for bodily injury reaches EUR 5,000,000, while the property damage limit is up to EUR 1,000,000. Other countries have different limits, so it is recommended to check the current amounts before your trip.",
-    },
-    {
-      id: "why-use",
-      question: "Why should I obtain a Green Card in advance?",
-      answer:
-        "The policy is issued fully online, valid across all participating countries, does not require re-issuance during its validity period, suits various vehicle categories, and does not require you to be the vehicle owner. Claims are settled under the laws of the country where the accident occurs, providing clear rules and protecting your interests.",
-    },
-  ],
-},
 
+  faq: {
+    title: "Frequently Asked Questions About the Green Card",
+    intro:
+      "Answers to key questions about international motor third-party liability insurance.",
+    items: [
+      {
+        id: "what-is",
+        question: "What is a Green Card?",
+        answer:
+          "A Green Card is an international insurance document that provides third-party liability coverage for vehicle owners when they cause damage to others in a road accident outside the country of registration. It is mandatory when entering countries participating in the international motor insurance system and guarantees that victims receive compensation according to the laws of the country where the accident occurred.",
+      },
+      {
+        id: "vs-border",
+        question: "How is a Green Card different from border insurance?",
+        answer:
+          "First, it is a unified international standard recognized in dozens of countries. Second, the Green Card provides broader and more reliable coverage: property damage, bodily injury, and death of third parties. Third, the policy is issued in advance by a broker, avoiding queues at the border—faster and more convenient than purchasing border insurance upon entry.",
+      },
+      {
+        id: "bureaux",
+        question: "What are Green Card Bureaux?",
+        answer:
+          "Each country in the Green Card system has its own National Bureau. It guarantees payments to victims of accidents caused by foreign vehicles on its territory and later recovers these amounts from the Bureau of the country where the liable driver was insured. The Bureaux unite motor insurers and operate under harmonized internal regulations.",
+      },
+      {
+        id: "territory",
+        question: "In which countries is the Green Card valid?",
+        answer:
+          "The policy covers most European countries, as well as several states in North Africa and the Middle East. The exact list of countries and exclusions is printed on the policy form and depends on the issuing country. Countries whose codes are crossed out are not included in the coverage.",
+      },
+      {
+        id: "covers",
+        question: "What does the Green Card cover?",
+        answer:
+          "The policy covers bodily injury and death of third parties, as well as damage to their property caused during the operation of the insured vehicle abroad, within the liability limits of the destination country.",
+      },
+      {
+        id: "not-cover",
+        question: "What does the Green Card not cover?",
+        answer:
+          "It does not cover damage to the policyholder’s own vehicle, medical expenses of the driver or passengers, intentional acts, damage during competitions or training runs, nor losses incurred while driving under the influence of alcohol or drugs.",
+      },
+      {
+        id: "limits",
+        question: "What are the liability limits under the policy?",
+        answer:
+          "The limits are defined by the legislation of the country you enter. For example, in Poland, the limit for bodily injury reaches EUR 5,000,000, while the property damage limit is up to EUR 1,000,000. Other countries have different limits, so it is recommended to check the current amounts before your trip.",
+      },
+      {
+        id: "why-use",
+        question: "Why should I obtain a Green Card in advance?",
+        answer:
+          "The policy is issued fully online, valid across all participating countries, does not require re-issuance during its validity period, suits various vehicle categories, and does not require you to be the vehicle owner. Claims are settled under the laws of the country where the accident occurs, providing clear rules and protecting your interests.",
+      },
+    ],
+  },
 };
 
 const kz: GreenCardPageDictionary = {
   hero: {
-  title: "ЕУРОПА МЕН ТҮРКИЯҒА ЖАСЫЛ КАРТА",
-  subtitle:
-    "Қазақстанда тіркелген автокөліктерге арналған азаматтық-құқықтық жауапкершіліктің халықаралық сақтандыруы. Еуропалық Одақ елдеріне, Түркияға және басқа мемлекеттерге кіру кезінде міндетті.",
+    title: "ЕУРОПА МЕН ТҮРКИЯҒА ЖАСЫЛ КАРТА",
+    subtitle:
+      "Қазақстанда тіркелген автокөліктерге арналған азаматтық-құқықтық жауапкершіліктің халықаралық сақтандыруы. Еуропалық Одақ елдеріне, Түркияға және басқа мемлекеттерге кіру кезінде міндетті.",
     ctaOrder: "ЖАСЫЛ КАРТА рәсімдеу",
     carAlt: "Green Card полисі бар автомобиль",
     policyAlt: "Green Card полисінің үлгісі",
     logoAlt: "Dionis Insurance Broker логотипі",
   },
+
   questionBlock: {
     title: "Green Card бойынша сұрақтарыңыз бар ма?",
     text1:
@@ -519,14 +554,15 @@ const kz: GreenCardPageDictionary = {
     text2:
       "Жасыл картаның өзіне тапсырыс беру үшін жоғарыдағы өтінімді толтырыңыз.",
   },
+
   calculator: {
     title: "Green Card құнын есептеу",
     subtitle: "Онлайн есептеу – 20 секундта!",
     labels: {
-      region: "Бағыт    ",
-      vehicle: "Көлік құралының санаты    ",
-      period: "Полис мерзімі    ",
-      rate: "1 АҚШ долларына теңге курсы    ",
+      region: "Бағыт",
+      vehicle: "Көлік құралының санаты",
+      period: "Полис мерзімі",
+      rate: "1 АҚШ долларына теңге курсы",
       orderEuropeLabel: "ЕУРОПАҒА ЖАСЫЛ КАРТА ТАПСЫРЫС БЕРУ",
       orderEuropeHref: "/kz/green-card#green-card-order",
     },
@@ -557,6 +593,7 @@ const kz: GreenCardPageDictionary = {
     resultPrefix: "Полис құны:",
     resultApprox: "≈",
   },
+
   writeUs: {
     title: "Жылдам рәсімдеу",
     text: "Бізге жазыңыз — полисті 20 минут ішінде рәсімдейміз",
@@ -564,57 +601,57 @@ const kz: GreenCardPageDictionary = {
     telegram: "Telegram арқылы жазу",
     phone: "Бізге қоңырау шалу: +7 (727) 357-30-30",
   },
-  howItWorks: {
-  title: "Бұл қалай жұмыс істейді",
-  subtitle: "Полисті онлайн алудың қарапайым процесі",
-  steps: [
-    {
-      title: "Өтінім қалдырасыз",
-      text: "Сайтта қысқа форманы толтырасыз немесе менеджерге жазасыз.",
-    },
-    {
-      title: "Деректерді тексереміз",
-      text: "Мәліметтерді нақтылап, маршрутыңызға сәйкес оңтайлы тарифті таңдаймыз.",
-    },
-    {
-      title: "Төлем жасайсыз",
-      text: "Картамен немесе шот арқылы төлеу мүмкін — жеке және заңды тұлғалар үшін қолайлы.",
-    },
-    {
-      title: "Полисті аласыз",
-      text: "Дайын құжатты e-mail арқылы жібереміз. Әдетте төлемнен кейін 15 минут ішінде.",
-    },
-  ],
-},
 
-coverage: {
-  title: "Қамту аймағы мен шарттары",
-  items: [
-    {
-      title: "Қолданылу аумағы",
-      text:
-        "Полис «Жасыл карта» жүйесіне кіретін елдерде қолданылады:\n\n" +
-        "Австрия, Албания, Андорра, Бельгия, Болгария, Босния және Герцеговина, " +
-        "Ұлыбритания, Греция, Дания, Эстония, Ирландия, Исландия, Испания, Италия, " +
-        "Кипр, Литва, Латвия, Люксембург, Мальта, Марокко, Молдова, Нидерланды, Германия, " +
-        "Норвегия, Солтүстік Македония, Польша, Португалия, Румыния, Сербия, Словакия, " +
-        "Словения, Тунис, Түркия, Венгрия, Украина, Финляндия, Франция, Хорватия, " +
-        "Чех Республикасы, Черногория, Швейцария, Швеция.\n\n" +
-        "МАҢЫЗДЫ: «Жасыл карта» Әзірбайжанның сақтандыру компаниясы арқылы рәсімделеді, " +
-        "сондықтан Әзірбайжан аумағында жарамсыз.",
-    },
-    {
-      title: "Көлік құралдарының түрлері",
-      text: "Жеңіл автомобильдер, мотоциклдер, жүк көліктері, тіркемелер, автобустар.",
-    },
-    {
-      title: "Жарамдылық мерзімі",
-      text: "Ең аз мерзім — 1 ай. Ең көп мерзім — 1 жыл.",
-    },
-  ],
-  imageAlt: "Green Card қамту аймағы мен шарттары",
-},
-  
+  howItWorks: {
+    title: "Бұл қалай жұмыс істейді",
+    subtitle: "Полисті онлайн алудың қарапайым процесі",
+    steps: [
+      {
+        title: "Өтінім қалдырасыз",
+        text: "Сайтта қысқа форманы толтырасыз немесе менеджерге жазасыз.",
+      },
+      {
+        title: "Деректерді тексереміз",
+        text: "Мәліметтерді нақтылап, маршрутыңызға сәйкес оңтайлы тарифті таңдаймыз.",
+      },
+      {
+        title: "Төлем жасайсыз",
+        text: "Картамен немесе шот арқылы төлеу мүмкін — жеке және заңды тұлғалар үшін қолайлы.",
+      },
+      {
+        title: "Полисті аласыз",
+        text: "Дайын құжатты e-mail арқылы жібереміз. Әдетте төлемнен кейін 15 минут ішінде.",
+      },
+    ],
+  },
+
+  coverage: {
+    title: "Қамту аймағы мен шарттары",
+    items: [
+      {
+        title: "Қолданылу аумағы",
+        text:
+          "Полис «Жасыл карта» жүйесіне кіретін елдерде қолданылады:\n\n" +
+          "Австрия, Албания, Андорра, Бельгия, Болгария, Босния және Герцеговина, " +
+          "Ұлыбритания, Греция, Дания, Эстония, Ирландия, Исландия, Испания, Италия, " +
+          "Кипр, Литва, Латвия, Люксембург, Мальта, Марокко, Молдова, Нидерланды, Германия, " +
+          "Норвегия, Солтүстік Македония, Польша, Португалия, Румыния, Сербия, Словакия, " +
+          "Словения, Тунис, Түркия, Венгрия, Украина, Финляндия, Франция, Хорватия, " +
+          "Чех Республикасы, Черногория, Швейцария, Швеция.\n\n" +
+          "МАҢЫЗДЫ: «Жасыл карта» Әзірбайжанның сақтандыру компаниясы арқылы рәсімделеді, " +
+          "сондықтан Әзірбайжан аумағында жарамсыз.",
+      },
+      {
+        title: "Көлік құралдарының түрлері",
+        text: "Жеңіл автомобильдер, мотоциклдер, жүк көліктері, тіркемелер, автобустар.",
+      },
+      {
+        title: "Жарамдылық мерзімі",
+        text: "Ең аз мерзім — 1 ай. Ең көп мерзім — 1 жыл.",
+      },
+    ],
+    imageAlt: "Green Card қамту аймағы мен шарттары",
+  },
 
   advantages: {
     title: "«DIONIS» МЫНАДАЙ АРТЫҚШЫЛЫҚТАР ҰСЫНАДЫ:",
@@ -641,6 +678,17 @@ coverage: {
       },
     ],
   },
+
+  greenCardCheckUpsell: {
+    title: "Green Card полисін тексеру",
+    text1:
+      "Егер сізде рәсімделген полис бар болса, оны Жасыл карта Бюросының сайтында өзіңіз тексере аласыз.",
+    text2:
+      "Тексеру полис нөмірі немесе көлік құралының тіркеу деректері арқылы қолжетімді.",
+    btn: "Полисті тексеру",
+    imageAlt: "Green Card полисін тексеру",
+  },
+
   osagoUpsell: {
     title: "Ресейлік ОСАГО (РФ-тағы Green Card)",
     text1:
@@ -650,62 +698,62 @@ coverage: {
     btn: "Ресейлік ОСАГО туралы толығырақ",
     imageAlt: "Резидент еместерге арналған ресейлік ОСАГО",
   },
+
   faq: {
     title: "«Жасыл карта» туралы жиі қойылатын сұрақтар",
     intro:
-        "Халықаралық азаматтық жауапкершілікті сақтандыру жөніндегі негізгі сұрақтарға жауаптар.",
+      "Халықаралық азаматтық жауапкершілікті сақтандыру жөніндегі негізгі сұрақтарға жауаптар.",
     items: [
-        {
+      {
         id: "what-is",
         question: "«Жасыл карта» деген не?",
         answer:
-            "«Жасыл карта» — бұл көлік иесінің өз елінен тыс жерде жол-көлік оқиғасы кезінде үшінші тұлғаларға келтірген залалы үшін жауапкершілігін сақтандыратын халықаралық сақтандыру құжаты. Құжат халықаралық автомобиль сақтандыру жүйесіне қатысушы елдерге кірген кезде міндетті болып табылады және зардап шеккендерге оқиға болған елдің заңнамасы бойынша өтемақы төленуін қамтамасыз етеді.",
-        },
-        {
+          "«Жасыл карта» — бұл көлік иесінің өз елінен тыс жерде жол-көлік оқиғасы кезінде үшінші тұлғаларға келтірген залалы үшін жауапкершілігін сақтандыратын халықаралық сақтандыру құжаты. Құжат халықаралық автомобиль сақтандыру жүйесіне қатысушы елдерге кірген кезде міндетті болып табылады және зардап шеккендерге оқиға болған елдің заңнамасы бойынша өтемақы төленуін қамтамасыз етеді.",
+      },
+      {
         id: "vs-border",
         question: "«Жасыл карта» шекаралық сақтандырудан несімен ерекшеленеді?",
         answer:
-            "Біріншіден, бұл ондаған елдер мойындаған бірыңғай халықаралық стандарт. Екіншіден, «Жасыл карта» кең әрі сенімді қамту ұсынады: мүліктік зиян, үшінші тұлғалардың өмірі мен денсаулығына келтірілген зиян. Үшіншіден, полис брокер арқылы алдын ала рәсімделеді, шекарада кезек күтуді қажет етпейді — бұл шекаралық сақтандыруды оқиға орнында рәсімдеуге қарағанда жылдам әрі ыңғайлы.",
-        },
-        {
+          "Біріншіден, бұл ондаған елдер мойындаған бірыңғай халықаралық стандарт. Екіншіден, «Жасыл карта» кең әрі сенімді қамту ұсынады: мүліктік зиян, үшінші тұлғалардың өмірі мен денсаулығына келтірілген зиян. Үшіншіден, полис брокер арқылы алдын ала рәсімделеді, шекарада кезек күтуді қажет етпейді — бұл шекаралық сақтандыруды оқиға орнында рәсімдеуге қарағанда жылдам әрі ыңғайлы.",
+      },
+      {
         id: "bureaux",
         question: "Жасыл карталар бюролары деген кімдер?",
         answer:
-            "«Жасыл карта» жүйесіне кіретін әр елде өзінің ұлттық Бюросы жұмыс істейді. Ол шетелдік көлік құралдарының қатысуымен болған ЖКО салдарынан өз еліндегі зардап шеккендерге өтемақы төлеуге кепілдік береді, кейін бұл соманы кінәлі жүргізуші сақтандырылған елдің Бюросынан регресс тәртібімен өндіріп алады. Бюролар автокөлік сақтандырушыларын біріктіреді және бірыңғай ішкі ережелер бойынша жұмыс істейді.",
-        },
-        {
+          "«Жасыл карта» жүйесіне кіретін әр елде өзінің ұлттық Бюросы жұмыс істейді. Ол шетелдік көлік құралдарының қатысуымен болған ЖКО салдарынан өз еліндегі зардап шеккендерге өтемақы төлеуге кепілдік береді, кейін бұл соманы кінәлі жүргізуші сақтандырылған елдің Бюросынан регресс тәртібімен өндіріп алады. Бюролар автокөлік сақтандырушыларын біріктіреді және бірыңғай ішкі ережелер бойынша жұмыс істейді.",
+      },
+      {
         id: "territory",
         question: "«Жасыл карта» қай елдерде жарамды?",
         answer:
-            "Полис Еуропаның көптеген елдерін, сондай-ақ Солтүстік Африка мен Таяу Шығыстың бірқатар мемлекеттерін қамтиды. Елдердің нақты тізімі мен шектеулер полис бланкісінде көрсетіледі және полис берілген елге байланысты. Коды сызылған елдер қамту аймағына кірмейді.",
-        },
-        {
+          "Полис Еуропаның көптеген елдерін, сондай-ақ Солтүстік Африка мен Таяу Шығыстың бірқатар мемлекеттерін қамтиды. Елдердің нақты тізімі мен шектеулер полис бланкісінде көрсетіледі және полис берілген елге байланысты. Коды сызылған елдер қамту аймағына кірмейді.",
+      },
+      {
         id: "covers",
         question: "«Жасыл карта» нені сақтандырады?",
         answer:
-            "Полис үшінші тұлғалардың өмірі мен денсаулығына келтірілген зиянды, сондай-ақ шетелде сақтандырылған көлік құралын пайдалану нәтижесінде олардың мүлкіне келтірілген зиянды, бару елі белгілеген жауапкершілік лимиттері шегінде өтейді.",
-        },
-        {
+          "Полис үшінші тұлғалардың өмірі мен денсаулығына келтірілген зиянды, сондай-ақ шетелде сақтандырылған көлік құралын пайдалану нәтижесінде олардың мүлкіне келтірілген зиянды, бару елі белгілеген жауапкершілік лимиттері шегінде өтейді.",
+      },
+      {
         id: "not-cover",
         question: "«Жасыл карта» нені сақтандырмайды?",
         answer:
-            "Сақтандыру сақтанушының өз көлігіне келтірілген зиянды, жүргізушінің және жолаушылардың медициналық шығындарын, қасақана жасалған әрекеттерді, жарыстар мен оқу-жаттығу заездтері кезіндегі зиянды, сондай-ақ алкогольдік немесе есірткілік мас күйінде басқару кезіндегі шығындарды өтемейді.",
-        },
-        {
+          "Сақтандыру сақтанушының өз көлігіне келтірілген зиянды, жүргізушінің және жолаушылардың медициналық шығындарын, қасақана жасалған әрекеттерді, жарыстар мен оқу-жаттығу заездтері кезіндегі зиянды, сондай-ақ алкогольдік немесе есірткілік мас күйінде басқару кезіндегі шығындарды өтемейді.",
+      },
+      {
         id: "limits",
         question: "Полис бойынша жауапкершілік лимиттері қандай?",
         answer:
-            "Лимиттер сіз кіретін елдің заңнамасымен белгіленеді. Мысалы, Польшада өмірі мен денсаулығына келтірілген зиян бойынша лимит 5 000 000 еуроға дейін, мүлікке келтірілген зиян бойынша — 1 000 000 еуроға дейін жетеді. Басқа елдерде лимиттер әртүрлі, сондықтан сапар алдында қажетті бағыттар бойынша қолданыстағы сомаларды тексеру ұсынылады.",
-        },
-        {
+          "Лимиттер сіз кіретін елдің заңнамасымен белгіленеді. Мысалы, Польшада өмірі мен денсаулығына келтірілген зиян бойынша лимит 5 000 000 еуроға дейін, мүлікке келтірілген зиян бойынша — 1 000 000 еуроға дейін жетеді. Басқа елдерде лимиттер әртүрлі, сондықтан сапар алдында қажетті бағыттар бойынша қолданыстағы сомаларды тексеру ұсынылады.",
+      },
+      {
         id: "why-use",
         question: "Неліктен «Жасыл картаны» алдын ала рәсімдеген дұрыс?",
         answer:
-            "Полис толық онлайн рәсімделеді, жүйеге қатысушы елдерде жарамды, қолданылу кезеңінде қайта рәсімдеуді қажет етпейді, көліктің түрлі санаттарына жарамды және көлік сіздің атыңызда болуын талап етпейді. Залалды реттеу жол-көлік оқиғасы орын алған елдің заңнамасына сәйкес жүргізіледі, бұл айқын ережелерді және құқықтарыңыздың қорғалуын қамтамасыз етеді.",
-        },
+          "Полис толық онлайн рәсімделеді, жүйеге қатысушы елдерде жарамды, қолданылу кезеңінде қайта рәсімдеуді қажет етпейді, көліктің түрлі санаттарына жарамды және көлік сіздің атыңызда болуын талап етпейді. Залалды реттеу жол-көлік оқиғасы орын алған елдің заңнамасына сәйкес жүргізіледі, бұл айқын ережелерді және құқықтарыңыздың қорғалуын қамтамасыз етеді.",
+      },
     ],
-    },
-
+  },
 };
 
 export function getGreenCardPageDictionary(lang: Lang): GreenCardPageDictionary {

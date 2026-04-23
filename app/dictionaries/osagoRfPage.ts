@@ -40,7 +40,7 @@ export type OsagoRfPageDictionary = {
     whatsapp: string;
     telegram: string;
     phone: string;
-  }
+  };
 
   info: {
     title: string;
@@ -54,6 +54,14 @@ export type OsagoRfPageDictionary = {
       title: string;
       text: string;
     }[];
+  };
+
+  osagoCheckUpsell: {
+    title: string;
+    text1: string;
+    text2: string;
+    btn: string;
+    imageAlt: string;
   };
 
   greenCardUpsell: {
@@ -161,7 +169,6 @@ const ru: OsagoRfPageDictionary = {
 
   info: {
     title: "Что такое ОСАГО РФ для нерезидентов",
-    
     paragraphs: [
       "ОСАГО — обязательное страхование гражданской ответственности владельцев транспортных средств. Для автомобилей с иностранной регистрацией наличие полиса ОСАГО обязательно при въезде и передвижении по территории Российской Федерации.",
       "Полис покрывает ответственность водителя за вред, причинённый жизни, здоровью или имуществу третьих лиц в результате ДТП на территории РФ.",
@@ -196,6 +203,16 @@ const ru: OsagoRfPageDictionary = {
     ],
   },
 
+  osagoCheckUpsell: {
+    title: "Проверить полис ОСАГО РФ",
+    text1:
+      "Если у вас уже есть оформленный полис, вы можете самостоятельно проверить его на сайте Российской Национальной Страховой Информационной Системы.",
+    text2:
+      "Проверка помогает убедиться, что данные полиса корректно отражены в системе.",
+    btn: "Проверить полис",
+    imageAlt: "Проверка полиса ОСАГО РФ",
+  },
+
   greenCardUpsell: {
     title: "Планируете поездки в Турцию или ЕС?",
     text1:
@@ -207,83 +224,78 @@ const ru: OsagoRfPageDictionary = {
   },
 
   faq: {
-  title: "Вопросы по ОСАГО РФ для нерезидентов",
-  intro: "Ответы на самые частые вопросы перед оформлением полиса.",
-  items: [
-    // --- старые вопросы ---
-    {
-      id: "mandatory",
-      question: "Обязательно ли ОСАГО для иностранного автомобиля?",
-      answer:
-        "Да. При въезде и эксплуатации автомобиля с иностранной регистрацией на территории РФ наличие полиса ОСАГО обязательно.",
-    },
-    {
-      id: "electronic-policy",
-      question: "Можно ли использовать электронный полис?",
-      answer:
-        "Да. Электронный полис ОГПО в РФ официально признаётся и не требует бумажного оригинала.",
-    },
-    {
-      id: "term",
-      question: "На какой срок лучше оформлять ОСАГО?",
-      answer:
-        "Полис должен покрывать весь период нахождения автомобиля в РФ. Обычно оформляют с небольшим запасом по датам.",
-    },
-    {
-      id: "check",
-      question: "Кто может проверить наличие ОСАГО?",
-      answer:
-        "Сотрудники ГИБДД, пограничные службы, а также при оформлении ДТП.",
-    },
-
-    // --- НОВОЕ: из INFO ---
-    {
-      id: "what-is-osago",
-      question: "Что такое ОСАГО РФ для нерезидентов?",
-      answer:
-        "ОСАГО — обязательное страхование гражданской ответственности владельцев транспортных средств. Для автомобилей с иностранной регистрацией полис обязателен при въезде и передвижении по территории РФ.",
-    },
-    {
-      id: "what-covers",
-      question: "Что покрывает ОГПО в РФ при ДТП?",
-      answer:
-        "Полис покрывает ответственность водителя за вред, причинённый жизни, здоровью или имуществу третьих лиц в результате ДТП на территории РФ — в пределах установленных лимитов.",
-    },
-    {
-      id: "is-eosago-valid",
-      question: "Признают ли электронный ОСАГО сотрудники ГИБДД и на границе?",
-      answer:
-        "Да. Электронный полис официально признаётся сотрудниками ГИБДД, пограничной службой и другими контролирующими органами.",
-    },
-
-    // --- НОВОЕ: из BENEFITS ---
-    {
-      id: "legal-driving",
-      question: "Зачем ОСАГО нужно нерезиденту на авто с иностранными номерами?",
-      answer:
-        "Полис ОСАГО обязателен для легального передвижения по дорогам РФ на автомобиле с иностранной регистрацией.",
-    },
-    {
-      id: "financial-protection",
-      question: "Какая финансовая защита даёт ОСАГО?",
-      answer:
-        "При ДТП страховая компания возмещает ущерб пострадавшим в рамках установленных лимитов — это снижает риск крупных личных расходов.",
-    },
-    {
-      id: "valid-all-rf",
-      question: "Действует ли ОСАГО по всей территории России?",
-      answer:
-        "Да. Полис действует во всех регионах РФ без территориальных ограничений (при соблюдении условий договора).",
-    },
-    {
-      id: "flex-term",
-      question: "Можно ли оформить ОГПО в РФ только на срок поездки?",
-      answer:
-        "Да. Обычно можно подобрать срок так, чтобы он покрывал период пребывания в РФ и не переплачивать за лишние месяцы.",
-    },
-  ],
+    title: "Вопросы по ОСАГО РФ для нерезидентов",
+    intro: "Ответы на самые частые вопросы перед оформлением полиса.",
+    items: [
+      {
+        id: "mandatory",
+        question: "Обязательно ли ОСАГО для иностранного автомобиля?",
+        answer:
+          "Да. При въезде и эксплуатации автомобиля с иностранной регистрацией на территории РФ наличие полиса ОСАГО обязательно.",
+      },
+      {
+        id: "electronic-policy",
+        question: "Можно ли использовать электронный полис?",
+        answer:
+          "Да. Электронный полис ОГПО в РФ официально признаётся и не требует бумажного оригинала.",
+      },
+      {
+        id: "term",
+        question: "На какой срок лучше оформлять ОСАГО?",
+        answer:
+          "Полис должен покрывать весь период нахождения автомобиля в РФ. Обычно оформляют с небольшим запасом по датам.",
+      },
+      {
+        id: "check",
+        question: "Кто может проверить наличие ОСАГО?",
+        answer:
+          "Сотрудники ГИБДД, пограничные службы, а также при оформлении ДТП.",
+      },
+      {
+        id: "what-is-osago",
+        question: "Что такое ОСАГО РФ для нерезидентов?",
+        answer:
+          "ОСАГО — обязательное страхование гражданской ответственности владельцев транспортных средств. Для автомобилей с иностранной регистрацией полис обязателен при въезде и передвижении по территории РФ.",
+      },
+      {
+        id: "what-covers",
+        question: "Что покрывает ОГПО в РФ при ДТП?",
+        answer:
+          "Полис покрывает ответственность водителя за вред, причинённый жизни, здоровью или имуществу третьих лиц в результате ДТП на территории РФ — в пределах установленных лимитов.",
+      },
+      {
+        id: "is-eosago-valid",
+        question: "Признают ли электронный ОСАГО сотрудники ГИБДД и на границе?",
+        answer:
+          "Да. Электронный полис официально признаётся сотрудниками ГИБДД, пограничной службой и другими контролирующими органами.",
+      },
+      {
+        id: "legal-driving",
+        question: "Зачем ОСАГО нужно нерезиденту на авто с иностранными номерами?",
+        answer:
+          "Полис ОСАГО обязателен для легального передвижения по дорогам РФ на автомобиле с иностранной регистрацией.",
+      },
+      {
+        id: "financial-protection",
+        question: "Какая финансовая защита даёт ОСАГО?",
+        answer:
+          "При ДТП страховая компания возмещает ущерб пострадавшим в рамках установленных лимитов — это снижает риск крупных личных расходов.",
+      },
+      {
+        id: "valid-all-rf",
+        question: "Действует ли ОСАГО по всей территории России?",
+        answer:
+          "Да. Полис действует во всех регионах РФ без территориальных ограничений (при соблюдении условий договора).",
+      },
+      {
+        id: "flex-term",
+        question: "Можно ли оформить ОГПО в РФ только на срок поездки?",
+        answer:
+          "Да. Обычно можно подобрать срок так, чтобы он покрывал период пребывания в РФ и не переплачивать за лишние месяцы.",
+      },
+    ],
   },
-}
+};
 
 const en: OsagoRfPageDictionary = {
   hero: {
@@ -297,9 +309,9 @@ const en: OsagoRfPageDictionary = {
   },
 
   questionBlock: {
-    title: "Need консультаtion on MTPL for Russia?",
+    title: "Need consultation on MTPL for Russia?",
     text1:
-      "We clarify validity period, pricing and requirements for non-residents.",
+      "We clarify validity period, pricing, and requirements for non-residents.",
     text2:
       "To issue a policy, complete the application form above. It takes only a few minutes.",
   },
@@ -365,7 +377,7 @@ const en: OsagoRfPageDictionary = {
     title: "What is MTPL in Russia for non-residents",
     paragraphs: [
       "MTPL is mandatory motor third-party liability insurance. For vehicles registered abroad, a valid MTPL policy is required when entering and operating within the Russian Federation.",
-      "The policy covers the driver’s liability for damage caused to third parties’ life, health or property as a result of a traffic accident in Russia.",
+      "The policy covers the driver’s liability for damage caused to third parties’ life, health, or property as a result of a traffic accident in Russia.",
       "Electronic MTPL policies are officially recognized by traffic police and other supervisory authorities.",
     ],
   },
@@ -405,6 +417,16 @@ const en: OsagoRfPageDictionary = {
     ],
   },
 
+  osagoCheckUpsell: {
+    title: "Check your Russian MTPL policy",
+    text1:
+      "If you already have an issued policy, you can verify it yourself on the website of the Russian National Insurance Information System.",
+    text2:
+      "This helps confirm that the policy details are correctly reflected in the system.",
+    btn: "Check policy",
+    imageAlt: "Russian MTPL policy verification",
+  },
+
   greenCardUpsell: {
     title: "Planning trips to the EU or Turkey?",
     text1:
@@ -441,13 +463,13 @@ const en: OsagoRfPageDictionary = {
         id: "check",
         question: "Who may verify MTPL validity?",
         answer:
-          "Traffic police, border authorities and in case of an accident.",
+          "Traffic police, border authorities, and parties involved in accident handling.",
       },
       {
         id: "what-is-osago",
         question: "What does MTPL cover?",
         answer:
-          "Liability for damage to third parties’ life, health or property resulting from a traffic accident in Russia.",
+          "Liability for damage to third parties’ life, health, or property resulting from a traffic accident in Russia.",
       },
     ],
   },
@@ -571,6 +593,16 @@ const kz: OsagoRfPageDictionary = {
           "Сапар мерзіміне сәйкес рәсімдеуге болады.",
       },
     ],
+  },
+
+  osagoCheckUpsell: {
+    title: "РФ ОСАГО полисін тексеру",
+    text1:
+      "Егер сізде рәсімделген полис бар болса, оны Ресейдің Ұлттық Сақтандыру Ақпараттық Жүйесінің сайтында өзіңіз тексере аласыз.",
+    text2:
+      "Тексеру полис деректерінің жүйеде дұрыс көрсетілгеніне көз жеткізуге көмектеседі.",
+    btn: "Полисті тексеру",
+    imageAlt: "РФ ОСАГО полисін тексеру",
   },
 
   greenCardUpsell: {
