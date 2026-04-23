@@ -262,57 +262,149 @@ const ru: GreenCardPageDictionary = {
 
   faq: {
     title: "Часто задаваемые вопросы о «Зелёной карте»",
-    intro:
-      "Ответы на ключевые вопросы по международному страхованию ответственности.",
+    intro: "Ответы на ключевые вопросы по международному страхованию ответственности.",
     items: [
+
+      {
+        id: "border-acceptance",
+        question: "Примут ли полис на границе?",
+        answer:
+          "При действующем и корректно оформленном полисе его обычно принимают в пределах территории действия, указанной в полисе. Перед поездкой важно проверить данные автомобиля, срок действия и перечень стран покрытия.",
+      },
+
+      {
+        id: "verification",
+        question: "Как проверяют полис на границе и полиция?",
+        answer:
+          "При проверке сверяют реквизиты полиса, данные автомобиля и срок действия. Порядок проверки может различаться в зависимости от страны и ситуации.",
+      },
+
+      {
+        id: "error-handling",
+        question: "Что будет, если возникнут проблемы с полисом?",
+        answer:
+          "Если проблема связана с нашей ошибкой или техническим сбоем, мы оперативно переоформим полис или вернём деньги — по вашему выбору. Если ошибка в данных, предоставленных клиентом, решение рассматривается индивидуально.",
+      },
+
       {
         id: "what-is",
         question: "Что такое «Зелёная карта»?",
         answer:
-          "Зелёная карта — это международный страховой документ, который обеспечивает страхование ответственности владельца автомобиля за причинение вреда третьим лицам при ДТП за пределами страны регистрации. Документ обязателен при въезде в страны — участницы системы международного автострахования и гарантирует, что пострадавшие получат компенсацию по законам страны происшествия.",
+          "Это международный полис страхования ответственности. Он покрывает ущерб, который вы можете причинить другим участникам ДТП за границей, по законам страны происшествия.",
       },
+
       {
-        id: "vs-border",
-        question: "Чем «Зелёная карта» отличается от пограничного страхования?",
+        id: "coverage",
+        question: "Что покрывает полис?",
         answer:
-          "Во-первых, это единый международный стандарт, признаваемый в десятках стран. Во-вторых, «Зелёная карта» даёт более широкое и надёжное покрытие: материальный ущерб, вред жизни и здоровью третьих лиц. В-третьих, полис оформляется заранее у брокера, без очередей на границе — это быстрее и удобнее, чем пограничное страхование при въезде.",
+          "Полис покрывает вашу ответственность перед третьими лицами: ущерб их автомобилю, имуществу, а также вред жизни и здоровью. Ваш собственный автомобиль не покрывается.",
       },
+
       {
-        id: "bureaux",
-        question: "Кто такие Бюро Зеленой карты?",
+        id: "not-covered",
+        question: "Что не покрывается?",
         answer:
-          "В каждой стране системы «Зелёная карта» действует своё Бюро. Оно гарантирует выплаты пострадавшим на территории своей страны по ДТП, совершённым иностранными транспортными средствами, а затем регрессом взыскивает суммы с Бюро страны, где застрахован виновник. Бюро объединяют страховщиков по автострахованию и работают по единым внутренним правилам.",
+          "Полис не покрывает ваш автомобиль и ваши личные убытки. Также не покрываются случаи умышленных действий и грубых нарушений (например, вождение в состоянии опьянения).",
       },
+
+      {
+        id: "limits",
+        question: "Какие лимиты выплат?",
+        answer:
+          "Лимиты устанавливаются законодательством страны, где произошло ДТП, и могут значительно отличаться. Обычно это крупные суммы, покрывающие серьёзный ущерб.",
+      },
+
+      {
+        id: "who-pays",
+        question: "Кто выплачивает при ДТП?",
+        answer:
+          "Урегулирование происходит по правилам страны, где произошло ДТП, с участием страховщика и национальной системы урегулирования, применимой к такому случаю.",
+      },
+
       {
         id: "territory",
         question: "В каких странах действует «Зелёная карта»?",
         answer:
-          "Полис покрывает большинство стран Европы, а также ряд государств Северной Африки и Ближнего Востока. Конкретный список стран и ограничения указаны на самом бланке и зависят от страны выдачи полиса. Страны, коды которых вычеркнуты, в покрытие не входят.",
+          "Полис действует в странах системы «Зелёная карта» (большинство стран Европы и ряд других государств). Конкретный список всегда указан в вашем полисе — именно он является окончательным.",
       },
+
       {
-        id: "covers",
-        question: "Что покрывает «Зелёная карта»?",
+        id: "coverage-zones",
+        question: "От чего зависит территория действия?",
         answer:
-          "Полис покрывает ущерб жизни и здоровью третьих лиц, а также ущерб их имуществу, причинённый в результате эксплуатации застрахованного транспортного средства за границей, в пределах установленных лимитов ответственности страны пребывания.",
+          "При оформлении выбирается зона покрытия. Если страна не включена в полис, страхование там не действует, даже если вы туда поехали.",
       },
+
       {
-        id: "not-cover",
-        question: "Что «Зелёная карта» не покрывает?",
+        id: "difference-border",
+        question: "Чем отличается от пограничного страхования?",
         answer:
-          "Страхование не покрывает ущерб собственному автомобилю страхователя, медицинские расходы самого водителя и его пассажиров, умышленные действия, ущерб при участии в соревнованиях и учебных заездах, а также убытки при управлении в состоянии алкогольного или наркотического опьянения.",
+          "Пограничное страхование — это локальный временный полис на въезде. «Зелёная карта» — международный полис, который действует сразу в нескольких странах и оформляется заранее.",
       },
+
       {
-        id: "limits",
-        question: "Каковы лимиты ответственности по полису?",
+        id: "foreign-plates",
+        question: "Можно ли оформить на иностранные номера?",
         answer:
-          "Лимиты устанавливаются законодательством страны, в которую вы въезжаете. Например, в Польше лимит по вреду жизни и здоровью достигает 5 000 000 евро, по имуществу — до 1 000 000 евро. В других странах размеры лимитов отличаются, поэтому перед поездкой рекомендуется проверить действующие суммы для выбранных направлений.",
+          "Нет, полис оформляется только на автомобили, зарегистрированные в Казахстане.",
       },
+
       {
-        id: "why-use",
-        question: "Почему стоит оформить «Зелёную карту» заранее?",
+        id: "how-to-buy",
+        question: "Какие данные нужны для оформления?",
         answer:
-          "Полис выдаётся полностью онлайн, действителен в странах — участницах системы, не требует переоформления в течение срока действия, подходит для разных категорий транспорта и не требует, чтобы вы были собственником ТС. Урегулирование убытков производится по закону страны ДТП, что даёт понятные правила и защищает ваши интересы.",
+          "Для оформления потребуется информация об автомобиле (сертификат регистрации ТС) и владельце (паспортные данные, данные о проживании, контактные данные). Точный список данных запрашивается при оформлении или менеджером.",
       },
+
+      {
+        id: "processing-time",
+        question: "Сколько времени занимает оформление?",
+        answer:
+          "Обычно оформление занимает до 15 минут после оплаты. В редких случаях может потребоваться дополнительная проверка.",
+      },
+
+      {
+        id: "start-date",
+        question: "С какого момента действует полис?",
+        answer:
+          "Полис начинает действовать с даты и времени, указанных при оформлении. Оформление задним числом невозможно.",
+      },
+
+      {
+        id: "same-day",
+        question: "Можно ли оформить «сегодня на сегодня»?",
+        answer:
+          "Да, это возможно. Однако иногда требуется дополнительная проверка, поэтому рекомендуется оформлять заранее.",
+      },
+
+      {
+        id: "print",
+        question: "Нужно ли распечатывать полис?",
+        answer:
+          "Да, полис необходимо иметь при себе в распечатанном виде. Достаточно чёрно-белой печати.",
+      },
+
+      {
+        id: "not-owner",
+        question: "Можно ли оформить, если я не собственник автомобиля?",
+        answer:
+          "Да, оформление возможно при наличии корректных данных автомобиля.",
+      },
+
+      {
+        id: "accident",
+        question: "Что делать при ДТП за границей?",
+        answer:
+          "Нужно зафиксировать ДТП, при необходимости вызвать полицию и уведомить Бюро той страны, где произошло ДТП (контакты найдете на обратной стороне полиса). Дальнейшее урегулирование происходит по правилам страны происшествия.",
+      },
+
+      {
+        id: "why-us",
+        question: "Почему покупать у вас, а не на границе?",
+        answer:
+          "На границе полис оформляют в спешке и без проверки данных, что увеличивает риск ошибок. Мы оформляем заранее: проверяем данные, контролируем регистрацию в базе и остаёмся на связи, если возникают вопросы.",
+      },
+
     ],
   },
 };
@@ -480,58 +572,150 @@ const en: GreenCardPageDictionary = {
   },
 
   faq: {
-    title: "Frequently Asked Questions About the Green Card",
-    intro:
-      "Answers to key questions about international motor third-party liability insurance.",
+    title: "Frequently Asked Questions about the Green Card",
+    intro: "Answers to key questions about international motor third-party liability insurance.",
     items: [
+
+      {
+        id: "border-acceptance",
+        question: "Will the policy be accepted at the border?",
+        answer:
+          "A valid and properly issued policy is generally accepted within the territory specified in the policy. Before traveling, it is important to check the vehicle details, validity period, and the list of covered countries.",
+      },
+
+      {
+        id: "verification",
+        question: "How is the policy checked at the border and by the police?",
+        answer:
+          "During checks, the policy details, vehicle information, and validity period are verified. The procedure may vary depending on the country and the situation.",
+      },
+
+      {
+        id: "error-handling",
+        question: "What happens if there is a problem with the policy?",
+        answer:
+          "If the issue is caused by our error or a technical problem, we will promptly reissue the policy or refund the payment, at your choice. If the error is in the data provided by the client, the case is reviewed individually.",
+      },
+
       {
         id: "what-is",
-        question: "What is a Green Card?",
+        question: "What is the Green Card?",
         answer:
-          "A Green Card is an international insurance document that provides third-party liability coverage for vehicle owners when they cause damage to others in a road accident outside the country of registration. It is mandatory when entering countries participating in the international motor insurance system and guarantees that victims receive compensation according to the laws of the country where the accident occurred.",
+          "It is an international motor third-party liability insurance policy. It covers damage you may cause to third parties in a road traffic accident abroad, in accordance with the laws of the country where the accident occurs.",
       },
+
       {
-        id: "vs-border",
-        question: "How is a Green Card different from border insurance?",
+        id: "coverage",
+        question: "What does the policy cover?",
         answer:
-          "First, it is a unified international standard recognized in dozens of countries. Second, the Green Card provides broader and more reliable coverage: property damage, bodily injury, and death of third parties. Third, the policy is issued in advance by a broker, avoiding queues at the border—faster and more convenient than purchasing border insurance upon entry.",
+          "The policy covers your liability to third parties: damage to their vehicle, property, as well as injury to life and health. Your own vehicle is not covered.",
       },
+
       {
-        id: "bureaux",
-        question: "What are Green Card Bureaux?",
+        id: "not-covered",
+        question: "What is not covered?",
         answer:
-          "Each country in the Green Card system has its own National Bureau. It guarantees payments to victims of accidents caused by foreign vehicles on its territory and later recovers these amounts from the Bureau of the country where the liable driver was insured. The Bureaux unite motor insurers and operate under harmonized internal regulations.",
+          "The policy does not cover your own vehicle or your personal losses. It also excludes intentional acts and serious violations, such as driving under the influence.",
       },
+
+      {
+        id: "limits",
+        question: "What are the coverage limits?",
+        answer:
+          "Limits are defined by the legislation of the country where the accident occurs and may vary significantly. They are typically set at levels sufficient to cover major damages.",
+      },
+
+      {
+        id: "who-pays",
+        question: "Who pays in case of an accident?",
+        answer:
+          "Claims are handled in accordance with the rules of the country where the accident occurs, with the involvement of the insurer and the applicable national claims settlement system.",
+      },
+
       {
         id: "territory",
         question: "In which countries is the Green Card valid?",
         answer:
-          "The policy covers most European countries, as well as several states in North Africa and the Middle East. The exact list of countries and exclusions is printed on the policy form and depends on the issuing country. Countries whose codes are crossed out are not included in the coverage.",
+          "The policy is valid in the countries participating in the Green Card system (most European countries and several others). The exact list is always specified in your policy and is final.",
       },
+
       {
-        id: "covers",
-        question: "What does the Green Card cover?",
+        id: "coverage-zones",
+        question: "What determines the coverage territory?",
         answer:
-          "The policy covers bodily injury and death of third parties, as well as damage to their property caused during the operation of the insured vehicle abroad, within the liability limits of the destination country.",
+          "The coverage zone is selected during issuance. If a country is not included in the policy, the insurance is not valid there.",
       },
+
       {
-        id: "not-cover",
-        question: "What does the Green Card not cover?",
+        id: "difference-border",
+        question: "How does it differ from border insurance?",
         answer:
-          "It does not cover damage to the policyholder’s own vehicle, medical expenses of the driver or passengers, intentional acts, damage during competitions or training runs, nor losses incurred while driving under the influence of alcohol or drugs.",
+          "Border insurance is a local temporary policy issued upon entry. The Green Card is an international policy that covers multiple countries and is arranged in advance.",
       },
+
       {
-        id: "limits",
-        question: "What are the liability limits under the policy?",
+        id: "foreign-plates",
+        question: "Can it be issued for foreign license plates?",
         answer:
-          "The limits are defined by the legislation of the country you enter. For example, in Poland, the limit for bodily injury reaches EUR 5,000,000, while the property damage limit is up to EUR 1,000,000. Other countries have different limits, so it is recommended to check the current amounts before your trip.",
+          "No, the policy can only be issued for vehicles registered in Kazakhstan.",
       },
+
       {
-        id: "why-use",
-        question: "Why should I obtain a Green Card in advance?",
+        id: "how-to-buy",
+        question: "What information is required for issuance?",
         answer:
-          "The policy is issued fully online, valid across all participating countries, does not require re-issuance during its validity period, suits various vehicle categories, and does not require you to be the vehicle owner. Claims are settled under the laws of the country where the accident occurs, providing clear rules and protecting your interests.",
+          "You will need vehicle information (registration certificate) and owner details (identification data, residence information, and contact details). The exact list is уточняется during the application process or by a manager.",
       },
+
+      {
+        id: "processing-time",
+        question: "How long does it take to issue the policy?",
+        answer:
+          "The process usually takes up to 15 minutes after payment. In rare cases, additional verification may be required.",
+      },
+
+      {
+        id: "start-date",
+        question: "When does the policy start?",
+        answer:
+          "The policy becomes effective from the date and time specified during issuance. Backdating is not possible.",
+      },
+
+      {
+        id: "same-day",
+        question: "Can it be issued on the same day?",
+        answer:
+          "Yes, this is possible. However, additional verification may sometimes be required, so issuing in advance is recommended.",
+      },
+
+      {
+        id: "print",
+        question: "Do I need to print the policy?",
+        answer:
+          "Yes, you should carry a printed copy of the policy. A black and white printout is sufficient.",
+      },
+
+      {
+        id: "not-owner",
+        question: "Can I issue it if I am not the vehicle owner?",
+        answer:
+          "Yes, it can be issued if the vehicle details are correct.",
+      },
+
+      {
+        id: "accident",
+        question: "What should I do in case of an accident abroad?",
+        answer:
+          "You should document the accident, call the police if necessary, and notify the bureau of the country where the accident occurred (contact details are on the back of the policy). Further handling follows the rules of that country.",
+      },
+
+      {
+        id: "why-us",
+        question: "Why buy from you instead of at the border?",
+        answer:
+          "At the border, policies are often issued in a hurry without proper data verification, increasing the risk of errors. We arrange the policy in advance, verify the data, monitor registration, and remain available for support if needed.",
+      },
+
     ],
   },
 };
@@ -700,58 +884,150 @@ const kz: GreenCardPageDictionary = {
   },
 
   faq: {
-    title: "«Жасыл карта» туралы жиі қойылатын сұрақтар",
-    intro:
-      "Халықаралық азаматтық жауапкершілікті сақтандыру жөніндегі негізгі сұрақтарға жауаптар.",
+    title: "«Жасыл карта» бойынша жиі қойылатын сұрақтар",
+    intro: "Халықаралық жауапкершілікті сақтандыру бойынша негізгі сұрақтарға жауаптар.",
     items: [
+
+      {
+        id: "border-acceptance",
+        question: "Полис шекарада қабылдана ма?",
+        answer:
+          "Қолданыстағы және дұрыс рәсімделген полис әдетте полисте көрсетілген әрекет ету аумағында қабылданады. Сапар алдында көлік деректерін, қолданылу мерзімін және қамту елдерінің тізімін тексеру маңызды.",
+      },
+
+      {
+        id: "verification",
+        question: "Полисті шекарада және полиция қалай тексереді?",
+        answer:
+          "Тексеру кезінде полистің деректері, көлік туралы мәліметтер және қолданылу мерзімі салыстырылады. Тексеру тәртібі елге және жағдайға байланысты өзгеруі мүмкін.",
+      },
+
+      {
+        id: "error-handling",
+        question: "Полиске байланысты мәселе туындаса не болады?",
+        answer:
+          "Егер мәселе біздің қателігімізден немесе техникалық ақаудан туындаса, біз полисті жедел қайта рәсімдейміз немесе таңдауыңыз бойынша қаражатты қайтарамыз. Клиент берген деректердегі қате болса, мәселе жеке тәртіпте қаралады.",
+      },
+
       {
         id: "what-is",
         question: "«Жасыл карта» деген не?",
         answer:
-          "«Жасыл карта» — бұл көлік иесінің өз елінен тыс жерде жол-көлік оқиғасы кезінде үшінші тұлғаларға келтірген залалы үшін жауапкершілігін сақтандыратын халықаралық сақтандыру құжаты. Құжат халықаралық автомобиль сақтандыру жүйесіне қатысушы елдерге кірген кезде міндетті болып табылады және зардап шеккендерге оқиға болған елдің заңнамасы бойынша өтемақы төленуін қамтамасыз етеді.",
+          "Бұл азаматтық-құқықтық жауапкершілікті халықаралық сақтандыру полисі. Ол шетелде жол-көлік оқиғасы кезінде үшінші тұлғаларға келтірілген зиянды сол елдің заңнамасына сәйкес өтейді.",
       },
+
       {
-        id: "vs-border",
-        question: "«Жасыл карта» шекаралық сақтандырудан несімен ерекшеленеді?",
+        id: "coverage",
+        question: "Полис нені қамтиды?",
         answer:
-          "Біріншіден, бұл ондаған елдер мойындаған бірыңғай халықаралық стандарт. Екіншіден, «Жасыл карта» кең әрі сенімді қамту ұсынады: мүліктік зиян, үшінші тұлғалардың өмірі мен денсаулығына келтірілген зиян. Үшіншіден, полис брокер арқылы алдын ала рәсімделеді, шекарада кезек күтуді қажет етпейді — бұл шекаралық сақтандыруды оқиға орнында рәсімдеуге қарағанда жылдам әрі ыңғайлы.",
+          "Полис үшінші тұлғалар алдындағы жауапкершілікті қамтиды: олардың көлігіне, мүлкіне келтірілген зиянды, сондай-ақ өмірі мен денсаулығына келтірілген залалды. Сіздің жеке көлігіңіз қамтылмайды.",
       },
+
       {
-        id: "bureaux",
-        question: "Жасыл карталар бюролары деген кімдер?",
+        id: "not-covered",
+        question: "Не қамтылмайды?",
         answer:
-          "«Жасыл карта» жүйесіне кіретін әр елде өзінің ұлттық Бюросы жұмыс істейді. Ол шетелдік көлік құралдарының қатысуымен болған ЖКО салдарынан өз еліндегі зардап шеккендерге өтемақы төлеуге кепілдік береді, кейін бұл соманы кінәлі жүргізуші сақтандырылған елдің Бюросынан регресс тәртібімен өндіріп алады. Бюролар автокөлік сақтандырушыларын біріктіреді және бірыңғай ішкі ережелер бойынша жұмыс істейді.",
+          "Полис сіздің көлігіңізді және жеке шығындарыңызды қамтымайды. Сондай-ақ қасақана әрекеттер және өрескел бұзушылықтар (мысалы, мас күйінде көлік жүргізу) қамтылмайды.",
       },
-      {
-        id: "territory",
-        question: "«Жасыл карта» қай елдерде жарамды?",
-        answer:
-          "Полис Еуропаның көптеген елдерін, сондай-ақ Солтүстік Африка мен Таяу Шығыстың бірқатар мемлекеттерін қамтиды. Елдердің нақты тізімі мен шектеулер полис бланкісінде көрсетіледі және полис берілген елге байланысты. Коды сызылған елдер қамту аймағына кірмейді.",
-      },
-      {
-        id: "covers",
-        question: "«Жасыл карта» нені сақтандырады?",
-        answer:
-          "Полис үшінші тұлғалардың өмірі мен денсаулығына келтірілген зиянды, сондай-ақ шетелде сақтандырылған көлік құралын пайдалану нәтижесінде олардың мүлкіне келтірілген зиянды, бару елі белгілеген жауапкершілік лимиттері шегінде өтейді.",
-      },
-      {
-        id: "not-cover",
-        question: "«Жасыл карта» нені сақтандырмайды?",
-        answer:
-          "Сақтандыру сақтанушының өз көлігіне келтірілген зиянды, жүргізушінің және жолаушылардың медициналық шығындарын, қасақана жасалған әрекеттерді, жарыстар мен оқу-жаттығу заездтері кезіндегі зиянды, сондай-ақ алкогольдік немесе есірткілік мас күйінде басқару кезіндегі шығындарды өтемейді.",
-      },
+
       {
         id: "limits",
-        question: "Полис бойынша жауапкершілік лимиттері қандай?",
+        question: "Төлем лимиттері қандай?",
         answer:
-          "Лимиттер сіз кіретін елдің заңнамасымен белгіленеді. Мысалы, Польшада өмірі мен денсаулығына келтірілген зиян бойынша лимит 5 000 000 еуроға дейін, мүлікке келтірілген зиян бойынша — 1 000 000 еуроға дейін жетеді. Басқа елдерде лимиттер әртүрлі, сондықтан сапар алдында қажетті бағыттар бойынша қолданыстағы сомаларды тексеру ұсынылады.",
+          "Лимиттер жол-көлік оқиғасы болған елдің заңнамасымен белгіленеді және айтарлықтай айырмашылық болуы мүмкін. Әдетте олар ірі шығындарды жабуға жеткілікті болады.",
       },
+
       {
-        id: "why-use",
-        question: "Неліктен «Жасыл картаны» алдын ала рәсімдеген дұрыс?",
+        id: "who-pays",
+        question: "ЖКО кезінде төлемді кім жүргізеді?",
         answer:
-          "Полис толық онлайн рәсімделеді, жүйеге қатысушы елдерде жарамды, қолданылу кезеңінде қайта рәсімдеуді қажет етпейді, көліктің түрлі санаттарына жарамды және көлік сіздің атыңызда болуын талап етпейді. Залалды реттеу жол-көлік оқиғасы орын алған елдің заңнамасына сәйкес жүргізіледі, бұл айқын ережелерді және құқықтарыңыздың қорғалуын қамтамасыз етеді.",
+          "Өтемақы төлеу жол-көлік оқиғасы болған елдің ережелеріне сәйкес, сақтандырушының және сол елдің ұлттық реттеу жүйесінің қатысуымен жүзеге асырылады.",
       },
+
+      {
+        id: "territory",
+        question: "«Жасыл карта» қай елдерде әрекет етеді?",
+        answer:
+          "Полис «Жасыл карта» жүйесіне кіретін елдерде әрекет етеді (Еуропаның көп бөлігі және басқа да бірқатар мемлекеттер). Нақты тізім әрқашан полисте көрсетіледі және ол түпкілікті болып табылады.",
+      },
+
+      {
+        id: "coverage-zones",
+        question: "Әрекет ету аумағы неге байланысты?",
+        answer:
+          "Рәсімдеу кезінде қамту аймағы таңдалады. Егер ел полиске енгізілмесе, ол жерде сақтандыру қолданылмайды.",
+      },
+
+      {
+        id: "difference-border",
+        question: "Шекаралық сақтандырудан айырмашылығы қандай?",
+        answer:
+          "Шекаралық сақтандыру — бұл кіру кезінде рәсімделетін жергілікті уақытша полис. «Жасыл карта» — бірнеше елде бірден әрекет ететін және алдын ала рәсімделетін халықаралық полис.",
+      },
+
+      {
+        id: "foreign-plates",
+        question: "Шетелдік нөмірлерге рәсімдеуге бола ма?",
+        answer:
+          "Жоқ, полис тек Қазақстанда тіркелген көліктерге рәсімделеді.",
+      },
+
+      {
+        id: "how-to-buy",
+        question: "Рәсімдеу үшін қандай деректер қажет?",
+        answer:
+          "Рәсімдеу үшін көлік туралы мәліметтер (көлікті тіркеу куәлігі) және иесі туралы деректер (жеке куәлік деректері, тұрғылықты жері, байланыс мәліметтері) қажет. Нақты тізім рәсімдеу кезінде немесе менеджер арқылы нақтыланады.",
+      },
+
+      {
+        id: "processing-time",
+        question: "Рәсімдеу қанша уақыт алады?",
+        answer:
+          "Әдетте рәсімдеу төлемнен кейін 15 минутқа дейін созылады. Сирек жағдайларда қосымша тексеру қажет болуы мүмкін.",
+      },
+
+      {
+        id: "start-date",
+        question: "Полис қашан күшіне енеді?",
+        answer:
+          "Полис рәсімдеу кезінде көрсетілген күн мен уақыттан бастап күшіне енеді. Артқа қарай рәсімдеу мүмкін емес.",
+      },
+
+      {
+        id: "same-day",
+        question: "Бүгінге бүгін рәсімдеуге бола ма?",
+        answer:
+          "Иә, бұл мүмкін. Алайда кейде қосымша тексеру қажет болуы мүмкін, сондықтан алдын ала рәсімдеу ұсынылады.",
+      },
+
+      {
+        id: "print",
+        question: "Полисті басып шығару қажет пе?",
+        answer:
+          "Иә, полисті басып шығарылған түрде өзіңізбен бірге алып жүру қажет. Қара-ақ баспа жеткілікті.",
+      },
+
+      {
+        id: "not-owner",
+        question: "Мен көліктің иесі болмасам, рәсімдеуге бола ма?",
+        answer:
+          "Иә, көлік деректері дұрыс болған жағдайда рәсімдеуге болады.",
+      },
+
+      {
+        id: "accident",
+        question: "Шетелде ЖКО болса не істеу керек?",
+        answer:
+          "ЖКО фактісін тіркеу, қажет болған жағдайда полиция шақыру және оқиға болған елдің бюросына хабарлау қажет (байланыс деректері полистің артқы бетінде көрсетілген). Кейінгі реттеу сол елдің ережелері бойынша жүргізіледі.",
+      },
+
+      {
+        id: "why-us",
+        question: "Неліктен шекарада емес, сізден сатып алу керек?",
+        answer:
+          "Шекарада полис көбіне асығыс рәсімделеді және деректер толық тексерілмейді, бұл қателер қаупін арттырады. Біз алдын ала рәсімдейміз: деректерді тексереміз, тіркеуді бақылап, сұрақтар туындаса байланыста боламыз.",
+      },
+
     ],
   },
 };
