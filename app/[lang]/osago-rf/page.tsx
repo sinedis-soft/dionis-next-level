@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { keepShortWords } from "@/lib/keepShortWords";
 import type { Lang } from "@/dictionaries/header";
 import Image from "next/image";
 import type { CSSProperties } from "react";
@@ -331,8 +332,8 @@ export default async function OsagoRfPage({
           <div className="gc-hero__bg" aria-hidden="true" />
           <div className="gc-container gc-hero__grid">
             <div className="gc-hero__left">
-              <h1 className="gc-hero__title">{osagoPageDict.hero.title}</h1>
-              <p className="gc-hero__subtitle">{osagoPageDict.hero.subtitle}</p>
+              <h1 className="gc-hero__title">{keepShortWords(osagoPageDict.hero.title)}</h1>
+              <p className="gc-hero__subtitle">{keepShortWords(osagoPageDict.hero.subtitle)}</p>
 
               <div className="gc-hero__cta">
                 <a href={orderAnchor} role="button" className="btn btn-wide">
@@ -392,7 +393,7 @@ export default async function OsagoRfPage({
               </div>
 
               <div className="legacy-only">
-                <h2 className="gc-h2">{osagoCalcDict.title}</h2>
+                <h2 className="gc-h2">{keepShortWords(osagoCalcDict.title)}</h2>
                 <p className="gc-text-muted">{osagoCalcDict.subtitle}</p>
 
                 <div className="gc-legacy-note">
@@ -428,7 +429,7 @@ export default async function OsagoRfPage({
 
         <section id="write-us" className="gc-section">
           <div className="gc-container">
-            <h3 className="writeus__title">{osagoPageDict.writeUs.title}</h3>
+            <h3 className="writeus__title">{keepShortWords(osagoPageDict.writeUs.title)}</h3>
 
             <p className="writeus__text">{osagoPageDict.writeUs.text}</p>
 
@@ -518,7 +519,7 @@ export default async function OsagoRfPage({
           <section className="gc-advantages" aria-labelledby="advantages-heading">
             <div className="gc-container">
               <h2 id="advantages-heading" className="gc-advantages__title">
-                {osagoPageDict.advantages.title}
+                {keepShortWords(osagoPageDict.advantages.title)}
               </h2>
 
               <div className="gc-advantages__grid">

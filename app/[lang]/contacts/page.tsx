@@ -1,5 +1,6 @@
 // app/[lang]/contacts/page.tsx
 import type { Metadata } from "next";
+import { keepShortWords } from "@/lib/keepShortWords";
 import type { Lang } from "@/dictionaries/header";
 
 import { getHomeDictionary } from "@/dictionaries/home";
@@ -85,7 +86,7 @@ export default async function ContactsPage({
     <main className="cp-page">
       <section className="cp-top">
         <div className="gc-container">
-          <h1 className="cp-title">{titles[lang]}</h1>
+          <h1 className="cp-title">{keepShortWords(titles[lang])}</h1>
 
           <div className="cp-lead">
             <p className="cp-intro">{introText[lang]}</p>

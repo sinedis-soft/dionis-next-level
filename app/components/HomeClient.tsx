@@ -2,6 +2,7 @@
 "use client";
 
 import Image from "next/image";
+import { keepShortWords } from "@/lib/keepShortWords";
 import { useMemo } from "react";
 
 import type { Lang } from "@/dictionaries/header";
@@ -107,7 +108,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
           <div className="hp-hero__grid">
             <div className="hp-hero__left">
               <h1 className="hp-hero__title" style={{ whiteSpace: "pre-line" }}>
-                {t.hero.title}
+                {keepShortWords(t.hero.title)}
               </h1>
 
               <p className="hp-hero__subtitle">{t.hero.subtitle}</p>
@@ -146,7 +147,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
         <section className="hp-benefits" aria-labelledby="benefits-heading">
           <div className="container">
             <h2 id="benefits-heading" className="hp-sectionTitle">
-              {t.benefits.title}
+              {keepShortWords(t.benefits.title)}
             </h2>
             <p className="hp-sectionIntro">{t.benefits.subtitle}</p>
 
@@ -170,7 +171,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
         <section className="hp-director" aria-labelledby="director-message-heading">
           <div className="container">
             <h2 id="director-message-heading" className="hp-director__title">
-              {t.director.heading}
+              {keepShortWords(t.director.heading)}
             </h2>
 
             <div className="card hp-director__card">
