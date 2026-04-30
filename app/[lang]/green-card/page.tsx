@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { keepShortWords } from "@/lib/keepShortWords";
 import type { Lang } from "@/dictionaries/header";
 import Image from "next/image";
 import type { CSSProperties } from "react";
@@ -223,8 +224,8 @@ export default async function GreenCardPage({
           <div className="gc-hero__bg" aria-hidden="true" />
           <div className="gc-container gc-hero__grid">
             <div className="gc-hero__left">
-              <h1 className="gc-hero__title">{gcPageDict.hero.title}</h1>
-              <p className="gc-hero__subtitle">{gcPageDict.hero.subtitle}</p>
+              <h1 className="gc-hero__title">{keepShortWords(gcPageDict.hero.title)}</h1>
+              <p className="gc-hero__subtitle">{keepShortWords(gcPageDict.hero.subtitle)}</p>
 
               <div className="gc-hero__cta">
                 <a
@@ -288,7 +289,7 @@ export default async function GreenCardPage({
               </div>
 
               <div className="legacy-only">
-                <h2 className="gc-h2">{gcPageDict.calculator.title}</h2>
+                <h2 className="gc-h2">{keepShortWords(gcPageDict.calculator.title)}</h2>
                 <p className="gc-text-muted">{gcPageDict.calculator.subtitle}</p>
 
                 <div className="gc-legacy-note">
@@ -324,7 +325,7 @@ export default async function GreenCardPage({
 
         <section id="write-us" className="gc-section">
           <div className="gc-container">
-            <h3 className="writeus__title">{gcPageDict.writeUs.title}</h3>
+            <h3 className="writeus__title">{keepShortWords(gcPageDict.writeUs.title)}</h3>
 
             <p className="writeus__text">{gcPageDict.writeUs.text}</p>
 
@@ -422,7 +423,7 @@ export default async function GreenCardPage({
           <section className="gc-advantages" aria-labelledby="advantages-heading">
             <div className="gc-container">
               <h2 id="advantages-heading" className="gc-advantages__title">
-                {gcPageDict.advantages.title}
+                {keepShortWords(gcPageDict.advantages.title)}
               </h2>
 
               <div className="gc-advantages__grid">

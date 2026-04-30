@@ -1,5 +1,6 @@
 // app/[lang]/authors/[slug]/page.tsx
 import type { Metadata } from "next";
+import { keepShortWords } from "@/lib/keepShortWords";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 
@@ -42,9 +43,9 @@ export async function generateMetadata({
   const author = await getAuthorBySlug(slug);
   if (!author) return {};
 
-  const title = `${author.name} — автор блога`;
+  const title = `${keepShortWords(author.name)} — автор блога`;
   const description =
-    author.bio ?? `Публикации и экспертные материалы автора ${author.name}`;
+    author.bio ?? `Публикации и экспертные материалы автора ${keepShortWords(author.name)}`;
 
   return {
     title,
@@ -106,11 +107,11 @@ export default async function AuthorPage({
           <span className="ap-bc__sep" aria-hidden="true">
             →
           </span>
-          <span className="ap-bc__current">{author.name}</span>
+          <span className="ap-bc__current">{keepShortWords(author.name)}</span>
         </nav>
 
         <section className="ap-section">
-          <h1 className="ap-title">{author.name}</h1>
+          <h1 className="ap-title">{keepShortWords(author.name)}</h1>
 
           <div className="ap-box">
             <AuthorBox
