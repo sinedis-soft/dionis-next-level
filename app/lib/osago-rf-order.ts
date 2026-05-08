@@ -735,7 +735,7 @@ function buildVehicleMail(args: {
   const html = `
     <div style="max-width: 600px; margin: 0 auto; background-color: #FFFFFF; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
       <img
-        src="https://dionis-insurance.com/logo_1.webp"
+        src="https://dionis-insurance.kz/logo_1.webp"
         width="56"
         height="56"
         alt="Dionis Insurance"
