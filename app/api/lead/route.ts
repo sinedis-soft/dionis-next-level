@@ -48,6 +48,10 @@ type RecaptchaVerifyResponse = {
   hostname?: string;
   "error-codes"?: string[];
 };
+const BITRIX_COMM_LANG_FIELD = "UF_CRM_1753957395750";
+const BITRIX_COMM_LANG_BY_SITE_LANG: Record<string, number> = {
+  ru: 3937,
+};
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -117,6 +121,12 @@ function safeMeta(v: unknown): InlineCtaMeta {
     variant: safeString(v.variant),
     source: safeString(v.source),
   };
+}
+
+function resolveCommunicationLanguageId(pageUrl: string): number | undefined {
+  const match = pageUrl.toLowerCase().match(/\/(ru|kz|en)(?:\/|$)/);
+  if (!match) return undefined;
+  return BITRIX_COMM_LANG_BY_SITE_LANG[match[1]];
 }
 
 async function readJson(req: Request): Promise<unknown> {
@@ -281,6 +291,7 @@ export async function POST(req: Request) {
       `UTM: ${utm ? JSON.stringify(utm) : "none"}\n` +
       `IP: ${ip}\n` +
       `User-Agent: ${userAgent}\n`;
+    const communicationLanguageId = resolveCommunicationLanguageId(pageUrl);
 
     // -----------------------
     // 5) Bitrix24 lead
@@ -300,6 +311,9 @@ export async function POST(req: Request) {
           EMAIL: email ? [{ VALUE: email, VALUE_TYPE: "WORK" }] : [],
           COMMENTS: `${comment}${metaInfo}`,
           SOURCE_ID: "WEB",
+          ...(communicationLanguageId
+            ? { [BITRIX_COMM_LANG_FIELD]: communicationLanguageId }
+            : {}),
         },
         params: { REGISTER_SONET_EVENT: "Y" },
       };

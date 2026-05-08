@@ -1,5 +1,17 @@
 import nodemailer from "nodemailer";
 
+const BITRIX_COMM_LANG_FIELD = "UF_CRM_1753957395750";
+const BITRIX_COMM_LANG_BY_SITE_LANG: Record<string, number> = {
+  ru: 3937,
+};
+
+function resolveCommunicationLanguageId(pageUrl?: string): number | undefined {
+  if (!pageUrl) return undefined;
+  const match = pageUrl.toLowerCase().match(/\/(ru|kz|en)(?:\/|$)/);
+  if (!match) return undefined;
+  return BITRIX_COMM_LANG_BY_SITE_LANG[match[1]];
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -86,6 +98,7 @@ export async function POST(req: Request) {
 
         const userAgent = req.headers.get("user-agent") || "unknown";
         const { context, pageUrl, utm } = body;
+        const communicationLanguageId = resolveCommunicationLanguageId(pageUrl);
 
         const metaInfo =
           `\n\n---\nИсточник: Форма обратной связи DIONIS\n` +
@@ -114,6 +127,9 @@ export async function POST(req: Request) {
             EMAIL: [{ VALUE: email, VALUE_TYPE: "WORK" }],
             COMMENTS: `${comment}${metaInfo}`,   // ← добавили метаинфо
             SOURCE_ID: "WEB",
+            ...(communicationLanguageId
+              ? { [BITRIX_COMM_LANG_FIELD]: communicationLanguageId }
+              : {}),
         },
         params: { REGISTER_SONET_EVENT: "Y" },
       };

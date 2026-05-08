@@ -10,6 +10,10 @@ type RecaptchaVerifyResponse = {
   hostname?: string;
   "error-codes"?: string[];
 };
+const BITRIX_COMM_LANG_FIELD = "UF_CRM_1753957395750";
+const BITRIX_COMM_LANG_BY_SITE_LANG: Record<string, number> = {
+  ru: 3937,
+};
 
 function safeString(value: FormDataEntryValue | null): string {
   return typeof value === "string" ? value.trim() : "";
@@ -46,6 +50,12 @@ function parseUtm(raw: string): Record<string, string> | undefined {
   }
 }
 
+function resolveCommunicationLanguageId(pageUrl: string): number | undefined {
+  const match = pageUrl.toLowerCase().match(/\/(ru|kz|en)(?:\/|$)/);
+  if (!match) return undefined;
+  return BITRIX_COMM_LANG_BY_SITE_LANG[match[1]];
+}
+
 export async function POST(req: Request) {
   try {
     const form = await req.formData();
@@ -62,6 +72,7 @@ export async function POST(req: Request) {
     const recaptchaToken = safeString(form.get("recaptchaToken"));
     const utmRaw = safeString(form.get("utm"));
     const utm = parseUtm(utmRaw);
+    const communicationLanguageId = resolveCommunicationLanguageId(pageUrl);
 
     if (!name || !whatsapp) {
       return NextResponse.json(
@@ -141,6 +152,9 @@ export async function POST(req: Request) {
           EMAIL: [],
           COMMENTS: comment,
           SOURCE_ID: "WEB",
+          ...(communicationLanguageId
+            ? { [BITRIX_COMM_LANG_FIELD]: communicationLanguageId }
+            : {}),
         },
         params: { REGISTER_SONET_EVENT: "Y" },
       };
