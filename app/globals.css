@@ -2028,6 +2028,24 @@ textarea:focus{
 @media (min-width: 640px){ .hp-contact__img{ width: 320px; } }
 @media (min-width: 1024px){ .hp-contact__img{ width: 384px; } }
 
+.hp-certificates{ padding: 40px 0; background:#fff; }
+.hp-certificates__row{ display:flex; justify-content:center; align-items:flex-start; gap:16px; }
+.hp-certificates__item{
+  display:block;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 8px 20px rgba(17,24,39,.12);
+}
+.hp-certificates__img{
+  width:46vw;
+  max-width:260px;
+  min-width:140px;
+  height:auto;
+  display:block;
+  transition:transform .2s ease;
+}
+.hp-certificates__item:hover .hp-certificates__img{ transform:scale(1.02); }
+
 /* dark scheme (минимально, чтобы не резало глаз) */
 @media (prefers-color-scheme: dark){
   .hp-page{ background:#0a0a0a; }
@@ -2037,7 +2055,7 @@ textarea:focus{
   .hp-benefits{ background:#0a0a0a; border-top-color: rgba(255,255,255,.12); }
   .hp-director{ background:#0a0a0a; }
   .hp-services{ background:#0a0a0a; }
-  .hp-broker, .hp-contact{ background: rgba(255,255,255,.06); }
+  .hp-broker, .hp-contact, .hp-certificates{ background: rgba(255,255,255,.06); }
   .hp-benefitCard__label{ color: rgba(255,255,255,.62); }
 }
 
