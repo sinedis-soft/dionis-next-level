@@ -2038,7 +2038,7 @@ textarea:focus{
 }
 .hp-certificates__img{
   width:46vw;
-  max-width:260px;
+  max-width:520px;
   min-width:140px;
   height:auto;
   display:block;
