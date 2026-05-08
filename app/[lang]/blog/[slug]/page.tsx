@@ -130,7 +130,12 @@ export default async function BlogArticlePage({
 
     inLanguage: lang,
 
-    image: article.image,
+    image: {
+      "@type": "ImageObject",
+      url: article.image,
+      width: 1200,
+      height: 630,
+    },
 
     mainEntityOfPage: {
       "@type": "WebPage",
