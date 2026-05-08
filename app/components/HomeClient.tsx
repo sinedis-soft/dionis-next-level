@@ -317,6 +317,48 @@ export default function HomeClient({ lang, t, agreement }: Props) {
           </div>
         </section>
 
+        <section className="hp-certificates" aria-label="Сертификаты">
+          <div className="container">
+            <div className="hp-certificates__row">
+              <a
+                href="/certyfikatkz.webp"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hp-certificates__item"
+                aria-label="Открыть сертификат KZ в полном размере"
+              >
+                <Image
+                  src="/certyfikatkz.webp"
+                  alt="Сертификат на казахском языке"
+                  width={420}
+                  height={560}
+                  loading="lazy"
+                  sizes="(max-width: 640px) 46vw, 260px"
+                  className="hp-certificates__img"
+                />
+              </a>
+
+              <a
+                href="/certyfikatru.webp"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hp-certificates__item"
+                aria-label="Открыть сертификат RU в полном размере"
+              >
+                <Image
+                  src="/certyfikatru.webp"
+                  alt="Сертификат на русском языке"
+                  width={420}
+                  height={560}
+                  loading="lazy"
+                  sizes="(max-width: 640px) 46vw, 260px"
+                  className="hp-certificates__img"
+                />
+              </a>
+            </div>
+          </div>
+        </section>
+
         {/* CONTACT */}
         <section className="hp-contact">
           <div className="container">
