@@ -41,6 +41,13 @@ import InlineCta from "@/components/blog/mdx/InlineCta";
 // ✅ AUTHORS вынесли в отдельный файл данных (без циклов)
 import { AUTHORS } from "@/data/blog/authors";
 
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.kz").replace(/\/$/, "");
+
+function toAbsoluteUrl(url: string): string {
+  if (/^https?:\/\//i.test(url)) return url;
+  return `${SITE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
+}
+
 export async function getAllAuthors() {
   return AUTHORS;
 }
@@ -259,7 +266,7 @@ function parseFrontmatter(rawFile: string): BlogFrontmatter {
     publishedAt: String(data.publishedAt ?? ""),
     modifiedAt: data.modifiedAt ? String(data.modifiedAt) : undefined,
     readingTime: String(data.readingTime ?? "5 мин"),
-    image: String(data.image ?? "/blog/cover.webp"),
+    image: toAbsoluteUrl(String(data.image ?? "/blog/cover.webp")),
     imageAlt: String(data.imageAlt ?? title),
     tags,
     authorSlug: data.authorSlug ? String(data.authorSlug) : undefined,
