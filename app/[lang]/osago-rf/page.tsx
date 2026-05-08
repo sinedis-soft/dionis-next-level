@@ -21,6 +21,7 @@ import FAQSection from "@/components/osago-rf/FAQSection";
 import OsagoRfQuestionForm from "@/components/osago-rf/OsagoRfQuestionForm";
 import DeferredHydration from "@/components/DeferredHydration";
 import { OsagoOrderForm } from "@/components/osago-rf/OsagoOrderForm";
+import { buildAlternates } from "@/lib/seoAlternates";
 
 export const dynamicParams = false;
 
@@ -256,15 +257,9 @@ export async function generateMetadata({
   return {
     title: titles[lang],
     description: descriptions[lang],
-    alternates: {
-      canonical: url,
-      languages: {
-        ru: `${SITE_URL}/ru/osago-rf`,
-        "kk-KZ": `${SITE_URL}/kz/osago-rf`,
-        en: `${SITE_URL}/en/osago-rf`,
-        "x-default": `${SITE_URL}/ru/osago-rf`,
-      },
-    },
+
+    alternates: buildAlternates(lang, "/osago-rf"),
+
     openGraph: {
       type: "website",
       url,
@@ -273,7 +268,11 @@ export async function generateMetadata({
       locale: langToOgLocale(lang),
       siteName: "Dionis Insurance Broker",
     },
-    robots: { index: true, follow: true },
+
+    robots: {
+      index: true,
+      follow: true,
+    },
   };
 }
 

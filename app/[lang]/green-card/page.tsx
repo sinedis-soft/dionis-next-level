@@ -21,6 +21,7 @@ import GreenCardCalculator from "@/components/green-card/GreenCardCalculator";
 import FAQSection from "@/components/green-card/FAQSection";
 import GreenCardQuestionForm from "@/components/green-card/GreenCardQuestionForm";
 import DeferredHydration from "@/components/DeferredHydration";
+import { buildAlternates } from "@/lib/seoAlternates";
 
 export const dynamicParams = false;
 
@@ -132,6 +133,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { lang: rawLang } = await params;
   const lang = normalizeLang(rawLang);
+
   const url = `${SITE_URL}/${lang}/green-card`;
 
   const titles: Record<Lang, string> = {
@@ -149,15 +151,9 @@ export async function generateMetadata({
   return {
     title: titles[lang],
     description: descriptions[lang],
-    alternates: {
-      canonical: url,
-      languages: {
-        ru: `${SITE_URL}/ru/green-card`,
-        "kk-KZ": `${SITE_URL}/kz/green-card`,
-        en: `${SITE_URL}/en/green-card`,
-        "x-default": `${SITE_URL}/ru/green-card`,
-      },
-    },
+
+    alternates: buildAlternates(lang, "/green-card"),
+
     openGraph: {
       type: "website",
       url,
@@ -166,7 +162,11 @@ export async function generateMetadata({
       locale: langToOgLocale(lang),
       siteName: "Dionis Insurance Broker",
     },
-    robots: { index: true, follow: true },
+
+    robots: {
+      index: true,
+      follow: true,
+    },
   };
 }
 

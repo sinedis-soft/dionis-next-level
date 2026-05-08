@@ -7,6 +7,7 @@ import type { Lang } from "@/dictionaries/header";
 import { getHomeDictionary, type HomeDictionary } from "@/dictionaries/home";
 import { getAgreementDictionary, type AgreementDictionary } from "@/dictionaries/agreement";
 import HomeClient from "@/components/HomeClient";
+import { buildAlternates } from "@/lib/seoAlternates";
 
 function normalizeLang(value: string): Lang {
   return value === "ru" || value === "kz" || value === "en" ? value : "ru";
@@ -34,7 +35,11 @@ export async function generateMetadata({
         ? "Қазақстандағы сақтандыру брокері: бағдарламаларды таңдау, кеңес беру және сүйемелдеу. Лицензия бойынша ресми жұмыс. Алматы, байланыс телефоны және мессенджерлер."
         : "Insurance broker in Kazakhstan: program selection, consulting and support. Officially licensed. Almaty, phone and messengers.";
 
-  return { title, description };
+  return {
+    title,
+    description,
+    alternates: buildAlternates(lang),
+  };
 }
 
 export default async function Page({

@@ -1,8 +1,12 @@
 import type { MetadataRoute } from "next";
 
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.kz"
+).replace(/\/$/, "");
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [{ userAgent: "*", allow: "/" }],
-    sitemap: "https://dionis-insurance.com/sitemap.xml",
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

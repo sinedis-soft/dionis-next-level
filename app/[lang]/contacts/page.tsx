@@ -7,6 +7,7 @@ import { getHomeDictionary } from "@/dictionaries/home";
 import { getAgreementDictionary } from "@/dictionaries/agreement";
 
 import ContactSection from "@/components/ContactSection";
+import { buildAlternates } from "@/lib/seoAlternates";
 
 export const dynamicParams = false;
 
@@ -59,7 +60,7 @@ export async function generateMetadata({
   return {
     title: titles[lang],
     description: descriptions[lang],
-    alternates: { canonical: `/${lang}/contacts` },
+    alternates: buildAlternates(lang, "/contacts"),
     openGraph: {
       title: titles[lang],
       description: descriptions[lang],

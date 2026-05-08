@@ -18,6 +18,8 @@ import LiabilityProductsSection from "@/components/products/LiabilityProductsSec
 import LifeProductsSection from "@/components/products/LifeProductsSection";
 import MedicalProductsSection from "@/components/products/MedicalProductsSection";
 
+import { buildAlternates } from "@/lib/seoAlternates";
+
 import { RequestBox } from "@/components/RequestBox";
 
 export const dynamicParams = false;
@@ -69,7 +71,7 @@ export async function generateMetadata({
   return {
     title: titleByLang[lang],
     description: descByLang[lang],
-    alternates: { canonical: `/${lang}/products` },
+    alternates: buildAlternates(lang, "/products"),
     openGraph: {
       title: titleByLang[lang],
       description: descByLang[lang],

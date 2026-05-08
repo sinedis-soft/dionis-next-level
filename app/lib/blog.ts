@@ -41,6 +41,10 @@ import InlineCta from "@/components/blog/mdx/InlineCta";
 // ✅ AUTHORS вынесли в отдельный файл данных (без циклов)
 import { AUTHORS } from "@/data/blog/authors";
 
+export async function getAllAuthors() {
+  return AUTHORS;
+}
+
 export type BlogFAQItem = { q: string; a: string };
 
 // ✅ тип автора оставляем здесь (в данных AUTHORS он должен использовать совместимый shape)

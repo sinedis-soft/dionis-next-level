@@ -5,6 +5,7 @@ import type { Lang } from "@/dictionaries/header";
 import { getAllArticles } from "@/lib/blog";
 import BlogGrid from "@/components/blog/BlogGrid";
 import { getBlogDictionary } from "@/dictionaries/blog";
+import { buildAlternates } from "@/lib/seoAlternates";
 
 const ALLOWED_LANGS: Lang[] = ["ru", "kz", "en"];
 
@@ -32,6 +33,7 @@ export async function generateMetadata({
   return {
     title: dict.title,
     description: dict.description,
+    alternates: buildAlternates(lang, "/blog"),
   };
 }
 

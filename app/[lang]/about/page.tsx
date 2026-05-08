@@ -8,6 +8,7 @@ import type { Lang } from "@/dictionaries/header";
 import { getAboutDictionary, type AboutDictionary } from "@/dictionaries/about";
 import { getHomeDictionary } from "@/dictionaries/home";
 import { getAgreementDictionary } from "@/dictionaries/agreement";
+import { buildAlternates } from "@/lib/seoAlternates";
 
 import AboutPage from "@/components/AboutPage";
 
@@ -35,6 +36,7 @@ export async function generateMetadata({
   return {
     title: t.seo.title,
     description: t.seo.description,
+    alternates: buildAlternates(lang, "/about"),
   };
 }
 

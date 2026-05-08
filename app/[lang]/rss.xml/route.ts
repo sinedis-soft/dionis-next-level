@@ -4,7 +4,7 @@ import { getAllArticles } from "@/lib/blog";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-  "https://dionis-insurance.com";
+  "https://dionis-insurance.kz";
 
 function normalizeLang(value: string): Lang {
   return value === "ru" || value === "kz" || value === "en" ? value : "ru";

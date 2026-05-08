@@ -1,68 +1,102 @@
 // app/sitemap.ts
-import type { MetadataRoute } from "next";
-import type { Lang } from "@/dictionaries/header";
-import { getAllArticleSlugs, getArticleBySlug } from "@/lib/blog";
 
-const BASE_URL =
-  (process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.com").replace(/\/$/, "");
+import type { MetadataRoute } from "next";
+
+import type { Lang } from "@/dictionaries/header";
+
+import {
+  getAllArticleSlugs,
+  getArticleBySlug,
+  getAllAuthors,
+} from "@/lib/blog";
+
+const BASE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://dionis-insurance.kz"
+).replace(/\/$/, "");
 
 const SUPPORTED_LANGS: Lang[] = ["ru", "kz", "en"];
 
+/*
+  Стабильная дата для статических страниц.
+  Меняется только вручную.
+*/
+const STATIC_LASTMOD = "2026-05-08";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const urls: MetadataRoute.Sitemap = [];
-  const now = new Date().toISOString();
 
-  // ---- Основные страницы
+  /* ---------- STATIC PAGES ---------- */
+
+  const staticRoutes = [
+    "",
+    "/green-card",
+    "/osago-rf",
+    "/products",
+    "/blog",
+    "/contacts",
+    "/about",
+    "/privacy",
+    "/privacy/cookies",
+    "/privacy/regulation",
+  ];
+
   for (const lang of SUPPORTED_LANGS) {
     const prefix = `/${lang}`;
 
-    urls.push(
-      {
-        url: `${BASE_URL}${prefix}`,
-        lastModified: now,
-        changeFrequency: "weekly",
-        priority: 1.0,
-      },
-      {
-        url: `${BASE_URL}${prefix}/green-card`,
-        lastModified: now,
-        changeFrequency: "weekly",
-        priority: 0.9,
-      },
-      {
-        url: `${BASE_URL}${prefix}/osago-rf`,
-        lastModified: now,
-        changeFrequency: "weekly",
-        priority: 0.8,
-      },
-      {
-        url: `${BASE_URL}${prefix}/products`,
-        lastModified: now,
-        changeFrequency: "monthly",
-        priority: 0.6,
-      },
-      {
-        url: `${BASE_URL}${prefix}/blog`,
-        lastModified: now,
-        changeFrequency: "weekly",
-        priority: 0.7,
-      }
-    );
+    for (const route of staticRoutes) {
+      urls.push({
+        url: `${BASE_URL}${prefix}${route}`,
+        lastModified: STATIC_LASTMOD,
+        changeFrequency:
+          route === "" ||
+          route === "/green-card" ||
+          route === "/osago-rf"
+            ? "weekly"
+            : "monthly",
+        priority:
+          route === ""
+            ? 1.0
+            : route === "/green-card"
+            ? 0.9
+            : route === "/osago-rf"
+            ? 0.8
+            : 0.6,
+      });
+    }
   }
 
-  // ---- Статьи блога (из MDX)
+  /* ---------- BLOG ARTICLES ---------- */
+
   const slugs = await getAllArticleSlugs();
 
   for (const { lang, slug } of slugs) {
     const article = await getArticleBySlug(lang, slug);
+
     if (!article) continue;
 
     urls.push({
       url: `${BASE_URL}/${lang}/blog/${slug}`,
-      lastModified: article.modifiedAt ?? article.publishedAt,
+      lastModified:
+        article.modifiedAt ?? article.publishedAt,
       changeFrequency: "monthly",
-      priority: 0.6,
+      priority: 0.7,
     });
+  }
+
+  /* ---------- AUTHORS ---------- */
+
+  const authors = await getAllAuthors();
+
+  for (const author of authors) {
+    for (const lang of SUPPORTED_LANGS) {
+      urls.push({
+        url: `${BASE_URL}/${lang}/authors/${author.slug}`,
+        lastModified: STATIC_LASTMOD,
+        changeFrequency: "monthly",
+        priority: 0.5,
+      });
+    }
   }
 
   return urls;
