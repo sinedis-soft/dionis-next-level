@@ -21,6 +21,7 @@ import MedicalProductsSection from "@/components/products/MedicalProductsSection
 import { buildAlternates } from "@/lib/seoAlternates";
 
 import { RequestBox } from "@/components/RequestBox";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export const dynamicParams = false;
 
@@ -107,6 +108,13 @@ export default async function ProductsPage({
       <section className="u-pr-hero">
         <div className="u-pr-hero__bg" aria-hidden="true" />
         <div className="gc-container">
+          <Breadcrumbs
+            lang={lang}
+            items={[
+              { label: lang === "ru" ? "Главная" : lang === "kz" ? "Басты бет" : "Home", href: `/${lang}` },
+              { label: ui.h1 },
+            ]}
+          />
           <div className="u-pr-hero__inner">
             <div className="u-pr-hero__copy">
               <h1 className="pr-hero__title">{ui.h1}</h1>
