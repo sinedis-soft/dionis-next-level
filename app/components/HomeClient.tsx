@@ -410,19 +410,20 @@ export default function HomeClient({ lang, t, agreement }: Props) {
           </div>
         </section>
 
-        <section className="hp-certificates" aria-label="Сертификаты">
+        <section className="hp-certificates" aria-labelledby="certificates-heading">
           <div className="container">
+            <h2 id="certificates-heading" className="hp-sectionTitle">{t.certificates.title}</h2>
             <div className="hp-certificates__row">
               <a
                 href="/certyfikatkz.webp"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hp-certificates__item"
-                aria-label="Открыть сертификат KZ в полном размере"
+                aria-label={t.certificates.kzAriaLabel}
               >
                 <Image
                   src="/certyfikatkz.webp"
-                  alt="Сертификат на казахском языке"
+                  alt={t.certificates.kzAlt}
                   width={420}
                   height={560}
                   loading="lazy"
@@ -436,11 +437,11 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hp-certificates__item"
-                aria-label="Открыть сертификат RU в полном размере"
+                aria-label={t.certificates.ruAriaLabel}
               >
                 <Image
                   src="/certyfikatru.webp"
-                  alt="Сертификат на русском языке"
+                  alt={t.certificates.ruAlt}
                   width={420}
                   height={560}
                   loading="lazy"
