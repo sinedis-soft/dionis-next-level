@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import { keepShortWords } from "@/lib/keepShortWords";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { Lang } from "@/dictionaries/header";
 import type { HomeDictionary } from "@/dictionaries/home";
@@ -13,6 +13,7 @@ import ServicesGrid from "@/components/ServicesGrid";
 import ContactForm from "@/components/ContactForm";
 import { BrokerSection } from "@/components/BrokerSection";
 import DeferredHydration from "@/components/DeferredHydration";
+import { getPartnersDictionary } from "@/dictionaries/partners";
 
 type Props = {
   lang: Lang;
@@ -89,6 +90,31 @@ export default function HomeClient({ lang, t, agreement }: Props) {
   const greenCardLink = `/${lang}/green-card`;
   const osagoLink = `/${lang}/osago-rf`;
   const productsLink = `/${lang}/products`;
+
+  const partners = useMemo(() => getPartnersDictionary(lang), [lang]);
+  const [activePartner, setActivePartner] = useState(0);
+
+  useEffect(() => {
+    setActivePartner(0);
+  }, [lang]);
+
+  useEffect(() => {
+    if (partners.length <= 1) return;
+
+    const timer = window.setInterval(() => {
+      setActivePartner((prev) => (prev + 1) % partners.length);
+    }, 15000);
+
+    return () => window.clearInterval(timer);
+  }, [partners]);
+
+  const showPreviousPartner = () => {
+    setActivePartner((prev) => (prev - 1 + partners.length) % partners.length);
+  };
+
+  const showNextPartner = () => {
+    setActivePartner((prev) => (prev + 1) % partners.length);
+  };
 
   const otherServices = useMemo(
     () =>
@@ -307,6 +333,35 @@ export default function HomeClient({ lang, t, agreement }: Props) {
               moreBtnText={t.services.moreBtn}
               items={otherServices}
             />
+          </div>
+        </section>
+
+        <section className="hp-partners" aria-labelledby="partners-heading">
+          <div className="container">
+            <h2 id="partners-heading" className="hp-sectionTitle">{t.partners.title}</h2>
+
+            {partners.length > 0 && (
+              <div className="hp-partners__carousel">
+                <button type="button" className="hp-partners__nav" onClick={showPreviousPartner} aria-label={t.partners.prevAriaLabel}>
+                  ←
+                </button>
+
+                <a href={partners[activePartner].url} target="_blank" rel="noopener noreferrer" className="hp-partners__logoLink">
+                  <Image
+                    src={partners[activePartner].logo}
+                    alt={partners[activePartner].alt}
+                    width={260}
+                    height={100}
+                    loading="lazy"
+                    className="hp-partners__logo"
+                  />
+                </a>
+
+                <button type="button" className="hp-partners__nav" onClick={showNextPartner} aria-label={t.partners.nextAriaLabel}>
+                  →
+                </button>
+              </div>
+            )}
           </div>
         </section>
 
