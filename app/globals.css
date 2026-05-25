@@ -4142,3 +4142,45 @@ input.field:focus, select.field:focus, textarea.field:focus{
 .ab-prose th{background:#f8fafc;color:#0f172a;}
 .ab-prose td{vertical-align:top;}
 .ab-prose img{border-radius:1rem;box-shadow:0 1px 2px rgba(0,0,0,.08);}
+
+.hp-partners {
+  padding: 28px 0;
+}
+
+.hp-partners__carousel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.hp-partners__nav {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  border: 1px solid #d6d6d6;
+  background: #fff;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.hp-partners__logoLink {
+  min-height: 120px;
+  min-width: 280px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  padding: 12px;
+  background: #fff;
+}
+
+.hp-partners__logo {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 86px;
+  object-fit: contain;
+}

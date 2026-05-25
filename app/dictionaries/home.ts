@@ -84,6 +84,14 @@ export type HomeDictionary = {
     moreBtn: string;
   };
 
+
+  partners: {
+    title: string;
+    prevAriaLabel: string;
+    nextAriaLabel: string;
+  };
+
+
   broker: {
     titlePrefix: string;
     titleHighlight: string;
@@ -318,6 +326,12 @@ const ru: HomeDictionary = {
     moreBtn: "Подробнее",
   },
 
+  partners: {
+    title: "НАШИ ПАРТНЕРЫ",
+    prevAriaLabel: "Показать предыдущего партнера",
+    nextAriaLabel: "Показать следующего партнера",
+  },
+
   broker: {
     titlePrefix: "МЫ ",
     titleHighlight: "СТРАХОВОЙ БРОКЕР В КАЗАХСТАНЕ",
@@ -548,6 +562,12 @@ director: {
       },
     ],
     moreBtn: "Толығырақ",
+  },
+
+  partners: {
+    title: "БІЗДІҢ СЕРІКТЕСТЕР",
+    prevAriaLabel: "Алдыңғы серіктесті көрсету",
+    nextAriaLabel: "Келесі серіктесті көрсету",
   },
 
   broker: {
@@ -787,6 +807,12 @@ director: {
       },
     ],
     moreBtn: "More details",
+  },
+
+  partners: {
+    title: "OUR PARTNERS",
+    prevAriaLabel: "Show previous partner",
+    nextAriaLabel: "Show next partner",
   },
 
   broker: {
