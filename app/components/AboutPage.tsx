@@ -101,7 +101,7 @@ export default function AboutPage({ t, lang, contact, agreement }: Props) {
   return (
     <>
       <section className="u-py-10 u-sm-py-14 u-bg-gray-50">
-        <div className="u-max-w-6xl u-mx-auto u-px-4">
+        <div className="gc-container">
           <h1 className="u-text-3xl u-sm-text-4xl u-font-bold u-text--1a3a5f">
             {t.pageTitle}
           </h1>
