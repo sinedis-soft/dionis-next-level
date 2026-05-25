@@ -6,4 +6,5 @@ export type ArticleAuthor = {
   bio?: string;
   photo?: string;
   linkedin?: string;
+  sameAs?: string[];
 };

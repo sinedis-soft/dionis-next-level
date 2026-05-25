@@ -71,9 +71,9 @@ export async function generateMetadata({
       canonical: `${SITE_URL}/${lang}`,
       languages: {
         ru: `${SITE_URL}/ru`,
-        "kk-KZ": `${SITE_URL}/kz`,
+        kz: `${SITE_URL}/kz`,
         en: `${SITE_URL}/en`,
-        "x-default": `${SITE_URL}`,
+        "x-default": `${SITE_URL}/en`,
       },
     },
   };
@@ -98,21 +98,32 @@ export default async function LangLayout({
       {
         "@type": "Organization",
         "@id": `${SITE_URL}/#organization`,
-        name: "Dionis Insurance Broker, LLP",
-        legalName:
-          "Товарищество с ограниченной ответственностью «Страховой брокер Дионис»",
+        name: "Dionis Insurance Broker",
+        legalName: "Dionis Insurance Broker",
         url: SITE_URL,
-        logo: `${SITE_URL}/logo.webp`,
-        image: `${SITE_URL}/logo.webp`,
+        logo: `${SITE_URL}/logo_1.webp`,
+        image: `${SITE_URL}/logo_1.webp`,
         email: "info@dionis-insurance.kz",
-        telephone: ["+77273573030", "+375447030303"],
+        telephone: "+7-727-357-30-30",
         address: {
           "@type": "PostalAddress",
           addressCountry: "KZ",
-          addressLocality: "Almaty",
-          streetAddress: "Auezova Street, 14A",
-          postalCode: "050009",
+          addressLocality: "Алматы",
+          streetAddress: "ул. Ауэзова, дом 14А",
         },
+        contactPoint: {
+          "@type": "ContactPoint",
+          telephone: "+7-727-357-30-30",
+          email: "info@dionis-insurance.kz",
+          contactType: "customer service",
+          availableLanguage: ["Russian", "English", "Kazakh"],
+          areaServed: "KZ",
+        },
+        sameAs: [
+          "https://www.instagram.com/dionis_insurance",
+          "https://wa.me/77765275553",
+          "https://t.me/Dionis_insurance_broker_bot",
+        ],
       },
       {
         "@type": "WebSite",
