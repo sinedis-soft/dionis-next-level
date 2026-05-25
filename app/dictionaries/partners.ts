@@ -8,19 +8,19 @@ export type PartnerItem = {
 
 export const PARTNERS_DICTIONARY: Record<Lang, PartnerItem[]> = {
   ru: [
-    { logo: "/free-icon-whatsapp-1419525.png", url: "https://www.whatsapp.com/", alt: "Логотип WhatsApp" },
-    { logo: "/free-icon-telegram-1946547.png", url: "https://telegram.org/", alt: "Логотип Telegram" },
-    { logo: "/vercel.svg", url: "https://vercel.com/", alt: "Логотип Vercel" },
+    { logo: "/partners/pasha_sigorta.svg", url: "https://pasha-insurance.az/ru", alt: "Логотип страховой компании ПАША (Азербайджан)" },
+    { logo: "/partners/21vek.svg", url: "https://21-vek.spb.ru/", alt: "Логотип страховой компании 21 век (Россия)" },
+    { logo: "/partners/zetta_group.png", url: "https://zettains.ru/", alt: "Логотип страховой компании Зетта страхование (Россия)" },
   ],
   kz: [
-    { logo: "/free-icon-whatsapp-1419525.png", url: "https://www.whatsapp.com/", alt: "WhatsApp логотипі" },
-    { logo: "/free-icon-telegram-1946547.png", url: "https://telegram.org/", alt: "Telegram логотипі" },
-    { logo: "/vercel.svg", url: "https://vercel.com/", alt: "Vercel логотипі" },
+    { logo: "/partners/pasha_sigorta.svg", url: "https://pasha-insurance.az/ru", alt: "ПАША сақтандыру компаниясының логотипі (Әзірбайжан)" },
+    { logo: "/partners/21vek.svg", url: "https://21-vek.spb.ru/", alt: "21 Век сақтандыру компаниясының логотипі (Ресей)" },
+    { logo: "/partners/zetta_group.png", url: "https://zettains.ru/", alt: "Зетта сақтандыру компаниясының логотипі (Ресей)" },
   ],
   en: [
-    { logo: "/free-icon-whatsapp-1419525.png", url: "https://www.whatsapp.com/", alt: "WhatsApp logo" },
-    { logo: "/free-icon-telegram-1946547.png", url: "https://telegram.org/", alt: "Telegram logo" },
-    { logo: "/vercel.svg", url: "https://vercel.com/", alt: "Vercel logo" },
+    { logo: "/partners/pasha_sigorta.svg", url: "https://pasha-insurance.az/en", alt: "PASHA Insurance company logo (Azerbaijan)" },
+    { logo: "/partners/21vek.svg", url: "https://21-vek.spb.ru/", alt: "21 Vek insurance company logo (Russia)" },
+    { logo: "/partners/zetta_group.png", url: "https://zettains.ru/", alt: "Zetta Insurance company logo (Russia)" },
   ],
 };
 
