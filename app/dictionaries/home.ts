@@ -103,6 +103,14 @@ export type HomeDictionary = {
     logoAlt: string;
   };
 
+  certificates: {
+    title: string;
+    kzAriaLabel: string;
+    kzAlt: string;
+    ruAriaLabel: string;
+    ruAlt: string;
+  };
+
   contact: {
     sectionTitle: string;
     sectionSubtitle: string;
@@ -350,6 +358,14 @@ const ru: HomeDictionary = {
     logoAlt: "Dionis Insurance Broker — Казахстан",
   },
 
+  certificates: {
+    title: "Являемся действительным членом Ассоциации страховщиков Казахстана",
+    kzAriaLabel: "Открыть сертификат на казахском языке в полном размере",
+    kzAlt: "Сертификат на казахском языке",
+    ruAriaLabel: "Открыть сертификат на русском языке в полном размере",
+    ruAlt: "Сертификат на русском языке",
+  },
+
   contact: {
     sectionTitle: "Напишите нам сообщение",
     sectionSubtitle: "Нам важно ваше мнение",
@@ -589,6 +605,14 @@ director: {
     logoAlt: "Dionis Insurance Broker — Қазақстан",
   },
 
+
+  certificates: {
+    title: "Қазақстан сақтандырушылар қауымдастығының жарамды мүшесіміз",
+    kzAriaLabel: "Қазақ тіліндегі сертификатты толық өлшемде ашу",
+    kzAlt: "Қазақ тіліндегі сертификат",
+    ruAriaLabel: "Орыс тіліндегі сертификатты толық өлшемде ашу",
+    ruAlt: "Орыс тіліндегі сертификат",
+  },
 
   contact: {
     sectionTitle: "Бізге хабарлама жазыңыз",
@@ -834,6 +858,14 @@ director: {
     logoAlt: "Dionis Insurance Broker — Kazakhstan",
   },
 
+
+  certificates: {
+    title: "We are an active member of the Association of Insurers of Kazakhstan",
+    kzAriaLabel: "Open the Kazakh-language certificate in full size",
+    kzAlt: "Certificate in Kazakh language",
+    ruAriaLabel: "Open the Russian-language certificate in full size",
+    ruAlt: "Certificate in Russian language",
+  },
 
   contact: {
     sectionTitle: "Send us a message",
