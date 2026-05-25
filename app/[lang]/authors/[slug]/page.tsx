@@ -10,6 +10,10 @@ import AuthorBox from "@/components/blog/AuthorBox";
 import AuthorArticles from "@/components/blog/AuthorArticles";
 
 import { getAuthorBySlug, getArticlesByAuthor } from "@/lib/blog";
+
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.kz"
+).replace(/\/$/, "");
 import { buildAlternates } from "@/lib/seoAlternates";
 
 export const dynamicParams = false;
@@ -74,8 +78,10 @@ export default async function AuthorPage({
     name: author.name,
     jobTitle: author.title,
     description: author.bio,
-    url: `/${lang}/authors/${author.slug}`,
-    image: author.photo ? author.photo : "/authors/default.webp",
+    "@id": `${SITE_URL}/${lang}/authors/${author.slug}#person`,
+    url: `${SITE_URL}/${lang}/authors/${author.slug}`,
+    image: author.photo ? `${SITE_URL}${author.photo}` : `${SITE_URL}/authors/default.webp`,
+    inLanguage: localeByLang(lang),
   };
 
   if (author.linkedin) {

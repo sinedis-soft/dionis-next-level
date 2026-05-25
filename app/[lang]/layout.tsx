@@ -43,6 +43,12 @@ function normalizeLang(value: string): Lang {
     : "ru";
 }
 
+function langToIana(lang: Lang): string {
+  if (lang === "kz") return "kk-KZ";
+  if (lang === "en") return "en-US";
+  return "ru-RU";
+}
+
 function htmlLang(lang: Lang): string {
   if (lang === "kz") return "kk";
   if (lang === "en") return "en";
@@ -116,7 +122,7 @@ export default async function LangLayout({
         publisher: {
           "@id": `${SITE_URL}/#organization`,
         },
-        inLanguage: ["ru", "kk", "en"],
+        inLanguage: [langToIana("ru"), langToIana("kz"), langToIana("en")],
       },
       {
         "@type": "InsuranceAgency",
@@ -129,7 +135,7 @@ export default async function LangLayout({
         description:
           "Licensed insurance broker providing independent insurance brokerage services.",
         areaServed: ["KZ"],
-        knowsLanguage: ["ru", "kk", "en"],
+        knowsLanguage: [langToIana("ru"), langToIana("kz"), langToIana("en")],
       },
     ],
   };

@@ -128,7 +128,7 @@ export default async function BlogArticlePage({
       article.modifiedAt ??
       article.publishedAt,
 
-    inLanguage: lang,
+    inLanguage: localeByLang(lang),
 
     image: {
       "@type": "ImageObject",
@@ -141,16 +141,26 @@ export default async function BlogArticlePage({
       "@type": "WebPage",
       "@id": articleUrl,
     },
+
+    publisher: {
+      "@id": `${SITE_URL}/#organization`,
+    },
   };
 
-  if (author) {
-    jsonLdBase.author = {
-      "@type": "Person",
-      name: author.name,
-      url:
-        `${SITE_URL}/${lang}/authors/${author.slug}`,
-    };
-  }
+  jsonLdBase.author = author
+    ? {
+        "@type": "Person",
+        "@id": `${SITE_URL}/${lang}/authors/${author.slug}#person`,
+        name: author.name,
+        url:
+          `${SITE_URL}/${lang}/authors/${author.slug}`,
+      }
+    : {
+        "@type": "Organization",
+        "@id": `${SITE_URL}/#organization`,
+        name: "Dionis Insurance Broker, LLP",
+        url: SITE_URL,
+      };
 
   const breadcrumbLd = {
     "@context": "https://schema.org",
