@@ -63,6 +63,7 @@ export type ArticleAuthor = {
   bio?: string;
   photo?: string;
   linkedin?: string;
+  sameAs?: string[];
 };
 
 export type TocItem = {
@@ -460,6 +461,7 @@ export async function getAuthorBySlug(
     bio: loc.bio,
     photo: record.photo,
     linkedin: record.linkedin,
+    sameAs: record.sameAs,
   };
 }
 

@@ -7,6 +7,7 @@ import Script from "next/script";
 import { buildAlternates } from "@/lib/seoAlternates";
 
 import type { Lang } from "@/dictionaries/header";
+import { BREADCRUMB_LABELS } from "@/dictionaries/breadcrumbs";
 
 import TableOfContents from "@/components/blog/TableOfContents";
 import ArticleBody from "@/components/blog/ArticleBody";
@@ -39,6 +40,19 @@ function localeByLang(lang: Lang) {
   if (lang === "kz") return "kk-KZ";
   if (lang === "en") return "en-US";
   return "ru-RU";
+}
+
+function absoluteUrl(path?: string): string {
+  if (!path) return `${SITE_URL}/logo_1.webp`;
+  if (
+    path.startsWith("http://") ||
+    path.startsWith("https://")
+  ) {
+    return path;
+  }
+  return `${SITE_URL}${
+    path.startsWith("/") ? path : `/${path}`
+  }`;
 }
 
 export async function generateStaticParams(): Promise<
@@ -111,6 +125,8 @@ export default async function BlogArticlePage({
 
   const articleUrl =
     `${SITE_URL}/${lang}/blog/${article.slug}`;
+  const breadcrumbLabels =
+    BREADCRUMB_LABELS[lang];
 
   const jsonLdBase: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -132,7 +148,7 @@ export default async function BlogArticlePage({
 
     image: {
       "@type": "ImageObject",
-      url: article.image,
+      url: absoluteUrl(article.image),
       width: 1200,
       height: 630,
     },
@@ -152,8 +168,23 @@ export default async function BlogArticlePage({
         "@type": "Person",
         "@id": `${SITE_URL}/${lang}/authors/${author.slug}#person`,
         name: author.name,
+        jobTitle: author.title,
+        description: author.bio,
         url:
           `${SITE_URL}/${lang}/authors/${author.slug}`,
+        image: absoluteUrl(author.photo),
+        sameAs: author.sameAs ?? [],
+        worksFor: {
+          "@type": "Organization",
+          "@id": `${SITE_URL}/#organization`,
+          name: "Dionis Insurance Broker",
+        },
+        knowsAbout: [
+          "Green Card insurance",
+          "Motor third party liability insurance",
+          "International transport insurance",
+          "Border insurance",
+        ],
       }
     : {
         "@type": "Organization",
@@ -170,13 +201,7 @@ export default async function BlogArticlePage({
       {
         "@type": "ListItem",
         position: 1,
-
-        name:
-          lang === "ru"
-            ? "Главная"
-            : lang === "kz"
-            ? "Басты бет"
-            : "Home",
+        name: breadcrumbLabels.home,
 
         item: `${SITE_URL}/${lang}`,
       },
@@ -184,13 +209,7 @@ export default async function BlogArticlePage({
       {
         "@type": "ListItem",
         position: 2,
-
-        name:
-          lang === "ru"
-            ? "Блог"
-            : lang === "kz"
-            ? "Блог"
-            : "Blog",
+        name: breadcrumbLabels.blog,
 
         item:
           `${SITE_URL}/${lang}/blog`,
@@ -276,7 +295,7 @@ export default async function BlogArticlePage({
             className="bp-bc__link"
             href={`/${lang}`}
           >
-            Главная
+            {breadcrumbLabels.home}
           </a>
 
           <span
@@ -290,7 +309,7 @@ export default async function BlogArticlePage({
             className="bp-bc__link"
             href={`/${lang}/blog`}
           >
-            Блог
+            {breadcrumbLabels.blog}
           </a>
 
           <span

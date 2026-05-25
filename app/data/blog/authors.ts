@@ -16,6 +16,7 @@ export type AuthorRecord = {
   slug: string;
   photo?: string;
   linkedin?: string;
+  sameAs?: string[];
   i18n: Record<Lang, LocalizedAuthorFields>;
 };
 
@@ -23,6 +24,7 @@ export const AUTHORS: AuthorRecord[] = [
   {
     slug: "denis-borovoy",
     photo: "/Фон.png",
+    sameAs: ["https://jurist.by/avtor/borovoj-denis"],
     i18n: {
       ru: {
         name: "Денис Боровой",
@@ -53,6 +55,7 @@ export const AUTHORS: AuthorRecord[] = [
   {
     slug: "sergey-anatska",
     photo: "/sergey-anatska.png",
+    sameAs: ["https://www.facebook.com/sergiusz.anacka/"],
     i18n: {
       ru: {
         name: "Сергей Анацко",
