@@ -28,6 +28,13 @@ const nextConfig: NextConfig = {
     imageSizes: [
       16, 24, 32, 40, 48, 64, 70, 96, 128, 140, 160, 200, 224, 256,
     ],
+    qualities: [60, 75, 80],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "dionis-insurance.kz",
+      },
+    ],
     formats: ["image/webp"],
   },
 };
