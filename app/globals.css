@@ -4155,6 +4155,31 @@ input.field:focus, select.field:focus, textarea.field:focus{
   margin-top: 16px;
 }
 
+.hp-partners__track {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .hp-partners__track {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 980px) {
+  .hp-partners__track {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .hp-partners__track {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 .hp-partners__nav {
   width: 40px;
   height: 40px;
@@ -4167,7 +4192,7 @@ input.field:focus, select.field:focus, textarea.field:focus{
 
 .hp-partners__logoLink {
   min-height: 120px;
-  min-width: 280px;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;

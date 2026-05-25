@@ -93,10 +93,31 @@ export default function HomeClient({ lang, t, agreement }: Props) {
 
   const partners = useMemo(() => getPartnersDictionary(lang), [lang]);
   const [activePartner, setActivePartner] = useState(0);
+  const [visiblePartnersCount, setVisiblePartnersCount] = useState(1);
 
   useEffect(() => {
     setActivePartner(0);
   }, [lang]);
+
+  useEffect(() => {
+    const updateVisiblePartnersCount = () => {
+      const width = window.innerWidth;
+      if (width < 640) {
+        setVisiblePartnersCount(1);
+      } else if (width < 980) {
+        setVisiblePartnersCount(2);
+      } else if (width < 1280) {
+        setVisiblePartnersCount(3);
+      } else {
+        setVisiblePartnersCount(4);
+      }
+    };
+
+    updateVisiblePartnersCount();
+    window.addEventListener("resize", updateVisiblePartnersCount);
+
+    return () => window.removeEventListener("resize", updateVisiblePartnersCount);
+  }, []);
 
   useEffect(() => {
     if (partners.length <= 1) return;
@@ -115,6 +136,13 @@ export default function HomeClient({ lang, t, agreement }: Props) {
   const showNextPartner = () => {
     setActivePartner((prev) => (prev + 1) % partners.length);
   };
+
+  const visiblePartners = useMemo(() => {
+    if (partners.length === 0) return [];
+
+    const count = Math.min(visiblePartnersCount, partners.length);
+    return Array.from({ length: count }, (_, offset) => partners[(activePartner + offset) % partners.length]);
+  }, [activePartner, partners, visiblePartnersCount]);
 
   const otherServices = useMemo(
     () =>
@@ -346,16 +374,26 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                   ←
                 </button>
 
-                <a href={partners[activePartner].url} target="_blank" rel="noopener noreferrer" className="hp-partners__logoLink">
-                  <Image
-                    src={partners[activePartner].logo}
-                    alt={partners[activePartner].alt}
-                    width={260}
-                    height={100}
-                    loading="lazy"
-                    className="hp-partners__logo"
-                  />
-                </a>
+                <div className="hp-partners__track">
+                  {visiblePartners.map((partner) => (
+                    <a
+                      key={`${partner.url}-${partner.logo}`}
+                      href={partner.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hp-partners__logoLink"
+                    >
+                      <Image
+                        src={partner.logo}
+                        alt={partner.alt}
+                        width={260}
+                        height={100}
+                        loading="lazy"
+                        className="hp-partners__logo"
+                      />
+                    </a>
+                  ))}
+                </div>
 
                 <button type="button" className="hp-partners__nav" onClick={showNextPartner} aria-label={t.partners.nextAriaLabel}>
                   →
