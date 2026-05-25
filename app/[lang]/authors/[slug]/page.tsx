@@ -10,6 +10,7 @@ import AuthorBox from "@/components/blog/AuthorBox";
 import AuthorArticles from "@/components/blog/AuthorArticles";
 
 import { getAuthorBySlug, getArticlesByAuthor } from "@/lib/blog";
+import { buildAlternates } from "@/lib/seoAlternates";
 
 export const dynamicParams = false;
 
@@ -50,7 +51,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: `/${lang}/authors/${author.slug}` },
+    alternates: buildAlternates(lang, `/authors/${author.slug}`),
     openGraph: { title, description, type: "profile" },
   };
 }

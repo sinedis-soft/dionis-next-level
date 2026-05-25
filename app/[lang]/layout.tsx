@@ -67,7 +67,7 @@ export async function generateMetadata({
         ru: `${SITE_URL}/ru`,
         "kk-KZ": `${SITE_URL}/kz`,
         en: `${SITE_URL}/en`,
-        "x-default": `${SITE_URL}/ru`,
+        "x-default": `${SITE_URL}`,
       },
     },
   };

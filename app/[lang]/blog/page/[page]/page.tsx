@@ -1,58 +1,62 @@
-// app/[lang]/blog/page.tsx
 import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import type { Lang } from "@/dictionaries/header";
 
-import { getBlogPagination, getBlogPagePath } from "@/lib/blogPagination";
-import Link from "next/link";
 import BlogGrid from "@/components/blog/BlogGrid";
 import { getBlogDictionary } from "@/dictionaries/blog";
 import { buildAlternates } from "@/lib/seoAlternates";
+import { BLOG_PAGE_SIZE, getBlogPagination, getBlogPagePath } from "@/lib/blogPagination";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
 const ALLOWED_LANGS: Lang[] = ["ru", "kz", "en"];
 
 function normalizeLang(value: string): Lang {
-  return (ALLOWED_LANGS as readonly string[]).includes(value)
-    ? (value as Lang)
-    : "ru";
+  return (ALLOWED_LANGS as readonly string[]).includes(value) ? (value as Lang) : "ru";
 }
 
-export const dynamicParams = false;
-
-export function generateStaticParams() {
-  return ALLOWED_LANGS.map((lang) => ({ lang }));
+function normalizePage(value: string): number {
+  const num = Number(value);
+  if (!Number.isInteger(num) || num < 2) return 2;
+  return num;
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ lang: string }>;
+  params: Promise<{ lang: string; page: string }>;
 }): Promise<Metadata> {
-  const { lang: rawLang } = await params;
+  const { lang: rawLang, page: rawPage } = await params;
   const lang = normalizeLang(rawLang);
+  const page = normalizePage(rawPage);
   const dict = getBlogDictionary(lang);
 
   return {
-    title: dict.title,
+    title: `${dict.title} — Page ${page}`,
     description: dict.description,
-    alternates: buildAlternates(lang, "/blog"),
+    alternates: buildAlternates(lang, `/blog/page/${page}`),
   };
 }
 
-export default async function BlogIndexPage({
+export default async function BlogPaginatedPage({
   params,
 }: {
-  params: Promise<{ lang: string }>;
+  params: Promise<{ lang: string; page: string }>;
 }) {
-  const { lang: rawLang } = await params;
+  const { lang: rawLang, page: rawPage } = await params;
   const lang = normalizeLang(rawLang);
+  const page = normalizePage(rawPage);
 
   const [{ articles, totalPages }, dict] = await Promise.all([
     getBlogPagination(lang),
     Promise.resolve(getBlogDictionary(lang)),
   ]);
 
-  const pageArticles = articles.slice(0, 12);
+  if (page > totalPages) return notFound();
+
+  const start = (page - 1) * BLOG_PAGE_SIZE;
+  const end = start + BLOG_PAGE_SIZE;
+  const pageArticles = articles.slice(start, end);
 
   return (
     <main className="bi-page">
@@ -62,7 +66,8 @@ export default async function BlogIndexPage({
             lang={lang}
             items={[
               { label: lang === "ru" ? "Главная" : lang === "kz" ? "Басты бет" : "Home", href: `/${lang}` },
-              { label: lang === "ru" ? "Блог" : "Blog" },
+              { label: lang === "ru" ? "Блог" : "Blog", href: `/${lang}/blog` },
+              { label: `Page ${page}` },
             ]}
           />
           <header className="bi-head">
@@ -80,13 +85,19 @@ export default async function BlogIndexPage({
               }}
             />
           </div>
-                  {totalPages > 1 ? (
-            <nav className="bi-pagination" aria-label="Blog pagination">
-              <Link href={getBlogPagePath(lang, 2)} rel="next">
+
+          <nav className="bi-pagination" aria-label="Blog pagination">
+            {page > 1 ? (
+              <Link href={getBlogPagePath(lang, page - 1)} rel="prev">
+                Previous page
+              </Link>
+            ) : null}
+            {page < totalPages ? (
+              <Link href={getBlogPagePath(lang, page + 1)} rel="next">
                 Next page
               </Link>
-            </nav>
-          ) : null}
+            ) : null}
+          </nav>
         </section>
       </div>
     </main>

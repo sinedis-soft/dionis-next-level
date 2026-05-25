@@ -7,6 +7,7 @@ import { getHomeDictionary } from "@/dictionaries/home";
 import { getAgreementDictionary } from "@/dictionaries/agreement";
 
 import ContactSection from "@/components/ContactSection";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { buildAlternates } from "@/lib/seoAlternates";
 
 export const dynamicParams = false;
@@ -87,6 +88,13 @@ export default async function ContactsPage({
     <main className="cp-page">
       <section className="cp-top">
         <div className="gc-container">
+          <Breadcrumbs
+            lang={lang}
+            items={[
+              { label: lang === "ru" ? "Главная" : lang === "kz" ? "Басты бет" : "Home", href: `/${lang}` },
+              { label: titles[lang] },
+            ]}
+          />
           <h1 className="cp-title">{keepShortWords(titles[lang])}</h1>
 
           <div className="cp-lead">

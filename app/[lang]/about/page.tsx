@@ -11,6 +11,7 @@ import { getAgreementDictionary } from "@/dictionaries/agreement";
 import { buildAlternates } from "@/lib/seoAlternates";
 
 import AboutPage from "@/components/AboutPage";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 const ALLOWED_LANGS: Lang[] = ["ru", "kz", "en"];
 
@@ -53,11 +54,22 @@ export default async function Page({
   const agreement = getAgreementDictionary(lang);
 
   return (
-    <AboutPage
+    <main>
+      <div className="gc-container" style={{ paddingTop: "16px" }}>
+        <Breadcrumbs
+          lang={lang}
+          items={[
+            { label: lang === "ru" ? "Главная" : lang === "kz" ? "Басты бет" : "Home", href: `/${lang}` },
+            { label: t.pageTitle },
+          ]}
+        />
+      </div>
+      <AboutPage
       lang={lang}
       t={t}
       contact={home.contact}
       agreement={agreement}
     />
+    </main>
   );
 }

@@ -23,7 +23,9 @@ export function buildAlternates(lang: Lang, path = "") {
     languages[HREFLANG_MAP[l]] = `${SITE_URL}/${l}${cleanPath}`;
   }
 
-  languages["x-default"] = `${SITE_URL}/ru${cleanPath}`;
+  // x-default should point to a neutral entry URL (or language chooser).
+  // Here root redirects to /ru, so we keep x-default at the site root.
+  languages["x-default"] = `${SITE_URL}${cleanPath}`;
 
   return {
     canonical: `${SITE_URL}/${lang}${cleanPath}`,
