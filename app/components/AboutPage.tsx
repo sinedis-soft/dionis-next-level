@@ -14,21 +14,19 @@ type Props = {
   agreement: AgreementDictionary;
 };
 
-function FeatureCard({ title, text }: { title: string; text: string }) {
+function FeatureCard({ title, text, index }: { title: string; text: string; index: number }) {
   return (
-    <div className="u-rounded-2xl u-bg-white u-border u-border-gray-100 u-shadow-sm u-p-6">
-      <h3 className="u-text-sm u-sm-text-base u-font-extrabold u-tracking-wide u-text-gray-900">
-        {title}
-      </h3>
-      <p className="u-mt-3 u-text-sm u-sm-text-base u-leading-relaxed u-text-gray-600">
-        {text}
-      </p>
-    </div>
+    <article className="about-featureCard">
+      <div className="about-featureCard__index" aria-hidden="true">
+        {String(index + 1).padStart(2, "0")}
+      </div>
+      <h3 className="about-featureCard__title">{title}</h3>
+      <p className="about-featureCard__text">{text}</p>
+    </article>
   );
 }
 
 function LegalBody({ lines }: { lines: string[] }) {
-  // группируем подряд идущие "• " в один список
   const blocks: Array<
     | { type: "spacer"; key: string }
     | { type: "p"; key: string; text: string }
@@ -67,28 +65,22 @@ function LegalBody({ lines }: { lines: string[] }) {
   flushBuf("end");
 
   return (
-    <div className="u-text-sm u-sm-text-base u-text-gray-700 u-leading-relaxed">
+    <div className="about-legalBody">
       {blocks.map((b) => {
-        if (b.type === "spacer") return <div key={b.key} className="u-h-3" />;
+        if (b.type === "spacer") return <div key={b.key} className="about-legalBody__spacer" />;
 
         if (b.type === "ul") {
           return (
-            <ul key={b.key} className="u-list-disc u-pl-5 u-text-gray-700 u-my-2">
+            <ul key={b.key} className="about-legalBody__list">
               {b.items.map((it, idx) => (
-                <li key={`${b.key}-${idx}`} className="u-text-left">
-                  {it}
-                </li>
+                <li key={`${b.key}-${idx}`}>{it}</li>
               ))}
             </ul>
           );
         }
 
         return (
-          <p
-            key={b.key}
-            className="u-my-2 u-text-justify u-hyphens-auto"
-            style={{ textAlign: "justify", textJustify: "inter-word" }}
-          >
+          <p key={b.key} className="about-legalBody__paragraph">
             {b.text}
           </p>
         );
@@ -98,81 +90,102 @@ function LegalBody({ lines }: { lines: string[] }) {
 }
 
 export default function AboutPage({ t, lang, contact, agreement }: Props) {
+  const primaryFeature = t.about.features[0];
+  const secondaryFeature = t.about.features[1];
+  const legalHighlights = t.legal.headerLines.slice(0, 5);
+  const trustItems = [primaryFeature?.title, secondaryFeature?.title, t.legal.orgTitle].filter(
+    (item): item is string => Boolean(item)
+  );
+
   return (
     <>
-      <section className="u-py-10 u-sm-py-14 u-bg-gray-50">
+      <section className="about-page" aria-labelledby="about-page-title">
         <div className="gc-container">
-          <h1 className="u-text-3xl u-sm-text-4xl u-font-bold u-text--1a3a5f">
-            {t.pageTitle}
-          </h1>
+          <div className="about-hero">
+            <div className="about-hero__content">
+              <p className="about-hero__eyebrow">{t.about.leadTitle}</p>
+              <h1 id="about-page-title" className="about-hero__title">
+                {t.pageTitle}
+              </h1>
+              <p className="about-hero__lead">{t.about.cta}</p>
 
-          <div className="u-mt-10 u-sm-mt-12">
-            <div className="u-grid u-grid-cols-1 u-lg-grid-cols-12 u-gap-6 u-lg-gap-10 u-items-start">
-              <div className="u-lg-col-span-3">
-                <h2 className="u-text-2xl u-sm-text-3xl u-font-extrabold u-text-gray-900">
-                  {t.about.leadTitle}
-                </h2>
-
-                <div className="u-mt-6 u-flex u-justify-center u-lg-justify-start u-lg-mt-12">
-                  <Image
-                    src="/dionis-crkl_2_960x960.webp"
-                    alt="Dionis Insurance emblem"
-                    width={280}
-                    height={280}
-                    quality={70}
-                    loading="lazy"
-                    sizes="(max-width: 1024px) 160px, 220px"
-                    className="u-opacity-90"
-                  />
-                </div>
-              </div>
-
-              <div className="u-lg-col-span-9">
-                <div className="u-grid u-grid-cols-1 u-md-grid-cols-2 u-gap-6">
-                  {t.about.features.map((f, idx) => (
-                    <FeatureCard
-                      key={`${f.title}-${idx}`}
-                      title={f.title}
-                      text={f.text}
-                    />
-                  ))}
-                </div>
-
-                <div className="u-mt-8">
-                  <p className="u-text-base u-sm-text-lg u-font-semibold u-text-gray-900">
-                    {t.about.cta}
-                  </p>
-                </div>
+              <div className="about-hero__actions" aria-label={t.about.leadTitle}>
+                <a href="#about-contact" className="btn btn-primary about-hero__button" role="button">
+                  {contact.sectionTitle}
+                </a>
+                <a href="#about-legal" className="btn btn-ghost about-hero__button" role="button">
+                  {primaryFeature?.title ?? t.legal.orgTitle}
+                </a>
               </div>
             </div>
+
+            <aside className="about-hero__proof" aria-label={t.legal.orgTitle}>
+              <div className="about-hero__logoWrap">
+                <Image
+                  src="/dionis-crkl_2_960x960.webp"
+                  alt="Dionis Insurance emblem"
+                  width={220}
+                  height={220}
+                  quality={70}
+                  loading="lazy"
+                  sizes="(max-width: 640px) 112px, 160px"
+                  className="about-hero__logo"
+                />
+              </div>
+              <div className="about-hero__proofText">
+                <strong>{t.legal.orgTitle}</strong>
+                <ul>
+                  {legalHighlights.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+              </div>
+            </aside>
           </div>
 
-          <div className="u-mt-12 u-sm-mt-16">
-            <div className="u-rounded-2xl u-bg-white u-border u-border-gray-100 u-shadow-sm u-p-6 u-sm-p-8">
-              <h2 className="u-text-xl u-sm-text-2xl u-font-extrabold u-text-gray-900">
-                {t.legal.orgTitle}
-              </h2>
+          <div className="about-featureGrid" aria-label={t.about.leadTitle}>
+            {t.about.features.map((f, idx) => (
+              <FeatureCard key={`${f.title}-${idx}`} title={f.title} text={f.text} index={idx} />
+            ))}
+          </div>
 
-              <div className="u-mt-5 u-text-sm u-sm-text-base u-text-gray-700 u-leading-relaxed">
+          <div className="about-trustStrip" aria-label={t.about.leadTitle}>
+            {trustItems.map((item) => (
+              <div key={item} className="about-trustStrip__item">
+                {item}
+              </div>
+            ))}
+          </div>
+
+          <section id="about-legal" className="about-legal" aria-labelledby="about-legal-title">
+            <div className="about-legal__head">
+              <div>
+                <p className="about-legal__eyebrow">{t.pageTitle}</p>
+                <h2 id="about-legal-title" className="about-legal__title">
+                  {t.legal.orgTitle}
+                </h2>
+              </div>
+
+              <div className="about-legal__summary">
                 {t.legal.headerLines.map((line, i) => (
                   <p key={i}>{line}</p>
                 ))}
               </div>
-
-              <hr className="u-my-6 u-border-gray-200" />
-
-              <LegalBody lines={t.legal.body} />
             </div>
-          </div>
+
+            <LegalBody lines={t.legal.body} />
+          </section>
         </div>
       </section>
 
-      <ContactSection
-        contact={contact}
-        agreement={agreement}
-        imageSrc="/laiter(1).png"
-        context={`about-${lang}`}
-      />
+      <div id="about-contact">
+        <ContactSection
+          contact={contact}
+          agreement={agreement}
+          imageSrc="/laiter(1).png"
+          context={`about-${lang}`}
+        />
+      </div>
     </>
   );
 }

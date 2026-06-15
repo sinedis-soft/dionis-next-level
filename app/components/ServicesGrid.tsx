@@ -20,7 +20,7 @@ export default function ServicesGrid({
       </div>
 
       <div className="svc-grid">
-        {items.map((service) => (
+        {items.map((service, index) => (
           <article key={service.key} className="card card-static svc-card">
             <div className="svc-card__media">
               <Image
@@ -35,6 +35,9 @@ export default function ServicesGrid({
             </div>
 
             <div className="svc-card__body">
+              <div className="svc-card__kicker" aria-hidden="true">
+                {String(index + 1).padStart(2, "0")}
+              </div>
               <h4 className="svc-card__title">{service.title}</h4>
 
               <ul className="svc-card__list">
