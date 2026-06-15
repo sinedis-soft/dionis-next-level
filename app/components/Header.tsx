@@ -135,12 +135,12 @@ export default function Header({ lang }: { lang: Lang }) {
             <Image src="/logo_1.webp" alt="Dionis Insurance" width={56} height={56} priority />
           </Link>
 
-          <nav className="hdr__nav" aria-label="Primary navigation">
-            <Link href={base} className={cx("hdr__link", isActive(base) && "is-active")}>
+          <nav className="hdr__nav" aria-label={t.primaryNavAria}>
+            <Link href={base} className={cx("hdr__link", isActive(base) && "is-active")} aria-current={isActive(base) ? "page" : undefined}>
               {t.home}
             </Link>
 
-            <Link href={`${base}/about`} className={cx("hdr__link", isActive(`${base}/about`) && "is-active")}>
+            <Link href={`${base}/about`} className={cx("hdr__link", isActive(`${base}/about`) && "is-active")} aria-current={isActive(`${base}/about`) ? "page" : undefined}>
               {t.about}
             </Link>
 
@@ -164,6 +164,7 @@ export default function Header({ lang }: { lang: Lang }) {
                     href={`${base}/green-card`}
                     className={cx("hdr__dditem", isActive(`${base}/green-card`) && "is-active")}
                     role="menuitem"
+                    aria-current={isActive(`${base}/green-card`) ? "page" : undefined}
                     onClick={() => setInsuranceDesktopOpen(false)}
                   >
                     {t.greenCard}
@@ -173,6 +174,7 @@ export default function Header({ lang }: { lang: Lang }) {
                     href={`${base}/osago-rf`}
                     className={cx("hdr__dditem", isActive(`${base}/osago-rf`) && "is-active")}
                     role="menuitem"
+                    aria-current={isActive(`${base}/osago-rf`) ? "page" : undefined}
                     onClick={() => setInsuranceDesktopOpen(false)}
                   >
                     {t.osagoRu}
@@ -182,6 +184,7 @@ export default function Header({ lang }: { lang: Lang }) {
                     href={`${base}/products`}
                     className={cx("hdr__dditem", isActive(`${base}/products`) && "is-active")}
                     role="menuitem"
+                    aria-current={isActive(`${base}/products`) ? "page" : undefined}
                     onClick={() => setInsuranceDesktopOpen(false)}
                   >
                     {t.allProducts}
@@ -190,35 +193,35 @@ export default function Header({ lang }: { lang: Lang }) {
               )}
             </div>
 
-            <Link href={`${base}/blog`} className={cx("hdr__link", isActive(`${base}/blog`) && "is-active")}>
+            <Link href={`${base}/blog`} className={cx("hdr__link", isActive(`${base}/blog`) && "is-active")} aria-current={isActive(`${base}/blog`) ? "page" : undefined}>
               {t.blog}
             </Link>
 
-            <Link href={`${base}/contacts`} className={cx("hdr__link", isActive(`${base}/contacts`) && "is-active")}>
+            <Link href={`${base}/contacts`} className={cx("hdr__link", "hdr__link--contact", isActive(`${base}/contacts`) && "is-active")} aria-current={isActive(`${base}/contacts`) ? "page" : undefined}>
               {t.contacts}
             </Link>
           </nav>
 
           <div className="hdr__right">
-            <a href="tel:+77273573030" className="hdr__phone">
+            <a href="tel:+77273573030" className="hdr__phone" aria-label={t.phoneAria}>
               +7 (727) 357-30-30
             </a>
 
             <div className="hdr__rightRow">
-              <a href="https://wa.me/77765275553" target="_blank" rel="noopener noreferrer" className="hdr__icon">
-                <Image src="/wa.webp" alt="WhatsApp" width={26} height={26} />
+              <a href="https://wa.me/77765275553" target="_blank" rel="noopener noreferrer" className="hdr__icon" aria-label="WhatsApp">
+                <Image src="/wa.webp" alt="" width={26} height={26} />
               </a>
 
               <a
                 href="https://t.me/Dionis_insurance_broker_bot"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hdr__icon"
+                className="hdr__icon" aria-label="Telegram"
               >
-                <Image src="/tg.webp" alt="Telegram" width={22} height={22} />
+                <Image src="/tg.webp" alt="" width={22} height={22} />
               </a>
 
-              <div className="hdr__langs" aria-label="Language switcher">
+              <div className="hdr__langs" aria-label={t.langSwitcherAria}>
                 <Link href={buildLangUrl("ru")} className={cx("hdr__lang", lang === "ru" && "is-active")}>
                   RU
                 </Link>
@@ -235,11 +238,10 @@ export default function Header({ lang }: { lang: Lang }) {
           <button
             className="hdr__burger"
             onClick={() => setMenuOpen(true)}
-            aria-label="Open menu"
+            aria-label={t.openMenuAria}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             type="button"
-            disabled={menuOpen}
           >
             <span className="hdr__burgerLines" aria-hidden="true">
               <span />
@@ -251,24 +253,24 @@ export default function Header({ lang }: { lang: Lang }) {
       </div>
 
       {menuOpen && (
-        <div id="mobile-menu" className="mnav" role="dialog" aria-modal="true" aria-label="Mobile menu">
-          <button className="mnav__overlay" aria-label="Close menu" onClick={() => setMenuOpen(false)} />
+        <div id="mobile-menu" className="mnav" role="dialog" aria-modal="true" aria-label={t.mobileNavAria}>
+          <button className="mnav__overlay" aria-label={t.closeMenuAria} onClick={() => setMenuOpen(false)} />
 
           <div className="mnav__panel">
             <div className="mnav__top">
-              <span className="mnav__brand">Dionis Insurance</span>
-              <button className="mnav__close" onClick={() => setMenuOpen(false)} aria-label="Close" type="button">
+              <span className="mnav__brand"><Image src="/logo_1.webp" alt="" width={34} height={34} />Dionis Insurance</span>
+              <button className="mnav__close" onClick={() => setMenuOpen(false)} aria-label={t.closeMenuAria} type="button">
                 ✕
               </button>
             </div>
 
             <div className="mnav__content">
-              <nav className="mnav__links" aria-label="Mobile navigation">
-                <Link href={base} className={cx("mnav__link", isActive(base) && "is-active")} onClick={() => setMenuOpen(false)}>
+              <nav className="mnav__links" aria-label={t.mobileNavAria}>
+                <Link href={base} className={cx("mnav__link", isActive(base) && "is-active")} aria-current={isActive(base) ? "page" : undefined} onClick={() => setMenuOpen(false)}>
                   {t.home}
                 </Link>
 
-                <Link href={`${base}/about`} className={cx("mnav__link", isActive(`${base}/about`) && "is-active")} onClick={() => setMenuOpen(false)}>
+                <Link href={`${base}/about`} className={cx("mnav__link", isActive(`${base}/about`) && "is-active")} aria-current={isActive(`${base}/about`) ? "page" : undefined} onClick={() => setMenuOpen(false)}>
                   {t.about}
                 </Link>
 
@@ -278,49 +280,53 @@ export default function Header({ lang }: { lang: Lang }) {
                     className="mnav__accBtn"
                     onClick={() => setInsuranceMobileOpen((p) => !p)}
                     aria-expanded={insuranceMobileOpen}
+                    aria-controls="mnav-insurance-list"
                   >
                     <span className="mnav__accTitle">{t.insurances}</span>
                     <span className={cx("mnav__accCaret", insuranceMobileOpen && "is-open")}>▾</span>
                   </button>
 
                   {insuranceMobileOpen && (
-                    <div className="mnav__accBody">
-                      <Link href={`${base}/green-card`} className="mnav__sublink" onClick={() => setMenuOpen(false)}>
+                    <div id="mnav-insurance-list" className="mnav__accBody">
+                      <Link href={`${base}/green-card`} className={cx("mnav__sublink", isActive(`${base}/green-card`) && "is-active")} aria-current={isActive(`${base}/green-card`) ? "page" : undefined} onClick={() => setMenuOpen(false)}>
                         {t.greenCard}
                       </Link>
-                      <Link href={`${base}/osago-rf`} className="mnav__sublink" onClick={() => setMenuOpen(false)}>
+                      <Link href={`${base}/osago-rf`} className={cx("mnav__sublink", isActive(`${base}/osago-rf`) && "is-active")} aria-current={isActive(`${base}/osago-rf`) ? "page" : undefined} onClick={() => setMenuOpen(false)}>
                         {t.osagoRu}
                       </Link>
-                      <Link href={`${base}/products`} className="mnav__sublink" onClick={() => setMenuOpen(false)}>
+                      <Link href={`${base}/products`} className={cx("mnav__sublink", isActive(`${base}/products`) && "is-active")} aria-current={isActive(`${base}/products`) ? "page" : undefined} onClick={() => setMenuOpen(false)}>
                         {t.allProducts}
                       </Link>
                     </div>
                   )}
                 </div>
 
-                <Link href={`${base}/blog`} className={cx("mnav__link", isActive(`${base}/blog`) && "is-active")} onClick={() => setMenuOpen(false)}>
+                <Link href={`${base}/blog`} className={cx("mnav__link", isActive(`${base}/blog`) && "is-active")} aria-current={isActive(`${base}/blog`) ? "page" : undefined} onClick={() => setMenuOpen(false)}>
                   {t.blog}
                 </Link>
 
-                <Link href={`${base}/contacts`} className={cx("mnav__link", isActive(`${base}/contacts`) && "is-active")} onClick={() => setMenuOpen(false)}>
+                <Link href={`${base}/contacts`} className={cx("mnav__link", "mnav__link--contact", isActive(`${base}/contacts`) && "is-active")} aria-current={isActive(`${base}/contacts`) ? "page" : undefined} onClick={() => setMenuOpen(false)}>
                   {t.contacts}
                 </Link>
               </nav>
 
               <div className="mnav__box">
-                <a href="tel:+77273573030" className="mnav__phone">
+                <div className="mnav__boxTitle">{t.contactChannels}</div>
+                <a href="tel:+77273573030" className="mnav__phone" aria-label={t.phoneAria}>
                   +7 (727) 357-30-30
                 </a>
 
+                <div className="mnav__meta">{t.workTime}<br />{t.addressLine}</div>
+
                 <div className="mnav__icons">
-                  <a href="https://wa.me/77765275553" target="_blank" rel="noopener noreferrer" className="mnav__icon">
-                    <Image src="/wa.webp" width={28} height={28} alt="WhatsApp" />
+                  <a href="https://wa.me/77765275553" target="_blank" rel="noopener noreferrer" className="mnav__icon" aria-label="WhatsApp">
+                    <Image src="/wa.webp" width={28} height={28} alt="" />
                   </a>
-                  <a href="https://t.me/Dionis_insurance_broker_bot" target="_blank" rel="noopener noreferrer" className="mnav__icon">
-                    <Image src="/tg.webp" width={28} height={28} alt="Telegram" />
+                  <a href="https://t.me/Dionis_insurance_broker_bot" target="_blank" rel="noopener noreferrer" className="mnav__icon" aria-label="Telegram">
+                    <Image src="/tg.webp" width={28} height={28} alt="" />
                   </a>
 
-                  <div className="mnav__langs" aria-label="Language switcher">
+                  <div className="mnav__langs" aria-label={t.langSwitcherAria}>
                     <Link href={buildLangUrl("ru")} className={cx("mnav__lang", lang === "ru" && "is-active")} onClick={() => setMenuOpen(false)}>
                       RU
                     </Link>
