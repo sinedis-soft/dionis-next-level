@@ -55,7 +55,7 @@ export default async function Page({
 
   return (
     <main>
-      <div className="gc-container" style={{ paddingTop: "16px" }}>
+      <div className="gc-container about-breadcrumbs">
         <Breadcrumbs
           lang={lang}
           items={[
@@ -65,11 +65,11 @@ export default async function Page({
         />
       </div>
       <AboutPage
-      lang={lang}
-      t={t}
-      contact={home.contact}
-      agreement={agreement}
-    />
+        lang={lang}
+        t={t}
+        contact={home.contact}
+        agreement={agreement}
+      />
     </main>
   );
 }
