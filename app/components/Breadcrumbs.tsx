@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Script from "next/script";
 import type { Lang } from "@/dictionaries/header";
+import { BREADCRUMB_LABELS } from "@/dictionaries/breadcrumbs";
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.kz").replace(/\/$/, "");
 
@@ -24,7 +25,7 @@ export default function Breadcrumbs({ lang, items }: { lang: Lang; items: Breadc
   return (
     <>
       <Script id={`ld-breadcrumbs-${lang}-${items.map((i) => i.label).join("-")}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <nav aria-label="Breadcrumb" className="ap-bc">
+      <nav aria-label={BREADCRUMB_LABELS[lang].ariaLabel} className="ap-bc">
         {items.map((item, idx) => {
           const isLast = idx === items.length - 1;
           return (
