@@ -1,15 +1,16 @@
 type Props = {
+  title: string;
   version?: string;
   changes?: string[];
 };
 
-export default function Changelog({ version, changes }: Props) {
+export default function Changelog({ title, version, changes }: Props) {
   if (!version && (!changes || changes.length === 0)) return null;
 
   return (
     <section className="u-mt-16 u-rounded-2xl u-border u-border-slate-200 u-bg-slate-50 u-p-6">
       <div className="u-mb-3 u-text-sm u-font-semibold u-text-slate-700">
-        История обновлений
+        {title}
         {version && (
           <span className="u-ml-2 u-rounded u-bg-slate-200 u-px-2 u-py-0-5 u-text-xs">
             v{version}

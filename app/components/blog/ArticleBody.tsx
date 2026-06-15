@@ -6,6 +6,8 @@ import type { Lang } from "@/dictionaries/header";
 import ContentStatus from "@/components/blog/mdx/blocks/ContentStatus";
 import UpdateNotice from "@/components/blog/mdx/blocks/UpdateNotice";
 import ScopeNote from "@/components/blog/mdx/blocks/ScopeNote";
+import FromPractice from "@/components/blog/mdx/blocks/FromPractice";
+import KeyTakeaway from "@/components/blog/mdx/blocks/KeyTakeaway";
 
 type Props = {
   children: ReactNode;
@@ -18,6 +20,8 @@ const LANG_AWARE_TYPES = new Set<any>([
   ContentStatus,
   UpdateNotice,
   ScopeNote,
+  FromPractice,
+  KeyTakeaway,
   // добавляй сюда другие блоки при необходимости
 ]);
 

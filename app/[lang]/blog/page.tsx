@@ -8,6 +8,7 @@ import BlogGrid from "@/components/blog/BlogGrid";
 import { getBlogDictionary } from "@/dictionaries/blog";
 import { buildAlternates } from "@/lib/seoAlternates";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { BREADCRUMB_LABELS } from "@/dictionaries/breadcrumbs";
 
 const ALLOWED_LANGS: Lang[] = ["ru", "kz", "en"];
 
@@ -46,6 +47,7 @@ export default async function BlogIndexPage({
 }) {
   const { lang: rawLang } = await params;
   const lang = normalizeLang(rawLang);
+  const breadcrumbLabels = BREADCRUMB_LABELS[lang];
 
   const [{ articles, totalPages }, dict] = await Promise.all([
     getBlogPagination(lang),
@@ -61,13 +63,18 @@ export default async function BlogIndexPage({
           <Breadcrumbs
             lang={lang}
             items={[
-              { label: lang === "ru" ? "Главная" : lang === "kz" ? "Басты бет" : "Home", href: `/${lang}` },
-              { label: lang === "ru" ? "Блог" : "Blog" },
+              { label: breadcrumbLabels.home, href: `/${lang}` },
+              { label: dict.title },
             ]}
           />
           <header className="bi-head">
             <h1 className="bi-title">{dict.title}</h1>
             <p className="bi-desc">{dict.description}</p>
+            <div className="bi-facts" aria-label={dict.title}>
+              {dict.heroFacts.map((fact) => (
+                <span key={fact}>{fact}</span>
+              ))}
+            </div>
           </header>
 
           <div className="bi-grid">
@@ -80,10 +87,11 @@ export default async function BlogIndexPage({
               }}
             />
           </div>
-                  {totalPages > 1 ? (
-            <nav className="bi-pagination" aria-label="Blog pagination">
+
+          {totalPages > 1 ? (
+            <nav className="bi-pagination" aria-label={dict.paginationLabel}>
               <Link href={getBlogPagePath(lang, 2)} rel="next">
-                Next page
+                {dict.nextPage}
               </Link>
             </nav>
           ) : null}
