@@ -4947,6 +4947,7 @@ input.field:focus, select.field:focus, textarea.field:focus{
   .pr-product-card__media{ background:rgba(255,255,255,.06); }
 }
 
+
 /* Blog UX refresh */
 .bi-page{
   background:
@@ -5029,3 +5030,4 @@ input.field:focus, select.field:focus, textarea.field:focus{
   .bp-lead, .bc-excerpt, .bp-relcard__text{ color:rgba(255,255,255,.74); }
   .bp-head__media{ background:rgba(255,255,255,.06); }
 }
+
