@@ -4,10 +4,6 @@ import type { Lang } from "@/dictionaries/header";
 import type { ProductsPageUI } from "@/dictionaries/products";
 import { getCargoProductsSectionDictionary } from "@/dictionaries/products/cargoProductsSection";
 
-function cx(...c: Array<string | false | null | undefined>) {
-  return c.filter(Boolean).join(" ");
-}
-
 type Props = {
   lang: Lang;
   base: string;
