@@ -20,12 +20,22 @@ export type BenefitCard = {
 
 export type HomeDictionary = {
   hero: {
+    eyebrow: string;
     title: string;
     subtitle: string;
     greenCardBtn: string;
     osagoBtn: string;
     otherBtn: string;
     heroAlt: string;
+    actionsAriaLabel: string;
+    trustAriaLabel: string;
+    trustBadges: string[];
+    routeCard: {
+      label: string;
+      title: string;
+      items: string[];
+      note: string;
+    };
   };
 
   benefits: {
@@ -143,13 +153,23 @@ export type HomeDictionary = {
 
 const ru: HomeDictionary = {
   hero: {
-    title: "Страховой брокер в Казахстане\nдля частных лиц и бизнеса",
+    eyebrow: "Официальный страховой брокер • Алматы",
+    title: "Страхование без лишней бюрократии\nдля поездок, перевозок и бизнеса",
     subtitle:
-      "Подбор страховых программ, консультации и сопровождение. Работаем официально, по лицензии. Алматы, связь по телефону и в мессенджерах.",
-    greenCardBtn: "Зелёная карта",
-    osagoBtn: "ОСАГО РФ",
-    otherBtn: "Все услуги",
+      "Подбираем полисы под маршрут и задачу, заранее объясняем условия, стоимость и документы. Работаем официально, по лицензии, сопровождаем до получения полиса.",
+    greenCardBtn: "Оформить Зелёную карту",
+    osagoBtn: "Рассчитать ОСАГО РФ",
+    otherBtn: "Посмотреть все услуги",
     heroAlt: "Dionis Insurance Broker — страховой брокер в Казахстане",
+    actionsAriaLabel: "Основные действия по страхованию",
+    trustAriaLabel: "Факторы доверия",
+    trustBadges: ["Лицензированные страховщики", "Стоимость до оплаты", "WhatsApp и Telegram"],
+    routeCard: {
+      label: "Популярно сейчас",
+      title: "Полис для выезда за границу",
+      items: ["Зелёная карта для Европы и Турции", "ОСАГО РФ для въезда в Россию", "Подбор срока и территории покрытия"],
+      note: "Проверим маршрут и подскажем, какие документы понадобятся.",
+    },
   },
 
   benefits: {
@@ -397,14 +417,24 @@ const ru: HomeDictionary = {
 
 const kz: HomeDictionary = {
   hero: {
-    title: "Қазақстандағы жеке тұлғалар мен бизнеске\nарналған сақтандыру брокері",
+    eyebrow: "Ресми сақтандыру брокері • Алматы",
+    title: "Сапар, тасымал және бизнес үшін\nартық бюрократиясыз сақтандыру",
     subtitle:
-      "Сақтандыру бағдарламаларын іріктеу, кеңес беру және толық сүйемелдеу. Лицензия негізінде ресми жұмыс істейміз. Алматы, телефон және мессенджерлер арқылы байланыс.",
-    greenCardBtn: "Green Card",
-    osagoBtn: "РФ ОСАГО",
-    otherBtn: "Барлық қызметтер",
+      "Маршрут пен міндетке сай полис таңдаймыз, шарттарды, құнын және құжаттарды алдын ала түсіндіреміз. Лицензия негізінде ресми жұмыс істейміз және полис алынғанға дейін сүйемелдейміз.",
+    greenCardBtn: "Green Card рәсімдеу",
+    osagoBtn: "РФ ОСАГО есептеу",
+    otherBtn: "Барлық қызметтерді көру",
     heroAlt:
       "Dionis Insurance Broker — Қазақстандағы сақтандыру брокері",
+    actionsAriaLabel: "Сақтандыру бойынша негізгі әрекеттер",
+    trustAriaLabel: "Сенім факторлары",
+    trustBadges: ["Лицензияланған сақтандырушылар", "Төлемге дейінгі құн", "WhatsApp және Telegram"],
+    routeCard: {
+      label: "Қазір жиі таңдалады",
+      title: "Шетелге шығуға арналған полис",
+      items: ["Еуропа және Түркия үшін Green Card", "Ресейге кіруге арналған РФ ОСАГО", "Қамту мерзімі мен аумағын таңдау"],
+      note: "Маршрутты тексеріп, қандай құжаттар қажет екенін айтамыз.",
+    },
   },
 
   benefits: {
@@ -645,14 +675,24 @@ director: {
 
 const en: HomeDictionary = {
   hero: {
-    title: "Insurance broker in Kazakhstan\nfor individuals and businesses",
+    eyebrow: "Licensed insurance broker • Almaty",
+    title: "Insurance without extra bureaucracy\nfor trips, transport and business",
     subtitle:
-      "Licensed insurance broker: we select insurance solutions and provide full client support.",
-    greenCardBtn: "Green Card",
-    osagoBtn: "OSAGO (Russia)",
-    otherBtn: "All services",
+      "We select policies for your route and task, explain terms, price and documents in advance, and support you until the policy is issued.",
+    greenCardBtn: "Issue a Green Card",
+    osagoBtn: "Calculate Russian OSAGO",
+    otherBtn: "View all services",
     heroAlt:
       "Dionis Insurance Broker — insurance broker in Kazakhstan",
+    actionsAriaLabel: "Primary insurance actions",
+    trustAriaLabel: "Trust signals",
+    trustBadges: ["Licensed insurers", "Price before payment", "WhatsApp and Telegram"],
+    routeCard: {
+      label: "Popular now",
+      title: "Policy for travelling abroad",
+      items: ["Green Card for Europe and Türkiye", "Russian OSAGO for entering Russia", "Coverage period and territory selection"],
+      note: "We will check your route and tell you which documents are required.",
+    },
   },
 
 
