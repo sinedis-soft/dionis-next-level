@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { keepShortWords } from "@/lib/keepShortWords";
 import type { Lang } from "@/dictionaries/header";
 import Image from "next/image";
@@ -211,11 +212,36 @@ export default async function GreenCardPage({
   const osagoLink = `/${lang}/osago-rf`;
   const orderAnchor = "#green-card-order";
 
+  const heroFacts: Record<Lang, string[]> = {
+    ru: ["Для авто из Казахстана", "ЕС, Турция и страны системы", "Стоимость до оплаты"],
+    kz: ["Қазақстанда тіркелген көлікке", "ЕО, Түркия және жүйе елдері", "Құны төлемге дейін"],
+    en: ["For vehicles from Kazakhstan", "EU, Türkiye and Green Card states", "Price before payment"],
+  };
+
+  const orderChecklist: Record<Lang, { title: string; text: string; items: string[] }> = {
+    ru: {
+      title: "Перед заявкой подготовьте документы",
+      text: "Так менеджер быстрее проверит данные, территорию действия и дату начала полиса.",
+      items: [gcFormDict.passportFilesLabel, gcFormDict.vehicles.techPassportFilesLabel, gcFormDict.vehicles.startDate],
+    },
+    kz: {
+      title: "Өтінім алдында құжаттарды дайындаңыз",
+      text: "Менеджер деректерді, қолданылу аумағын және полистің басталу күнін тезірек тексереді.",
+      items: [gcFormDict.passportFilesLabel, gcFormDict.vehicles.techPassportFilesLabel, gcFormDict.vehicles.startDate],
+    },
+    en: {
+      title: "Prepare documents before applying",
+      text: "This helps the manager check the data, territory and policy start date faster.",
+      items: [gcFormDict.passportFilesLabel, gcFormDict.vehicles.techPassportFilesLabel, gcFormDict.vehicles.startDate],
+    },
+  };
+
   return (
     <>
-      <script
-        id="webpage-jsonld"
+      <Script
+        id="green-card-webpage-jsonld"
         type="application/ld+json"
+        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
       />
 
@@ -227,6 +253,12 @@ export default async function GreenCardPage({
               <h1 className="gc-hero__title">{keepShortWords(gcPageDict.hero.title)}</h1>
               <p className="gc-hero__subtitle">{keepShortWords(gcPageDict.hero.subtitle)}</p>
 
+              <div className="gc-hero__facts" aria-label={gcPageDict.hero.title}>
+                {heroFacts[lang].map((fact) => (
+                  <span key={fact}>{fact}</span>
+                ))}
+              </div>
+
               <div className="gc-hero__cta">
                 <a
                   href={orderAnchor}
@@ -234,6 +266,13 @@ export default async function GreenCardPage({
                   className="btn btn-primary btn-wide"
                 >
                   {gcPageDict.hero.ctaOrder}
+                </a>
+                <a
+                  href="#green-card-calculator"
+                  role="button"
+                  className="btn btn-ghost btn-wide"
+                >
+                  {gcPageDict.calculator.calcButton}
                 </a>
               </div>
             </div>
@@ -323,42 +362,46 @@ export default async function GreenCardPage({
           </div>
         </section>
 
-        <section id="write-us" className="gc-section">
+        <section id="write-us" className="gc-section gc-writeus-section">
           <div className="gc-container">
-            <h3 className="writeus__title">{keepShortWords(gcPageDict.writeUs.title)}</h3>
+            <div className="writeus-card">
+              <div className="writeus-card__copy">
+                <h3 className="writeus__title">{keepShortWords(gcPageDict.writeUs.title)}</h3>
 
-            <p className="writeus__text">{gcPageDict.writeUs.text}</p>
+                <p className="writeus__text">{gcPageDict.writeUs.text}</p>
+              </div>
 
-            <div className="writeus__actions">
-              <a
-                href="https://wa.me/77765275553"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-whatsapp"
-                role="button"
-              >
-                {gcPageDict.writeUs.whatsapp}
-              </a>
+              <div className="writeus__actions">
+                <a
+                  href="https://wa.me/77765275553"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-whatsapp"
+                  role="button"
+                >
+                  {gcPageDict.writeUs.whatsapp}
+                </a>
 
-              <a
-                href="https://t.me/Dionis_insurance_broker_bot"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-telegram"
-                role="button"
-              >
-                {gcPageDict.writeUs.telegram}
-              </a>
+                <a
+                  href="https://t.me/Dionis_insurance_broker_bot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-telegram"
+                  role="button"
+                >
+                  {gcPageDict.writeUs.telegram}
+                </a>
 
-              <a
-                href="tel:+77273573030"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-secondary"
-                role="button"
-              >
-                {gcPageDict.writeUs.phone}
-              </a>
+                <a
+                  href="tel:+77273573030"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                  role="button"
+                >
+                  {gcPageDict.writeUs.phone}
+                </a>
+              </div>
             </div>
           </div>
         </section>
@@ -411,10 +454,22 @@ export default async function GreenCardPage({
           </div>
         </section>
 
-        <section id="green-card-order" className="gc-section">
+        <section id="green-card-order" className="gc-section gc-order-section">
           <div className="gc-container">
-            <div className="legacy-form-scope legacy-form-card">
-              <GreenCardOrderForm dict={gcFormDict} />
+            <div className="gc-order-layout">
+              <aside className="gc-order-prep" aria-label={orderChecklist[lang].title}>
+                <h2 className="gc-order-prep__title">{orderChecklist[lang].title}</h2>
+                <p className="gc-order-prep__text">{orderChecklist[lang].text}</p>
+                <ul className="gc-order-prep__list">
+                  {orderChecklist[lang].items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </aside>
+
+              <div className="legacy-form-scope legacy-form-card gc-order-form-card">
+                <GreenCardOrderForm dict={gcFormDict} />
+              </div>
             </div>
           </div>
         </section>
