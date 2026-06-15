@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { keepShortWords } from "@/lib/keepShortWords";
 import type { Lang } from "@/dictionaries/header";
 import Image from "next/image";
@@ -237,9 +238,10 @@ export default async function GreenCardPage({
 
   return (
     <>
-      <script
-        id="webpage-jsonld"
+      <Script
+        id="green-card-webpage-jsonld"
         type="application/ld+json"
+        strategy="beforeInteractive"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
       />
 

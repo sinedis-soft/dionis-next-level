@@ -531,6 +531,7 @@ export function GreenCardOrderForm({ dict }: Props) {
           className="gc-form__inner"
           onSubmit={handleSubmit}
           aria-describedby={formStatus !== "idle" ? statusId : undefined}
+          suppressHydrationWarning
         >
           <div ref={step1Ref} hidden={step !== 1}>
             <ErrorSummary title={dict.errors.title} items={step1Errors} />

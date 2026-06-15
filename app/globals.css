@@ -4660,7 +4660,6 @@ input.field:focus, select.field:focus, textarea.field:focus{
   .about-legal__summary{ background:rgba(255,255,255,.06); border-color:rgba(255,255,255,.12); }
 }
 
-
 /* =========================
    Green Card UX refresh
    ========================= */
@@ -4800,4 +4799,3 @@ input.field:focus, select.field:focus, textarea.field:focus{
   .gc-hero__visualWrap, .gc-hero__facts span, .gc-order-prep, .gc-upsell, .gc-upsell__body, .gc-adv-card, .gc-order-form-card{ background:rgba(15,23,42,.78); border-color:rgba(255,255,255,.12); }
   .gc-section--muted, .gc-order-section, .gc-question{ background:#0f172a; }
 }
-
