@@ -161,36 +161,55 @@ export default function HomeClient({ lang, t, agreement }: Props) {
         <div className="container">
           <div className="hp-hero__grid">
             <div className="hp-hero__left">
+              <div className="hp-hero__eyebrow">{t.hero.eyebrow}</div>
               <h1 className="hp-hero__title" style={{ whiteSpace: "pre-line" }}>
                 {keepShortWords(t.hero.title)}
               </h1>
 
               <p className="hp-hero__subtitle">{t.hero.subtitle}</p>
 
-              <div className="hp-hero__cta">
+              <div className="hp-hero__cta" aria-label={t.hero.actionsAriaLabel}>
                 <a href={greenCardLink} role="button" className="btn btn-primary btn-wide">
                   {t.hero.greenCardBtn}
                 </a>
                 <a href={osagoLink} role="button" className="btn btn-secondary btn-wide">
                   {t.hero.osagoBtn}
                 </a>
-                <a href={productsLink} role="button" className="btn btn-secondary btn-wide">
+                <a href={productsLink} role="button" className="btn btn-ghost btn-wide">
                   {t.hero.otherBtn}
                 </a>
               </div>
+
+              <ul className="hp-hero__badges" aria-label={t.hero.trustAriaLabel}>
+                {t.hero.trustBadges.map((badge) => (
+                  <li key={badge}>{badge}</li>
+                ))}
+              </ul>
             </div>
 
             <div className="hp-hero__right">
-              <Image
-                src="/hero.png"
-                alt={t.hero.heroAlt}
-                width={510}
-                height={510}
-                priority
-                fetchPriority="high"
-                sizes="(max-width: 640px) 224px, (max-width: 1024px) 288px, (max-width: 1280px) 420px, 480px"
-                className="hp-hero__logo"
-              />
+              <div className="hp-hero__visualCard">
+                <Image
+                  src="/hero.png"
+                  alt={t.hero.heroAlt}
+                  width={510}
+                  height={510}
+                  priority
+                  fetchPriority="high"
+                  sizes="(max-width: 640px) 224px, (max-width: 1024px) 288px, (max-width: 1280px) 420px, 480px"
+                  className="hp-hero__logo"
+                />
+                <aside className="hp-hero__routeCard" aria-label={t.hero.routeCard.title}>
+                  <span>{t.hero.routeCard.label}</span>
+                  <strong>{t.hero.routeCard.title}</strong>
+                  <ul>
+                    {t.hero.routeCard.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                  <p>{t.hero.routeCard.note}</p>
+                </aside>
+              </div>
             </div>
           </div>
         </div>
