@@ -24,6 +24,12 @@ function localeByLang(lang: Lang) {
   return "ru-RU";
 }
 
+function absoluteUrl(path?: string): string {
+  if (!path) return `${SITE_URL}/authors/default.webp`;
+  if (path.startsWith("http://") || path.startsWith("https://")) return path;
+  return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
 function formatDateSafe(locale: string) {
   const d = new Date();
   try {
@@ -75,18 +81,26 @@ export default async function AuthorPage({
   const personLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Person",
+    "@id": `${SITE_URL}/${lang}/authors/${author.slug}#person`,
     name: author.name,
     jobTitle: author.title,
     description: author.bio,
-    "@id": `${SITE_URL}/${lang}/authors/${author.slug}#person`,
     url: `${SITE_URL}/${lang}/authors/${author.slug}`,
-    image: author.photo ? `${SITE_URL}${author.photo}` : `${SITE_URL}/authors/default.webp`,
+    image: absoluteUrl(author.photo),
+    sameAs: author.sameAs ?? [],
+    worksFor: {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "Dionis Insurance Broker",
+    },
+    knowsAbout: [
+      "Green Card insurance",
+      "Motor third party liability insurance",
+      "International transport insurance",
+      "Border insurance",
+    ],
     inLanguage: localeByLang(lang),
   };
-
-  if (author.linkedin) {
-    personLd.sameAs = [author.linkedin];
-  }
 
   const locale = localeByLang(lang);
   const dateStr = formatDateSafe(locale);

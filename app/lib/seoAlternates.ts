@@ -10,7 +10,7 @@ const LANGS: Lang[] = ["ru", "kz", "en"];
 
 const HREFLANG_MAP: Record<Lang, string> = {
   ru: "ru",
-  kz: "kk-KZ",
+  kz: "kz",
   en: "en",
 };
 
@@ -23,9 +23,8 @@ export function buildAlternates(lang: Lang, path = "") {
     languages[HREFLANG_MAP[l]] = `${SITE_URL}/${l}${cleanPath}`;
   }
 
-  // x-default should point to a neutral entry URL (or language chooser).
-  // Here root redirects to /ru, so we keep x-default at the site root.
-  languages["x-default"] = `${SITE_URL}${cleanPath}`;
+  // x-default points to the English version as a default international target.
+  languages["x-default"] = `${SITE_URL}/en${cleanPath}`;
 
   return {
     canonical: `${SITE_URL}/${lang}${cleanPath}`,
