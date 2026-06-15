@@ -1,18 +1,19 @@
 // components/blog/AuthorBox.tsx
 import Image from "next/image";
 import Link from "next/link";
+import { getBlogDictionary } from "@/dictionaries/blog";
 import type { ArticleAuthor } from "@/lib/blog";
 
 type Props = {
   author: ArticleAuthor;
   lang?: string;
   className?: string;
-
-  // ✅ режим использования (влияет на длину текста)
   variant?: "article" | "profile";
-
-  // ✅ управление ссылкой явно (без догадок)
   showProfileLink?: boolean;
+  labels?: {
+    authorAriaLabel: string;
+    authorProfile: string;
+  };
 };
 
 const DEFAULT_AUTHOR_PHOTO = "/authors/default.webp";
@@ -22,8 +23,15 @@ export default function AuthorBox({
   lang,
   className,
   variant = "article",
-  showProfileLink, // если не задан — определим по variant
+  showProfileLink,
+  labels,
 }: Props) {
+  const normalizedLang = lang === "en" || lang === "kz" || lang === "ru" ? lang : "ru";
+  const defaultLabels = getBlogDictionary(normalizedLang);
+  const resolvedLabels = labels ?? {
+    authorAriaLabel: defaultLabels.authorAriaLabel,
+    authorProfile: defaultLabels.authorProfile,
+  };
   const authorHref =
     typeof lang === "string" && lang.length > 0
       ? `/${lang}/authors/${author.slug}`
@@ -36,13 +44,8 @@ export default function AuthorBox({
       ? author.shortBio ?? author.bio
       : author.bio ?? author.shortBio;
 
-  // ✅ по умолчанию:
-  // - в статье ссылка нужна
-  // - в профиле автора — НЕ нужна
   const shouldShowLink =
-    typeof showProfileLink === "boolean"
-      ? showProfileLink
-      : variant === "article";
+    typeof showProfileLink === "boolean" ? showProfileLink : variant === "article";
 
   return (
     <section
@@ -50,7 +53,7 @@ export default function AuthorBox({
         "u-rounded-2xl u-border u-border-slate-200 u-bg-white u-p-4 shadow-sm",
         className ?? "",
       ].join(" ")}
-      aria-label="Об авторе"
+      aria-label={resolvedLabels.authorAriaLabel}
     >
       <div className="u-flex u-items-start u-gap-4">
         <div className="u-relative u-h-14 u-w-14 shrink-0 u-overflow-hidden u-rounded-full u-border u-border-slate-200 u-bg-slate-100">
@@ -82,14 +85,13 @@ export default function AuthorBox({
             </p>
           ) : null}
 
-          {/* ✅ ссылка включается/выключается явно */}
           {shouldShowLink ? (
             <div className="u-mt-2">
               <Link
                 href={authorHref}
                 className="u-text-sm u-font-medium u-text-slate-900 u-underline u-underline-offset-4 u-hover-opacity-80"
               >
-                Профиль автора
+                {resolvedLabels.authorProfile}
               </Link>
             </div>
           ) : null}

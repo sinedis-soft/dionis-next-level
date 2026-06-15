@@ -1,6 +1,7 @@
 // app/[lang]/blog/[slug]/page.tsx
 
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 
@@ -8,6 +9,7 @@ import { buildAlternates } from "@/lib/seoAlternates";
 
 import type { Lang } from "@/dictionaries/header";
 import { BREADCRUMB_LABELS } from "@/dictionaries/breadcrumbs";
+import { getBlogDictionary } from "@/dictionaries/blog";
 
 import TableOfContents from "@/components/blog/TableOfContents";
 import ArticleBody from "@/components/blog/ArticleBody";
@@ -127,6 +129,7 @@ export default async function BlogArticlePage({
     `${SITE_URL}/${lang}/blog/${article.slug}`;
   const breadcrumbLabels =
     BREADCRUMB_LABELS[lang];
+  const blogDict = getBlogDictionary(lang);
 
   const jsonLdBase: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -289,7 +292,7 @@ export default async function BlogArticlePage({
 
         <nav
           className="bp-bc"
-          aria-label="Breadcrumb"
+          aria-label={breadcrumbLabels.ariaLabel}
         >
           <a
             className="bp-bc__link"
@@ -327,46 +330,77 @@ export default async function BlogArticlePage({
         {/* Header */}
 
         <header className="bp-head">
-          <h1 className="bp-title">
-            {article.title}
-          </h1>
-
-          <div className="bp-subrow">
-            <ContentTypeBadge
-              type={article.contentType}
-              size="sm"
-            />
-
-            <ArticleMeta
-              locale={locale}
-              publishedAt={
-                article.publishedAt
-              }
-              updatedAt={
-                article.modifiedAt
-              }
-            />
-
-            <span
-              className="bp-dot"
-              aria-hidden="true"
-            >
-              •
-            </span>
-
-            <span className="bp-reading">
-              {article.readingTime}
-            </span>
-          </div>
-
-          {author ? (
-            <div className="bp-author">
-              <AuthorBox
-                author={author}
+          <div className="bp-head__grid">
+            <div className="bp-head__copy">
+              <ContentTypeBadge
+                type={article.contentType}
                 lang={lang}
+                size="sm"
+              />
+
+              <h1 className="bp-title">
+                {article.title}
+              </h1>
+
+              {article.seoDescription ? (
+                <p className="bp-lead">
+                  {article.seoDescription}
+                </p>
+              ) : null}
+
+              <div className="bp-subrow">
+                <ArticleMeta
+                  locale={locale}
+                  publishedAt={
+                    article.publishedAt
+                  }
+                  updatedAt={
+                    article.modifiedAt
+                  }
+                  labels={{
+                    published: blogDict.publishedLabel,
+                    updated: blogDict.updatedLabel,
+                    actual: blogDict.actualLabel,
+                  }}
+                />
+
+                <span
+                  className="bp-dot"
+                  aria-hidden="true"
+                >
+                  •
+                </span>
+
+                <span className="bp-reading">
+                  {article.readingTime}
+                </span>
+              </div>
+
+              {author ? (
+                <div className="bp-author">
+                  <AuthorBox
+                    author={author}
+                    lang={lang}
+                    labels={{
+                      authorAriaLabel: blogDict.authorAriaLabel,
+                      authorProfile: blogDict.authorProfile,
+                    }}
+                  />
+                </div>
+              ) : null}
+            </div>
+
+            <div className="bp-head__media">
+              <Image
+                src={article.image}
+                alt={article.imageAlt || article.title}
+                fill
+                sizes="(min-width: 1024px) 420px, 100vw"
+                className="bp-head__img"
+                priority
               />
             </div>
-          ) : null}
+          </div>
         </header>
 
         {/* Content + TOC */}
@@ -377,6 +411,8 @@ export default async function BlogArticlePage({
               <div className="bp-sticky">
                 <TableOfContents
                   toc={article.toc}
+                  title={blogDict.tocTitle}
+                  navLabel={blogDict.tocNavLabel}
                 />
               </div>
             </aside>
@@ -385,6 +421,8 @@ export default async function BlogArticlePage({
               <div className="bp-toc bp-toc--mobile">
                 <TableOfContents
                   toc={article.toc}
+                  title={blogDict.tocTitle}
+                  navLabel={blogDict.tocNavLabel}
                   className="bp-toc__mobileBox"
                 />
               </div>
@@ -393,14 +431,17 @@ export default async function BlogArticlePage({
                 {article.content}
 
                 <RequiredReading
+                  title={blogDict.requiredReadingTitle}
                   items={requiredReading}
                 />
 
                 <NextStep
+                  title={blogDict.nextStepTitle}
                   items={nextSteps}
                 />
 
                 <Changelog
+                  title={blogDict.changelogTitle}
                   version={article.version}
                   changes={article.changes}
                 />
@@ -414,7 +455,7 @@ export default async function BlogArticlePage({
         {article.faq?.length ? (
           <section className="bp-faq">
             <h2 className="bp-h2">
-              Вопросы и ответы
+              {blogDict.faqTitle}
             </h2>
 
             <div className="bp-faq__list">
@@ -443,7 +484,7 @@ export default async function BlogArticlePage({
         {related.length ? (
           <section className="bp-related">
             <h2 className="bp-h2">
-              Похожие статьи
+              {blogDict.relatedTitle}
             </h2>
 
             <div className="bp-related__grid">
@@ -459,6 +500,7 @@ export default async function BlogArticlePage({
                       x.contentType ? (
                         <ContentTypeBadge
                           type={x.contentType}
+                          lang={lang}
                           size="sm"
                         />
                       ) : (

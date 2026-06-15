@@ -5,6 +5,8 @@ export type OsagoRfPageDictionary = {
     title: string;
     subtitle: string;
     ctaOrder: string;
+    factsLabel: string;
+    facts: string[];
     carAlt: string;
     policyAlt: string;
     logoAlt: string;
@@ -72,6 +74,12 @@ export type OsagoRfPageDictionary = {
     imageAlt: string;
   };
 
+  orderPrep: {
+    title: string;
+    text: string;
+    items: string[];
+  };
+
   faq: {
     title: string;
     intro: string;
@@ -89,6 +97,12 @@ const ru: OsagoRfPageDictionary = {
     subtitle:
       "Обязательный страховой полис для въезда и передвижения по территории России на автомобиле с иностранными номерами.",
     ctaOrder: "Оформить ОГПО в РФ",
+    factsLabel: "Ключевые условия продукта",
+    facts: [
+      "Для авто с иностранными номерами",
+      "Электронный полис PDF",
+      "Консультация перед оплатой",
+    ],
     carAlt: "Автомобиль с иностранными номерами и полисом ОСАГО РФ",
     policyAlt: "Электронный полис ОСАГО РФ для нерезидентов",
     logoAlt: "Dionis Insurance Broker",
@@ -223,6 +237,16 @@ const ru: OsagoRfPageDictionary = {
     imageAlt: "Полис Зеленая карта для международных поездок",
   },
 
+  orderPrep: {
+    title: "Перед заявкой подготовьте данные",
+    text: "Так менеджер быстрее проверит возможность оформления и подтвердит стоимость без лишних уточнений.",
+    items: [
+      "СТС или техпаспорт автомобиля",
+      "Даты въезда и выезда из РФ",
+      "Контактный телефон и e-mail для полиса",
+    ],
+  },
+
   faq: {
     title: "Вопросы по ОСАГО РФ для нерезидентов",
     intro: "Ответы на самые частые вопросы перед оформлением полиса.",
@@ -303,6 +327,12 @@ const en: OsagoRfPageDictionary = {
     subtitle:
       "Mandatory motor third-party liability insurance required to enter and drive within the Russian Federation with foreign license plates.",
     ctaOrder: "Get MTPL for Russia",
+    factsLabel: "Key product facts",
+    facts: [
+      "For foreign-registered vehicles",
+      "Electronic PDF policy",
+      "Consultation before payment",
+    ],
     carAlt: "Vehicle with foreign plates and Russian MTPL policy",
     policyAlt: "Electronic MTPL policy for non-residents",
     logoAlt: "Dionis Insurance Broker",
@@ -437,6 +467,16 @@ const en: OsagoRfPageDictionary = {
     imageAlt: "Green Card motor insurance for international travel",
   },
 
+  orderPrep: {
+    title: "Prepare these details before applying",
+    text: "This helps the manager verify issuance options and confirm the price without unnecessary follow-up.",
+    items: [
+      "Vehicle registration certificate or technical passport",
+      "Entry and exit dates for Russia",
+      "Phone and email for the policy",
+    ],
+  },
+
   faq: {
     title: "FAQ on MTPL in Russia for non-residents",
     intro: "Answers to common questions before issuing a policy.",
@@ -481,6 +521,12 @@ const kz: OsagoRfPageDictionary = {
     subtitle:
       "Шетелдік тіркеудегі автокөлікпен Ресей Федерациясына кіру және қозғалу үшін міндетті азаматтық-құқықтық жауапкершілік сақтандыруы. РФ аумағында қазақстандық көлікке арналған МІАЖ (ОСАГО)",
     ctaOrder: "РФ үшін МІАЖ рәсімдеу",
+    factsLabel: "Өнімнің негізгі шарттары",
+    facts: [
+      "Шетел нөмірлі көліктерге",
+      "Электрондық PDF полис",
+      "Төлемге дейін кеңес",
+    ],
     carAlt: "Шетелдік нөмірлі автокөлік және РФ МІАЖ полисі",
     policyAlt: "Резидент емес тұлғаларға арналған электрондық ОСАГО",
     logoAlt: "Dionis Insurance Broker",
@@ -613,6 +659,16 @@ const kz: OsagoRfPageDictionary = {
       "Маршрутыңызға сәйкес сақтандыру шешімін ұсынамыз.",
     btn: "Жасыл карта туралы білу",
     imageAlt: "Халықаралық сапарға арналған Жасыл карта",
+  },
+
+  orderPrep: {
+    title: "Өтінім алдында деректерді дайындаңыз",
+    text: "Бұл менеджерге рәсімдеу мүмкіндігін тез тексеріп, құнын нақтылауға көмектеседі.",
+    items: [
+      "Көліктің тіркеу куәлігі немесе техникалық паспорты",
+      "РФ-ға кіру және шығу күндері",
+      "Полис үшін телефон және e-mail",
+    ],
   },
 
   faq: {

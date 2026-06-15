@@ -334,6 +334,15 @@ export default async function OsagoRfPage({
               <h1 className="gc-hero__title">{keepShortWords(osagoPageDict.hero.title)}</h1>
               <p className="gc-hero__subtitle">{keepShortWords(osagoPageDict.hero.subtitle)}</p>
 
+              <div
+                className="gc-hero__facts"
+                aria-label={osagoPageDict.hero.factsLabel}
+              >
+                {osagoPageDict.hero.facts.map((fact) => (
+                  <span key={fact}>{fact}</span>
+                ))}
+              </div>
+
               <div className="gc-hero__cta">
                 <a href={orderAnchor} role="button" className="btn btn-wide">
                   {osagoPageDict.hero.ctaOrder}
@@ -382,6 +391,28 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
+        <section
+          className="gc-section gc-info-strip"
+          aria-labelledby="osago-rf-info-heading"
+        >
+          <div className="gc-container">
+            <article className="gc-info-strip__card">
+              <div className="gc-info-strip__header">
+                <p className="gc-info-strip__eyebrow">OSAGO RF / MTPL</p>
+                <h2 id="osago-rf-info-heading" className="gc-info-strip__title">
+                  {osagoPageDict.info.title}
+                </h2>
+              </div>
+
+              <div className="gc-info-strip__body">
+                {osagoPageDict.info.paragraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
+            </article>
+          </div>
+        </section>
+
         <section className="gc-section" id="osago-rf-calculator">
           <div className="gc-container">
             <div className="legacy-form-scope legacy-form-card">
@@ -426,43 +457,49 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
-        <section id="write-us" className="gc-section">
+        <section id="write-us" className="gc-section gc-writeus-section">
           <div className="gc-container">
-            <h3 className="writeus__title">{keepShortWords(osagoPageDict.writeUs.title)}</h3>
+            <article className="writeus-card">
+              <div>
+                <h3 className="writeus__title">
+                  {keepShortWords(osagoPageDict.writeUs.title)}
+                </h3>
 
-            <p className="writeus__text">{osagoPageDict.writeUs.text}</p>
+                <p className="writeus__text">{osagoPageDict.writeUs.text}</p>
+              </div>
 
-            <div className="writeus__actions">
-              <a
-                href="https://wa.me/77765275553"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-whatsapp"
-                role="button"
-              >
-                {osagoPageDict.writeUs.whatsapp}
-              </a>
+              <div className="writeus__actions">
+                <a
+                  href="https://wa.me/77765275553"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-whatsapp"
+                  role="button"
+                >
+                  {osagoPageDict.writeUs.whatsapp}
+                </a>
 
-              <a
-                href="https://t.me/Dionis_insurance_broker_bot"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-telegram"
-                role="button"
-              >
-                {osagoPageDict.writeUs.telegram}
-              </a>
+                <a
+                  href="https://t.me/Dionis_insurance_broker_bot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-telegram"
+                  role="button"
+                >
+                  {osagoPageDict.writeUs.telegram}
+                </a>
 
-              <a
-                href="tel:+77273573030"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-secondary"
-                role="button"
-              >
-                {osagoPageDict.writeUs.phone}
-              </a>
-            </div>
+                <a
+                  href="tel:+77273573030"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                  role="button"
+                >
+                  {osagoPageDict.writeUs.phone}
+                </a>
+              </div>
+            </article>
           </div>
         </section>
 
@@ -543,9 +580,24 @@ export default async function OsagoRfPage({
           </section>
         </DeferredHydration>
 
-        <section id="osago-rf-order" className="gc-section">
-          <div className="gc-container">
-            <div className="legacy-form-scope legacy-form-card">
+        <section id="osago-rf-order" className="gc-section gc-order-section">
+          <div className="gc-container gc-order-layout">
+            <aside
+              className="gc-order-prep"
+              aria-labelledby="osago-rf-order-prep-heading"
+            >
+              <h2 id="osago-rf-order-prep-heading" className="gc-order-prep__title">
+                {osagoPageDict.orderPrep.title}
+              </h2>
+              <p className="gc-order-prep__text">{osagoPageDict.orderPrep.text}</p>
+              <ul className="gc-order-prep__list">
+                {osagoPageDict.orderPrep.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </aside>
+
+            <div className="legacy-form-scope legacy-form-card gc-order-form-card">
               <OsagoOrderForm dict={osagoFormDict} />
             </div>
           </div>

@@ -2,11 +2,13 @@ import type { TocItem } from "@/lib/blog";
 
 export default function TableOfContents({
   toc,
-  title = "Содержание",
-  className="",
+  title,
+  navLabel,
+  className = "",
 }: {
   toc: TocItem[];
-  title?: string;
+  title: string;
+  navLabel: string;
   className?: string;
 }) {
   if (!toc.length) return null;
@@ -18,13 +20,10 @@ export default function TableOfContents({
           {title}
         </div>
 
-        <nav aria-label="Table of contents" className="u-max-h--70vh u-overflow-auto u-pr-2">
+        <nav aria-label={navLabel} className="u-max-h--70vh u-overflow-auto u-pr-2">
           <ul className="u-space-y-2 u-text-sm">
             {toc.map((item) => (
-              <li 
-                key={item.id} 
-                className={item.level === 3 ? "u-ml-4" : ""}
-              >
+              <li key={item.id} className={item.level === 3 ? "u-ml-4" : ""}>
                 <a
                   href={`#${item.id}`}
                   className="u-text-gray-700 u-hover-text--1a3a5f u-hover-underline"

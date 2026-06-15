@@ -8,6 +8,7 @@ import { getBlogDictionary } from "@/dictionaries/blog";
 import { buildAlternates } from "@/lib/seoAlternates";
 import { BLOG_PAGE_SIZE, getBlogPagination, getBlogPagePath } from "@/lib/blogPagination";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { BREADCRUMB_LABELS } from "@/dictionaries/breadcrumbs";
 
 const ALLOWED_LANGS: Lang[] = ["ru", "kz", "en"];
 
@@ -32,7 +33,7 @@ export async function generateMetadata({
   const dict = getBlogDictionary(lang);
 
   return {
-    title: `${dict.title} — Page ${page}`,
+    title: `${dict.title} — ${dict.pageLabel} ${page}`,
     description: dict.description,
     alternates: buildAlternates(lang, `/blog/page/${page}`),
   };
@@ -45,6 +46,7 @@ export default async function BlogPaginatedPage({
 }) {
   const { lang: rawLang, page: rawPage } = await params;
   const lang = normalizeLang(rawLang);
+  const breadcrumbLabels = BREADCRUMB_LABELS[lang];
   const page = normalizePage(rawPage);
 
   const [{ articles, totalPages }, dict] = await Promise.all([
@@ -65,14 +67,19 @@ export default async function BlogPaginatedPage({
           <Breadcrumbs
             lang={lang}
             items={[
-              { label: lang === "ru" ? "Главная" : lang === "kz" ? "Басты бет" : "Home", href: `/${lang}` },
-              { label: lang === "ru" ? "Блог" : "Blog", href: `/${lang}/blog` },
-              { label: `Page ${page}` },
+              { label: breadcrumbLabels.home, href: `/${lang}` },
+              { label: dict.title, href: `/${lang}/blog` },
+              { label: `${dict.pageLabel} ${page}` },
             ]}
           />
           <header className="bi-head">
             <h1 className="bi-title">{dict.title}</h1>
             <p className="bi-desc">{dict.description}</p>
+            <div className="bi-facts" aria-label={dict.title}>
+              {dict.heroFacts.map((fact) => (
+                <span key={fact}>{fact}</span>
+              ))}
+            </div>
           </header>
 
           <div className="bi-grid">
@@ -86,15 +93,15 @@ export default async function BlogPaginatedPage({
             />
           </div>
 
-          <nav className="bi-pagination" aria-label="Blog pagination">
+          <nav className="bi-pagination" aria-label={dict.paginationLabel}>
             {page > 1 ? (
               <Link href={getBlogPagePath(lang, page - 1)} rel="prev">
-                Previous page
+                {dict.previousPage}
               </Link>
             ) : null}
             {page < totalPages ? (
               <Link href={getBlogPagePath(lang, page + 1)} rel="next">
-                Next page
+                {dict.nextPage}
               </Link>
             ) : null}
           </nav>
