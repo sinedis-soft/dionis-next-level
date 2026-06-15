@@ -5030,6 +5030,7 @@ input.field:focus, select.field:focus, textarea.field:focus{
   .bp-head__media{ background:rgba(255,255,255,.06); }
 }
 
+
 /* Products detail sections: unified service description system */
 .pr-page .u-max-w-6xl{ max-width:1200px; }
 .pr-page .u-max-w-4xl{ max-width:896px; }
@@ -5341,3 +5342,4 @@ input.field:focus, select.field:focus, textarea.field:focus{
   .pr-page > section[id]:not(.pr-directory):not(.u-pr-hero) ul.u-space-y-2,
   .pr-page > section[id]:not(.pr-directory):not(.u-pr-hero) .u-space-y-3 .u-text-right{ color:rgba(255,255,255,.74); }
 }
+
