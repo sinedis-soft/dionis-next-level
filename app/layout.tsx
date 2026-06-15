@@ -28,8 +28,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
+
     <html lang="ru" suppressHydrationWarning>
       <body className="u-min-h-screen u-flex u-flex-col" suppressHydrationWarning>{children}</body>
+
     </html>
   );
 }

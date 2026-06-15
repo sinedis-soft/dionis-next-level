@@ -4,7 +4,9 @@ import type { ReactNode } from "react";
 import { Suspense } from "react";
 
 import type { Metadata } from "next";
+
 import Script from "next/script";
+
 import type { Lang } from "@/dictionaries/header";
 
 import Header from "@/components/Header";
@@ -136,10 +138,12 @@ export default async function LangLayout({
 
   return (
     <>
+
       <Script
         id={`site-jsonld-${lang}`}
         type="application/ld+json"
         strategy="beforeInteractive"
+
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(jsonLd),
         }}
