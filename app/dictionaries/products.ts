@@ -15,6 +15,9 @@ export type ProductsPageUI = {
   h1: string;
   sub: string;
   quick: string;
+  heroFacts: string[];
+  guideTitle: string;
+  guideItems: string[];
   requestTitle: string;
   requestText: string;
   btnRequest: string;
@@ -150,6 +153,17 @@ export const PRODUCTS_UI: Record<Lang, ProductsPageUI> = {
     h1: "Все страховые продукты",
     sub: "Выберите раздел и получите краткое описание + подробный блок ниже. Авто оформляется онлайн (Green Card, ОСАГО РФ). Остальное — через брокера под задачу.",
     quick: "Разделы",
+    heroFacts: [
+      "Онлайн-полисы для авто",
+      "Подбор через страхового брокера",
+      "Помощь с нестандартными кейсами",
+    ],
+    guideTitle: "Как выбрать раздел",
+    guideItems: [
+      "Для поездок и въезда в другие страны начните с автострахования.",
+      "Для бизнеса и контрактов проверьте груз, имущество и ответственность.",
+      "Если не уверены в продукте — отправьте запрос, брокер уточнит задачу.",
+    ],
 
     requestTitle: "Нужно подобрать условия?",
     requestText: "Оставьте заявку — уточним задачу и предложим варианты от страховщиков.",
@@ -168,6 +182,17 @@ export const PRODUCTS_UI: Record<Lang, ProductsPageUI> = {
     h1: "Барлық сақтандыру өнімдері",
     sub: "Бөлімді таңдаңыз: қысқаша сипаттама + төменде толық блок. Авто онлайн (Green Card, РФ ОСАГО). Қалғаны — брокер арқылы.",
     quick: "Бөлімдер",
+    heroFacts: [
+      "Автоға онлайн полистер",
+      "Сақтандыру брокері арқылы таңдау",
+      "Ерекше жағдайларға көмек",
+    ],
+    guideTitle: "Бөлімді қалай таңдау керек",
+    guideItems: [
+      "Сапарлар және басқа елге кіру үшін автосақтандырудан бастаңыз.",
+      "Бизнес пен келісімшарттар үшін жүк, мүлік және жауапкершілік бөлімдерін қараңыз.",
+      "Қай өнім керек екенін білмесеңіз — өтінім жіберіңіз, брокер міндетті нақтылайды.",
+    ],
 
     requestTitle: "Шарттарды таңдап береміз бе?",
     requestText: "Өтінім қалдырыңыз — міндетті нақтылап, нұсқалар ұсынамыз.",
@@ -186,6 +211,17 @@ export const PRODUCTS_UI: Record<Lang, ProductsPageUI> = {
     h1: "All insurance products",
     sub: "Pick a section to see a short summary + full block below. Motor is online (Green Card, OSAGO Russia). Others are broker-assisted.",
     quick: "Sections",
+    heroFacts: [
+      "Online motor policies",
+      "Broker-assisted product matching",
+      "Support for non-standard cases",
+    ],
+    guideTitle: "How to choose a section",
+    guideItems: [
+      "For trips and border entry, start with motor insurance.",
+      "For business and contracts, review cargo, property and liability.",
+      "If you are unsure which product fits, send a request and a broker will clarify the case.",
+    ],
 
     requestTitle: "Need a tailored offer?",
     requestText: "Send a request — we’ll clarify the case and propose options.",

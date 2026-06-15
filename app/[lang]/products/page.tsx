@@ -119,6 +119,25 @@ export default async function ProductsPage({
             <div className="u-pr-hero__copy">
               <h1 className="pr-hero__title">{ui.h1}</h1>
               <p className="pr-hero__sub">{ui.sub}</p>
+
+              <div className="pr-hero__facts" aria-label={ui.quick}>
+                {ui.heroFacts.map((fact) => (
+                  <span key={fact}>{fact}</span>
+                ))}
+              </div>
+
+              <div className="pr-hero__actions">
+                <a href="#products-directory" className="btn btn-wide" role="button">
+                  {ui.quick}
+                </a>
+                <a
+                  href={`${base}/contacts`}
+                  className="btn btn-secondary btn-wide"
+                  role="button"
+                >
+                  {ui.btnRequest}
+                </a>
+              </div>
             </div>
           </div>
         </div>

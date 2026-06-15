@@ -1,4 +1,5 @@
 // app/components/products/ProductsDirectoryServer.tsx
+import Image from "next/image";
 import Link from "next/link";
 import type { Lang } from "@/dictionaries/header";
 import type {
@@ -29,32 +30,66 @@ export default function ProductsDirectoryServer({
   active: ProductsSectionKey;
 }) {
   return (
-    <section className="u-py-8">
-      <div className="u-max-w-6xl u-mx-auto u-px-4">
-        <h2 className="u-text-lg u-sm-text-xl u-font-semibold u-text--1a3a5f u-mb-4">
-          {ui.quick}
-        </h2>
+    <section
+      id="products-directory"
+      className="pr-directory"
+      aria-labelledby="products-directory-heading"
+    >
+      <div className="gc-container">
+        <div className="pr-directory__head">
+          <div>
+            <p className="pr-directory__eyebrow">{ui.quick}</p>
+            <h2 id="products-directory-heading" className="pr-directory__title">
+              {ui.guideTitle}
+            </h2>
+          </div>
 
-        {/* GRID: 2 rows × 3 columns */}
+          <div className="pr-directory__guide" aria-label={ui.guideTitle}>
+            {ui.guideItems.map((item, index) => (
+              <p key={item} className="pr-directory__guideItem">
+                <span aria-hidden="true">{index + 1}</span>
+                {item}
+              </p>
+            ))}
+          </div>
+        </div>
+
         <nav aria-label={ui.quick}>
-          <div className="u-grid u-gap-3 u-sm-grid-cols-2 u-lg-grid-cols-3">
-            {categories.map((c) => {
-              const isActive = c.sectionKey === active;
+          <div className="pr-directory__grid">
+            {categories.map((category) => {
+              const isActive = category.sectionKey === active;
 
               return (
                 <Link
-                  key={c.key}
-                  href={buildProductsUrl(base, c.sectionKey)}
+                  key={category.key}
+                  href={buildProductsUrl(base, category.sectionKey)}
                   scroll={false}
                   aria-current={isActive ? "page" : undefined}
-                  className={cx(
-                    "btn btn-wide u-justify-center u-text-center",
-                    isActive
-                      ? "btn-primary u-pointer-events-none"
-                      : "btn-secondary"
-                  )}
+                  className={cx("pr-product-card", isActive && "is-active")}
                 >
-                  {c.title[lang]}
+                  <span className="pr-product-card__media" aria-hidden="true">
+                    <Image
+                      src={category.image}
+                      alt=""
+                      width={360}
+                      height={220}
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      className="pr-product-card__img"
+                    />
+                  </span>
+
+                  <span className="pr-product-card__body">
+                    <span className="pr-product-card__title">{category.title[lang]}</span>
+                    <span className="pr-product-card__lead">{category.lead[lang]}</span>
+                    <span className="pr-product-card__bullets">
+                      {category.bullets[lang].map((bullet) => (
+                        <span key={bullet} className="pr-product-card__bullet">
+                          {bullet}
+                        </span>
+                      ))}
+                    </span>
+                    <span className="pr-product-card__cta">{ui.btnToSection}</span>
+                  </span>
                 </Link>
               );
             })}
