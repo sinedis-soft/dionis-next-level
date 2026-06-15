@@ -4,8 +4,6 @@ import type { ReactNode } from "react";
 import { Suspense } from "react";
 
 import type { Metadata } from "next";
-import { Roboto, Montserrat } from "next/font/google";
-
 import type { Lang } from "@/dictionaries/header";
 
 import Header from "@/components/Header";
@@ -18,22 +16,6 @@ import AnalyticsManager from "@/components/AnalyticsManager";
 const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.kz"
 ).replace(/\/$/, "");
-
-/* ---------- Fonts ---------- */
-
-const roboto = Roboto({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500"],
-  variable: "--font-roboto",
-  display: "swap",
-});
-
-const montserrat = Montserrat({
-  subsets: ["latin", "cyrillic"],
-  weight: ["600", "700"],
-  variable: "--font-montserrat",
-  display: "swap",
-});
 
 /* ---------- Helpers ---------- */
 
@@ -70,9 +52,9 @@ export async function generateMetadata({
     alternates: {
       canonical: `${SITE_URL}/${lang}`,
       languages: {
-        ru: `${SITE_URL}/ru`,
-        kz: `${SITE_URL}/kz`,
-        en: `${SITE_URL}/en`,
+        "ru-RU": `${SITE_URL}/ru`,
+        "kk-KZ": `${SITE_URL}/kz`,
+        "en-US": `${SITE_URL}/en`,
         "x-default": `${SITE_URL}/en`,
       },
     },
@@ -152,36 +134,33 @@ export default async function LangLayout({
   };
 
   return (
-    <html
-      lang={htmlLang(lang)}
-      className={`${roboto.variable} ${montserrat.variable}`}
-    >
-      <head>
-        <link rel="stylesheet" href="/legacy.css" />
+    <>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `document.documentElement.lang=${JSON.stringify(htmlLang(lang))};`,
+        }}
+      />
 
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(jsonLd),
-          }}
-        />
-      </head>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd),
+        }}
+      />
 
-      <body className="u-min-h-screen u-flex u-flex-col">
-        <AnalyticsScripts />
-        <AnalyticsManager />
+      <AnalyticsScripts />
+      <AnalyticsManager />
 
-        <Suspense fallback={<div className="u-h-16 u-xl-h-20" />}>
-          <Header lang={lang} />
-        </Suspense>
+      <Suspense fallback={<div className="u-h-16 u-xl-h-20" />}>
+        <Header lang={lang} />
+      </Suspense>
 
-        <main className="u-flex-1">
-          {children}
-        </main>
+      <div className="u-flex-1" lang={htmlLang(lang)}>
+        {children}
+      </div>
 
-        <SiteFooter lang={lang} />
-        <CookieConsent lang={lang} />
-      </body>
-    </html>
+      <SiteFooter lang={lang} />
+      <CookieConsent lang={lang} />
+    </>
   );
 }
