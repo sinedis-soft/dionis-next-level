@@ -643,7 +643,7 @@ export default async function OsagoRfPage({
                   height={360}
                   sizes="(min-width: 1024px) 520px, 90vw"
                   className="gc-question__img"
-                  loading="lazy"
+                  loading="eager"
                 />
               </DeferredHydration>
             </div>

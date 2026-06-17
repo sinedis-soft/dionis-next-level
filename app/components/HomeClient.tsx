@@ -188,28 +188,21 @@ export default function HomeClient({ lang, t, agreement }: Props) {
             </div>
 
             <div className="hp-hero__right">
-              <div className="hp-hero__visualCard">
-                <Image
-                  src="/hero.png"
-                  alt={t.hero.heroAlt}
-                  width={510}
-                  height={510}
-                  priority
-                  fetchPriority="high"
-                  sizes="(max-width: 640px) 224px, (max-width: 1024px) 288px, (max-width: 1280px) 420px, 480px"
-                  className="hp-hero__logo"
-                />
-                <aside className="hp-hero__routeCard" aria-label={t.hero.routeCard.title}>
+              <aside className="hp-hero__popularCard" aria-label={t.hero.routeCard.title}>
+                <div className="hp-hero__popularHeader">
                   <span>{t.hero.routeCard.label}</span>
                   <strong>{t.hero.routeCard.title}</strong>
-                  <ul>
-                    {t.hero.routeCard.items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
                   <p>{t.hero.routeCard.note}</p>
-                </aside>
-              </div>
+                </div>
+                <ul className="hp-hero__popularList">
+                  {t.hero.routeCard.items.map((item, index) => (
+                    <li key={item}>
+                      <span aria-hidden="true">0{index + 1}</span>
+                      <strong>{item}</strong>
+                    </li>
+                  ))}
+                </ul>
+              </aside>
             </div>
           </div>
         </div>
