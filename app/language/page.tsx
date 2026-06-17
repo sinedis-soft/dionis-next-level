@@ -13,8 +13,10 @@ export const metadata: Metadata = {
 
 export default function LanguagePage() {
   return (
-    <Suspense fallback={null}>
-      <LanguageSelector />
-    </Suspense>
+    <div className="lang-select-font">
+      <Suspense fallback={null}>
+        <LanguageSelector />
+      </Suspense>
+    </div>
   );
 }
