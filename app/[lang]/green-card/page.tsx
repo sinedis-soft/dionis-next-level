@@ -280,36 +280,16 @@ export default async function GreenCardPage({
             <div className="gc-hero__right">
               <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
                 <div className="gc-hero__visualWrap">
-                  <div className="gc-hero-visual">
+                  <div className="gc-hero-visual gc-hero-visual--single">
                     <Image
-                      src="/green-card/car-removebg-preview.png"
+                      src="/green-card/HiroGreenCard.webp"
                       alt={gcPageDict.hero.carAlt}
-                      width={620}
-                      height={320}
-                      sizes="(min-width: 1280px) 620px, (min-width: 1024px) 520px, 0px"
-                      className="gc-hero__car gc-anim-car"
+                      width={1672}
+                      height={941}
+                      sizes="(min-width: 1280px) 560px, (min-width: 1024px) 46vw, 0px"
+                      className="gc-hero__image"
                       style={{ height: "auto" }}
                       priority
-                    />
-
-                    <Image
-                      src="/green-card/policy-large_1.webp"
-                      alt={gcPageDict.hero.policyAlt}
-                      width={160}
-                      height={160}
-                      sizes="160px"
-                      className="gc-hero-policy gc-anim-policy"
-                      loading="lazy"
-                    />
-
-                    <Image
-                      src="/dionis-crkl.webp"
-                      alt={gcPageDict.hero.logoAlt}
-                      width={110}
-                      height={110}
-                      sizes="110px"
-                      className="gc-hero-logo-small gc-anim-logo"
-                      loading="lazy"
                     />
                   </div>
                 </div>
