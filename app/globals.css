@@ -5579,7 +5579,7 @@ input.field:focus, select.field:focus, textarea.field:focus{
 }
 
 
-.lang-select-font{font-family:"Roboto",Arial,sans-serif;}
+.lang-select-font{font-family:"IBM Plex Sans",Arial,sans-serif;}
 .lang-select{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at top left,rgba(200,159,74,.22),transparent 34%),linear-gradient(135deg,#f8fafc 0%,#eef4fb 100%);color:#0f2238;}
 .lang-select__card{width:min(100%,620px);padding:34px;border:1px solid rgba(26,58,95,.14);border-radius:28px;background:rgba(255,255,255,.92);box-shadow:0 24px 70px rgba(15,34,56,.13);}
 .lang-select__eyebrow{margin-bottom:12px;color:#1A3A5F;font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;}

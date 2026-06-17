@@ -22,19 +22,19 @@ const OPTIONS: Array<{
 }> = [
   {
     lang: "ru",
-    label: "Русский",
+    label: "РУССКИЙ",
     nativeName: "RU",
     description: "Продолжить на русском языке",
   },
   {
     lang: "kz",
-    label: "Қазақша",
+    label: "ҚАЗАҚША",
     nativeName: "KZ",
     description: "Сайтты қазақ тілінде ашу",
   },
   {
     lang: "en",
-    label: "English",
+    label: "ENGLISH",
     nativeName: "EN",
     description: "Continue in English",
   },
@@ -82,9 +82,13 @@ export default function LanguageSelector() {
         <h1 id="language-title" className="lang-select__title">
           Выберите язык сайта
         </h1>
-        <p className="lang-select__lead">
-          Мы запомним выбор в браузере и откроем нужную страницу на выбранном языке.
-        </p>
+        <h1 id="language-title" className="lang-select__title">
+          Сайт тілін таңдаңыз
+        </h1>
+        <h1 id="language-title" className="lang-select__title">
+          Choose website language
+        </h1>
+       
 
         <div className="lang-select__options" role="list" aria-label="Доступные языки">
           {OPTIONS.map((option) => (
@@ -103,9 +107,7 @@ export default function LanguageSelector() {
           ))}
         </div>
 
-        <p className="lang-select__note">
-          Например, текущий адрес будет открыт как <strong>{previewPath}</strong> при выборе русского языка.
-        </p>
+
       </section>
     </main>
   );
