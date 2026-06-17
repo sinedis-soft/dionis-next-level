@@ -12,6 +12,19 @@ function cx(...c: Array<string | false | null | undefined>) {
   return c.filter(Boolean).join(" ");
 }
 
+const LANGUAGE_COOKIE = "dionis_language";
+const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
+
+function setLanguageCookie(lang: Lang) {
+  const descriptor = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
+  descriptor?.set?.call(document, `${LANGUAGE_COOKIE}=${lang}; Max-Age=${ONE_YEAR_SECONDS}; Path=/; SameSite=Lax`);
+}
+
+function rememberLanguage(lang: Lang) {
+  setLanguageCookie(lang);
+  window.localStorage.setItem(LANGUAGE_COOKIE, lang);
+}
+
 function isBlogArticlePath(pathname: string) {
   return /^\/(ru|kz|en)\/blog\/[^\/]+\/?$/.test(pathname);
 }
@@ -222,13 +235,13 @@ export default function Header({ lang }: { lang: Lang }) {
               </a>
 
               <div className="hdr__langs" aria-label={t.langSwitcherAria}>
-                <Link href={buildLangUrl("ru")} className={cx("hdr__lang", lang === "ru" && "is-active")}>
+                <Link href={buildLangUrl("ru")} className={cx("hdr__lang", lang === "ru" && "is-active")} onClick={() => rememberLanguage("ru")}>
                   RU
                 </Link>
-                <Link href={buildLangUrl("kz")} className={cx("hdr__lang", lang === "kz" && "is-active")}>
+                <Link href={buildLangUrl("kz")} className={cx("hdr__lang", lang === "kz" && "is-active")} onClick={() => rememberLanguage("kz")}>
                   KZ
                 </Link>
-                <Link href={buildLangUrl("en")} className={cx("hdr__lang", lang === "en" && "is-active")}>
+                <Link href={buildLangUrl("en")} className={cx("hdr__lang", lang === "en" && "is-active")} onClick={() => rememberLanguage("en")}>
                   EN
                 </Link>
               </div>
@@ -327,13 +340,13 @@ export default function Header({ lang }: { lang: Lang }) {
                   </a>
 
                   <div className="mnav__langs" aria-label={t.langSwitcherAria}>
-                    <Link href={buildLangUrl("ru")} className={cx("mnav__lang", lang === "ru" && "is-active")} onClick={() => setMenuOpen(false)}>
+                    <Link href={buildLangUrl("ru")} className={cx("mnav__lang", lang === "ru" && "is-active")} onClick={() => { rememberLanguage("ru"); setMenuOpen(false); }}>
                       RU
                     </Link>
-                    <Link href={buildLangUrl("kz")} className={cx("mnav__lang", lang === "kz" && "is-active")} onClick={() => setMenuOpen(false)}>
+                    <Link href={buildLangUrl("kz")} className={cx("mnav__lang", lang === "kz" && "is-active")} onClick={() => { rememberLanguage("kz"); setMenuOpen(false); }}>
                       KZ
                     </Link>
-                    <Link href={buildLangUrl("en")} className={cx("mnav__lang", lang === "en" && "is-active")} onClick={() => setMenuOpen(false)}>
+                    <Link href={buildLangUrl("en")} className={cx("mnav__lang", lang === "en" && "is-active")} onClick={() => { rememberLanguage("en"); setMenuOpen(false); }}>
                       EN
                     </Link>
                   </div>
