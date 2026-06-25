@@ -86,6 +86,11 @@ export async function generateMetadata({
       `/blog/${slug}`
     ),
 
+    robots: {
+      index: true,
+      follow: true,
+    },
+
     openGraph: {
       title,
       description,
