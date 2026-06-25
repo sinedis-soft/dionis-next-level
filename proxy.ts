@@ -19,6 +19,11 @@ function shouldSkip(pathname: string) {
   );
 }
 
+function hasSupportedLanguagePrefix(pathname: string) {
+  const [, lang] = pathname.split("/");
+  return isSupportedLang(lang);
+}
+
 function withLanguage(pathname: string, lang: string) {
   const [rawPathname, rawQuery = ""] = pathname.split("?");
   const parts = rawPathname.split("/");
@@ -52,6 +57,10 @@ export function proxy(request: NextRequest) {
       return NextResponse.redirect(destination);
     }
 
+    return NextResponse.next();
+  }
+
+  if (hasSupportedLanguagePrefix(pathname)) {
     return NextResponse.next();
   }
 
