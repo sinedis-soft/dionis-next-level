@@ -13,6 +13,8 @@ Do not produce polished but empty marketing text. Write and review copy that a r
 
 The text must be simple, direct, concrete, and human. Respect Kazakh identity, Kazakhstan's business reality, local language sensitivity, and the reader's practical situation.
 
+When publishing a new page/article or substantially updating an existing one, also use `$llms-txt-builder` if the change affects a core product/service page, high-value evergreen article, geography, insurance limitations, legal/product disclaimers, canonical route, or site-level meaning. Do not update `llms.txt` for minor copy polishing unless these facts change.
+
 ## Core principle
 
 Do not start with abstract definitions. Start with a real situation, conflict, risk, cost of mistake, or practical decision.
