@@ -200,6 +200,7 @@ export default function ContactForm({
             <input
               type="text"
               name="website"
+              aria-label={t.honeypotLabel}
               value={formData.website}
               onChange={handleChange}
               autoComplete="off"
@@ -216,6 +217,7 @@ export default function ContactForm({
             <input
               type="text"
               name="firstName"
+              aria-label={t.fields.firstName}
               value={formData.firstName}
               onChange={handleChange}
               className="field"
@@ -231,6 +233,7 @@ export default function ContactForm({
             <input
               type="text"
               name="lastName"
+              aria-label={t.fields.lastName}
               value={formData.lastName}
               onChange={handleChange}
               className="field"
@@ -247,6 +250,7 @@ export default function ContactForm({
           <input
             type="email"
             name="email"
+            aria-label={t.fields.email}
             value={formData.email}
             onChange={handleChange}
             inputMode="email"
@@ -264,6 +268,7 @@ export default function ContactForm({
           <input
             type="tel"
             name="phone"
+            aria-label={t.fields.phone}
             value={formData.phone}
             onChange={handleChange}
             inputMode="tel"
@@ -280,6 +285,7 @@ export default function ContactForm({
           </label>
           <textarea
             name="comment"
+            aria-label={t.fields.comment}
             rows={4}
             value={formData.comment}
             onChange={handleChange}
@@ -290,7 +296,15 @@ export default function ContactForm({
         </div>
 
         <div className="qf-agree">
-          <input id="agree" type="checkbox" name="agree" checked={formData.agree} onChange={handleChange} required />
+          <input
+            id="agree"
+            type="checkbox"
+            name="agree"
+            aria-label={`${t.agreePrefix} ${t.agreeLink} ${t.agreeSuffix}`}
+            checked={formData.agree}
+            onChange={handleChange}
+            required
+          />
           <label htmlFor="agree">
             {t.agreePrefix}{" "}
             <button

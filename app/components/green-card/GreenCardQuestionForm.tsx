@@ -386,6 +386,7 @@ export default function GreenCardQuestionForm({ homeContact, agreement, dict }: 
               id={ids.agree}
               type="checkbox"
               name="agree"
+              aria-label={`${homeContact.agreePrefix} ${homeContact.agreeLink} ${homeContact.agreeSuffix}`}
               checked={formData.agree}
               onChange={handleChange}
               required

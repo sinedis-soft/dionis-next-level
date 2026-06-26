@@ -4,7 +4,9 @@ import { Suspense } from "react";
 import LanguageSelector from "./LanguageSelector";
 
 export const metadata: Metadata = {
-  title: "Выбор языка",
+  title: "Выбор языка | Dionis Insurance Broker",
+  description:
+    "Выберите язык сайта Dionis Insurance Broker: русский, қазақша немесе English.",
   robots: {
     index: false,
     follow: false,

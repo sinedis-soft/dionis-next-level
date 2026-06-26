@@ -231,7 +231,7 @@ export default function OsagoRfQuestionForm({
           <div style={{ display: "none" }}>
             <label>
               {homeContact.honeypotLabel}
-              <input type="text" name="website" value={formData.website} onChange={handleChange} autoComplete="off" />
+              <input type="text" name="website" aria-label={homeContact.honeypotLabel} value={formData.website} onChange={handleChange} autoComplete="off" />
             </label>
           </div>
 
@@ -243,6 +243,7 @@ export default function OsagoRfQuestionForm({
               <input
                 type="text"
                 name="firstName"
+                aria-label={homeContact.fields.firstName}
                 value={formData.firstName}
                 onChange={handleChange}
                 className="field"
@@ -257,6 +258,7 @@ export default function OsagoRfQuestionForm({
               <input
                 type="text"
                 name="lastName"
+                aria-label={homeContact.fields.lastName}
                 value={formData.lastName}
                 onChange={handleChange}
                 className="field"
@@ -272,6 +274,7 @@ export default function OsagoRfQuestionForm({
             <input
               type="email"
               name="email"
+              aria-label={homeContact.fields.email}
               value={formData.email}
               onChange={handleChange}
               inputMode="email"
@@ -289,6 +292,7 @@ export default function OsagoRfQuestionForm({
             <input
               type="tel"
               name="phone"
+              aria-label={homeContact.fields.phone}
               value={formData.phone}
               onChange={handleChange}
               inputMode="tel"
@@ -305,6 +309,7 @@ export default function OsagoRfQuestionForm({
             </label>
             <textarea
               name="comment"
+              aria-label={homeContact.fields.comment}
               rows={4}
               value={formData.comment}
               onChange={handleChange}
@@ -315,7 +320,15 @@ export default function OsagoRfQuestionForm({
           </div>
 
           <div className="qf-agree">
-            <input id="agree" type="checkbox" name="agree" checked={formData.agree} onChange={handleChange} required />
+            <input
+              id="agree"
+              type="checkbox"
+              name="agree"
+              aria-label={`${homeContact.agreePrefix} ${homeContact.agreeLink} ${homeContact.agreeSuffix}`}
+              checked={formData.agree}
+              onChange={handleChange}
+              required
+            />
             <label htmlFor="agree">
               {homeContact.agreePrefix}{" "}
               <button type="button" onClick={() => setIsAgreementOpen(true)} className="qf-link">

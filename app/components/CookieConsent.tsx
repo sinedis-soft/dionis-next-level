@@ -158,6 +158,7 @@ export default function CookieConsent({ lang }: Props) {
                         <input
                           type="checkbox"
                           className="sr-only"
+                          aria-label={c.title}
                           checked={checked}
                           disabled={locked}
                           onChange={(e) =>

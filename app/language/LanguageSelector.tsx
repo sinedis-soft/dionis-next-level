@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 
 const LANGUAGE_COOKIE = "dionis_language";
@@ -65,8 +64,6 @@ export default function LanguageSelector() {
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo") || "/";
 
-  const previewPath = useMemo(() => buildLocalizedPath(returnTo, "ru"), [returnTo]);
-
   function chooseLanguage(lang: Lang) {
     const destination = buildLocalizedPath(returnTo, lang);
 
@@ -80,34 +77,28 @@ export default function LanguageSelector() {
       <section className="lang-select__card">
         <div className="lang-select__eyebrow">Dionis Insurance Broker</div>
         <h1 id="language-title" className="lang-select__title">
-          Выберите язык сайта
+          <span>Выберите язык сайта</span>
+          <span lang="kk">Сайт тілін таңдаңыз</span>
+          <span lang="en">Choose website language</span>
         </h1>
-        <h1 id="language-title" className="lang-select__title">
-          Сайт тілін таңдаңыз
-        </h1>
-        <h1 id="language-title" className="lang-select__title">
-          Choose website language
-        </h1>
-       
 
-        <div className="lang-select__options" role="list" aria-label="Доступные языки">
+        <ul className="lang-select__options" aria-label="Доступные языки">
           {OPTIONS.map((option) => (
-            <button
-              key={option.lang}
-              type="button"
-              className="lang-select__option"
-              onClick={() => chooseLanguage(option.lang)}
-            >
-              <span className="lang-select__code" aria-hidden="true">{option.nativeName}</span>
-              <span>
-                <span className="lang-select__name">{option.label}</span>
-                <span className="lang-select__description">{option.description}</span>
-              </span>
-            </button>
+            <li key={option.lang}>
+              <button
+                type="button"
+                className="lang-select__option"
+                onClick={() => chooseLanguage(option.lang)}
+              >
+                <span className="lang-select__code" aria-hidden="true">{option.nativeName}</span>
+                <span>
+                  <span className="lang-select__name">{option.label}</span>
+                  <span className="lang-select__description">{option.description}</span>
+                </span>
+              </button>
+            </li>
           ))}
-        </div>
-
-
+        </ul>
       </section>
     </main>
   );

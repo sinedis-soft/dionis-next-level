@@ -117,6 +117,7 @@ export function WhatsAppCall({ dict }: Props) {
           <input
             type="text"
             name="website"
+            aria-label="Website"
             tabIndex={-1}
             autoComplete="off"
             style={{ display: "none" }}

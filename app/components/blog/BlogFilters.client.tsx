@@ -62,6 +62,7 @@ export default function BlogFilters({
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
+            aria-label={ui.searchPlaceholder}
             placeholder={ui.searchPlaceholder}
             className="u-w-full u-rounded-xl u-border u-px-4 u-py-3 u-text-sm u-outline-none u-focus-ring-2 u-focus-ring--1a3a5f-20"
           />
