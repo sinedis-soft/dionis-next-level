@@ -77,6 +77,7 @@ export function CountrySelect({
         <div className="u-relative">
           <Combobox.Input
             className="u-w-full u-border u-border-gray-300 u-rounded-md u-px-3 u-py-2 u-text-sm u-focus-ring-2 u-focus-ring--c89f4a u-focus-outline-none"
+            aria-label={label}
             placeholder={ui.placeholder}
             onChange={(e) => setQuery(e.target.value)}
             displayValue={() => selectedName}

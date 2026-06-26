@@ -280,6 +280,7 @@ function NumField(props: {
         <input
           className="control"
           inputMode="numeric"
+          aria-label={props.label}
           value={inputValue}
           onChange={(e) => {
             const raw = e.target.value;
@@ -323,6 +324,7 @@ function NumField(props: {
         <input
           className="range"
           type="range"
+          aria-label={props.label}
           min={props.min}
           max={props.max}
           step={props.sliderStep ?? step}
@@ -606,16 +608,18 @@ export default function OsagoRfCalculator({ dict }: Props) {
                     <button
                       type="button"
                       className="btn-square"
+                      aria-label={`${dict.labels.term}: меньше`}
                       onClick={() => setTerm((v) => normalizeTerm(v === 0.5 ? 0.5 : v - 1, termMax))}
                     >
                       −
                     </button>
 
-                    <input className="control" value={termLabel(term)} readOnly />
+                    <input className="control" aria-label={dict.labels.term} value={termLabel(term)} readOnly />
 
                     <button
                       type="button"
                       className="btn-square"
+                      aria-label={`${dict.labels.term}: больше`}
                       onClick={() => setTerm((v) => normalizeTerm(v === 0.5 ? 1 : v + 1, termMax))}
                     >
                       +
@@ -625,6 +629,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                   <input
                     className="range"
                     type="range"
+                    aria-label={dict.labels.term}
                     min={0.5}
                     max={termMax}
                     step={0.5}
@@ -706,6 +711,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                         className="control"
                         type="text"
                         inputMode="decimal"
+                        aria-label={dict.labels.rateRub}
                         placeholder={dict.ratePlaceholder}
                         value={rubRate}
                         onChange={(e) => setRubRate(e.target.value)}
@@ -760,6 +766,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                 <label className="label">{dict.labels.policyholderType}</label>
                 <select
                   className="control"
+                  aria-label={dict.labels.policyholderType}
                   value={policyholderType}
                   onChange={(e) => setPolicyholderType(e.target.value as PolicyholderType)}
                 >
@@ -772,6 +779,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                 <label className="label">{dict.labels.vehicleKind}</label>
                 <select
                   className="control"
+                  aria-label={dict.labels.vehicleKind}
                   value={vehicleKind}
                   onChange={(e) => setVehicleKind(e.target.value as VehicleKind)}
                 >
@@ -784,6 +792,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                 <label className="label">{dict.labels.calcMode}</label>
                 <select
                   className="control"
+                  aria-label={dict.labels.calcMode}
                   value={mode}
                   onChange={(e) => setMode(e.target.value as Mode)}
                 >
@@ -798,6 +807,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                   <input
                     className="control"
                     type="number"
+                    aria-label={dict.labels.hp}
                     value={hp}
                     min={70}
                     max={250}
@@ -812,6 +822,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                 <input
                   className="control"
                   type="number"
+                  aria-label={dict.labels.carAge}
                   value={carAge}
                   min={0}
                   max={40}
@@ -824,6 +835,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                 <label className="label">{dict.labels.term}</label>
                 <select
                   className="control"
+                  aria-label={dict.labels.term}
                   value={String(term)}
                   onChange={(e) => setTerm(normalizeTerm(Number(e.target.value), termMax))}
                 >
@@ -851,6 +863,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                     <input
                       className="control"
                       type="number"
+                      aria-label={dict.labels.driverAge}
                       value={driverAge}
                       min={18}
                       max={80}
@@ -863,6 +876,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                     <input
                       className="control"
                       type="number"
+                      aria-label={dict.labels.driverExp}
                       value={driverExp}
                       min={0}
                       max={60}
@@ -887,6 +901,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                   className="control"
                   type="text"
                   inputMode="decimal"
+                  aria-label={dict.labels.rateRub}
                   placeholder={dict.ratePlaceholder}
                   value={rubRate}
                   onChange={(e) => setRubRate(e.target.value)}

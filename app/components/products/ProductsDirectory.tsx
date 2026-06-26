@@ -84,6 +84,7 @@ export default function ProductsDirectory({ categories, lang, base, ui }: Props)
           <select
             value={active}
             onChange={(e) => onPick(coerceKey(e.target.value))}
+            aria-label={dict.mobileLabel}
             className="u-w-full u-rounded-xl u-border u-border-black-10 u-bg-white u-px-4 u-py-3 u-text-sm"
           >
             {safe.map((c) => (

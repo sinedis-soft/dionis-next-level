@@ -86,6 +86,7 @@ export const mdxHeadingComponents = {
       return (
         <input
           {...props}
+          aria-label={props["aria-label"] ?? "Checklist item"}
           className={`u-mr-2 u-h-4 u-w-4 align-middle accent-[#1A3A5F] ${props.className ?? ""}`.trim()}
         />
       );

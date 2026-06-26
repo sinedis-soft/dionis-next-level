@@ -9,9 +9,9 @@ const SITE_URL = (
 const LANGS: Lang[] = ["ru", "kz", "en"];
 
 const HREFLANG_MAP: Record<Lang, string> = {
-  ru: "ru",
-  kz: "kz",
-  en: "en",
+  ru: "ru-RU",
+  kz: "kk-KZ",
+  en: "en-US",
 };
 
 export function buildAlternates(lang: Lang, path = "") {
