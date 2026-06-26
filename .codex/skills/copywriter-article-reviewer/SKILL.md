@@ -11,6 +11,8 @@ Act as a strict senior editor and commercial copy reviewer. Do not praise by def
 
 Use this skill for commercial and editorial quality review. If the task is mainly SEO structure, SERP intent, metadata, schema, hreflang, or cannibalization, use the repo's SEO/localization skills instead or combine only when the user asks for both.
 
+If an article or landing page is added, removed, renamed, or substantially rewritten for publication, also use `$llms-txt-builder` when the change affects a core product/service page, high-value evergreen article, legal/product limitations, geography, canonical route, or site-level meaning. Minor wording edits do not require `llms.txt` updates.
+
 ## Main goal
 
 Evaluate whether the text is clear, credible, commercially useful, legally careful, and ready for the intended audience.
