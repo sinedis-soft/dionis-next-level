@@ -66,6 +66,13 @@ export function proxy(request: NextRequest) {
 
   if (!isSupportedLang(selectedLang)) {
     const destination = request.nextUrl.clone();
+
+    if (pathname === "/") {
+      destination.pathname = "/ru";
+      destination.search = "";
+      return NextResponse.redirect(destination);
+    }
+
     destination.pathname = LANGUAGE_ROUTE;
     destination.searchParams.set("returnTo", `${pathname}${search}`);
     return NextResponse.redirect(destination);
