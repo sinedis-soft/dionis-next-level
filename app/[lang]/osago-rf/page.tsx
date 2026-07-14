@@ -243,16 +243,18 @@ export async function generateMetadata({
   const url = `${SITE_URL}/${lang}/osago-rf`;
 
   const titles: Record<Lang, string> = {
-    ru: "ОСАГО РФ для нерезидентов — оформить онлайн | Dionis Insurance Broker",
-    kz: "РФ ОСАҒО — резидент еместерге онлайн рәсімдеу | Dionis Insurance Broker",
-    en: "Russian MTPL (OSAGO RF) for non-residents — online | Dionis Insurance Broker",
+    ru: "ОСАГО России для авто из Казахстана — цена и оформление онлайн | DIONIS",
+    kz: "Қазақстандық автокөліктерге арналған Ресей ОСАГО — бағасы және онлайн рәсімдеу | DIONIS",
+    en: "Russian OSAGO for Vehicles from Kazakhstan — Price and Online Application | DIONIS",
   };
 
   const descriptions: Record<Lang, string> = {
-    ru: "Оформление ОСАГО РФ для авто с иностранными номерами. Онлайн-заявка, консультация, электронный полис.",
-    kz: "Шетел нөмірлі көліктерге РФ ОСАҒО. Онлайн өтінім, кеңес, электронды полис.",
-    en: "OSAGO RF (Russian MTPL) for vehicles with foreign plates. Online application and consultation.",
+    ru: "Электронное ОСАГО РФ для автомобиля с казахстанскими номерами. Расчёт стоимости на 15 дней и более, проверка документов и получение полиса онлайн.",
+    kz: "Қазақстандық нөмірі бар автокөлікке арналған электрондық Ресей ОСАГО полисі. 15 күннен бастап сақтандыру құнын есептеу, құжаттарды тексеру және полисті онлайн алу.",
+    en: "Electronic Russian OSAGO insurance for vehicles with Kazakhstan license plates. Calculate the price for coverage starting from 15 days, submit your documents for verification, and receive the policy online.",
   };
+
+
 
   return {
     title: titles[lang],
