@@ -33,7 +33,7 @@ export const PRIVACY_COOKIES_DICTIONARY: Record<Lang, CookiesPolicyDictionary> =
   {
     ru: {
       seo: {
-        title: "Политика использования cookie — Dionis Insurance Broker",
+        title: "Политика использования cookie",
         description:
           "Политика использования cookie-файлов на сайте Dionis Insurance Broker: категории cookie, управление, правовые основания.",
       },
@@ -199,7 +199,7 @@ export const PRIVACY_COOKIES_DICTIONARY: Record<Lang, CookiesPolicyDictionary> =
 
     kz: {
       seo: {
-        title: "Cookie саясаты — Dionis Insurance Broker",
+        title: "Cookie саясаты",
         description:
           "Dionis Insurance Broker сайтындағы cookie файлдарын пайдалану саясаты: санаттар, басқару, құқықтық негіздер.",
       },
@@ -337,7 +337,7 @@ export const PRIVACY_COOKIES_DICTIONARY: Record<Lang, CookiesPolicyDictionary> =
 
     en: {
       seo: {
-        title: "Cookie Policy — Dionis Insurance Broker",
+        title: "Cookie Policy",
         description:
           "Cookie policy for Dionis Insurance Broker: cookie categories, controls, and legal basis.",
       },

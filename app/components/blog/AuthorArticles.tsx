@@ -38,7 +38,9 @@ export default function AuthorArticles({ lang, items }: Props) {
               <div className="u-text-xs u-text-gray-500">{x.readingTime}</div>
             </div>
 
-            <div className="u-mt-2 u-font-semibold u-text--1a3a5f">{x.title}</div>
+            <div className="u-mt-2 u-font-semibold u-text--1a3a5f">
+              {x.title}
+            </div>
 
             <div className="u-mt-2 u-text-sm u-text-gray-700 u-line-clamp-2">
               {x.excerpt}
@@ -46,7 +48,7 @@ export default function AuthorArticles({ lang, items }: Props) {
 
             <div className="u-mt-3 u-text-xs u-text-gray-500">
               {new Date(x.publishedAt).toLocaleDateString(
-                lang === "kz" ? "kk-KZ" : lang === "en" ? "en-US" : "ru-RU"
+                lang === "kz" ? "kk-KZ" : lang === "en" ? "en-KZ" : "ru-RU",
               )}
             </div>
           </a>

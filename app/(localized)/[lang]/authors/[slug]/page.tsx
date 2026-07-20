@@ -20,7 +20,7 @@ export const dynamicParams = false;
 
 function localeByLang(lang: Lang) {
   if (lang === "kz") return "kk-KZ";
-  if (lang === "en") return "en-US";
+  if (lang === "en") return "en-KZ";
   return "ru-RU";
 }
 
@@ -56,7 +56,8 @@ export async function generateMetadata({
 
   const title = `${keepShortWords(author.name)} — автор блога`;
   const description =
-    author.bio ?? `Публикации и экспертные материалы автора ${keepShortWords(author.name)}`;
+    author.bio ??
+    `Публикации и экспертные материалы автора ${keepShortWords(author.name)}`;
 
   return {
     title,
@@ -145,14 +146,17 @@ export default async function AuthorPage({
 
           <div className="ap-meta">
             <span className="ap-meta__item">
-              Публикации: <span className="ap-meta__strong">{items.length}</span>
+              Публикации:{" "}
+              <span className="ap-meta__strong">{items.length}</span>
             </span>
             <span className="ap-meta__dot" aria-hidden="true">
               ·
             </span>
             <span className="ap-meta__item">
               Язык:{" "}
-              <span className="ap-meta__strong">{String(lang).toUpperCase()}</span>
+              <span className="ap-meta__strong">
+                {String(lang).toUpperCase()}
+              </span>
             </span>
             <span className="ap-meta__dot" aria-hidden="true">
               ·

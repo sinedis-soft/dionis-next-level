@@ -41,7 +41,7 @@ function normalizeLang(value: unknown): Lang {
 }
 
 function langToOgLocale(lang: Lang): string {
-  return lang === "ru" ? "ru_RU" : lang === "kz" ? "kk_KZ" : "en_US";
+  return lang === "ru" ? "ru_RU" : lang === "kz" ? "kk_KZ" : "en_KZ";
 }
 
 function langToIana(lang: Lang): string {
@@ -138,9 +138,9 @@ export async function generateMetadata({
   const url = `${SITE_URL}/${lang}/green-card`;
 
   const titles: Record<Lang, string> = {
-    ru: "Зелёная карта для авто из Казахстана — оформить онлайн | Dionis Insurance Broker",
-    kz: "Қазақстаннан автокөлікке Green Card — онлайн рәсімдеу | Dionis Insurance Broker",
-    en: "Green Card insurance for vehicles from Kazakhstan | Dionis Insurance Broker",
+    ru: "Зелёная карта для авто из Казахстана — цена и оформление онлайн",
+    kz: "Қазақстаннан автокөлікке Green Card — бағасы және онлайн рәсімдеу",
+    en: "Green Card insurance for vehicles from Kazakhstan — price and online application",
   };
 
   const descriptions: Record<Lang, string> = {
@@ -213,26 +213,53 @@ export default async function GreenCardPage({
   const orderAnchor = "#green-card-order";
 
   const heroFacts: Record<Lang, string[]> = {
-    ru: ["Для авто из Казахстана", "ЕС, Турция и страны системы", "Стоимость до оплаты"],
-    kz: ["Қазақстанда тіркелген көлікке", "ЕО, Түркия және жүйе елдері", "Құны төлемге дейін"],
-    en: ["For vehicles from Kazakhstan", "EU, Türkiye and Green Card states", "Price before payment"],
+    ru: [
+      "Для авто из Казахстана",
+      "ЕС, Турция и страны системы",
+      "Стоимость до оплаты",
+    ],
+    kz: [
+      "Қазақстанда тіркелген көлікке",
+      "ЕО, Түркия және жүйе елдері",
+      "Құны төлемге дейін",
+    ],
+    en: [
+      "For vehicles from Kazakhstan",
+      "EU, Türkiye and Green Card states",
+      "Price before payment",
+    ],
   };
 
-  const orderChecklist: Record<Lang, { title: string; text: string; items: string[] }> = {
+  const orderChecklist: Record<
+    Lang,
+    { title: string; text: string; items: string[] }
+  > = {
     ru: {
       title: "Перед заявкой подготовьте документы",
       text: "Так менеджер быстрее проверит данные, территорию действия и дату начала полиса.",
-      items: [gcFormDict.passportFilesLabel, gcFormDict.vehicles.techPassportFilesLabel, gcFormDict.vehicles.startDate],
+      items: [
+        gcFormDict.passportFilesLabel,
+        gcFormDict.vehicles.techPassportFilesLabel,
+        gcFormDict.vehicles.startDate,
+      ],
     },
     kz: {
       title: "Өтінім алдында құжаттарды дайындаңыз",
       text: "Менеджер деректерді, қолданылу аумағын және полистің басталу күнін тезірек тексереді.",
-      items: [gcFormDict.passportFilesLabel, gcFormDict.vehicles.techPassportFilesLabel, gcFormDict.vehicles.startDate],
+      items: [
+        gcFormDict.passportFilesLabel,
+        gcFormDict.vehicles.techPassportFilesLabel,
+        gcFormDict.vehicles.startDate,
+      ],
     },
     en: {
       title: "Prepare documents before applying",
       text: "This helps the manager check the data, territory and policy start date faster.",
-      items: [gcFormDict.passportFilesLabel, gcFormDict.vehicles.techPassportFilesLabel, gcFormDict.vehicles.startDate],
+      items: [
+        gcFormDict.passportFilesLabel,
+        gcFormDict.vehicles.techPassportFilesLabel,
+        gcFormDict.vehicles.startDate,
+      ],
     },
   };
 
@@ -250,10 +277,17 @@ export default async function GreenCardPage({
           <div className="gc-hero__bg" aria-hidden="true" />
           <div className="gc-container gc-hero__grid">
             <div className="gc-hero__left">
-              <h1 className="gc-hero__title">{keepShortWords(gcPageDict.hero.title)}</h1>
-              <p className="gc-hero__subtitle">{keepShortWords(gcPageDict.hero.subtitle)}</p>
+              <h1 className="gc-hero__title">
+                {keepShortWords(gcPageDict.hero.title)}
+              </h1>
+              <p className="gc-hero__subtitle">
+                {keepShortWords(gcPageDict.hero.subtitle)}
+              </p>
 
-              <div className="gc-hero__facts" aria-label={gcPageDict.hero.title}>
+              <div
+                className="gc-hero__facts"
+                aria-label={gcPageDict.hero.title}
+              >
                 {heroFacts[lang].map((fact) => (
                   <span key={fact}>{fact}</span>
                 ))}
@@ -278,7 +312,11 @@ export default async function GreenCardPage({
             </div>
 
             <div className="gc-hero__right">
-              <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+              <DeferredHydration
+                disableOnLegacy
+                rootMargin="1200px"
+                minDelayMs={0}
+              >
                 <div className="gc-hero__visualWrap">
                   <div className="gc-hero-visual gc-hero-visual--single">
                     <Image
@@ -308,16 +346,21 @@ export default async function GreenCardPage({
               </div>
 
               <div className="legacy-only">
-                <h2 className="gc-h2">{keepShortWords(gcPageDict.calculator.title)}</h2>
-                <p className="gc-text-muted">{gcPageDict.calculator.subtitle}</p>
+                <h2 className="gc-h2">
+                  {keepShortWords(gcPageDict.calculator.title)}
+                </h2>
+                <p className="gc-text-muted">
+                  {gcPageDict.calculator.subtitle}
+                </p>
 
                 <div className="gc-legacy-note">
                   <p className="gc-text-muted">
-                    Ваш браузер устарел. Калькулятор может работать медленно или не
-                    работать.
+                    Ваш браузер устарел. Калькулятор может работать медленно или
+                    не работать.
                   </p>
                   <p className="gc-text-muted">
-                    Оформите заявку — мы рассчитаем стоимость и пришлём предложение.
+                    Оформите заявку — мы рассчитаем стоимость и пришлём
+                    предложение.
                   </p>
 
                   <div className="gc-mt-12">
@@ -333,8 +376,8 @@ export default async function GreenCardPage({
 
                 <noscript>
                   <div className="gc-mt-12 gc-text-muted">
-                    JavaScript отключён. Оформите заявку ниже — мы рассчитаем стоимость
-                    вручную.
+                    JavaScript отключён. Оформите заявку ниже — мы рассчитаем
+                    стоимость вручную.
                   </div>
                 </noscript>
               </div>
@@ -346,7 +389,9 @@ export default async function GreenCardPage({
           <div className="gc-container">
             <div className="writeus-card">
               <div className="writeus-card__copy">
-                <h3 className="writeus__title">{keepShortWords(gcPageDict.writeUs.title)}</h3>
+                <h3 className="writeus__title">
+                  {keepShortWords(gcPageDict.writeUs.title)}
+                </h3>
 
                 <p className="writeus__text">{gcPageDict.writeUs.text}</p>
               </div>
@@ -392,7 +437,11 @@ export default async function GreenCardPage({
           <div className="gc-container">
             <article className="card gc-upsell">
               <div className="gc-upsell__media">
-                <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+                <DeferredHydration
+                  disableOnLegacy
+                  rootMargin="1200px"
+                  minDelayMs={0}
+                >
                   <Image
                     src="/services/green_card_check.svg"
                     alt={gcPageDict.greenCardCheckUpsell.imageAlt}
@@ -437,9 +486,16 @@ export default async function GreenCardPage({
         <section id="green-card-order" className="gc-section gc-order-section">
           <div className="gc-container">
             <div className="gc-order-layout">
-              <aside className="gc-order-prep" aria-label={orderChecklist[lang].title}>
-                <h2 className="gc-order-prep__title">{orderChecklist[lang].title}</h2>
-                <p className="gc-order-prep__text">{orderChecklist[lang].text}</p>
+              <aside
+                className="gc-order-prep"
+                aria-label={orderChecklist[lang].title}
+              >
+                <h2 className="gc-order-prep__title">
+                  {orderChecklist[lang].title}
+                </h2>
+                <p className="gc-order-prep__text">
+                  {orderChecklist[lang].text}
+                </p>
                 <ul className="gc-order-prep__list">
                   {orderChecklist[lang].items.map((item) => (
                     <li key={item}>{item}</li>
@@ -455,7 +511,10 @@ export default async function GreenCardPage({
         </section>
 
         <DeferredHydration rootMargin="800px" minDelayMs={150}>
-          <section className="gc-advantages" aria-labelledby="advantages-heading">
+          <section
+            className="gc-advantages"
+            aria-labelledby="advantages-heading"
+          >
             <div className="gc-container">
               <h2 id="advantages-heading" className="gc-advantages__title">
                 {keepShortWords(gcPageDict.advantages.title)}
@@ -495,7 +554,11 @@ export default async function GreenCardPage({
           <div className="gc-container">
             <article className="card gc-upsell">
               <div className="gc-upsell__media">
-                <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+                <DeferredHydration
+                  disableOnLegacy
+                  rootMargin="1200px"
+                  minDelayMs={0}
+                >
                   <Image
                     src="/services/osago_rf_photo.webp"
                     alt={gcPageDict.osagoUpsell.imageAlt}
@@ -510,7 +573,9 @@ export default async function GreenCardPage({
 
               <div className="gc-upsell__body">
                 <div>
-                  <h3 className="gc-upsell__title">{gcPageDict.osagoUpsell.title}</h3>
+                  <h3 className="gc-upsell__title">
+                    {gcPageDict.osagoUpsell.title}
+                  </h3>
                   <p className="gc-upsell__p">{gcPageDict.osagoUpsell.text1}</p>
                   <p className="gc-upsell__p gc-text-muted">
                     {gcPageDict.osagoUpsell.text2}
@@ -518,7 +583,11 @@ export default async function GreenCardPage({
                 </div>
 
                 <div className="gc-upsell__cta">
-                  <a href={osagoLink} className="btn btn-secondary" role="button">
+                  <a
+                    href={osagoLink}
+                    className="btn btn-secondary"
+                    role="button"
+                  >
                     {gcPageDict.osagoUpsell.btn}
                   </a>
                 </div>
@@ -533,7 +602,11 @@ export default async function GreenCardPage({
         <section className="gc-question gc-section--muted">
           <div className="gc-container gc-question__grid">
             <div className="gc-question__media">
-              <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+              <DeferredHydration
+                disableOnLegacy
+                rootMargin="1200px"
+                minDelayMs={0}
+              >
                 <Image
                   src="/green-card/policy-large.webp"
                   alt={gcPageDict.hero.policyAlt}

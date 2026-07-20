@@ -3,7 +3,7 @@
 
 import Image from "next/image";
 import { keepShortWords } from "@/lib/keepShortWords";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 
 import type { Lang } from "@/dictionaries/header";
 import type { HomeDictionary } from "@/dictionaries/home";
@@ -26,7 +26,12 @@ function BenefitIcon({ index }: { index: number }) {
   switch (index) {
     case 0:
       return (
-        <svg viewBox="0 0 24 24" className="hp-benefitIcon" fill="none" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          className="hp-benefitIcon"
+          fill="none"
+          aria-hidden="true"
+        >
           <path
             d="M12 8v5l3 2M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
             stroke="currentColor"
@@ -38,7 +43,12 @@ function BenefitIcon({ index }: { index: number }) {
       );
     case 1:
       return (
-        <svg viewBox="0 0 24 24" className="hp-benefitIcon" fill="none" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          className="hp-benefitIcon"
+          fill="none"
+          aria-hidden="true"
+        >
           <path
             d="M4 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z"
             stroke="currentColor"
@@ -56,13 +66,23 @@ function BenefitIcon({ index }: { index: number }) {
       );
     case 2:
       return (
-        <svg viewBox="0 0 24 24" className="hp-benefitIcon" fill="none" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          className="hp-benefitIcon"
+          fill="none"
+          aria-hidden="true"
+        >
           <path
             d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
             stroke="currentColor"
             strokeWidth="2"
           />
-          <path d="M3 12h18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          <path
+            d="M3 12h18"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
           <path
             d="M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"
             stroke="currentColor"
@@ -73,7 +93,12 @@ function BenefitIcon({ index }: { index: number }) {
       );
     default:
       return (
-        <svg viewBox="0 0 24 24" className="hp-benefitIcon" fill="none" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          className="hp-benefitIcon"
+          fill="none"
+          aria-hidden="true"
+        >
           <path
             d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"
             stroke="currentColor"
@@ -91,58 +116,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
   const osagoLink = `/${lang}/osago-rf`;
   const productsLink = `/${lang}/products`;
 
-  const partners = useMemo(() => getPartnersDictionary(lang), [lang]);
-  const [activePartner, setActivePartner] = useState(0);
-  const [visiblePartnersCount, setVisiblePartnersCount] = useState(1);
-
-  useEffect(() => {
-    setActivePartner(0);
-  }, [lang]);
-
-  useEffect(() => {
-    const updateVisiblePartnersCount = () => {
-      const width = window.innerWidth;
-      if (width < 640) {
-        setVisiblePartnersCount(1);
-      } else if (width < 980) {
-        setVisiblePartnersCount(2);
-      } else if (width < 1280) {
-        setVisiblePartnersCount(3);
-      } else {
-        setVisiblePartnersCount(4);
-      }
-    };
-
-    updateVisiblePartnersCount();
-    window.addEventListener("resize", updateVisiblePartnersCount);
-
-    return () => window.removeEventListener("resize", updateVisiblePartnersCount);
-  }, []);
-
-  useEffect(() => {
-    if (partners.length <= 1) return;
-
-    const timer = window.setInterval(() => {
-      setActivePartner((prev) => (prev + 1) % partners.length);
-    }, 15000);
-
-    return () => window.clearInterval(timer);
-  }, [partners]);
-
-  const showPreviousPartner = () => {
-    setActivePartner((prev) => (prev - 1 + partners.length) % partners.length);
-  };
-
-  const showNextPartner = () => {
-    setActivePartner((prev) => (prev + 1) % partners.length);
-  };
-
-  const visiblePartners = useMemo(() => {
-    if (partners.length === 0) return [];
-
-    const count = Math.min(visiblePartnersCount, partners.length);
-    return Array.from({ length: count }, (_, offset) => partners[(activePartner + offset) % partners.length]);
-  }, [activePartner, partners, visiblePartnersCount]);
+  const partners = getPartnersDictionary(lang);
 
   const otherServices = useMemo(
     () =>
@@ -150,7 +124,7 @@ export default function HomeClient({ lang, t, agreement }: Props) {
         ...service,
         link: `/${lang}${service.linkSuffix}`,
       })),
-    [t.services.otherServices, lang]
+    [t.services.otherServices, lang],
   );
 
   return (
@@ -168,19 +142,37 @@ export default function HomeClient({ lang, t, agreement }: Props) {
 
               <p className="hp-hero__subtitle">{t.hero.subtitle}</p>
 
-              <div className="hp-hero__cta" aria-label={t.hero.actionsAriaLabel}>
-                <a href={greenCardLink} role="button" className="btn btn-primary btn-wide">
+              <div
+                className="hp-hero__cta"
+                aria-label={t.hero.actionsAriaLabel}
+              >
+                <a
+                  href={greenCardLink}
+                  role="button"
+                  className="btn btn-primary btn-wide"
+                >
                   {t.hero.greenCardBtn}
                 </a>
-                <a href={osagoLink} role="button" className="btn btn-secondary btn-wide">
+                <a
+                  href={osagoLink}
+                  role="button"
+                  className="btn btn-secondary btn-wide"
+                >
                   {t.hero.osagoBtn}
                 </a>
-                <a href={productsLink} role="button" className="btn btn-ghost btn-wide">
+                <a
+                  href={productsLink}
+                  role="button"
+                  className="btn btn-ghost btn-wide"
+                >
                   {t.hero.otherBtn}
                 </a>
               </div>
 
-              <ul className="hp-hero__badges" aria-label={t.hero.trustAriaLabel}>
+              <ul
+                className="hp-hero__badges"
+                aria-label={t.hero.trustAriaLabel}
+              >
                 {t.hero.trustBadges.map((badge) => (
                   <li key={badge}>{badge}</li>
                 ))}
@@ -188,7 +180,10 @@ export default function HomeClient({ lang, t, agreement }: Props) {
             </div>
 
             <div className="hp-hero__right">
-              <aside className="hp-hero__popularCard" aria-label={t.hero.routeCard.title}>
+              <aside
+                className="hp-hero__popularCard"
+                aria-label={t.hero.routeCard.title}
+              >
                 <div className="hp-hero__popularHeader">
                   <span>{t.hero.routeCard.label}</span>
                   <strong>{t.hero.routeCard.title}</strong>
@@ -208,280 +203,332 @@ export default function HomeClient({ lang, t, agreement }: Props) {
         </div>
       </section>
 
-      <DeferredHydration rootMargin="800px" minDelayMs={150}>
-        {/* BENEFITS */}
-        <section className="hp-benefits" aria-labelledby="benefits-heading">
-          <div className="container">
-            <h2 id="benefits-heading" className="hp-sectionTitle">
-              {keepShortWords(t.benefits.title)}
-            </h2>
-            <p className="hp-sectionIntro">{t.benefits.subtitle}</p>
+      {/* BENEFITS */}
+      <section className="hp-benefits" aria-labelledby="benefits-heading">
+        <div className="container">
+          <h2 id="benefits-heading" className="hp-sectionTitle">
+            {keepShortWords(t.benefits.title)}
+          </h2>
+          <p className="hp-sectionIntro">{t.benefits.subtitle}</p>
 
-            <div className="hp-benefits__grid">
-              {t.benefits.cards.map((card, idx) => (
-                <article key={idx} className="card hp-benefitCard">
-                  <div className="hp-benefitCard__iconWrap" aria-hidden="true">
-                    <BenefitIcon index={idx} />
-                  </div>
-
-                  <div className="hp-benefitCard__value">{card.value}</div>
-                  <div className="hp-benefitCard__label">{card.label}</div>
-                  <p className="hp-benefitCard__text">{card.text}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* DIRECTOR */}
-        <section className="hp-director" aria-labelledby="director-message-heading">
-          <div className="container">
-            <h2 id="director-message-heading" className="hp-director__title">
-              {keepShortWords(t.director.heading)}
-            </h2>
-
-            <div className="card hp-director__card">
-              <div className="hp-director__grid">
-                <article className="hp-director__text">
-                  <div className="hp-director__paragraphs">
-                    {t.director.paragraphs.map((p, i) => (
-                      <p key={i}>{p}</p>
-                    ))}
-                  </div>
-
-                  <div className="hp-director__sign">
-                    {t.director.signLines.map((line, index) => (
-                      <div key={index}>{line}</div>
-                    ))}
-                  </div>
-
-                  <div className="hp-director__signature">
-                    <Image
-                      src="/director-signature.webp"
-                      alt={t.director.signatureAlt}
-                      width={180}
-                      height={110}
-                      quality={60}
-                      loading="lazy"
-                      sizes="(max-width: 640px) 150px, 180px"
-                      className="hp-director__signatureImg"
-                    />
-                  </div>
-                </article>
-
-                <aside className="hp-director__photoWrap">
-                  <div className="hp-director__photo">
-                    <Image
-                      src="/Фон.png"
-                      alt={t.director.logoAlt}
-                      width={340}
-                      height={340}
-                      quality={80}
-                      sizes="(max-width: 1024px) 170px, 170px"
-                      className="hp-director__photoImg"
-                    />
-                  </div>
-                </aside>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SERVICES */}
-        <section className="hp-services" aria-labelledby="services-heading">
-          <div className="container">
-            <div className="hp-services__head">
-              <h2 id="services-heading" className="hp-services__title">
-                <span className="hp-services__titleBlue">{t.services.titlePart1}</span>
-                <span className="hp-services__titleGold">{t.services.titlePart2}</span>
-              </h2>
-              <div className="hp-services__bar" aria-hidden="true" />
-            </div>
-
-            <div className="hp-services__topGrid">
-              <article className="card hp-serviceCard">
-                <div className="hp-serviceCard__media">
-                  <Image
-                    src="/services/zk_photo.webp"
-                    alt={t.services.greenCardCard.imageAlt}
-                    width={600}
-                    height={400}
-                    quality={60}
-                    loading="lazy"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 600px"
-                    className="hp-serviceCard__img"
-                  />
+          <div className="hp-benefits__grid">
+            {t.benefits.cards.map((card, idx) => (
+              <article key={idx} className="card hp-benefitCard">
+                <div className="hp-benefitCard__iconWrap" aria-hidden="true">
+                  <BenefitIcon index={idx} />
                 </div>
 
-                <div className="hp-serviceCard__body hp-serviceCard__body--green">
-                  <div>
-                    <h3 className="hp-serviceCard__title">{t.services.greenCardCard.title}</h3>
-                    <p className="hp-serviceCard__p hp-serviceCard__pLight">{t.services.greenCardCard.text1}</p>
-                    <p className="hp-serviceCard__p hp-serviceCard__pDim">{t.services.greenCardCard.text2}</p>
-                  </div>
-
-                  <div className="hp-serviceCard__meta">
-                    <span className="hp-serviceCard__price">{t.services.greenCardCard.price}</span>
-                    <span className="hp-serviceCard__term">{t.services.greenCardCard.term}</span>
-                  </div>
-
-                  <div className="hp-serviceCard__cta">
-                    <a href={greenCardLink} className="btn btn-primary" role="button" style={{ width: "100%" }}>
-                      {t.services.greenCardCard.cta}
-                    </a>
-                  </div>
-                </div>
+                <div className="hp-benefitCard__value">{card.value}</div>
+                <div className="hp-benefitCard__label">{card.label}</div>
+                <p className="hp-benefitCard__text">{card.text}</p>
               </article>
-
-              <article className="card hp-serviceCard">
-                <div className="hp-serviceCard__media">
-                  <Image
-                    src="/services/osago_rf_photo.webp"
-                    alt={t.services.osagoCard.imageAlt}
-                    width={600}
-                    height={400}
-                    quality={60}
-                    loading="lazy"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 600px"
-                    className="hp-serviceCard__img"
-                  />
-                </div>
-
-                <div className="hp-serviceCard__body hp-serviceCard__body--brown">
-                  <div>
-                    <h3 className="hp-serviceCard__title">{t.services.osagoCard.title}</h3>
-                    <p className="hp-serviceCard__p hp-serviceCard__pLight">{t.services.osagoCard.text1}</p>
-                    <p className="hp-serviceCard__p hp-serviceCard__pDim">{t.services.osagoCard.text2}</p>
-                  </div>
-
-                  <div className="hp-serviceCard__meta">
-                    <span className="hp-serviceCard__price">{t.services.osagoCard.price}</span>
-                    <span className="hp-serviceCard__term">{t.services.osagoCard.term}</span>
-                  </div>
-
-                  <div className="hp-serviceCard__cta">
-                    <a href={osagoLink} className="btn btn-primary" role="button" style={{ width: "100%" }}>
-                      {t.services.osagoCard.cta}
-                    </a>
-                  </div>
-                </div>
-              </article>
-            </div>
-
-            <ServicesGrid
-              heading={t.services.otherHeading}
-              moreBtnText={t.services.moreBtn}
-              items={otherServices}
-            />
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="hp-partners" aria-labelledby="partners-heading">
-          <div className="container">
-            <h2 id="partners-heading" className="hp-sectionTitle">{t.partners.title}</h2>
+      {/* DIRECTOR */}
+      <section
+        className="hp-director"
+        aria-labelledby="director-message-heading"
+      >
+        <div className="container">
+          <h2 id="director-message-heading" className="hp-director__title">
+            {keepShortWords(t.director.heading)}
+          </h2>
 
-            {partners.length > 0 && (
-              <div className="hp-partners__carousel">
-                <button type="button" className="hp-partners__nav" onClick={showPreviousPartner} aria-label={t.partners.prevAriaLabel}>
-                  ←
-                </button>
-
-                <div className="hp-partners__track">
-                  {visiblePartners.map((partner) => (
-                    <a
-                      key={`${partner.url}-${partner.logo}`}
-                      href={partner.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hp-partners__logoLink"
-                    >
-                      <Image
-                        src={partner.logo}
-                        alt={partner.alt}
-                        width={260}
-                        height={100}
-                        loading="lazy"
-                        className="hp-partners__logo"
-                      />
-                    </a>
+          <div className="card hp-director__card">
+            <div className="hp-director__grid">
+              <article className="hp-director__text">
+                <div className="hp-director__paragraphs">
+                  {t.director.paragraphs.map((p, i) => (
+                    <p key={i}>{p}</p>
                   ))}
                 </div>
 
-                <button type="button" className="hp-partners__nav" onClick={showNextPartner} aria-label={t.partners.nextAriaLabel}>
-                  →
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
+                <div className="hp-director__sign">
+                  {t.director.signLines.map((line, index) => (
+                    <div key={index}>{line}</div>
+                  ))}
+                </div>
 
-        {/* BROKER */}
-        <section className="hp-broker" aria-labelledby="about-broker-heading">
-          <div className="container">
-            <BrokerSection broker={t.broker} />
-          </div>
-        </section>
+                <div className="hp-director__signature">
+                  <Image
+                    src="/director-signature.webp"
+                    alt={t.director.signatureAlt}
+                    width={180}
+                    height={110}
+                    quality={60}
+                    loading="lazy"
+                    sizes="(max-width: 640px) 150px, 180px"
+                    className="hp-director__signatureImg"
+                  />
+                </div>
+              </article>
 
-        <section className="hp-certificates" aria-labelledby="certificates-heading">
-          <div className="container">
-            <h2 id="certificates-heading" className="hp-sectionTitle">{t.certificates.title}</h2>
-            <div className="hp-certificates__row">
-              <a
-                href="/certyfikatkz.webp"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hp-certificates__item"
-                aria-label={t.certificates.kzAriaLabel}
-              >
-                <Image
-                  src="/certyfikatkz.webp"
-                  alt={t.certificates.kzAlt}
-                  width={420}
-                  height={560}
-                  loading="lazy"
-                  sizes="(max-width: 640px) 46vw, 260px"
-                  className="hp-certificates__img"
-                />
-              </a>
-
-              <a
-                href="/certyfikatru.webp"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hp-certificates__item"
-                aria-label={t.certificates.ruAriaLabel}
-              >
-                <Image
-                  src="/certyfikatru.webp"
-                  alt={t.certificates.ruAlt}
-                  width={420}
-                  height={560}
-                  loading="lazy"
-                  sizes="(max-width: 640px) 46vw, 260px"
-                  className="hp-certificates__img"
-                />
-              </a>
+              <aside className="hp-director__photoWrap">
+                <div className="hp-director__photo">
+                  <Image
+                    src="/Фон.png"
+                    alt={t.director.logoAlt}
+                    width={340}
+                    height={340}
+                    quality={80}
+                    sizes="(max-width: 1024px) 170px, 170px"
+                    className="hp-director__photoImg"
+                  />
+                </div>
+              </aside>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* CONTACT */}
-        <section className="hp-contact">
-          <div className="container">
-            <div className="hp-contact__grid">
-              <div className="hp-contact__media">
+      {/* SERVICES */}
+      <section className="hp-services" aria-labelledby="services-heading">
+        <div className="container">
+          <div className="hp-services__head">
+            <h2 id="services-heading" className="hp-services__title">
+              <span className="hp-services__titleBlue">
+                {t.services.titlePart1}
+              </span>
+              <span className="hp-services__titleGold">
+                {t.services.titlePart2}
+              </span>
+            </h2>
+            <div className="hp-services__bar" aria-hidden="true" />
+          </div>
+
+          <div className="hp-services__topGrid">
+            <article className="card hp-serviceCard">
+              <div className="hp-serviceCard__media">
                 <Image
-                  src="/laiter(1).png"
-                  alt={t.contact.photoAlt}
-                  width={500}
-                  height={900}
+                  src="/services/zk_photo.webp"
+                  alt={t.services.greenCardCard.imageAlt}
+                  width={600}
+                  height={400}
                   quality={60}
                   loading="lazy"
-                  sizes="(max-width: 640px) 288px, (max-width: 1024px) 320px, 384px"
-                  className="hp-contact__img"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 600px"
+                  className="hp-serviceCard__img"
                 />
               </div>
 
+              <div className="hp-serviceCard__body hp-serviceCard__body--green">
+                <div>
+                  <h3 className="hp-serviceCard__title">
+                    {t.services.greenCardCard.title}
+                  </h3>
+                  <p className="hp-serviceCard__p hp-serviceCard__pLight">
+                    {t.services.greenCardCard.text1}
+                  </p>
+                  <p className="hp-serviceCard__p hp-serviceCard__pDim">
+                    {t.services.greenCardCard.text2}
+                  </p>
+                </div>
+
+                <div className="hp-serviceCard__meta">
+                  <span className="hp-serviceCard__price">
+                    {t.services.greenCardCard.price}
+                  </span>
+                  <span className="hp-serviceCard__term">
+                    {t.services.greenCardCard.term}
+                  </span>
+                </div>
+
+                <div className="hp-serviceCard__cta">
+                  <a
+                    href={greenCardLink}
+                    className="btn btn-primary"
+                    role="button"
+                    style={{ width: "100%" }}
+                  >
+                    {t.services.greenCardCard.cta}
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <article className="card hp-serviceCard">
+              <div className="hp-serviceCard__media">
+                <Image
+                  src="/services/osago_rf_photo.webp"
+                  alt={t.services.osagoCard.imageAlt}
+                  width={600}
+                  height={400}
+                  quality={60}
+                  loading="lazy"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 600px"
+                  className="hp-serviceCard__img"
+                />
+              </div>
+
+              <div className="hp-serviceCard__body hp-serviceCard__body--brown">
+                <div>
+                  <h3 className="hp-serviceCard__title">
+                    {t.services.osagoCard.title}
+                  </h3>
+                  <p className="hp-serviceCard__p hp-serviceCard__pLight">
+                    {t.services.osagoCard.text1}
+                  </p>
+                  <p className="hp-serviceCard__p hp-serviceCard__pDim">
+                    {t.services.osagoCard.text2}
+                  </p>
+                </div>
+
+                <div className="hp-serviceCard__meta">
+                  <span className="hp-serviceCard__price">
+                    {t.services.osagoCard.price}
+                  </span>
+                  <span className="hp-serviceCard__term">
+                    {t.services.osagoCard.term}
+                  </span>
+                </div>
+
+                <div className="hp-serviceCard__cta">
+                  <a
+                    href={osagoLink}
+                    className="btn btn-primary"
+                    role="button"
+                    style={{ width: "100%" }}
+                  >
+                    {t.services.osagoCard.cta}
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <ServicesGrid
+            heading={t.services.otherHeading}
+            moreBtnText={t.services.moreBtn}
+            items={otherServices}
+          />
+        </div>
+      </section>
+
+      <section className="hp-partners" aria-labelledby="partners-heading">
+        <div className="container">
+          <h2 id="partners-heading" className="hp-sectionTitle">
+            {t.partners.title}
+          </h2>
+
+          {partners.length > 0 && (
+            <div className="hp-partners__carousel">
+              <div className="hp-partners__track">
+                {partners.map((partner) => (
+                  <a
+                    key={`${partner.url}-${partner.logo}`}
+                    href={partner.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hp-partners__logoLink"
+                  >
+                    <Image
+                      src={partner.logo}
+                      alt={partner.alt}
+                      width={260}
+                      height={100}
+                      loading="lazy"
+                      className="hp-partners__logo"
+                    />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* BROKER */}
+      <section className="hp-broker" aria-labelledby="about-broker-heading">
+        <div className="container">
+          <BrokerSection broker={t.broker} />
+        </div>
+      </section>
+
+      <section
+        className="hp-certificates"
+        aria-labelledby="certificates-heading"
+      >
+        <div className="container">
+          <h2 id="certificates-heading" className="hp-sectionTitle">
+            {t.certificates.title}
+          </h2>
+          <div className="hp-certificates__row">
+            <a
+              href="/certyfikatkz.webp"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hp-certificates__item"
+              aria-label={t.certificates.kzAriaLabel}
+            >
+              <Image
+                src="/certyfikatkz.webp"
+                alt={t.certificates.kzAlt}
+                width={420}
+                height={560}
+                loading="lazy"
+                sizes="(max-width: 640px) 46vw, 260px"
+                className="hp-certificates__img"
+              />
+            </a>
+
+            <a
+              href="/certyfikatru.webp"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hp-certificates__item"
+              aria-label={t.certificates.ruAriaLabel}
+            >
+              <Image
+                src="/certyfikatru.webp"
+                alt={t.certificates.ruAlt}
+                width={420}
+                height={560}
+                loading="lazy"
+                sizes="(max-width: 640px) 46vw, 260px"
+                className="hp-certificates__img"
+              />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section className="hp-faq" aria-labelledby="home-faq-heading">
+        <div className="container">
+          <h2 id="home-faq-heading" className="hp-sectionTitle">
+            {t.faq.title}
+          </h2>
+          <div className="hp-faq__grid">
+            {t.faq.items.map((item) => (
+              <article key={item.question} className="card hp-faq__item">
+                <h3 className="hp-faq__question">{item.question}</h3>
+                <p className="hp-faq__answer">{item.answer}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CONTACT */}
+      <section className="hp-contact">
+        <div className="container">
+          <div className="hp-contact__grid">
+            <div className="hp-contact__media">
+              <Image
+                src="/laiter(1).png"
+                alt={t.contact.photoAlt}
+                width={500}
+                height={900}
+                quality={60}
+                loading="lazy"
+                sizes="(max-width: 640px) 288px, (max-width: 1024px) 320px, 384px"
+                className="hp-contact__img"
+              />
+            </div>
+
+            <DeferredHydration rootMargin="800px" minDelayMs={150}>
               <ContactForm
                 t={t.contact}
                 agreement={agreement}
@@ -489,10 +536,10 @@ export default function HomeClient({ lang, t, agreement }: Props) {
                 submitUrl="/api/contact"
                 recaptchaAction="contact"
               />
-            </div>
+            </DeferredHydration>
           </div>
-        </section>
-      </DeferredHydration>
+        </div>
+      </section>
     </main>
   );
 }

@@ -1,9 +1,10 @@
-// app/[lang]/layout.tsx
+import "../../globals.css";
+import "../../../public/legacy.css";
 
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 
 import Script from "next/script";
 
@@ -20,17 +21,30 @@ const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.kz"
 ).replace(/\/$/, "");
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 2,
+  userScalable: true,
+};
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Dionis Insurance Broker",
+    template: "%s — Dionis Insurance Broker",
+  },
+};
+
 /* ---------- Helpers ---------- */
 
 function normalizeLang(value: string): Lang {
-  return value === "ru" || value === "kz" || value === "en"
-    ? value
-    : "ru";
+  return value === "ru" || value === "kz" || value === "en" ? value : "ru";
 }
 
 function langToIana(lang: Lang): string {
   if (lang === "kz") return "kk-KZ";
-  if (lang === "en") return "en-US";
+  if (lang === "en") return "en-KZ";
   return "ru-RU";
 }
 
@@ -38,30 +52,6 @@ function htmlLang(lang: Lang): string {
   if (lang === "kz") return "kk";
   if (lang === "en") return "en";
   return "ru";
-}
-
-/* ---------- Metadata ---------- */
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}): Promise<Metadata> {
-  const { lang: rawLang } = await params;
-
-  const lang = normalizeLang(rawLang);
-
-  return {
-    alternates: {
-      canonical: `${SITE_URL}/${lang}`,
-      languages: {
-        "ru-RU": `${SITE_URL}/ru`,
-        "kk-KZ": `${SITE_URL}/kz`,
-        "en-US": `${SITE_URL}/en`,
-        "x-default": `${SITE_URL}/en`,
-      },
-    },
-  };
 }
 
 /* ---------- Layout ---------- */
@@ -137,31 +127,34 @@ export default async function LangLayout({
   };
 
   return (
-    <>
+    <html lang={htmlLang(lang)} suppressHydrationWarning>
+      <body
+        className="u-min-h-screen u-flex u-flex-col"
+        suppressHydrationWarning
+      >
+        <Script
+          id={`site-jsonld-${lang}`}
+          type="application/ld+json"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(jsonLd),
+          }}
+        />
 
-      <Script
-        id={`site-jsonld-${lang}`}
-        type="application/ld+json"
-        strategy="beforeInteractive"
+        <AnalyticsScripts />
+        <AnalyticsManager />
 
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd),
-        }}
-      />
+        <Suspense fallback={<div className="u-h-16 u-xl-h-20" />}>
+          <Header lang={lang} />
+        </Suspense>
 
-      <AnalyticsScripts />
-      <AnalyticsManager />
+        <div className="u-flex-1" lang={htmlLang(lang)}>
+          {children}
+        </div>
 
-      <Suspense fallback={<div className="u-h-16 u-xl-h-20" />}>
-        <Header lang={lang} />
-      </Suspense>
-
-      <div className="u-flex-1" lang={htmlLang(lang)}>
-        {children}
-      </div>
-
-      <SiteFooter lang={lang} />
-      <CookieConsent lang={lang} />
-    </>
+        <SiteFooter lang={lang} />
+        <CookieConsent lang={lang} />
+      </body>
+    </html>
   );
 }

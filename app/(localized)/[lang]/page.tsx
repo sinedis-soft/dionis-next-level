@@ -1,13 +1,21 @@
 // app/[lang]/page.tsx
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const dynamicParams = false;
 export const revalidate = 60;
 
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
 import { getHomeDictionary, type HomeDictionary } from "@/dictionaries/home";
-import { getAgreementDictionary, type AgreementDictionary } from "@/dictionaries/agreement";
+import {
+  getAgreementDictionary,
+  type AgreementDictionary,
+} from "@/dictionaries/agreement";
 import HomeClient from "@/components/HomeClient";
 import { buildAlternates } from "@/lib/seoAlternates";
+
+export function generateStaticParams(): Array<{ lang: Lang }> {
+  return [{ lang: "ru" }, { lang: "kz" }, { lang: "en" }];
+}
 
 function normalizeLang(value: string): Lang {
   return value === "ru" || value === "kz" || value === "en" ? value : "ru";
@@ -23,10 +31,10 @@ export async function generateMetadata({
 
   const title =
     lang === "ru"
-      ? "Dionis Insurance Broker — страховой брокер в Казахстане (Алматы) | Официально"
+      ? "Страховой брокер в Казахстане (Алматы) | Официально"
       : lang === "kz"
-        ? "Dionis Insurance Broker — Қазақстандағы сақтандыру брокері (Алматы) | Ресми"
-        : "Dionis Insurance Broker — insurance broker in Kazakhstan (Almaty) | Official";
+        ? "Қазақстандағы сақтандыру брокері (Алматы) | Ресми"
+        : "Insurance broker in Kazakhstan (Almaty) | Official";
 
   const description =
     lang === "ru"

@@ -1,6 +1,5 @@
-// app/layout.tsx
-import "./globals.css";
-import "../public/legacy.css";
+import "../globals.css";
+import "../../public/legacy.css";
 import type { Metadata, Viewport } from "next";
 
 const SITE_URL = (
@@ -22,16 +21,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default function SystemRootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-
     <html lang="ru" suppressHydrationWarning>
-      <body className="u-min-h-screen u-flex u-flex-col" suppressHydrationWarning>{children}</body>
-
+      <body
+        className="u-min-h-screen u-flex u-flex-col"
+        suppressHydrationWarning
+      >
+        {children}
+      </body>
     </html>
   );
 }

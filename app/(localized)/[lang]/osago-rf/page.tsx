@@ -40,7 +40,7 @@ function normalizeLang(value: unknown): Lang {
 }
 
 function langToOgLocale(lang: Lang): string {
-  return lang === "ru" ? "ru_RU" : lang === "kz" ? "kk_KZ" : "en_US";
+  return lang === "ru" ? "ru_RU" : lang === "kz" ? "kk_KZ" : "en_KZ";
 }
 
 function langToIana(lang: Lang): string {
@@ -202,7 +202,9 @@ function OsagoInfoBlocks({
                         </div>
 
                         <div>
-                          <div className="gc-coverage__itemTitle">{it.title}</div>
+                          <div className="gc-coverage__itemTitle">
+                            {it.title}
+                          </div>
                           <p className="gc-coverage__itemText">{it.text}</p>
                         </div>
                       </div>
@@ -220,7 +222,10 @@ function OsagoInfoBlocks({
                       sizes="(min-width: 1024px) 520px, 90vw"
                       priority={false}
                     />
-                    <div className="gc-coverage__imgOverlay" aria-hidden="true" />
+                    <div
+                      className="gc-coverage__imgOverlay"
+                      aria-hidden="true"
+                    />
                   </div>
                 </div>
               </div>
@@ -243,9 +248,9 @@ export async function generateMetadata({
   const url = `${SITE_URL}/${lang}/osago-rf`;
 
   const titles: Record<Lang, string> = {
-    ru: "ОСАГО России для авто из Казахстана — цена и оформление онлайн | DIONIS",
-    kz: "Қазақстандық автокөліктерге арналған Ресей ОСАГО — бағасы және онлайн рәсімдеу | DIONIS",
-    en: "Russian OSAGO for Vehicles from Kazakhstan — Price and Online Application | DIONIS",
+    ru: "ОСАГО России для авто из Казахстана — цена и оформление онлайн",
+    kz: "Қазақстандық автокөліктерге арналған Ресей ОСАГО — бағасы және онлайн рәсімдеу",
+    en: "Russian OSAGO for vehicles from Kazakhstan — price and online application",
   };
 
   const descriptions: Record<Lang, string> = {
@@ -253,8 +258,6 @@ export async function generateMetadata({
     kz: "Қазақстандық нөмірі бар автокөлікке арналған электрондық Ресей ОСАГО полисі. 15 күннен бастап сақтандыру құнын есептеу, құжаттарды тексеру және полисті онлайн алу.",
     en: "Electronic Russian OSAGO insurance for vehicles with Kazakhstan license plates. Calculate the price for coverage starting from 15 days, submit your documents for verification, and receive the policy online.",
   };
-
-
 
   return {
     title: titles[lang],
@@ -333,8 +336,12 @@ export default async function OsagoRfPage({
           <div className="gc-hero__bg" aria-hidden="true" />
           <div className="gc-container gc-hero__grid">
             <div className="gc-hero__left">
-              <h1 className="gc-hero__title">{keepShortWords(osagoPageDict.hero.title)}</h1>
-              <p className="gc-hero__subtitle">{keepShortWords(osagoPageDict.hero.subtitle)}</p>
+              <h1 className="gc-hero__title">
+                {keepShortWords(osagoPageDict.hero.title)}
+              </h1>
+              <p className="gc-hero__subtitle">
+                {keepShortWords(osagoPageDict.hero.subtitle)}
+              </p>
 
               <div
                 className="gc-hero__facts"
@@ -353,7 +360,11 @@ export default async function OsagoRfPage({
             </div>
 
             <div className="gc-hero__right">
-              <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+              <DeferredHydration
+                disableOnLegacy
+                rootMargin="1200px"
+                minDelayMs={0}
+              >
                 <div className="gc-hero__visualWrap">
                   <div className="gc-hero-visual gc-hero-visual--single">
                     <Image
@@ -410,11 +421,12 @@ export default async function OsagoRfPage({
 
                 <div className="gc-legacy-note">
                   <p className="gc-text-muted">
-                    Ваш браузер устарел. Калькулятор может работать медленно или не
-                    работать.
+                    Ваш браузер устарел. Калькулятор может работать медленно или
+                    не работать.
                   </p>
                   <p className="gc-text-muted">
-                    Оформите заявку — мы рассчитаем стоимость и пришлём предложение.
+                    Оформите заявку — мы рассчитаем стоимость и пришлём
+                    предложение.
                   </p>
 
                   <div className="gc-mt-12">
@@ -430,8 +442,8 @@ export default async function OsagoRfPage({
 
                 <noscript>
                   <div className="gc-mt-12 gc-text-muted">
-                    JavaScript отключён. Оформите заявку ниже — мы рассчитаем стоимость
-                    вручную.
+                    JavaScript отключён. Оформите заявку ниже — мы рассчитаем
+                    стоимость вручную.
                   </div>
                 </noscript>
               </div>
@@ -491,7 +503,11 @@ export default async function OsagoRfPage({
           <div className="gc-container">
             <article className="card gc-upsell">
               <div className="gc-upsell__media">
-                <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+                <DeferredHydration
+                  disableOnLegacy
+                  rootMargin="1200px"
+                  minDelayMs={0}
+                >
                   <Image
                     src="/services/osago_check.png"
                     alt={osagoPageDict.osagoCheckUpsell.imageAlt}
@@ -534,7 +550,10 @@ export default async function OsagoRfPage({
         </section>
 
         <DeferredHydration rootMargin="800px" minDelayMs={150}>
-          <section className="gc-advantages" aria-labelledby="advantages-heading">
+          <section
+            className="gc-advantages"
+            aria-labelledby="advantages-heading"
+          >
             <div className="gc-container">
               <h2 id="advantages-heading" className="gc-advantages__title">
                 {keepShortWords(osagoPageDict.advantages.title)}
@@ -568,10 +587,15 @@ export default async function OsagoRfPage({
               className="gc-order-prep"
               aria-labelledby="osago-rf-order-prep-heading"
             >
-              <h2 id="osago-rf-order-prep-heading" className="gc-order-prep__title">
+              <h2
+                id="osago-rf-order-prep-heading"
+                className="gc-order-prep__title"
+              >
                 {osagoPageDict.orderPrep.title}
               </h2>
-              <p className="gc-order-prep__text">{osagoPageDict.orderPrep.text}</p>
+              <p className="gc-order-prep__text">
+                {osagoPageDict.orderPrep.text}
+              </p>
               <ul className="gc-order-prep__list">
                 {osagoPageDict.orderPrep.items.map((item) => (
                   <li key={item}>{item}</li>
@@ -589,7 +613,11 @@ export default async function OsagoRfPage({
           <div className="gc-container">
             <article className="card gc-upsell">
               <div className="gc-upsell__media">
-                <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+                <DeferredHydration
+                  disableOnLegacy
+                  rootMargin="1200px"
+                  minDelayMs={0}
+                >
                   <Image
                     src="/services/zk_photo.webp"
                     alt={osagoPageDict.greenCardUpsell.imageAlt}
@@ -607,7 +635,9 @@ export default async function OsagoRfPage({
                   <h3 className="gc-upsell__title">
                     {osagoPageDict.greenCardUpsell.title}
                   </h3>
-                  <p className="gc-upsell__p">{osagoPageDict.greenCardUpsell.text1}</p>
+                  <p className="gc-upsell__p">
+                    {osagoPageDict.greenCardUpsell.text1}
+                  </p>
                   <p className="gc-upsell__p gc-text-muted">
                     {osagoPageDict.greenCardUpsell.text2}
                   </p>
@@ -637,7 +667,11 @@ export default async function OsagoRfPage({
         <section className="gc-question gc-section--muted">
           <div className="gc-container gc-question__grid">
             <div className="gc-question__media">
-              <DeferredHydration disableOnLegacy rootMargin="1200px" minDelayMs={0}>
+              <DeferredHydration
+                disableOnLegacy
+                rootMargin="1200px"
+                minDelayMs={0}
+              >
                 <Image
                   src="/osago-rf/policy-large.webp"
                   alt={osagoPageDict.hero.policyAlt}
