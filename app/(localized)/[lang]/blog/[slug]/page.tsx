@@ -32,29 +32,23 @@ import {
 } from "@/lib/blog";
 
 const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  "https://dionis-insurance.kz"
+  process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.kz"
 ).replace(/\/$/, "");
 
 export const dynamicParams = false;
 
 function localeByLang(lang: Lang) {
   if (lang === "kz") return "kk-KZ";
-  if (lang === "en") return "en-US";
+  if (lang === "en") return "en-KZ";
   return "ru-RU";
 }
 
 function absoluteUrl(path?: string): string {
   if (!path) return `${SITE_URL}/logo_1.webp`;
-  if (
-    path.startsWith("http://") ||
-    path.startsWith("https://")
-  ) {
+  if (path.startsWith("http://") || path.startsWith("https://")) {
     return path;
   }
-  return `${SITE_URL}${
-    path.startsWith("/") ? path : `/${path}`
-  }`;
+  return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
 export async function generateStaticParams(): Promise<
@@ -81,10 +75,7 @@ export async function generateMetadata({
     title,
     description,
 
-    alternates: buildAlternates(
-      lang,
-      `/blog/${slug}`
-    ),
+    alternates: buildAlternates(lang, `/blog/${slug}`),
 
     robots: {
       index: true,
@@ -116,24 +107,16 @@ export default async function BlogArticlePage({
 
   if (!article) return notFound();
 
-  const author = await getAuthorBySlug(
-    article.authorSlug,
-    lang
-  );
+  const author = await getAuthorBySlug(article.authorSlug, lang);
 
-  const requiredReading =
-    article.requiredReading ?? [];
+  const requiredReading = article.requiredReading ?? [];
 
-  const nextSteps =
-    article.nextSteps ?? [];
+  const nextSteps = article.nextSteps ?? [];
 
-  const related =
-    await getRelatedArticles(article, 6);
+  const related = await getRelatedArticles(article, 6);
 
-  const articleUrl =
-    `${SITE_URL}/${lang}/blog/${article.slug}`;
-  const breadcrumbLabels =
-    BREADCRUMB_LABELS[lang];
+  const articleUrl = `${SITE_URL}/${lang}/blog/${article.slug}`;
+  const breadcrumbLabels = BREADCRUMB_LABELS[lang];
   const blogDict = getBlogDictionary(lang);
 
   const jsonLdBase: Record<string, unknown> = {
@@ -142,15 +125,11 @@ export default async function BlogArticlePage({
 
     headline: article.title,
 
-    description:
-      article.seoDescription,
+    description: article.seoDescription,
 
-    datePublished:
-      article.publishedAt,
+    datePublished: article.publishedAt,
 
-    dateModified:
-      article.modifiedAt ??
-      article.publishedAt,
+    dateModified: article.modifiedAt ?? article.publishedAt,
 
     inLanguage: localeByLang(lang),
 
@@ -178,8 +157,7 @@ export default async function BlogArticlePage({
         name: author.name,
         jobTitle: author.title,
         description: author.bio,
-        url:
-          `${SITE_URL}/${lang}/authors/${author.slug}`,
+        url: `${SITE_URL}/${lang}/authors/${author.slug}`,
         image: absoluteUrl(author.photo),
         sameAs: author.sameAs ?? [],
         worksFor: {
@@ -219,8 +197,7 @@ export default async function BlogArticlePage({
         position: 2,
         name: breadcrumbLabels.blog,
 
-        item:
-          `${SITE_URL}/${lang}/blog`,
+        item: `${SITE_URL}/${lang}/blog`,
       },
 
       {
@@ -234,27 +211,24 @@ export default async function BlogArticlePage({
     ],
   };
 
-  const faqLd =
-    article.faq?.length
-      ? {
-          "@context":
-            "https://schema.org",
+  const faqLd = article.faq?.length
+    ? {
+        "@context": "https://schema.org",
 
-          "@type": "FAQPage",
+        "@type": "FAQPage",
 
-          mainEntity:
-            article.faq.map((x) => ({
-              "@type": "Question",
+        mainEntity: article.faq.map((x) => ({
+          "@type": "Question",
 
-              name: x.q,
+          name: x.q,
 
-              acceptedAnswer: {
-                "@type": "Answer",
-                text: x.a,
-              },
-            })),
-        }
-      : null;
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: x.a,
+          },
+        })),
+      }
+    : null;
 
   const locale = localeByLang(lang);
 
@@ -264,9 +238,7 @@ export default async function BlogArticlePage({
         id="ld-article"
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(
-            jsonLdBase
-          ),
+          __html: JSON.stringify(jsonLdBase),
         }}
       />
 
@@ -274,9 +246,7 @@ export default async function BlogArticlePage({
         id="ld-breadcrumbs"
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(
-            breadcrumbLd
-          ),
+          __html: JSON.stringify(breadcrumbLd),
         }}
       />
 
@@ -285,9 +255,7 @@ export default async function BlogArticlePage({
           id="ld-faq"
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(
-              faqLd
-            ),
+            __html: JSON.stringify(faqLd),
           }}
         />
       ) : null}
@@ -295,41 +263,24 @@ export default async function BlogArticlePage({
       <div className="gc-container">
         {/* Breadcrumbs */}
 
-        <nav
-          className="bp-bc"
-          aria-label={breadcrumbLabels.ariaLabel}
-        >
-          <a
-            className="bp-bc__link"
-            href={`/${lang}`}
-          >
+        <nav className="bp-bc" aria-label={breadcrumbLabels.ariaLabel}>
+          <a className="bp-bc__link" href={`/${lang}`}>
             {breadcrumbLabels.home}
           </a>
 
-          <span
-            className="bp-bc__sep"
-            aria-hidden="true"
-          >
+          <span className="bp-bc__sep" aria-hidden="true">
             →
           </span>
 
-          <a
-            className="bp-bc__link"
-            href={`/${lang}/blog`}
-          >
+          <a className="bp-bc__link" href={`/${lang}/blog`}>
             {breadcrumbLabels.blog}
           </a>
 
-          <span
-            className="bp-bc__sep"
-            aria-hidden="true"
-          >
+          <span className="bp-bc__sep" aria-hidden="true">
             →
           </span>
 
-          <span className="bp-bc__current">
-            {article.title}
-          </span>
+          <span className="bp-bc__current">{article.title}</span>
         </nav>
 
         {/* Header */}
@@ -343,25 +294,17 @@ export default async function BlogArticlePage({
                 size="sm"
               />
 
-              <h1 className="bp-title">
-                {article.title}
-              </h1>
+              <h1 className="bp-title">{article.title}</h1>
 
               {article.seoDescription ? (
-                <p className="bp-lead">
-                  {article.seoDescription}
-                </p>
+                <p className="bp-lead">{article.seoDescription}</p>
               ) : null}
 
               <div className="bp-subrow">
                 <ArticleMeta
                   locale={locale}
-                  publishedAt={
-                    article.publishedAt
-                  }
-                  updatedAt={
-                    article.modifiedAt
-                  }
+                  publishedAt={article.publishedAt}
+                  updatedAt={article.modifiedAt}
                   labels={{
                     published: blogDict.publishedLabel,
                     updated: blogDict.updatedLabel,
@@ -369,16 +312,11 @@ export default async function BlogArticlePage({
                   }}
                 />
 
-                <span
-                  className="bp-dot"
-                  aria-hidden="true"
-                >
+                <span className="bp-dot" aria-hidden="true">
                   •
                 </span>
 
-                <span className="bp-reading">
-                  {article.readingTime}
-                </span>
+                <span className="bp-reading">{article.readingTime}</span>
               </div>
 
               {author ? (
@@ -440,10 +378,7 @@ export default async function BlogArticlePage({
                   items={requiredReading}
                 />
 
-                <NextStep
-                  title={blogDict.nextStepTitle}
-                  items={nextSteps}
-                />
+                <NextStep title={blogDict.nextStepTitle} items={nextSteps} />
 
                 <Changelog
                   title={blogDict.changelogTitle}
@@ -459,27 +394,16 @@ export default async function BlogArticlePage({
 
         {article.faq?.length ? (
           <section className="bp-faq">
-            <h2 className="bp-h2">
-              {blogDict.faqTitle}
-            </h2>
+            <h2 className="bp-h2">{blogDict.faqTitle}</h2>
 
             <div className="bp-faq__list">
-              {article.faq.map(
-                (item, idx) => (
-                  <details
-                    key={`${idx}-${item.q}`}
-                    className="bp-faq__item"
-                  >
-                    <summary className="bp-faq__q">
-                      {item.q}
-                    </summary>
+              {article.faq.map((item, idx) => (
+                <details key={`${idx}-${item.q}`} className="bp-faq__item">
+                  <summary className="bp-faq__q">{item.q}</summary>
 
-                    <div className="bp-faq__a">
-                      {item.a}
-                    </div>
-                  </details>
-                )
-              )}
+                  <div className="bp-faq__a">{item.a}</div>
+                </details>
+              ))}
             </div>
           </section>
         ) : null}
@@ -488,45 +412,34 @@ export default async function BlogArticlePage({
 
         {related.length ? (
           <section className="bp-related">
-            <h2 className="bp-h2">
-              {blogDict.relatedTitle}
-            </h2>
+            <h2 className="bp-h2">{blogDict.relatedTitle}</h2>
 
             <div className="bp-related__grid">
-              {related.map(
-                (x: BlogArticleCard) => (
-                  <a
-                    key={x.slug}
-                    href={`/${lang}/blog/${x.slug}`}
-                    className="bp-relcard"
-                  >
-                    <div className="bp-relcard__top">
-                      {"contentType" in x &&
-                      x.contentType ? (
-                        <ContentTypeBadge
-                          type={x.contentType}
-                          lang={lang}
-                          size="sm"
-                        />
-                      ) : (
-                        <span />
-                      )}
+              {related.map((x: BlogArticleCard) => (
+                <a
+                  key={x.slug}
+                  href={`/${lang}/blog/${x.slug}`}
+                  className="bp-relcard"
+                >
+                  <div className="bp-relcard__top">
+                    {"contentType" in x && x.contentType ? (
+                      <ContentTypeBadge
+                        type={x.contentType}
+                        lang={lang}
+                        size="sm"
+                      />
+                    ) : (
+                      <span />
+                    )}
 
-                      <div className="bp-relcard__rt">
-                        {x.readingTime}
-                      </div>
-                    </div>
+                    <div className="bp-relcard__rt">{x.readingTime}</div>
+                  </div>
 
-                    <div className="bp-relcard__title">
-                      {x.title}
-                    </div>
+                  <div className="bp-relcard__title">{x.title}</div>
 
-                    <div className="bp-relcard__text">
-                      {x.excerpt}
-                    </div>
-                  </a>
-                )
-              )}
+                  <div className="bp-relcard__text">{x.excerpt}</div>
+                </a>
+              ))}
             </div>
           </section>
         ) : null}

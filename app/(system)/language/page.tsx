@@ -9,7 +9,7 @@ const SITE_URL = (
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Выбор языка | Dionis Insurance Broker",
+  title: "Выбор языка",
   description:
     "Выберите язык сайта Dionis Insurance Broker: русский, қазақша немесе English.",
   alternates: {

@@ -3,9 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 const LANGUAGE_COOKIE = "dionis_language";
 const SUPPORTED_LANGS = ["ru", "kz", "en"] as const;
 const LANGUAGE_ROUTE = "/language";
+const CANONICAL_HOST = "dionis-insurance.kz";
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "0.0.0.0"]);
 
-function isSupportedLang(value: string | undefined): value is (typeof SUPPORTED_LANGS)[number] {
+function isSupportedLang(
+  value: string | undefined,
+): value is (typeof SUPPORTED_LANGS)[number] {
   return SUPPORTED_LANGS.some((lang) => lang === value);
+}
+
+function isLocalHost(hostname: string): boolean {
+  return LOCAL_HOSTS.has(hostname) || hostname.endsWith(".localhost");
 }
 
 function shouldSkip(pathname: string) {
@@ -34,7 +42,8 @@ function withLanguage(pathname: string, lang: string) {
     return rawQuery ? `${nextPathname}?${rawQuery}` : nextPathname;
   }
 
-  if (rawPathname === "/") return rawQuery ? `/${lang}?${rawQuery}` : `/${lang}`;
+  if (rawPathname === "/")
+    return rawQuery ? `/${lang}?${rawQuery}` : `/${lang}`;
 
   const nextPathname = `/${lang}${rawPathname}`;
   return rawQuery ? `${nextPathname}?${rawQuery}` : nextPathname;
@@ -42,6 +51,24 @@ function withLanguage(pathname: string, lang: string) {
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
+  const canonicalUrl = request.nextUrl.clone();
+  const hostname = canonicalUrl.hostname.toLowerCase();
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+  const shouldForceHttps =
+    (forwardedProto === "http" || canonicalUrl.protocol === "http:") &&
+    !isLocalHost(hostname);
+  const shouldDropWww = hostname === `www.${CANONICAL_HOST}`;
+  const shouldDropTrailingSlash = pathname.length > 1 && pathname.endsWith("/");
+
+  if (shouldDropWww) canonicalUrl.hostname = CANONICAL_HOST;
+  if (shouldForceHttps) canonicalUrl.protocol = "https:";
+  if (shouldDropTrailingSlash) {
+    canonicalUrl.pathname = pathname.replace(/\/+$/, "");
+  }
+
+  if (shouldDropWww || shouldForceHttps || shouldDropTrailingSlash) {
+    return NextResponse.redirect(canonicalUrl, 301);
+  }
 
   if (shouldSkip(pathname)) return NextResponse.next();
 
@@ -49,9 +76,13 @@ export function proxy(request: NextRequest) {
 
   if (pathname === LANGUAGE_ROUTE) {
     if (isSupportedLang(selectedLang)) {
-      const requestedReturnTo = request.nextUrl.searchParams.get("returnTo") || "/";
+      const requestedReturnTo =
+        request.nextUrl.searchParams.get("returnTo") || "/";
       const destination = request.nextUrl.clone();
-      const [nextPathname, nextSearch = ""] = withLanguage(requestedReturnTo, selectedLang).split("?");
+      const [nextPathname, nextSearch = ""] = withLanguage(
+        requestedReturnTo,
+        selectedLang,
+      ).split("?");
       destination.pathname = nextPathname;
       destination.search = nextSearch ? `?${nextSearch}` : "";
       return NextResponse.redirect(destination);

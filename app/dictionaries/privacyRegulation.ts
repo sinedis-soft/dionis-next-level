@@ -34,7 +34,7 @@ export const PRIVACY_REGULATION_DICTIONARY: Record<Lang, RegulationDictionary> =
     ru: {
       seo: {
         title:
-          "Регламент оказания услуг электронным способом — Dionis Insurance Broker",
+          "Регламент оказания услуг электронным способом",
         description:
           "Регламент оказания услуг электронным способом и содействия заключению договоров страхования на расстоянии через ТОО «Страховой брокер Дионис».",
       },
@@ -431,7 +431,7 @@ export const PRIVACY_REGULATION_DICTIONARY: Record<Lang, RegulationDictionary> =
     kz: {
         seo: {
             title:
-            "Электрондық тәсілмен қызмет көрсету регламенті — Dionis Insurance Broker",
+            "Электрондық тәсілмен қызмет көрсету регламенті",
             description:
             "«Страховой брокер Дионис» ЖШС арқылы электрондық тәсілмен қызмет көрсету және қашықтан сақтандыру шарттарын жасасуға жәрдемдесу регламенті.",
         },
@@ -829,7 +829,7 @@ export const PRIVACY_REGULATION_DICTIONARY: Record<Lang, RegulationDictionary> =
     en: {
   seo: {
     title:
-      "Regulations for the Provision of Services by Electronic Means — Dionis Insurance Broker",
+      "Regulations for the Provision of Services by Electronic Means",
     description:
       "Regulations for the provision of services by electronic means and assistance in concluding insurance contracts remotely through Dionis Insurance Broker LLP.",
   },

@@ -5,7 +5,7 @@ import type { BlogArticleCard } from "@/lib/blog";
 
 function localeByLang(lang: Lang) {
   if (lang === "kz") return "kk-KZ";
-  if (lang === "en") return "en-US";
+  if (lang === "en") return "en-KZ";
   return "ru-RU";
 }
 
@@ -21,11 +21,7 @@ export default function BlogCards({
   return (
     <div className="bc-grid">
       {articles.map((a) => (
-        <a
-          key={a.slug}
-          href={`/${lang}/blog/${a.slug}`}
-          className="bc-card"
-        >
+        <a key={a.slug} href={`/${lang}/blog/${a.slug}`} className="bc-card">
           <div className="bc-media">
             <Image
               src={a.image}
@@ -54,9 +50,7 @@ export default function BlogCards({
             <p className="bc-excerpt">{a.excerpt}</p>
 
             <div className="bc-meta">
-              <span>
-                {new Date(a.publishedAt).toLocaleDateString(locale)}
-              </span>
+              <span>{new Date(a.publishedAt).toLocaleDateString(locale)}</span>
               <span className="bc-dot" aria-hidden="true">
                 •
               </span>

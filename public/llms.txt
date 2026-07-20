@@ -2,7 +2,9 @@
 
 > Licensed insurance broker website in Kazakhstan with information, calculators, and application forms for motor, transport, cargo, liability, property, life, and medical insurance.
 
-Dionis Insurance Broker is a multilingual website for clients in Kazakhstan who need insurance information and broker-assisted applications. The site is available in Russian, Kazakh, and English at `/ru`, `/kz`, and `/en`.
+Dionis Insurance Broker is a multilingual website for clients in Kazakhstan who need insurance information and broker-assisted applications. The site is available in Russian, Kazakh, and English at `/ru`, `/kz`, and `/en`. The localized homepages expose the main insurance directions, product links, broker specialization, license and association information, partners, leadership information, benefits, and key questions directly in the initial HTML.
+
+Canonical public URLs do not use trailing slashes. The default discovery target is the Russian Kazakhstan entry point (`/ru`), while English alternates are marked for Kazakhstan users (`en-KZ`).
 
 The most important public content explains Green Card insurance for vehicles from Kazakhstan, Russian OSAGO/MTPL for foreign vehicles entering or travelling in Russia, the broader insurance product directory, practical route and transport articles, company information, contacts, and privacy/regulation pages.
 

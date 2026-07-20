@@ -2,6 +2,28 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  skipTrailingSlashRedirect: true,
+  async redirects() {
+    return [
+      {
+        source: "/:path+/",
+        destination: "/:path+",
+        statusCode: 301,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.dionis-insurance.kz" }],
+        destination: "https://dionis-insurance.kz/:path*",
+        statusCode: 301,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "header", key: "x-forwarded-proto", value: "http" }],
+        destination: "https://dionis-insurance.kz/:path*",
+        statusCode: 301,
+      },
+    ];
+  },
   images: {
     // ВАЖНО: добавляем мелкие ширины сюда (deviceSizes), не только в imageSizes
     deviceSizes: [
