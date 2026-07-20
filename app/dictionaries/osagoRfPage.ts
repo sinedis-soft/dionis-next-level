@@ -93,229 +93,229 @@ export type OsagoRfPageDictionary = {
 
 const ru: OsagoRfPageDictionary = {
   hero: {
-    title: "ОСАГО России для автомобилей из Казахстана",
+    title: "Автостраховка для выезда в Россию из Казахстана",
     subtitle:
-      "Электронная страховка для въезда и поездок по России на автомобиле с казахстанскими регистрационными номерами",
-    ctaOrder: "Оформить ОГПО в РФ",
-    factsLabel: "Ключевые условия продукта",
+      "Российский полис ОСАГО для автомобиля с казахстанскими регистрационными номерами. Проверка документов, расчёт стоимости и получение электронного полиса онлайн.",
+    ctaOrder: "Рассчитать ОСАГО",
+    factsLabel: "Основные условия",
     facts: [
-      "Для авто с иностранными номерами",
-      "Электронный полис PDF",
-      "Консультация перед оплатой",
+      "Для автомобилей с номерами Казахстана",
+      "Электронный полис ОСАГО",
+      "Проверка документов до оплаты",
     ],
-    carAlt: "Автомобиль с иностранными номерами и полисом ОСАГО РФ",
-    policyAlt: "Электронный полис ОСАГО РФ для нерезидентов",
-    logoAlt: "Dionis Insurance Broker",
+    carAlt:
+      "Автомобиль с казахстанскими номерами для поездки в Россию",
+    policyAlt:
+      "Электронный полис российского ОСАГО для автомобиля из Казахстана",
+    logoAlt: "Страховой брокер DIONIS",
   },
 
   questionBlock: {
-    title: "Нужна консультация по ОГПО в РФ?",
+    title: "Нужна консультация по страховке для поездки в Россию?",
     text1:
-      "Подскажем по срокам действия, стоимости и требованиям для нерезидентов.",
+      "Расскажем о доступных сроках страхования, порядке расчёта стоимости и документах, необходимых для оформления ОСАГО.",
     text2:
-      "Для оформления полиса заполните заявку выше — это займёт несколько минут.",
+      "Заполните заявку — менеджер проверит данные автомобиля и подтвердит возможность оформления.",
   },
 
   advantages: {
-    title: "Почему оформляют ОГПО в РФ через «Дионис»",
+    title: "Почему ОСАГО оформляют через DIONIS",
     items: [
       {
         icon: "⏱",
-        title: "Быстрое оформление онлайн",
+        title: "Оформление дистанционно",
         text:
-          "Оформление полиса без визита в офис. Все данные передаются дистанционно.",
+          "Заявку и документы можно передать онлайн без посещения офиса.",
       },
       {
         icon: "📄",
         title: "Электронный полис",
         text:
-          "Полис приходит на e-mail в формате PDF и признаётся на всей территории РФ.",
+          "После оформления полис отправляется на e-mail в формате PDF.",
       },
       {
         icon: "🛂",
-        title: "Подходит для нерезидентов",
+        title: "Для автомобилей из Казахстана",
         text:
-          "Оформляем ОСАГО для автомобилей с иностранной регистрацией.",
+          "Помогаем оформить российское ОСАГО на автомобиль с казахстанскими регистрационными номерами.",
       },
       {
         icon: "💳",
-        title: "Прозрачная оплата",
+        title: "Проверка до оплаты",
         text:
-          "Оплата картой или банковским переводом без скрытых комиссий.",
+          "Сначала проверяем документы и параметры автомобиля, затем подтверждаем стоимость и порядок оплаты.",
       },
     ],
   },
 
   howItWorks: {
-    title: "Как оформить ОГПО в РФ (ОСАГО РФ)",
-    subtitle: "Пошаговый процесс без лишних действий",
+    title: "Как оформить российское ОСАГО онлайн",
+    subtitle: "Последовательный процесс оформления полиса",
     steps: [
       {
         title: "Оставляете заявку",
         text:
-          "Заполняете форму с данными автомобиля и планируемым сроком поездки.",
+          "Указываете данные автомобиля, водителей и планируемые даты поездки в Россию.",
       },
       {
-        title: "Проверяем и уточняем данные",
+        title: "Мы проверяем документы",
         text:
-          "Менеджер проверяет корректность информации и подтверждает условия.",
+          "Менеджер проверяет полученные данные, возможность оформления и доступный срок страхования.",
       },
       {
-        title: "Оплачиваете полис",
+        title: "Получаете расчёт",
         text:
-          "Оплата онлайн — картой или по счёту. Подходит для физических и юридических лиц.",
+          "После проверки сообщаем стоимость полиса и направляем реквизиты или ссылку для оплаты.",
       },
       {
-        title: "Получаете ОСАГО",
+        title: "Получаете полис",
         text:
-          "Готовый электронный полис отправляем на e-mail. Обычно в течение 15–20 минут.",
+          "После оплаты и завершения оформления отправляем электронный полис ОСАГО на указанный e-mail.",
       },
     ],
   },
 
   writeUs: {
-    title: "Быстрое оформление",
-    text: "Напишите нам — оформим полис за 20 минут",
-    whatsapp: "Написать нам в WhatsApp",
-    telegram: "Написать нам в Telegram",
-    phone: "Позвонить нам: +7 (727) 357-30-30",
+    title: "Поможем оформить ОСАГО",
+    text:
+      "Напишите нам — проверим документы, рассчитаем стоимость и подтвердим возможность оформления полиса",
+    whatsapp: "Написать в WhatsApp",
+    telegram: "Написать в Telegram",
+    phone: "Позвонить: +7 (727) 357-30-30",
   },
 
   info: {
-    title: "Что такое ОСАГО РФ для нерезидентов",
+    title: "Что такое российское ОСАГО для автомобиля из Казахстана",
     paragraphs: [
-      "ОСАГО — обязательное страхование гражданской ответственности владельцев транспортных средств. Для автомобилей с иностранной регистрацией наличие полиса ОСАГО обязательно при въезде и передвижении по территории Российской Федерации.",
-      "Полис покрывает ответственность водителя за вред, причинённый жизни, здоровью или имуществу третьих лиц в результате ДТП на территории РФ.",
-      "Электронный полис ОСАГО официально признаётся сотрудниками ГИБДД, пограничной службой и другими контролирующими органами.",
+      "ОСАГО — обязательное страхование гражданской ответственности владельца транспортного средства. Полис предназначен для возмещения вреда, который водитель может причинить другим людям или их имуществу в результате ДТП.",
+      "Для эксплуатации автомобиля с казахстанскими регистрационными номерами в России необходимо действующее страхование гражданской ответственности, признаваемое на территории РФ. При отсутствии другого подходящего страхового покрытия оформляется российский полис ОСАГО.",
+      "ОСАГО не страхует сам автомобиль владельца от повреждения, угона, пожара, стихийных явлений и других рисков. Для защиты собственного автомобиля требуется отдельный договор каско.",
+      "Электронный полис имеет юридическую силу. Его данные можно проверить в российской страховой информационной системе.",
     ],
   },
 
   benefits: {
-    title: "Преимущества ОСАГО РФ для нерезидентов",
-    imageAlt: "ОСАГО РФ для нерезидентов — оформление онлайн",
+    title: "Что даёт российский полис ОСАГО",
+    imageAlt:
+      "Российское ОСАГО для автомобиля с казахстанскими номерами",
     items: [
       {
-        title: "Законный въезд и передвижение",
+        title: "Страховое покрытие в России",
         text:
-          "Наличие полиса ОГПО в РФ обязательно для легального передвижения по дорогам РФ на автомобиле с иностранными номерами.",
+          "Полис подтверждает наличие страхования гражданской ответственности на территории Российской Федерации в течение указанного срока.",
       },
       {
-        title: "Финансовая защита при ДТП",
+        title: "Возмещение вреда пострадавшим",
         text:
-          "В случае аварии страховая компания возмещает ущерб пострадавшим в рамках установленных лимитов.",
+          "Если водитель станет виновником ДТП, страховая компания возмещает вред жизни, здоровью или имуществу третьих лиц в пределах установленных лимитов.",
       },
       {
-        title: "Признание по всей территории РФ",
+        title: "Действие во всех регионах РФ",
         text:
-          "Полис действует во всех регионах России без ограничений.",
+          "Полис действует на территории России при соблюдении срока и других условий договора страхования.",
       },
       {
-        title: "Гибкий срок страхования",
+        title: "Срок с учётом поездки",
         text:
-          "Можно оформить ОСАГО на период поездки — без переплаты за лишние месяцы.",
+          "Период страхования подбирается с учётом планируемых дат поездки и доступных по правилам ОСАГО сроков.",
       },
     ],
   },
 
   osagoCheckUpsell: {
-    title: "Проверить полис ОСАГО РФ",
+    title: "Проверить полис ОСАГО",
     text1:
-      "Если у вас уже есть оформленный полис, вы можете самостоятельно проверить его на сайте Российской Национальной Страховой Информационной Системы.",
+      "Если полис уже оформлен, проверьте его данные в Российской Национальной Страховой Информационной Системе.",
     text2:
-      "Проверка помогает убедиться, что данные полиса корректно отражены в системе.",
+      "Проверка позволяет убедиться, что полис зарегистрирован в системе, а сведения об автомобиле, страхователе и сроке действия указаны правильно.",
     btn: "Проверить полис",
-    imageAlt: "Проверка полиса ОСАГО РФ",
+    imageAlt: "Проверка российского полиса ОСАГО",
   },
 
   greenCardUpsell: {
-    title: "Планируете поездки в Турцию или ЕС?",
+    title: "Планируете поездку в другие страны?",
     text1:
-      "Для поездок в страны ЕС и другие государства может потребоваться полис «Зелёная карта».",
+      "Российское ОСАГО предназначено для поездок по территории России. Для въезда в Турцию, страны ЕС и другие государства может потребоваться отдельное международное или пограничное страхование.",
     text2:
-      "Мы поможем подобрать оптимальное покрытие и объединить маршруты в одной страховой программе.",
-    btn: "Узнать о Зеленой карте",
-    imageAlt: "Полис Зеленая карта для международных поездок",
+      "Сообщите полный маршрут поездки — мы проверим, какое страховое покрытие потребуется для каждой страны.",
+    btn: "Проверить маршрут",
+    imageAlt:
+      "Страхование автомобиля для международной поездки",
   },
 
   orderPrep: {
-    title: "Перед заявкой подготовьте данные",
-    text: "Так менеджер быстрее проверит возможность оформления и подтвердит стоимость без лишних уточнений.",
+    title: "Подготовьте данные для расчёта",
+    text:
+      "Полный комплект информации позволит быстрее проверить возможность оформления и рассчитать стоимость полиса.",
     items: [
-      "СТС или техпаспорт автомобиля",
-      "Даты въезда и выезда из РФ",
-      "Контактный телефон и e-mail для полиса",
+      "СТС или технический паспорт автомобиля",
+      "Паспорт или удостоверение личности страхователя",
+      "Водительские удостоверения допущенных водителей",
+      "Планируемые даты поездки в Россию",
+      "Контактный телефон и e-mail для получения полиса",
     ],
   },
 
   faq: {
-    title: "Вопросы по ОСАГО РФ для нерезидентов",
-    intro: "Ответы на самые частые вопросы перед оформлением полиса.",
+    title: "Вопросы об ОСАГО для поездки в Россию",
+    intro:
+      "Основная информация для владельцев автомобилей с казахстанскими регистрационными номерами.",
     items: [
       {
         id: "mandatory",
-        question: "Обязательно ли ОСАГО для иностранного автомобиля?",
+        question:
+          "Нужна ли страховка для поездки в Россию на автомобиле из Казахстана?",
         answer:
-          "Да. При въезде и эксплуатации автомобиля с иностранной регистрацией на территории РФ наличие полиса ОСАГО обязательно.",
-      },
-      {
-        id: "electronic-policy",
-        question: "Можно ли использовать электронный полис?",
-        answer:
-          "Да. Электронный полис ОГПО в РФ официально признаётся и не требует бумажного оригинала.",
-      },
-      {
-        id: "term",
-        question: "На какой срок лучше оформлять ОСАГО?",
-        answer:
-          "Полис должен покрывать весь период нахождения автомобиля в РФ. Обычно оформляют с небольшим запасом по датам.",
-      },
-      {
-        id: "check",
-        question: "Кто может проверить наличие ОСАГО?",
-        answer:
-          "Сотрудники ГИБДД, пограничные службы, а также при оформлении ДТП.",
-      },
-      {
-        id: "what-is-osago",
-        question: "Что такое ОСАГО РФ для нерезидентов?",
-        answer:
-          "ОСАГО — обязательное страхование гражданской ответственности владельцев транспортных средств. Для автомобилей с иностранной регистрацией полис обязателен при въезде и передвижении по территории РФ.",
+          "Для эксплуатации автомобиля в России необходимо действующее страхование гражданской ответственности, признаваемое на территории РФ. При отсутствии другого подходящего покрытия необходимо оформить российский полис ОСАГО.",
       },
       {
         id: "what-covers",
-        question: "Что покрывает ОГПО в РФ при ДТП?",
+        question: "Что покрывает российское ОСАГО?",
         answer:
-          "Полис покрывает ответственность водителя за вред, причинённый жизни, здоровью или имуществу третьих лиц в результате ДТП на территории РФ — в пределах установленных лимитов.",
+          "Полис покрывает ответственность водителя за вред, причинённый жизни, здоровью или имуществу третьих лиц в результате ДТП, в пределах установленных законодательством и договором лимитов.",
       },
       {
-        id: "is-eosago-valid",
-        question: "Признают ли электронный ОСАГО сотрудники ГИБДД и на границе?",
+        id: "own-car-damage",
+        question:
+          "Покрывает ли ОСАГО повреждение автомобиля владельца?",
         answer:
-          "Да. Электронный полис официально признаётся сотрудниками ГИБДД, пограничной службой и другими контролирующими органами.",
+          "Нет. ОСАГО покрывает ответственность перед третьими лицами. Повреждение, угон, пожар и другие риски самого автомобиля страхуются отдельно по договору каско.",
       },
       {
-        id: "legal-driving",
-        question: "Зачем ОСАГО нужно нерезиденту на авто с иностранными номерами?",
+        id: "documents",
+        question: "Какие документы нужны для оформления ОСАГО?",
         answer:
-          "Полис ОСАГО обязателен для легального передвижения по дорогам РФ на автомобиле с иностранной регистрацией.",
+          "Обычно требуются регистрационные документы автомобиля, документ страхователя, водительские удостоверения допущенных водителей и планируемые даты поездки. Точный перечень подтверждается после проверки заявки.",
       },
       {
-        id: "financial-protection",
-        question: "Какая финансовая защита даёт ОСАГО?",
+        id: "term",
+        question: "На какой срок можно оформить ОСАГО?",
         answer:
-          "При ДТП страховая компания возмещает ущерб пострадавшим в рамках установленных лимитов — это снижает риск крупных личных расходов.",
+          "Доступный срок зависит от действующих правил страхования и параметров автомобиля. Полис должен покрывать весь период эксплуатации автомобиля в России.",
+      },
+      {
+        id: "electronic-policy",
+        question: "Действителен ли электронный полис ОСАГО?",
+        answer:
+          "Да. Электронный полис имеет юридическую силу. Рекомендуем сохранить PDF на телефоне и дополнительно иметь распечатанную копию на случай отсутствия доступа к интернету.",
+      },
+      {
+        id: "check",
+        question: "Как проверить оформленный полис?",
+        answer:
+          "Данные полиса можно проверить в Российской Национальной Страховой Информационной Системе. Сведения об автомобиле и сроке действия должны совпадать с указанными в электронном документе.",
       },
       {
         id: "valid-all-rf",
         question: "Действует ли ОСАГО по всей территории России?",
         answer:
-          "Да. Полис действует во всех регионах РФ без территориальных ограничений (при соблюдении условий договора).",
+          "Да. Российский полис ОСАГО действует во всех регионах Российской Федерации в течение указанного срока при соблюдении условий договора.",
       },
       {
-        id: "flex-term",
-        question: "Можно ли оформить ОГПО в РФ только на срок поездки?",
+        id: "start-date",
+        question: "Можно ли оформить полис в день въезда?",
         answer:
-          "Да. Обычно можно подобрать срок так, чтобы он покрывал период пребывания в РФ и не переплачивать за лишние месяцы.",
+          "Возможность начала действия полиса в нужную дату зависит от правил оформления и времени проверки документов. Рекомендуем подавать заявку заранее, до начала поездки.",
       },
     ],
   },
@@ -323,193 +323,229 @@ const ru: OsagoRfPageDictionary = {
 
 const en: OsagoRfPageDictionary = {
   hero: {
-    title: "MTPL in Russia for Kazakh-registered vehicles",
+    title: "Car insurance for travel from Kazakhstan to Russia",
     subtitle:
-      "Mandatory motor third-party liability insurance required to enter and drive within the Russian Federation with foreign license plates.",
-    ctaOrder: "Get MTPL for Russia",
-    factsLabel: "Key product facts",
+      "Russian OSAGO motor liability insurance for vehicles with Kazakhstan registration plates. Document verification, price calculation, and electronic policy delivery online.",
+    ctaOrder: "Calculate OSAGO price",
+    factsLabel: "Key conditions",
     facts: [
-      "For foreign-registered vehicles",
-      "Electronic PDF policy",
-      "Consultation before payment",
+      "For vehicles registered in Kazakhstan",
+      "Electronic Russian OSAGO policy",
+      "Document verification before payment",
     ],
-    carAlt: "Vehicle with foreign plates and Russian MTPL policy",
-    policyAlt: "Electronic MTPL policy for non-residents",
-    logoAlt: "Dionis Insurance Broker",
+    carAlt:
+      "Vehicle with Kazakhstan registration plates travelling to Russia",
+    policyAlt:
+      "Electronic Russian OSAGO policy for a vehicle registered in Kazakhstan",
+    logoAlt: "DIONIS Insurance Broker",
   },
 
   questionBlock: {
-    title: "Need consultation on MTPL for Russia?",
+    title: "Need advice on car insurance for travel to Russia?",
     text1:
-      "We clarify validity period, pricing, and requirements for non-residents.",
+      "We explain the available insurance periods, pricing procedure, and documents required to arrange Russian OSAGO.",
     text2:
-      "To issue a policy, complete the application form above. It takes only a few minutes.",
+      "Complete the application form, and our manager will verify the vehicle details and confirm whether the policy can be issued.",
   },
 
   advantages: {
-    title: "Why clients arrange MTPL in Russia via Dionis",
+    title: "Why arrange Russian OSAGO through DIONIS",
     items: [
       {
         icon: "⏱",
-        title: "Fast online issuance",
+        title: "Remote application",
         text:
-          "No office visit required. All data is submitted remotely.",
+          "You can submit the application and documents online without visiting an office.",
       },
       {
         icon: "📄",
-        title: "Electronic policy (PDF)",
+        title: "Electronic policy",
         text:
-          "The policy is sent by email in PDF format and is valid throughout the Russian Federation.",
+          "Once issued, the policy is sent to your email address as a PDF file.",
       },
       {
         icon: "🛂",
-        title: "Suitable for non-residents",
+        title: "For vehicles from Kazakhstan",
         text:
-          "We arrange MTPL for vehicles with foreign registration.",
+          "We assist with arranging Russian OSAGO for vehicles with Kazakhstan registration plates.",
       },
       {
         icon: "💳",
-        title: "Transparent payment",
+        title: "Verification before payment",
         text:
-          "Card payment or bank transfer without hidden fees.",
+          "We first check the documents and vehicle details, then confirm the price and payment procedure.",
       },
     ],
   },
 
   howItWorks: {
-    title: "How to obtain MTPL in Russia",
-    subtitle: "Clear step-by-step process",
+    title: "How to arrange Russian OSAGO online",
+    subtitle: "A clear step-by-step policy issuance process",
     steps: [
       {
         title: "Submit an application",
         text:
-          "Provide vehicle details and planned travel period.",
+          "Provide the vehicle details, driver information, and planned travel dates in Russia.",
       },
       {
-        title: "Data verification",
+        title: "We verify the documents",
         text:
-          "We check information accuracy and confirm conditions.",
+          "Our manager checks the submitted information, confirms whether the policy can be issued, and verifies the available insurance period.",
       },
       {
-        title: "Payment",
+        title: "Receive the quotation",
         text:
-          "Online card payment or bank transfer. Available for individuals and companies.",
+          "After verification, we confirm the policy price and send payment details or a payment link.",
       },
       {
         title: "Receive the policy",
         text:
-          "Electronic MTPL is sent by email, usually within 15–20 minutes.",
+          "Once payment and issuance are complete, we send the electronic OSAGO policy to the specified email address.",
       },
     ],
   },
 
-  info: {
-    title: "What is MTPL in Russia for non-residents",
-    paragraphs: [
-      "MTPL is mandatory motor third-party liability insurance. For vehicles registered abroad, a valid MTPL policy is required when entering and operating within the Russian Federation.",
-      "The policy covers the driver’s liability for damage caused to third parties’ life, health, or property as a result of a traffic accident in Russia.",
-      "Electronic MTPL policies are officially recognized by traffic police and other supervisory authorities.",
-    ],
-  },
-
   writeUs: {
-    title: "Quick application",
-    text: "Write to us — we will issue the policy in 20 minutes",
+    title: "We will help you arrange Russian OSAGO",
+    text:
+      "Contact us to have your documents checked, receive a price calculation, and confirm whether the policy can be issued",
     whatsapp: "Message us on WhatsApp",
     telegram: "Message us on Telegram",
     phone: "Call us: +7 (727) 357-30-30",
   },
 
+  info: {
+    title: "What Russian OSAGO is for vehicles from Kazakhstan",
+    paragraphs: [
+      "OSAGO is compulsory motor third-party liability insurance. It is intended to compensate for injury or property damage caused to other people as a result of a road traffic accident.",
+      "To operate a vehicle with Kazakhstan registration plates in Russia, the vehicle must have valid motor liability insurance recognized in the Russian Federation. If no other recognized coverage is available, a Russian OSAGO policy must be arranged.",
+      "OSAGO does not cover damage to, theft of, fire involving, or other risks affecting the policyholder’s own vehicle. Separate comprehensive motor insurance is required to protect the vehicle itself.",
+      "An electronic OSAGO policy has legal validity. Its details can be checked in the Russian insurance information system.",
+    ],
+  },
+
   benefits: {
-    title: "Key benefits of MTPL in Russia",
-    imageAlt: "Online MTPL for foreign vehicles in Russia",
+    title: "What Russian OSAGO covers",
+    imageAlt:
+      "Russian OSAGO insurance for a vehicle with Kazakhstan registration plates",
     items: [
       {
-        title: "Legal driving in Russia",
+        title: "Liability coverage in Russia",
         text:
-          "MTPL is mandatory for lawful operation of a foreign-registered vehicle on Russian roads.",
+          "The policy confirms motor third-party liability coverage in the Russian Federation for the stated insurance period.",
       },
       {
-        title: "Financial protection",
+        title: "Compensation for injured third parties",
         text:
-          "In case of an accident, the insurer compensates third parties within statutory limits.",
+          "If the driver is responsible for an accident, the insurer compensates third parties for bodily injury or property damage within the applicable limits.",
       },
       {
-        title: "Valid across Russia",
+        title: "Valid throughout Russia",
         text:
-          "The policy applies in all regions of the Russian Federation.",
+          "The policy applies throughout the Russian Federation, subject to its validity period and other policy conditions.",
       },
       {
-        title: "Flexible duration",
+        title: "Insurance period based on the trip",
         text:
-          "You may choose the period corresponding to your stay in Russia.",
+          "The insurance period is selected according to the planned travel dates and the periods available under Russian OSAGO rules.",
       },
     ],
   },
 
   osagoCheckUpsell: {
-    title: "Check your Russian MTPL policy",
+    title: "Check your Russian OSAGO policy",
     text1:
-      "If you already have an issued policy, you can verify it yourself on the website of the Russian National Insurance Information System.",
+      "If your policy has already been issued, you can verify its details in the Russian National Insurance Information System.",
     text2:
-      "This helps confirm that the policy details are correctly reflected in the system.",
-    btn: "Check policy",
-    imageAlt: "Russian MTPL policy verification",
+      "The check helps confirm that the policy is registered and that the vehicle, policyholder, and validity-period details are correct.",
+    btn: "Check the policy",
+    imageAlt: "Verification of a Russian OSAGO policy",
   },
 
   greenCardUpsell: {
-    title: "Planning trips to the EU or Turkey?",
+    title: "Planning to travel to other countries?",
     text1:
-      "For travel to EU countries and certain other states, a Green Card policy may be required.",
+      "Russian OSAGO is intended for driving in Russia. Separate international or border insurance may be required for travel to Turkey, EU countries, and other states.",
     text2:
-      "We help structure coverage for multi-country routes.",
-    btn: "Learn about Green Card",
-    imageAlt: "Green Card motor insurance for international travel",
+      "Send us your full route, and we will check what insurance coverage may be required for each country.",
+    btn: "Check your route",
+    imageAlt:
+      "Motor insurance for an international road trip",
   },
 
   orderPrep: {
-    title: "Prepare these details before applying",
-    text: "This helps the manager verify issuance options and confirm the price without unnecessary follow-up.",
+    title: "Prepare the details required for a quotation",
+    text:
+      "Complete information allows us to verify whether the policy can be issued and calculate the price more quickly.",
     items: [
       "Vehicle registration certificate or technical passport",
-      "Entry and exit dates for Russia",
-      "Phone and email for the policy",
+      "Passport or identity document of the policyholder",
+      "Driving licences of all drivers to be included",
+      "Planned travel dates in Russia",
+      "Contact phone number and email address for policy delivery",
     ],
   },
 
   faq: {
-    title: "FAQ on MTPL in Russia for non-residents",
-    intro: "Answers to common questions before issuing a policy.",
+    title: "Questions about OSAGO for travel to Russia",
+    intro:
+      "Key information for owners of vehicles with Kazakhstan registration plates.",
     items: [
       {
         id: "mandatory",
-        question: "Is MTPL mandatory for foreign vehicles?",
+        question:
+          "Is insurance required to travel to Russia in a vehicle registered in Kazakhstan?",
         answer:
-          "Yes. A valid MTPL policy is required when entering and using a foreign-registered vehicle in Russia.",
+          "To operate a vehicle in Russia, it must have valid motor liability insurance recognized in the Russian Federation. If no other recognized coverage is available, a Russian OSAGO policy must be arranged.",
       },
       {
-        id: "electronic-policy",
-        question: "Is an electronic policy sufficient?",
+        id: "what-covers",
+        question: "What does Russian OSAGO cover?",
         answer:
-          "Yes. Electronic MTPL policies are legally recognized.",
+          "The policy covers the driver’s liability for bodily injury or property damage caused to third parties in a road traffic accident, within the limits established by law and the insurance contract.",
+      },
+      {
+        id: "own-car-damage",
+        question:
+          "Does OSAGO cover damage to the policyholder’s own vehicle?",
+        answer:
+          "No. OSAGO covers liability to third parties. Damage to, theft of, fire involving, and other risks affecting the insured vehicle require separate comprehensive motor insurance.",
+      },
+      {
+        id: "documents",
+        question: "Which documents are required to arrange OSAGO?",
+        answer:
+          "The required documents usually include the vehicle registration document, the policyholder’s identity document, the driving licences of the listed drivers, and the planned travel dates. The final list is confirmed after the application is reviewed.",
       },
       {
         id: "term",
-        question: "What duration should be selected?",
+        question: "For how long can Russian OSAGO be arranged?",
         answer:
-          "The policy must cover the entire period of stay in Russia.",
+          "The available period depends on the applicable insurance rules and the vehicle details. The policy must cover the entire period during which the vehicle will be used in Russia.",
+      },
+      {
+        id: "electronic-policy",
+        question: "Is an electronic OSAGO policy valid?",
+        answer:
+          "Yes. An electronic OSAGO policy has legal validity. We recommend saving the PDF on your phone and carrying a printed copy in case internet access is unavailable.",
       },
       {
         id: "check",
-        question: "Who may verify MTPL validity?",
+        question: "How can I verify an issued policy?",
         answer:
-          "Traffic police, border authorities, and parties involved in accident handling.",
+          "The policy details can be checked in the Russian National Insurance Information System. The vehicle details and validity period should match the information shown in the electronic policy.",
       },
       {
-        id: "what-is-osago",
-        question: "What does MTPL cover?",
+        id: "valid-all-rf",
+        question: "Is Russian OSAGO valid throughout Russia?",
         answer:
-          "Liability for damage to third parties’ life, health, or property resulting from a traffic accident in Russia.",
+          "Yes. A Russian OSAGO policy applies in all regions of the Russian Federation during its stated validity period, subject to the policy conditions.",
+      },
+      {
+        id: "start-date",
+        question: "Can the policy be arranged on the day of entry?",
+        answer:
+          "Whether the policy can start on the required date depends on the issuance rules and the time needed to verify the documents. We recommend applying before the trip begins.",
       },
     ],
   },
@@ -517,187 +553,229 @@ const en: OsagoRfPageDictionary = {
 
 const kz: OsagoRfPageDictionary = {
   hero: {
-    title: "Ресейге жасыл карта",
+    title: "Қазақстаннан Ресейге баруға арналған автосақтандыру",
     subtitle:
-      "Шетелдік тіркеудегі автокөлікпен Ресей Федерациясына кіру және қозғалу үшін міндетті азаматтық-құқықтық жауапкершілік сақтандыруы. РФ аумағында қазақстандық көлікке арналған МІАЖ (ОСАГО)",
-    ctaOrder: "РФ үшін МІАЖ рәсімдеу",
-    factsLabel: "Өнімнің негізгі шарттары",
+      "Қазақстандық тіркеу нөмірі бар автокөлікке арналған ресейлік ОСАГО полисі. Құжаттарды тексеру, құнын есептеу және электрондық полисті онлайн алу.",
+    ctaOrder: "ОСАГО құнын есептеу",
+    factsLabel: "Негізгі шарттар",
     facts: [
-      "Шетел нөмірлі көліктерге",
-      "Электрондық PDF полис",
-      "Төлемге дейін кеңес",
+      "Қазақстандық нөмірі бар автокөліктерге",
+      "Электрондық ОСАГО полисі",
+      "Төлемге дейін құжаттарды тексеру",
     ],
-    carAlt: "Шетелдік нөмірлі автокөлік және РФ МІАЖ полисі",
-    policyAlt: "Резидент емес тұлғаларға арналған электрондық ОСАГО",
-    logoAlt: "Dionis Insurance Broker",
+    carAlt:
+      "Ресейге баруға арналған қазақстандық нөмірі бар автокөлік",
+    policyAlt:
+      "Қазақстандық автокөлікке арналған электрондық ресейлік ОСАГО полисі",
+    logoAlt: "DIONIS сақтандыру брокері",
   },
 
   questionBlock: {
-    title: "РФ бойынша МІАЖ туралы кеңес керек пе?",
+    title: "Ресейге баруға арналған сақтандыру бойынша кеңес керек пе?",
     text1:
-      "Қолданылу мерзімі, құны және резидент емес тұлғаларға қойылатын талаптар бойынша түсіндіреміз.",
+      "Сақтандырудың қолжетімді мерзімдері, құнын есептеу тәртібі және ОСАГО рәсімдеуге қажетті құжаттар туралы түсіндіреміз.",
     text2:
-      "Полис рәсімдеу үшін жоғарыдағы өтінімді толтырыңыз.",
+      "Өтінімді толтырыңыз — менеджер автокөлік деректерін тексеріп, полисті рәсімдеу мүмкіндігін растайды.",
   },
 
   advantages: {
-    title: "Неліктен МІАЖ-ды «Дионис» арқылы рәсімдейді",
+    title: "ОСАГО полисін DIONIS арқылы рәсімдеудің артықшылықтары",
     items: [
       {
         icon: "⏱",
-        title: "Онлайн рәсімдеу",
+        title: "Қашықтан рәсімдеу",
         text:
-          "Кеңсеге барудың қажеті жоқ. Барлық деректер қашықтан беріледі.",
+          "Өтінім мен құжаттарды кеңсеге бармай-ақ онлайн жіберуге болады.",
       },
       {
         icon: "📄",
         title: "Электрондық полис",
         text:
-          "Полис e-mail арқылы PDF форматында жіберіледі және РФ аумағында жарамды.",
+          "Рәсімделгеннен кейін полис PDF форматында e-mail арқылы жіберіледі.",
       },
       {
         icon: "🛂",
-        title: "Резидент еместерге арналған",
+        title: "Қазақстандық автокөліктерге",
         text:
-          "Шетелдік тіркеудегі автокөліктер үшін рәсімдейміз.",
+          "Қазақстандық тіркеу нөмірі бар автокөлікке ресейлік ОСАГО рәсімдеуге көмектесеміз.",
       },
       {
         icon: "💳",
-        title: "Айқын төлем",
+        title: "Төлемге дейін тексеру",
         text:
-          "Банк картасы немесе аударым арқылы төлем.",
+          "Алдымен құжаттар мен автокөлік деректерін тексереміз, содан кейін құны мен төлем тәртібін растаймыз.",
       },
     ],
   },
 
   howItWorks: {
-    title: "РФ үшін МІАЖ қалай рәсімделеді",
-    subtitle: "Қарапайым кезеңдер",
+    title: "Ресейлік ОСАГО полисін онлайн қалай рәсімдеуге болады",
+    subtitle: "Полисті рәсімдеудің кезең-кезеңімен жүргізілетін тәртібі",
     steps: [
       {
-        title: "Өтінім беру",
+        title: "Өтінім бересіз",
         text:
-          "Көлік деректерін және сапар мерзімін көрсетесіз.",
+          "Автокөлік, жүргізушілер және Ресейге жоспарланған сапар мерзімі туралы деректерді көрсетесіз.",
       },
       {
-        title: "Деректерді тексеру",
+        title: "Құжаттарды тексереміз",
         text:
-          "Ақпараттың дұрыстығын тексеріп, шарттарды нақтылаймыз.",
+          "Менеджер берілген ақпаратты, полисті рәсімдеу мүмкіндігін және қолжетімді сақтандыру мерзімін тексереді.",
       },
       {
-        title: "Төлем жасау",
+        title: "Есептеуді аласыз",
         text:
-          "Онлайн төлем немесе банк аударымы.",
+          "Тексеруден кейін полистің құнын хабарлап, төлем деректемелерін немесе төлем сілтемесін жібереміз.",
       },
       {
-        title: "Полисті алу",
+        title: "Полисті аласыз",
         text:
-          "Электрондық полис e-mail арқылы жіберіледі.",
+          "Төлем жасалып, рәсімдеу аяқталғаннан кейін электрондық ОСАГО полисін көрсетілген e-mail мекенжайына жібереміз.",
       },
-    ],
-  },
-
-  info: {
-    title: "РФ үшін ОСАГО дегеніміз не",
-    paragraphs: [
-      "ОСАГО — көлік иелерінің азаматтық-құқықтық жауапкершілігін міндетті сақтандыру.",
-      "Шетелдік тіркеудегі автокөлікпен РФ аумағында жүру үшін жарамды полис міндетті.",
-      "Электрондық полис РФ бақылаушы органдарымен ресми түрде танылады.",
     ],
   },
 
   writeUs: {
-    title: "Жылдам рәсімдеу",
-    text: "Бізге жазыңыз — полисті 20 минут ішінде рәсімдейміз",
+    title: "ОСАГО рәсімдеуге көмектесеміз",
+    text:
+      "Бізге жазыңыз — құжаттарды тексеріп, құнын есептеп, полисті рәсімдеу мүмкіндігін растаймыз",
     whatsapp: "WhatsApp арқылы жазу",
     telegram: "Telegram арқылы жазу",
-    phone: "Бізге қоңырау шалу: +7 (727) 357-30-30",
+    phone: "Қоңырау шалу: +7 (727) 357-30-30",
+  },
+
+  info: {
+    title: "Қазақстандық автокөлікке арналған ресейлік ОСАГО дегеніміз не",
+    paragraphs: [
+      "ОСАГО — көлік иесінің азаматтық-құқықтық жауапкершілігін міндетті сақтандыру. Полис жол-көлік оқиғасы салдарынан басқа адамдардың өміріне, денсаулығына немесе мүлкіне келтірілген зиянды өтеуге арналған.",
+      "Қазақстандық тіркеу нөмірі бар автокөлікті Ресей аумағында пайдалану үшін РФ аумағында танылатын азаматтық жауапкершілік сақтандыруы болуы қажет. Егер басқа жарамды сақтандыру өтемі болмаса, ресейлік ОСАГО полисі рәсімделеді.",
+      "ОСАГО автокөлік иесінің өз көлігін зақымданудан, ұрланудан, өрттен, табиғи апаттардан және басқа тәуекелдерден қорғамайды. Өз автокөлігіңізді қорғау үшін каско шарты қажет.",
+      "Электрондық полистің заңды күші бар. Оның деректерін Ресейдің сақтандыру ақпараттық жүйесінде тексеруге болады.",
+    ],
   },
 
   benefits: {
-    title: "РФ үшін МІАЖ артықшылықтары",
-    imageAlt: "РФ аумағында онлайн МІАЖ рәсімдеу",
+    title: "Ресейлік ОСАГО полисі қандай қорғау береді",
+    imageAlt:
+      "Қазақстандық тіркеу нөмірі бар автокөлікке арналған ресейлік ОСАГО",
     items: [
       {
-        title: "Заңды қозғалыс",
+        title: "Ресей аумағындағы сақтандыру өтемі",
         text:
-          "Полис РФ аумағында заңды түрде жүруге мүмкіндік береді.",
+          "Полис көрсетілген мерзім ішінде Ресей Федерациясының аумағында азаматтық жауапкершіліктің сақтандырылғанын растайды.",
       },
       {
-        title: "Қаржылық қорғау",
+        title: "Зардап шеккендерге зиянды өтеу",
         text:
-          "ЖКО кезінде үшінші тұлғаларға келтірілген залал сақтандыру лимиттері шегінде өтеледі.",
+          "Егер жүргізуші жол-көлік оқиғасына кінәлі болса, сақтандыру компаниясы үшінші тұлғалардың өміріне, денсаулығына немесе мүлкіне келтірілген зиянды белгіленген лимиттер шегінде өтейді.",
       },
       {
-        title: "РФ бойынша жарамды",
+        title: "Ресейдің барлық өңірінде жарамды",
         text:
-          "Барлық аймақтарда қолданылады.",
+          "Полис сақтандыру шартының мерзімі мен өзге де талаптары сақталған жағдайда Ресей аумағында қолданылады.",
       },
       {
-        title: "Икемді мерзім",
+        title: "Сапар мерзіміне сәйкес кезең",
         text:
-          "Сапар мерзіміне сәйкес рәсімдеуге болады.",
+          "Сақтандыру кезеңі жоспарланған сапар күндері мен ОСАГО ережелерінде қолжетімді мерзімдер ескеріле отырып таңдалады.",
       },
     ],
   },
 
   osagoCheckUpsell: {
-    title: "РФ ОСАГО полисін тексеру",
+    title: "ОСАГО полисін тексеру",
     text1:
-      "Егер сізде рәсімделген полис бар болса, оны Ресейдің Ұлттық Сақтандыру Ақпараттық Жүйесінің сайтында өзіңіз тексере аласыз.",
+      "Егер полис рәсімделген болса, оның деректерін Ресейдің Ұлттық сақтандыру ақпараттық жүйесінде тексеруге болады.",
     text2:
-      "Тексеру полис деректерінің жүйеде дұрыс көрсетілгеніне көз жеткізуге көмектеседі.",
+      "Тексеру полистің жүйеде тіркелгенін және автокөлік, сақтанушы мен қолданылу мерзімі туралы деректердің дұрыс көрсетілгенін растауға мүмкіндік береді.",
     btn: "Полисті тексеру",
-    imageAlt: "РФ ОСАГО полисін тексеру",
+    imageAlt: "Ресейлік ОСАГО полисін тексеру",
   },
 
   greenCardUpsell: {
-    title: "ЕО немесе Түркияға сапар жоспарлап отырсыз ба?",
+    title: "Басқа елдерге сапар жоспарлап отырсыз ба?",
     text1:
-      "Кейбір елдерге бару үшін «Жасыл карта» полисі қажет болуы мүмкін.",
+      "Ресейлік ОСАГО тек Ресей аумағында жүруге арналған. Түркияға, ЕО елдеріне және басқа мемлекеттерге кіру үшін бөлек халықаралық немесе шекаралық сақтандыру қажет болуы мүмкін.",
     text2:
-      "Маршрутыңызға сәйкес сақтандыру шешімін ұсынамыз.",
-    btn: "Жасыл карта туралы білу",
-    imageAlt: "Халықаралық сапарға арналған Жасыл карта",
+      "Сапардың толық бағытын хабарлаңыз — әр ел үшін қандай сақтандыру қажет екенін тексереміз.",
+    btn: "Бағытты тексеру",
+    imageAlt:
+      "Халықаралық автосапарға арналған сақтандыру",
   },
 
   orderPrep: {
-    title: "Өтінім алдында деректерді дайындаңыз",
-    text: "Бұл менеджерге рәсімдеу мүмкіндігін тез тексеріп, құнын нақтылауға көмектеседі.",
+    title: "Есептеу үшін қажетті деректерді дайындаңыз",
+    text:
+      "Толық ақпарат полисті рәсімдеу мүмкіндігін жылдам тексеруге және оның құнын есептеуге көмектеседі.",
     items: [
-      "Көліктің тіркеу куәлігі немесе техникалық паспорты",
-      "РФ-ға кіру және шығу күндері",
-      "Полис үшін телефон және e-mail",
+      "Автокөліктің тіркеу куәлігі немесе техникалық паспорты",
+      "Сақтанушының паспорты немесе жеке куәлігі",
+      "Көлікті басқаруға жіберілетін жүргізушілердің жүргізуші куәліктері",
+      "Ресейге жоспарланған сапар күндері",
+      "Полисті алу үшін байланыс телефоны және e-mail",
     ],
   },
 
   faq: {
-    title: "РФ үшін МІАЖ бойынша сұрақтар",
-    intro: "Полис рәсімдеу алдындағы негізгі сұрақтар.",
+    title: "Ресейге баруға арналған ОСАГО туралы сұрақтар",
+    intro:
+      "Қазақстандық тіркеу нөмірі бар автокөлік иелеріне арналған негізгі ақпарат.",
     items: [
       {
         id: "mandatory",
-        question: "Шетелдік көлік үшін ОСАГО міндетті ме?",
+        question:
+          "Қазақстандық автокөлікпен Ресейге бару үшін сақтандыру қажет пе?",
         answer:
-          "Иә. РФ аумағында жүру үшін жарамды полис болуы қажет.",
+          "Ресей аумағында автокөлікті пайдалану үшін РФ-та танылатын азаматтық жауапкершілік сақтандыруы қажет. Егер басқа жарамды сақтандыру өтемі болмаса, ресейлік ОСАГО полисін рәсімдеу керек.",
       },
       {
-        id: "electronic-policy",
-        question: "Электрондық полис жарамды ма?",
+        id: "what-covers",
+        question: "Ресейлік ОСАГО нені өтейді?",
         answer:
-          "Иә. Электрондық полис ресми түрде танылады.",
+          "Полис жол-көлік оқиғасы салдарынан жүргізушінің үшінші тұлғалардың өміріне, денсаулығына немесе мүлкіне келтірген зияны үшін жауапкершілігін заңнамада және шартта белгіленген лимиттер шегінде өтейді.",
+      },
+      {
+        id: "own-car-damage",
+        question:
+          "ОСАГО автокөлік иесінің өз көлігінің зақымдануын өтей ме?",
+        answer:
+          "Жоқ. ОСАГО үшінші тұлғалар алдындағы жауапкершілікті өтейді. Автокөліктің зақымдануы, ұрлануы, өртенуі және басқа тәуекелдер каско шарты бойынша бөлек сақтандырылады.",
+      },
+      {
+        id: "documents",
+        question: "ОСАГО рәсімдеу үшін қандай құжаттар қажет?",
+        answer:
+          "Әдетте автокөліктің тіркеу құжаттары, сақтанушының жеке басын куәландыратын құжат, жүргізушілердің жүргізуші куәліктері және жоспарланған сапар күндері қажет. Нақты тізім өтінім тексерілгеннен кейін расталады.",
       },
       {
         id: "term",
-        question: "Қандай мерзімге рәсімдеген дұрыс?",
+        question: "ОСАГО полисін қандай мерзімге рәсімдеуге болады?",
         answer:
-          "Полис РФ аумағында болу мерзімін толық қамтуы тиіс.",
+          "Қолжетімді мерзім қолданыстағы сақтандыру ережелеріне және автокөлік параметрлеріне байланысты. Полис автокөліктің Ресей аумағында пайдаланылатын бүкіл кезеңін қамтуы тиіс.",
+      },
+      {
+        id: "electronic-policy",
+        question: "Электрондық ОСАГО полисі жарамды ма?",
+        answer:
+          "Иә. Электрондық полистің заңды күші бар. PDF файлын телефонда сақтап, интернет болмаған жағдайға қағаз көшірмесін бірге алып жүруді ұсынамыз.",
       },
       {
         id: "check",
-        question: "Полисті кім тексере алады?",
+        question: "Рәсімделген полисті қалай тексеруге болады?",
         answer:
-          "Жол полициясы және шекара қызметі.",
+          "Полис деректерін Ресейдің Ұлттық сақтандыру ақпараттық жүйесінде тексеруге болады. Автокөлік туралы мәліметтер мен қолданылу мерзімі электрондық құжаттағы деректермен сәйкес келуі тиіс.",
+      },
+      {
+        id: "valid-all-rf",
+        question: "ОСАГО Ресейдің барлық аумағында жарамды ма?",
+        answer:
+          "Иә. Ресейлік ОСАГО полисі шарт талаптары сақталған жағдайда көрсетілген мерзім ішінде Ресей Федерациясының барлық өңірінде қолданылады.",
+      },
+      {
+        id: "start-date",
+        question: "Полисті Ресейге кіретін күні рәсімдеуге бола ма?",
+        answer:
+          "Полистің қажетті күні күшіне ену мүмкіндігі рәсімдеу ережелері мен құжаттарды тексеру уақытына байланысты. Өтінімді сапар басталғанға дейін алдын ала беруді ұсынамыз.",
       },
     ],
   },
