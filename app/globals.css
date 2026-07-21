@@ -160,6 +160,27 @@ a{ color:inherit; text-decoration:none; }
 .row-between{ display:flex; align-items:flex-start; justify-content:space-between; gap: 14px; }
 .row-center{ display:flex; align-items:center; gap: 10px; flex-wrap:wrap; }
 
+.gc-breadcrumbs {
+  padding: 12px 0;
+  background: #fff;
+}
+
+.gc-breadcrumbs .gc-container {
+  min-height: auto;
+}
+
+.gc-breadcrumbs a,
+.gc-breadcrumbs span {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+@media (max-width: 767px) {
+  .gc-breadcrumbs {
+    padding: 8px 0;
+  }
+}
+
 /* =========================
    4) TYPO
    ========================= */

@@ -21,7 +21,6 @@ export type OsagoRfPageDictionary = {
   advantages: {
     title: string;
     items: {
-      icon: string;
       title: string;
       text: string;
     }[];
@@ -89,695 +88,1237 @@ export type OsagoRfPageDictionary = {
       answer: string;
     }[];
   };
+  commercialTransport: {
+    title: string;
+    intro: string;
+    vehicleTypesTitle: string;
+    vehicleTypes: {
+      title: string;
+      text: string;
+    }[];
+    fleetTitle: string;
+    fleetText: string;
+    fleetItems: string[];
+    cta: string;
+  };
+  seo: {
+    title: string;
+    description: string;
+    serviceName: string;
+    serviceType: string;
+    audienceName: string;
+    breadcrumbs: {
+      home: string;
+      services: string;
+      current: string;
+    };
+    channels: {
+      website: string;
+      phone: string;
+      whatsapp: string;
+      telegram: string;
+    };
+  };
 };
 
 const ru: OsagoRfPageDictionary = {
   hero: {
-    title: "Автостраховка для выезда в Россию из Казахстана",
+    title: "ОСАГО России для автомобиля из Казахстана",
     subtitle:
-      "Российский полис ОСАГО для автомобиля с казахстанскими регистрационными номерами. Проверка документов, расчёт стоимости и получение электронного полиса онлайн.",
-    ctaOrder: "Рассчитать ОСАГО",
+      "Электронная страховка для въезда и поездок по России на автомобиле с казахстанскими регистрационными номерами. Проверим документы, рассчитаем стоимость и отправим полис в PDF.",
+    ctaOrder: "Рассчитать стоимость ОСАГО",
     factsLabel: "Основные условия",
     facts: [
-      "Для автомобилей с номерами Казахстана",
-      "Электронный полис ОСАГО",
-      "Проверка документов до оплаты",
+      "Для легковых и грузовых автомобилей",
+      "Для физических и юридических лиц",
+      "Возможность оформления от 15 дней",
+      "Электронный полис в PDF",
     ],
     carAlt:
-      "Автомобиль с казахстанскими номерами для поездки в Россию",
+      "Автомобиль с казахстанскими регистрационными номерами для поездки в Россию",
     policyAlt:
-      "Электронный полис российского ОСАГО для автомобиля из Казахстана",
+      "Электронный полис ОСАГО России для автомобиля из Казахстана",
     logoAlt: "Страховой брокер DIONIS",
   },
 
   questionBlock: {
-    title: "Нужна консультация по страховке для поездки в Россию?",
+    title: "Остались вопросы по ОСАГО для поездки в Россию?",
     text1:
-      "Расскажем о доступных сроках страхования, порядке расчёта стоимости и документах, необходимых для оформления ОСАГО.",
+      "Уточним доступный срок страхования, порядок расчёта, перечень документов и возможность оформления для вашего автомобиля.",
     text2:
-      "Заполните заявку — менеджер проверит данные автомобиля и подтвердит возможность оформления.",
+      "Отправьте вопрос — менеджер проверит маршрут и данные автомобиля и свяжется с вами.",
   },
 
   advantages: {
-    title: "Почему ОСАГО оформляют через DIONIS",
+    title: "Почему обращаются в DIONIS",
     items: [
       {
-        icon: "⏱",
         title: "Оформление дистанционно",
         text:
-          "Заявку и документы можно передать онлайн без посещения офиса.",
+          "Заявку и документы можно передать онлайн без посещения офиса. Готовый полис направляется в электронном виде.",
       },
       {
-        icon: "📄",
-        title: "Электронный полис",
-        text:
-          "После оформления полис отправляется на e-mail в формате PDF.",
-      },
-      {
-        icon: "🛂",
-        title: "Для автомобилей из Казахстана",
-        text:
-          "Помогаем оформить российское ОСАГО на автомобиль с казахстанскими регистрационными номерами.",
-      },
-      {
-        icon: "💳",
         title: "Проверка до оплаты",
         text:
-          "Сначала проверяем документы и параметры автомобиля, затем подтверждаем стоимость и порядок оплаты.",
+          "Сначала проверяем документы, данные автомобиля, водителей и доступный срок, затем подтверждаем стоимость и порядок оплаты.",
+      },
+      {
+        title: "Разные категории транспорта",
+        text:
+          "Принимаем заявки на легковые и грузовые автомобили, а также проверяем возможность оформления для автобусов и коммерческого транспорта.",
+      },
+      {
+        title: "Физические и юридические лица",
+        text:
+          "Помогаем подготовить данные для автомобилей, принадлежащих частным владельцам и организациям.",
       },
     ],
   },
 
   howItWorks: {
-    title: "Как оформить российское ОСАГО онлайн",
-    subtitle: "Последовательный процесс оформления полиса",
+    title: "Как оформить электронное ОСАГО России",
+    subtitle: "Порядок расчёта и получения полиса",
     steps: [
       {
-        title: "Оставляете заявку",
+        title: "Заполняете заявку",
         text:
-          "Указываете данные автомобиля, водителей и планируемые даты поездки в Россию.",
+          "Указываете данные страхователя, автомобиля, водителей, дату начала и предполагаемый срок поездки по России.",
       },
       {
-        title: "Мы проверяем документы",
+        title: "Передаёте документы",
         text:
-          "Менеджер проверяет полученные данные, возможность оформления и доступный срок страхования.",
+          "Направляете регистрационный документ автомобиля, документ страхователя и водительские удостоверения допущенных водителей.",
       },
       {
         title: "Получаете расчёт",
         text:
-          "После проверки сообщаем стоимость полиса и направляем реквизиты или ссылку для оплаты.",
+          "Мы проверяем данные, подтверждаем доступный срок и окончательную стоимость. Перед оплатой вы проверяете сведения для полиса.",
       },
       {
-        title: "Получаете полис",
+        title: "Получаете и проверяете полис",
         text:
-          "После оплаты и завершения оформления отправляем электронный полис ОСАГО на указанный e-mail.",
+          "После оплаты отправляем электронный полис в PDF. Проверьте регистрационный номер, VIN, водителей и срок действия в документе и НСИС.",
       },
     ],
   },
 
   writeUs: {
-    title: "Поможем оформить ОСАГО",
+    title: "Поможем рассчитать и оформить ОСАГО",
     text:
-      "Напишите нам — проверим документы, рассчитаем стоимость и подтвердим возможность оформления полиса",
+      "Напишите нам, если нужно проверить документы, срок страхования или возможность оформления для конкретного автомобиля",
     whatsapp: "Написать в WhatsApp",
     telegram: "Написать в Telegram",
     phone: "Позвонить: +7 (727) 357-30-30",
   },
 
   info: {
-    title: "Что такое российское ОСАГО для автомобиля из Казахстана",
+    title: "Какая страховка нужна для въезда в Россию из Казахстана",
     paragraphs: [
-      "ОСАГО — обязательное страхование гражданской ответственности владельца транспортного средства. Полис предназначен для возмещения вреда, который водитель может причинить другим людям или их имуществу в результате ДТП.",
-      "Для эксплуатации автомобиля с казахстанскими регистрационными номерами в России необходимо действующее страхование гражданской ответственности, признаваемое на территории РФ. При отсутствии другого подходящего страхового покрытия оформляется российский полис ОСАГО.",
-      "ОСАГО не страхует сам автомобиль владельца от повреждения, угона, пожара, стихийных явлений и других рисков. Для защиты собственного автомобиля требуется отдельный договор каско.",
-      "Электронный полис имеет юридическую силу. Его данные можно проверить в российской страховой информационной системе.",
+      "Для движения по территории России автомобилю с казахстанскими регистрационными номерами требуется страхование гражданской ответственности, действующее в Российской Федерации. Если у автомобиля нет другого признанного в России покрытия, необходимо оформить российский полис ОСАГО.",
+      "ОСАГО возмещает вред, причинённый другим людям, автомобилям и имуществу при ДТП, в пределах установленных условий и лимитов. Полис не компенсирует повреждение, угон, поломку или износ собственного автомобиля.",
+      "Электронный полис имеет юридическую силу и действует в течение указанного в нём периода. Даты страхования должны покрывать весь срок использования автомобиля в России.",
+      "Российское ОСАГО и Green Card — разные страховые продукты. Для поездки через несколько стран страховое покрытие необходимо проверять отдельно для каждой территории.",
     ],
   },
 
   benefits: {
-    title: "Что даёт российский полис ОСАГО",
+    title: "Стоимость, срок и условия ОСАГО РФ",
     imageAlt:
-      "Российское ОСАГО для автомобиля с казахстанскими номерами",
+      "Территория действия ОСАГО России для автомобиля с казахстанскими номерами",
     items: [
       {
-        title: "Страховое покрытие в России",
+        title: "Цена рассчитывается индивидуально",
         text:
-          "Полис подтверждает наличие страхования гражданской ответственности на территории Российской Федерации в течение указанного срока.",
+          "Стоимость зависит от категории и мощности автомобиля, типа страхователя, срока страхования, количества водителей, их возраста и стажа, а также применяемых тарифных коэффициентов.",
       },
       {
-        title: "Возмещение вреда пострадавшим",
+        title: "Возможен срок от 15 дней",
         text:
-          "Если водитель станет виновником ДТП, страховая компания возмещает вред жизни, здоровью или имуществу третьих лиц в пределах установленных лимитов.",
+          "Для временного использования иностранного автомобиля может быть доступно оформление на ограниченный срок. Точный период подтверждается после проверки данных и действующих правил.",
       },
       {
-        title: "Действие во всех регионах РФ",
+        title: "Легковые и грузовые автомобили",
         text:
-          "Полис действует на территории России при соблюдении срока и других условий договора страхования.",
+          "При расчёте учитываются категория транспортного средства, мощность двигателя, разрешённая масса и характер использования автомобиля.",
       },
       {
-        title: "Срок с учётом поездки",
+        title: "Оформление на юридическое лицо",
         text:
-          "Период страхования подбирается с учётом планируемых дат поездки и доступных по правилам ОСАГО сроков.",
+          "Для автомобиля организации дополнительно потребуются реквизиты юридического лица и сведения о представителе. Окончательный перечень подтверждается при проверке заявки.",
       },
     ],
   },
 
   osagoCheckUpsell: {
-    title: "Проверить полис ОСАГО",
+    title: "Как проверить электронный полис ОСАГО",
     text1:
-      "Если полис уже оформлен, проверьте его данные в Российской Национальной Страховой Информационной Системе.",
+      "После получения полиса проверьте его регистрацию в Российской Национальной Страховой Информационной Системе.",
     text2:
-      "Проверка позволяет убедиться, что полис зарегистрирован в системе, а сведения об автомобиле, страхователе и сроке действия указаны правильно.",
-    btn: "Проверить полис",
-    imageAlt: "Проверка российского полиса ОСАГО",
+      "Сверьте регистрационный номер, VIN, страхователя, список водителей и срок действия. При обнаружении ошибки сообщите об этом до начала поездки.",
+    btn: "Проверить полис в НСИС",
+    imageAlt: "Проверка электронного полиса ОСАГО России в НСИС",
   },
 
   greenCardUpsell: {
-    title: "Планируете поездку в другие страны?",
+    title: "ОСАГО России и Green Card — не одно и то же",
     text1:
-      "Российское ОСАГО предназначено для поездок по территории России. Для въезда в Турцию, страны ЕС и другие государства может потребоваться отдельное международное или пограничное страхование.",
+      "Российское ОСАГО предназначено для эксплуатации автомобиля на территории Российской Федерации. Green Card действует только в странах и территориях, указанных в соответствующем международном полисе.",
     text2:
-      "Сообщите полный маршрут поездки — мы проверим, какое страховое покрытие потребуется для каждой страны.",
-    btn: "Проверить маршрут",
+      "Если маршрут проходит через несколько государств, сообщите нам полный маршрут. Мы проверим, какое страхование требуется для каждой части поездки.",
+    btn: "Проверить страховку по маршруту",
     imageAlt:
-      "Страхование автомобиля для международной поездки",
+      "Сравнение ОСАГО России и международной страховки Green Card",
   },
 
   orderPrep: {
-    title: "Подготовьте данные для расчёта",
+    title: "Какие данные нужны для оформления ОСАГО",
     text:
-      "Полный комплект информации позволит быстрее проверить возможность оформления и рассчитать стоимость полиса.",
+      "Подготовьте читаемые документы и проверьте правильность данных. Для юридического лица дополнительно потребуются сведения об организации и её представителе.",
     items: [
-      "СТС или технический паспорт автомобиля",
+      "Свидетельство о регистрации или технический паспорт автомобиля",
       "Паспорт или удостоверение личности страхователя",
-      "Водительские удостоверения допущенных водителей",
-      "Планируемые даты поездки в Россию",
-      "Контактный телефон и e-mail для получения полиса",
+      "Водительские удостоверения всех допущенных водителей",
+      "Регистрационный номер, VIN, марка, модель и год выпуска",
+      "Мощность двигателя и категория транспортного средства",
+      "Дата начала и предполагаемый срок страхования",
+      "Для организации — наименование, регистрационные данные и сведения о представителе",
+      "Контактный телефон и e-mail для связи и получения полиса",
     ],
   },
 
   faq: {
-    title: "Вопросы об ОСАГО для поездки в Россию",
+    title: "Вопросы об ОСАГО для автомобиля из Казахстана",
     intro:
-      "Основная информация для владельцев автомобилей с казахстанскими регистрационными номерами.",
+      "Ответы о стоимости, сроках, документах и оформлении электронной страховки для поездки в Россию.",
     items: [
       {
         id: "mandatory",
         question:
-          "Нужна ли страховка для поездки в Россию на автомобиле из Казахстана?",
+          "Какая страховка нужна для въезда в Россию из Казахстана?",
         answer:
-          "Для эксплуатации автомобиля в России необходимо действующее страхование гражданской ответственности, признаваемое на территории РФ. При отсутствии другого подходящего покрытия необходимо оформить российский полис ОСАГО.",
+          "Для эксплуатации автомобиля с казахстанскими регистрационными номерами на территории России необходимо действующее страхование гражданской ответственности, признаваемое в Российской Федерации. В стандартной ситуации оформляется российский полис ОСАГО. Он покрывает ответственность водителя за вред, причинённый другим людям, автомобилям или имуществу при ДТП, но не страхует собственный автомобиль от повреждения, угона или поломки.",
       },
       {
-        id: "what-covers",
-        question: "Что покрывает российское ОСАГО?",
-        answer:
-          "Полис покрывает ответственность водителя за вред, причинённый жизни, здоровью или имуществу третьих лиц в результате ДТП, в пределах установленных законодательством и договором лимитов.",
-      },
-      {
-        id: "own-car-damage",
+        id: "kazakhstan-plates",
         question:
-          "Покрывает ли ОСАГО повреждение автомобиля владельца?",
+          "Нужно ли ОСАГО на автомобиль с казахстанскими номерами?",
         answer:
-          "Нет. ОСАГО покрывает ответственность перед третьими лицами. Повреждение, угон, пожар и другие риски самого автомобиля страхуются отдельно по договору каско.",
+          "Да, если автомобиль используется в России и не имеет другого страхового покрытия, признаваемого на территории РФ. Полис должен действовать в течение всего периода эксплуатации автомобиля в России.",
+      },
+      {
+        id: "green-card",
+        question: "Нужна ли Green Card для поездки в Россию?",
+        answer:
+          "Для поездки на автомобиле из Казахстана необходимо страхование гражданской ответственности, действующее именно на территории России. Green Card не следует считать заменой российского ОСАГО: Россия с 2023 года не участвует в системе «Зелёная карта». Для въезда и поездок по России обычно оформляется российский полис ОСАГО.",
+      },
+      {
+        id: "remote-application",
+        question:
+          "Можно ли оформить ОСАГО РФ, находясь в Казахстане?",
+        answer:
+          "Да. Заявку, документы и данные водителей можно передать дистанционно. После проверки сведений, расчёта стоимости и оплаты электронный полис направляется на указанный e-mail в формате PDF.",
+      },
+      {
+        id: "online-policy",
+        question: "Можно ли оформить ОСАГО России онлайн?",
+        answer:
+          "Да. Заявка и документы передаются онлайн, после чего менеджер проверяет возможность оформления и рассчитывает стоимость. Готовый электронный полис отправляется на указанный e-mail.",
+      },
+      {
+        id: "minimum-term",
+        question: "На какой минимальный срок можно оформить полис?",
+        answer:
+          "Для иностранного автомобиля, временно используемого в России, может быть доступно краткосрочное ОСАГО. Минимальный срок зависит от действующих правил, страховой компании, категории транспортного средства и параметров заявки. Доступный период подтверждается после проверки документов.",
+      },
+      {
+        id: "term-15-days",
+        question: "Можно ли оформить ОСАГО РФ на 15 дней?",
+        answer:
+          "Для временного использования иностранного автомобиля может быть доступно оформление на 15 дней. Возможность оформления и точный срок подтверждаются после проверки данных автомобиля, страхователя и действующих правил страховой компании.",
+      },
+      {
+        id: "price",
+        question:
+          "Сколько стоит ОСАГО для казахстанского автомобиля?",
+        answer:
+          "Единой фиксированной цены нет. Стоимость зависит от категории и мощности автомобиля, типа страхователя, срока страхования, списка водителей, их возраста и стажа, а также применяемых тарифных коэффициентов.",
+      },
+      {
+        id: "price-15-days",
+        question: "Сколько стоит ОСАГО на 15 дней?",
+        answer:
+          "Стоимость полиса на 15 дней рассчитывается индивидуально. На цену влияют тип автомобиля, мощность двигателя, данные собственника и водителей, категория страхователя и тарифы страховой компании. Точная сумма определяется после получения документов и параметров автомобиля.",
       },
       {
         id: "documents",
         question: "Какие документы нужны для оформления ОСАГО?",
         answer:
-          "Обычно требуются регистрационные документы автомобиля, документ страхователя, водительские удостоверения допущенных водителей и планируемые даты поездки. Точный перечень подтверждается после проверки заявки.",
+          "Обычно требуются регистрационный документ или технический паспорт автомобиля, паспорт либо удостоверение личности страхователя, водительские удостоверения допущенных водителей, регистрационный номер, VIN и предполагаемый срок поездки. Для юридического лица дополнительно запрашиваются регистрационные данные организации и сведения о её представителе.",
       },
       {
-        id: "term",
-        question: "На какой срок можно оформить ОСАГО?",
+        id: "truck",
+        question: "Можно ли оформить ОСАГО на грузовой автомобиль?",
         answer:
-          "Доступный срок зависит от действующих правил страхования и параметров автомобиля. Полис должен покрывать весь период эксплуатации автомобиля в России.",
+          "Да, заявки на грузовые автомобили с казахстанскими регистрационными номерами принимаются. Для расчёта потребуются категория транспортного средства, мощность двигателя, разрешённая максимальная масса, характер использования и регистрационные документы.",
+      },
+      {
+        id: "legal-entity",
+        question: "Можно ли оформить ОСАГО на юридическое лицо?",
+        answer:
+          "Да, возможность оформления проверяется для автомобиля, принадлежащего организации. Дополнительно потребуются полное наименование и регистрационные данные компании, сведения о представителе и документы, подтверждающие данные автомобиля.",
+      },
+      {
+        id: "what-covers",
+        question: "Что покрывает российское ОСАГО?",
+        answer:
+          "ОСАГО покрывает ответственность водителя за вред, причинённый жизни, здоровью или имуществу третьих лиц при ДТП, в пределах условий договора и установленных законом лимитов.",
+      },
+      {
+        id: "own-car-damage",
+        question:
+          "Покрывает ли ОСАГО повреждение собственного автомобиля?",
+        answer:
+          "Нет. ОСАГО не покрывает повреждение автомобиля виновника, угон, поломку, естественный износ, перевозимый груз или личные вещи. Для защиты собственного автомобиля требуется отдельное страхование каско.",
+      },
+      {
+        id: "start-date",
+        question: "Когда начинает действовать полис?",
+        answer:
+          "Полис начинает действовать с даты и времени, указанных в страховом документе. До поездки необходимо проверить, что начало действия полиса наступает не позднее момента эксплуатации автомобиля на территории России.",
+      },
+      {
+        id: "same-day",
+        question: "Можно ли оформить полис в день въезда?",
+        answer:
+          "Это зависит от времени подачи заявки, скорости проверки документов и правил страховой компании. Чтобы избежать поездки без действующего страхования, рекомендуется подавать документы заранее.",
       },
       {
         id: "electronic-policy",
         question: "Действителен ли электронный полис ОСАГО?",
         answer:
-          "Да. Электронный полис имеет юридическую силу. Рекомендуем сохранить PDF на телефоне и дополнительно иметь распечатанную копию на случай отсутствия доступа к интернету.",
+          "Да. Электронный полис ОСАГО имеет юридическую силу. После получения необходимо проверить указанные в нём данные и сохранить PDF на телефоне.",
+      },
+      {
+        id: "print-policy",
+        question: "Нужно ли распечатывать электронный полис?",
+        answer:
+          "Обязательная бумажная копия электронного полиса обычно не требуется. Однако рекомендуется сохранить PDF на телефоне и дополнительно иметь распечатанный экземпляр на случай отсутствия интернета, разрядки устройства или технических проблем при проверке.",
       },
       {
         id: "check",
-        question: "Как проверить оформленный полис?",
+        question: "Как проверить действительность полиса?",
         answer:
-          "Данные полиса можно проверить в Российской Национальной Страховой Информационной Системе. Сведения об автомобиле и сроке действия должны совпадать с указанными в электронном документе.",
+          "Полис можно проверить в Национальной страховой информационной системе. Необходимо убедиться, что в системе и в электронном документе правильно указаны регистрационный номер, VIN, страхователь, водители и срок действия.",
       },
       {
         id: "valid-all-rf",
         question: "Действует ли ОСАГО по всей территории России?",
         answer:
-          "Да. Российский полис ОСАГО действует во всех регионах Российской Федерации в течение указанного срока при соблюдении условий договора.",
+          "Российский полис ОСАГО действует на территории Российской Федерации в течение указанного срока при соблюдении условий договора страхования.",
       },
       {
-        id: "start-date",
-        question: "Можно ли оформить полис в день въезда?",
+        id: "outside-russia",
+        question:
+          "Действует ли российское ОСАГО за пределами России?",
         answer:
-          "Возможность начала действия полиса в нужную дату зависит от правил оформления и времени проверки документов. Рекомендуем подавать заявку заранее, до начала поездки.",
+          "Нет. Российское ОСАГО предназначено для эксплуатации автомобиля на территории Российской Федерации. Для поездки в Грузию, Турцию, страны Европейского союза и другие государства необходимо отдельно проверять требования каждой страны и оформлять соответствующее страхование.",
+      },
+      {
+        id: "multiple-drivers",
+        question: "Можно ли указать нескольких водителей?",
+        answer:
+          "Да. В полис можно включить нескольких водителей, допущенных к управлению автомобилем. Для каждого потребуются данные водительского удостоверения. В некоторых случаях может быть доступен полис без ограничения перечня водителей, но такой вариант влияет на стоимость.",
+      },
+      {
+        id: "accident-russia",
+        question: "Что делать при ДТП в России?",
+        answer:
+          "Необходимо остановить автомобиль, включить аварийную сигнализацию и выставить знак аварийной остановки. Если есть пострадавшие, следует немедленно вызвать экстренные службы. Зафиксируйте положение автомобилей, повреждения, регистрационные номера и обстоятельства ДТП, обменяйтесь данными с другим участником и сообщите о происшествии страховой компании. При споре, наличии пострадавших, повреждении другого имущества или сомнениях в порядке оформления следует вызвать сотрудников полиции.",
+      },
+      {
+        id: "policy-error",
+        question:
+          "Что делать, если в данных полиса допущена ошибка?",
+        answer:
+          "После получения полиса необходимо сразу проверить регистрационный номер, VIN, данные собственника, водителей и срок действия. Если обнаружена ошибка, нельзя самостоятельно редактировать PDF. Следует немедленно обратиться к менеджеру или страховщику, указать неверное поле и направить подтверждающий документ. Порядок исправления зависит от характера ошибки и стадии оформления.",
       },
     ],
+  },
+  commercialTransport: {
+  title: "ОСАГО РФ для грузовых автомобилей из Казахстана",
+  intro:
+    "Для тягачей, грузовых автомобилей, автобусов и другого коммерческого транспорта расчёт выполняется отдельно от легковых автомобилей. Учитываются категория транспортного средства, разрешённая максимальная масса, мощность, характер использования, срок поездок и данные собственника.",
+
+  vehicleTypesTitle: "Какой коммерческий транспорт можно заявить",
+  vehicleTypes: [
+    {
+      title: "Тягачи и грузовые автомобили",
+      text:
+        "При расчёте учитываются категория транспортного средства, разрешённая максимальная масса, мощность двигателя и характер перевозок.",
+    },
+    {
+      title: "Автобусы и микроавтобусы",
+      text:
+        "Возможность оформления проверяется с учётом категории, количества пассажирских мест и целей использования транспорта.",
+    },
+    {
+      title: "Коммерческий транспорт",
+      text:
+        "Принимаются заявки на транспорт, используемый для перевозки грузов, пассажиров, служебных и иных коммерческих задач.",
+    },
+    {
+      title: "Транспорт юридических лиц",
+      text:
+        "Для автомобиля организации дополнительно потребуются реквизиты компании и данные представителя, который подаёт заявку.",
+    },
+    {
+      title: "Автопарки",
+      text:
+        "Для нескольких автомобилей можно направить одну заявку и приложить список транспортных средств для общего расчёта.",
+    },
+    {
+      title: "Международные рейсы",
+      text:
+        "Для транспорта, регулярно выполняющего рейсы между Казахстаном и Россией, срок страхования следует выбирать с учётом всего периода эксплуатации в России.",
+    },
+  ],
+
+  fleetTitle: "Оформление ОСАГО на несколько автомобилей",
+  fleetText:
+    "Если необходимо застраховать несколько автомобилей, укажите количество транспортных средств и загрузите список автопарка. После проверки мы подготовим расчёт по каждому автомобилю и сообщим, какие дополнительные документы потребуются.",
+  fleetItems: [
+      "Количество автомобилей в заявке",
+      "Типы и категории транспортных средств",
+      "Регистрационные номера и VIN",
+      "Мощность или разрешённая максимальная масса",
+      "Данные собственника — юридического лица",
+      "Планируемые сроки эксплуатации в России",
+      "Список транспортных средств в XLSX, XLS, CSV или PDF",
+    ],
+    cta: "Оставить заявку на коммерческий транспорт",
+  },
+  seo: {
+    title:
+      "ОСАГО России для авто из Казахстана — цена и оформление онлайн | DIONIS",
+    description:
+      "Электронное ОСАГО России для автомобиля с казахстанскими номерами. Расчёт стоимости, проверка документов и получение полиса онлайн.",
+    serviceName:
+      "Оформление ОСАГО России для автомобилей из Казахстана",
+    serviceType:
+      "Обязательное страхование гражданской ответственности владельцев транспортных средств",
+    audienceName:
+      "Физические лица, юридические лица и владельцы коммерческого транспорта из Казахстана",
+    breadcrumbs: {
+      home: "Главная",
+      services: "Страховые продукты",
+      current: "ОСАГО России",
+    },
+    channels: {
+      website: "Онлайн-заявка на сайте",
+      phone: "Консультация по телефону",
+      whatsapp: "Консультация в WhatsApp",
+      telegram: "Консультация в Telegram",
+    },
   },
 };
 
 const en: OsagoRfPageDictionary = {
   hero: {
-    title: "Car insurance for travel from Kazakhstan to Russia",
+    title: "Russian OSAGO for a Vehicle from Kazakhstan",
     subtitle:
-      "Russian OSAGO motor liability insurance for vehicles with Kazakhstan registration plates. Document verification, price calculation, and electronic policy delivery online.",
-    ctaOrder: "Calculate OSAGO price",
+      "Electronic motor liability insurance for entering and driving in Russia with Kazakhstan registration plates. We verify the documents, calculate the price, and send the policy as a PDF.",
+    ctaOrder: "Calculate the OSAGO price",
     factsLabel: "Key conditions",
     facts: [
-      "For vehicles registered in Kazakhstan",
-      "Electronic Russian OSAGO policy",
-      "Document verification before payment",
+      "For passenger cars and trucks",
+      "For individuals and legal entities",
+      "Possible coverage from 15 days",
+      "Electronic policy in PDF",
     ],
     carAlt:
       "Vehicle with Kazakhstan registration plates travelling to Russia",
     policyAlt:
-      "Electronic Russian OSAGO policy for a vehicle registered in Kazakhstan",
+      "Electronic Russian OSAGO policy for a vehicle from Kazakhstan",
     logoAlt: "DIONIS Insurance Broker",
   },
 
   questionBlock: {
-    title: "Need advice on car insurance for travel to Russia?",
+    title: "Still have questions about OSAGO for travel to Russia?",
     text1:
-      "We explain the available insurance periods, pricing procedure, and documents required to arrange Russian OSAGO.",
+      "We will clarify the available insurance period, pricing procedure, required documents, and whether your vehicle can be insured.",
     text2:
-      "Complete the application form, and our manager will verify the vehicle details and confirm whether the policy can be issued.",
+      "Send your question, and our manager will review the route and vehicle details and contact you.",
   },
 
   advantages: {
-    title: "Why arrange Russian OSAGO through DIONIS",
+    title: "Why customers contact DIONIS",
     items: [
       {
-        icon: "⏱",
         title: "Remote application",
         text:
-          "You can submit the application and documents online without visiting an office.",
+          "The application and documents can be submitted online without visiting an office. The completed policy is delivered electronically.",
       },
       {
-        icon: "📄",
-        title: "Electronic policy",
-        text:
-          "Once issued, the policy is sent to your email address as a PDF file.",
-      },
-      {
-        icon: "🛂",
-        title: "For vehicles from Kazakhstan",
-        text:
-          "We assist with arranging Russian OSAGO for vehicles with Kazakhstan registration plates.",
-      },
-      {
-        icon: "💳",
         title: "Verification before payment",
         text:
-          "We first check the documents and vehicle details, then confirm the price and payment procedure.",
+          "We first check the documents, vehicle and driver details, and available period, then confirm the final price and payment procedure.",
+      },
+      {
+        title: "Different vehicle categories",
+        text:
+          "We accept applications for passenger cars and trucks and verify availability for buses and other commercial vehicles.",
+      },
+      {
+        title: "Individuals and legal entities",
+        text:
+          "We help prepare applications for vehicles owned by private individuals and organisations.",
       },
     ],
   },
 
   howItWorks: {
-    title: "How to arrange Russian OSAGO online",
-    subtitle: "A clear step-by-step policy issuance process",
+    title: "How to arrange electronic Russian OSAGO",
+    subtitle: "The quotation and policy issuance process",
     steps: [
       {
-        title: "Submit an application",
+        title: "Submit the application",
         text:
-          "Provide the vehicle details, driver information, and planned travel dates in Russia.",
+          "Provide the policyholder, vehicle and driver details, the required start date, and the expected period of use in Russia.",
       },
       {
-        title: "We verify the documents",
+        title: "Send the documents",
         text:
-          "Our manager checks the submitted information, confirms whether the policy can be issued, and verifies the available insurance period.",
+          "Provide the vehicle registration document, the policyholder's identity document, and the driving licences of all listed drivers.",
       },
       {
-        title: "Receive the quotation",
+        title: "Receive the confirmed quotation",
         text:
-          "After verification, we confirm the policy price and send payment details or a payment link.",
+          "We verify the information, confirm the available period and final price, and ask you to check the policy details before payment.",
       },
       {
-        title: "Receive the policy",
+        title: "Receive and verify the policy",
         text:
-          "Once payment and issuance are complete, we send the electronic OSAGO policy to the specified email address.",
+          "After payment, we send the electronic PDF policy. Check the registration number, VIN, drivers and validity period in the document and the insurance database.",
       },
     ],
   },
 
   writeUs: {
-    title: "We will help you arrange Russian OSAGO",
+    title: "We will help calculate and arrange OSAGO",
     text:
-      "Contact us to have your documents checked, receive a price calculation, and confirm whether the policy can be issued",
+      "Contact us if you need to verify the documents, insurance period, or eligibility of a particular vehicle",
     whatsapp: "Message us on WhatsApp",
     telegram: "Message us on Telegram",
     phone: "Call us: +7 (727) 357-30-30",
   },
 
   info: {
-    title: "What Russian OSAGO is for vehicles from Kazakhstan",
+    title: "Which insurance is required to enter Russia from Kazakhstan",
     paragraphs: [
-      "OSAGO is compulsory motor third-party liability insurance. It is intended to compensate for injury or property damage caused to other people as a result of a road traffic accident.",
-      "To operate a vehicle with Kazakhstan registration plates in Russia, the vehicle must have valid motor liability insurance recognized in the Russian Federation. If no other recognized coverage is available, a Russian OSAGO policy must be arranged.",
-      "OSAGO does not cover damage to, theft of, fire involving, or other risks affecting the policyholder’s own vehicle. Separate comprehensive motor insurance is required to protect the vehicle itself.",
-      "An electronic OSAGO policy has legal validity. Its details can be checked in the Russian insurance information system.",
+      "A vehicle with Kazakhstan registration plates must have motor third-party liability insurance valid in the Russian Federation when it is used in Russia. If the vehicle has no other coverage recognised in Russia, a Russian OSAGO policy must be arranged.",
+      "OSAGO compensates third parties for bodily injury and property damage caused in a road traffic accident, subject to the applicable terms and limits. It does not cover damage to, theft of, mechanical failure of, or wear and tear to the policyholder's own vehicle.",
+      "An electronic policy has legal validity and applies during the period stated in the document. The insurance dates must cover the entire period during which the vehicle will be used in Russia.",
+      "Russian OSAGO and Green Card are different insurance products. For a multi-country journey, coverage must be checked separately for each territory.",
     ],
   },
 
   benefits: {
-    title: "What Russian OSAGO covers",
+    title: "Russian OSAGO price, period and conditions",
     imageAlt:
-      "Russian OSAGO insurance for a vehicle with Kazakhstan registration plates",
+      "Territorial validity of Russian OSAGO for a vehicle with Kazakhstan plates",
     items: [
       {
-        title: "Liability coverage in Russia",
+        title: "The price is calculated individually",
         text:
-          "The policy confirms motor third-party liability coverage in the Russian Federation for the stated insurance period.",
+          "The premium depends on the vehicle category and engine power, policyholder type, insurance period, listed drivers, their age and driving experience, and the applicable tariff factors.",
       },
       {
-        title: "Compensation for injured third parties",
+        title: "Coverage from 15 days may be available",
         text:
-          "If the driver is responsible for an accident, the insurer compensates third parties for bodily injury or property damage within the applicable limits.",
+          "A limited insurance period may be available for temporary use of a foreign vehicle. The exact period is confirmed after the documents and current rules are checked.",
       },
       {
-        title: "Valid throughout Russia",
+        title: "Passenger cars and trucks",
         text:
-          "The policy applies throughout the Russian Federation, subject to its validity period and other policy conditions.",
+          "The calculation takes account of the vehicle category, engine power, permitted weight, and the way the vehicle is used.",
       },
       {
-        title: "Insurance period based on the trip",
+        title: "Policies for legal entities",
         text:
-          "The insurance period is selected according to the planned travel dates and the periods available under Russian OSAGO rules.",
+          "For a company-owned vehicle, company registration details and representative information are also required. The final document list is confirmed during the application review.",
       },
     ],
   },
 
   osagoCheckUpsell: {
-    title: "Check your Russian OSAGO policy",
+    title: "How to verify an electronic OSAGO policy",
     text1:
-      "If your policy has already been issued, you can verify its details in the Russian National Insurance Information System.",
+      "After receiving the policy, verify its registration in the Russian National Insurance Information System.",
     text2:
-      "The check helps confirm that the policy is registered and that the vehicle, policyholder, and validity-period details are correct.",
-    btn: "Check the policy",
-    imageAlt: "Verification of a Russian OSAGO policy",
+      "Check the registration number, VIN, policyholder, listed drivers and validity period. Report any discrepancy before the journey begins.",
+    btn: "Check the policy in the system",
+    imageAlt: "Verification of an electronic Russian OSAGO policy",
   },
 
   greenCardUpsell: {
-    title: "Planning to travel to other countries?",
+    title: "Russian OSAGO and Green Card are not the same",
     text1:
-      "Russian OSAGO is intended for driving in Russia. Separate international or border insurance may be required for travel to Turkey, EU countries, and other states.",
+      "Russian OSAGO is intended for the use of a vehicle in the Russian Federation. Green Card applies only in the countries and territories shown as covered by the relevant international policy.",
     text2:
-      "Send us your full route, and we will check what insurance coverage may be required for each country.",
-    btn: "Check your route",
-    imageAlt:
-      "Motor insurance for an international road trip",
+      "For a journey through several countries, send us the complete route. We will check which insurance is required for each part of the trip.",
+    btn: "Check insurance for the route",
+    imageAlt: "Comparison of Russian OSAGO and Green Card insurance",
   },
 
   orderPrep: {
-    title: "Prepare the details required for a quotation",
+    title: "Documents and details required for OSAGO",
     text:
-      "Complete information allows us to verify whether the policy can be issued and calculate the price more quickly.",
+      "Prepare clear copies and verify the information. For a legal entity, company and representative details will also be required.",
     items: [
       "Vehicle registration certificate or technical passport",
       "Passport or identity document of the policyholder",
-      "Driving licences of all drivers to be included",
-      "Planned travel dates in Russia",
-      "Contact phone number and email address for policy delivery",
+      "Driving licences of all listed drivers",
+      "Registration number, VIN, make, model and year of manufacture",
+      "Engine power and vehicle category",
+      "Required start date and expected insurance period",
+      "For an organisation: company name, registration details and representative information",
+      "Contact phone number and email address for communication and policy delivery",
     ],
   },
 
   faq: {
-    title: "Questions about OSAGO for travel to Russia",
+    title: "Questions About Russian OSAGO for a Vehicle from Kazakhstan",
     intro:
-      "Key information for owners of vehicles with Kazakhstan registration plates.",
+      "Answers about pricing, policy periods, required documents, and arranging electronic insurance for travel to Russia.",
     items: [
       {
         id: "mandatory",
         question:
-          "Is insurance required to travel to Russia in a vehicle registered in Kazakhstan?",
+          "Which insurance is required to enter Russia from Kazakhstan?",
         answer:
-          "To operate a vehicle in Russia, it must have valid motor liability insurance recognized in the Russian Federation. If no other recognized coverage is available, a Russian OSAGO policy must be arranged.",
+          "To use a vehicle with Kazakhstan registration plates in Russia, valid motor third-party liability insurance recognised in the Russian Federation is required. In standard cases, a Russian OSAGO policy is arranged. It covers the driver's liability for damage caused to other people, vehicles, or property in a road traffic accident, but it does not insure the policyholder's own vehicle against damage, theft, or mechanical failure.",
       },
       {
-        id: "what-covers",
-        question: "What does Russian OSAGO cover?",
-        answer:
-          "The policy covers the driver’s liability for bodily injury or property damage caused to third parties in a road traffic accident, within the limits established by law and the insurance contract.",
-      },
-      {
-        id: "own-car-damage",
+        id: "kazakhstan-plates",
         question:
-          "Does OSAGO cover damage to the policyholder’s own vehicle?",
+          "Is OSAGO required for a vehicle with Kazakhstan registration plates?",
         answer:
-          "No. OSAGO covers liability to third parties. Damage to, theft of, fire involving, and other risks affecting the insured vehicle require separate comprehensive motor insurance.",
+          "Yes, if the vehicle is used in Russia and does not have other insurance coverage recognised in the Russian Federation. The policy must remain valid for the entire period during which the vehicle is used in Russia.",
+      },
+      {
+        id: "green-card",
+        question: "Is a Green Card required for travel to Russia?",
+        answer:
+          "A vehicle travelling from Kazakhstan must have motor liability insurance that is valid specifically in Russia. A Green Card should not be treated as a replacement for Russian OSAGO, because Russia has not participated in the Green Card system since 2023. A Russian OSAGO policy is normally arranged for entry into and travel within Russia.",
+      },
+      {
+        id: "remote-application",
+        question:
+          "Can Russian OSAGO be arranged while the applicant is in Kazakhstan?",
+        answer:
+          "Yes. The application, documents, and driver details can be submitted remotely. After the information is checked, the premium is calculated, and payment is made, the electronic policy is sent to the specified email address as a PDF.",
+      },
+      {
+        id: "online-policy",
+        question: "Can Russian OSAGO be arranged online?",
+        answer:
+          "Yes. The application and documents are submitted online, after which a manager checks whether the policy can be issued and calculates the price. The completed electronic policy is sent to the specified email address.",
+      },
+      {
+        id: "minimum-term",
+        question: "What is the minimum policy period?",
+        answer:
+          "Short-term OSAGO may be available for a foreign vehicle temporarily used in Russia. The minimum period depends on the current rules, the insurance company, the vehicle category, and the application details. The available period is confirmed after the documents have been reviewed.",
+      },
+      {
+        id: "term-15-days",
+        question: "Can Russian OSAGO be arranged for 15 days?",
+        answer:
+          "A 15-day policy may be available for the temporary use of a foreign vehicle. Eligibility and the exact period are confirmed after the vehicle details, policyholder information, and current insurer rules have been checked.",
+      },
+      {
+        id: "price",
+        question:
+          "How much does OSAGO cost for a vehicle from Kazakhstan?",
+        answer:
+          "There is no single fixed price. The premium depends on the vehicle category and engine power, the policyholder type, the insurance period, the list of drivers, their age and driving experience, and the applicable tariff coefficients.",
+      },
+      {
+        id: "price-15-days",
+        question: "How much does OSAGO cost for 15 days?",
+        answer:
+          "The price of a 15-day policy is calculated individually. It depends on the vehicle type, engine power, owner and driver details, policyholder category, and the insurance company's tariffs. The exact amount is determined after the documents and vehicle details have been received.",
       },
       {
         id: "documents",
         question: "Which documents are required to arrange OSAGO?",
         answer:
-          "The required documents usually include the vehicle registration document, the policyholder’s identity document, the driving licences of the listed drivers, and the planned travel dates. The final list is confirmed after the application is reviewed.",
+          "The usual requirements include the vehicle registration document or technical passport, the policyholder's passport or identity document, the driving licences of all listed drivers, the registration number, VIN, and expected travel period. For a legal entity, company registration details and information about its representative are also required.",
       },
       {
-        id: "term",
-        question: "For how long can Russian OSAGO be arranged?",
+        id: "truck",
+        question: "Can OSAGO be arranged for a truck?",
         answer:
-          "The available period depends on the applicable insurance rules and the vehicle details. The policy must cover the entire period during which the vehicle will be used in Russia.",
+          "Yes, applications are accepted for trucks with Kazakhstan registration plates. The calculation requires the vehicle category, engine power, permitted maximum weight, type of use, and registration documents.",
       },
       {
-        id: "electronic-policy",
-        question: "Is an electronic OSAGO policy valid?",
+        id: "legal-entity",
+        question: "Can OSAGO be arranged for a legal entity?",
         answer:
-          "Yes. An electronic OSAGO policy has legal validity. We recommend saving the PDF on your phone and carrying a printed copy in case internet access is unavailable.",
+          "Yes, eligibility can be checked for a vehicle owned by an organisation. The company's full name and registration details, information about its representative, and documents confirming the vehicle details will also be required.",
       },
       {
-        id: "check",
-        question: "How can I verify an issued policy?",
+        id: "what-covers",
+        question: "What does Russian OSAGO cover?",
         answer:
-          "The policy details can be checked in the Russian National Insurance Information System. The vehicle details and validity period should match the information shown in the electronic policy.",
+          "OSAGO covers the driver's liability for bodily injury, death, or property damage caused to third parties in a road traffic accident, subject to the policy terms and statutory compensation limits.",
       },
       {
-        id: "valid-all-rf",
-        question: "Is Russian OSAGO valid throughout Russia?",
+        id: "own-car-damage",
+        question:
+          "Does OSAGO cover damage to the policyholder's own vehicle?",
         answer:
-          "Yes. A Russian OSAGO policy applies in all regions of the Russian Federation during its stated validity period, subject to the policy conditions.",
+          "No. OSAGO does not cover damage to the at-fault driver's vehicle, theft, mechanical failure, normal wear and tear, transported cargo, or personal belongings. Separate comprehensive motor insurance is required to protect the vehicle itself.",
       },
       {
         id: "start-date",
+        question: "When does the policy become effective?",
+        answer:
+          "The policy becomes effective on the date and at the time stated in the insurance document. Before travelling, confirm that coverage begins no later than the moment the vehicle starts being used in Russia.",
+      },
+      {
+        id: "same-day",
         question: "Can the policy be arranged on the day of entry?",
         answer:
-          "Whether the policy can start on the required date depends on the issuance rules and the time needed to verify the documents. We recommend applying before the trip begins.",
+          "This depends on the time the application is submitted, the document review process, and the insurance company's issuance rules. To avoid driving without valid coverage, the documents should be submitted in advance.",
+      },
+      {
+        id: "electronic-policy",
+        question: "Is an electronic OSAGO policy legally valid?",
+        answer:
+          "Yes. An electronic OSAGO policy has legal validity. After receiving it, check all the details and save the PDF on your phone.",
+      },
+      {
+        id: "print-policy",
+        question: "Does the electronic policy need to be printed?",
+        answer:
+          "A printed copy of an electronic policy is generally not mandatory. However, it is advisable to save the PDF on your phone and also carry a printed copy in case there is no internet connection, the device runs out of power, or a technical issue occurs during verification.",
+      },
+      {
+        id: "check",
+        question: "How can the policy's validity be checked?",
+        answer:
+          "The policy can be checked in the National Insurance Information System. Make sure that the registration number, VIN, policyholder, listed drivers, and validity period are shown correctly both in the system and in the electronic document.",
+      },
+      {
+        id: "valid-all-rf",
+        question: "Is OSAGO valid throughout Russia?",
+        answer:
+          "A Russian OSAGO policy is valid throughout the Russian Federation during the stated policy period, provided that the policy terms are complied with.",
+      },
+      {
+        id: "outside-russia",
+        question:
+          "Is Russian OSAGO valid outside Russia?",
+        answer:
+          "No. Russian OSAGO is intended for the use of a vehicle within the Russian Federation. For travel to Georgia, Turkey, European Union countries, or other states, the insurance requirements of each country must be checked separately and the appropriate insurance must be arranged.",
+      },
+      {
+        id: "multiple-drivers",
+        question: "Can several drivers be listed in the policy?",
+        answer:
+          "Yes. Several drivers authorised to use the vehicle can be included in the policy. Driving licence details are required for each driver. In some cases, an unrestricted-driver policy may also be available, but this option affects the premium.",
+      },
+      {
+        id: "accident-russia",
+        question: "What should be done after a road accident in Russia?",
+        answer:
+          "Stop the vehicle, switch on the hazard warning lights, and place the warning triangle. If anyone is injured, call the emergency services immediately. Record the positions of the vehicles, the damage, registration numbers, and the circumstances of the accident, exchange details with the other party, and notify the insurance company. If there is a dispute, anyone is injured, other property is damaged, or there is uncertainty about the correct procedure, the police should be called.",
+      },
+      {
+        id: "policy-error",
+        question:
+          "What should be done if the policy contains an error?",
+        answer:
+          "After receiving the policy, immediately check the registration number, VIN, owner details, driver details, and validity period. If an error is found, do not edit the PDF yourself. Contact the manager or insurer immediately, identify the incorrect field, and provide a supporting document. The correction procedure depends on the type of error and the stage of policy issuance.",
       },
     ],
+  },
+  commercialTransport: {
+  title: "Russian OSAGO for Commercial Vehicles from Kazakhstan",
+  intro:
+    "Tractor units, trucks, buses, and other commercial vehicles are calculated separately from passenger cars. The vehicle category, permitted maximum weight, engine power, type of use, travel period, and owner details are taken into account.",
+
+  vehicleTypesTitle: "Which commercial vehicles can be submitted",
+  vehicleTypes: [
+    {
+      title: "Tractor units and trucks",
+      text:
+        "The calculation takes into account the vehicle category, permitted maximum weight, engine power, and type of transport operations.",
+    },
+    {
+      title: "Buses and minibuses",
+      text:
+        "Eligibility is checked based on the vehicle category, number of passenger seats, and intended use.",
+    },
+    {
+      title: "Commercial vehicles",
+      text:
+        "Applications are accepted for vehicles used for freight transport, passenger transport, company operations, and other commercial purposes.",
+    },
+    {
+      title: "Vehicles owned by legal entities",
+      text:
+        "For a company-owned vehicle, the company details and information about the representative submitting the application will also be required.",
+    },
+    {
+      title: "Vehicle fleets",
+      text:
+        "For several vehicles, one application may be submitted together with a vehicle list for a combined quotation.",
+    },
+    {
+      title: "International routes",
+      text:
+        "For vehicles regularly operating between Kazakhstan and Russia, the insurance period should cover the entire period during which the vehicles will be used in Russia.",
+    },
+  ],
+
+    fleetTitle: "Arranging OSAGO for Multiple Vehicles",
+    fleetText:
+      "If several vehicles need to be insured, specify the number of vehicles and upload the fleet list. After reviewing the information, we will prepare a quotation for each vehicle and confirm which additional documents are required.",
+    fleetItems: [
+      "Number of vehicles included in the application",
+      "Vehicle types and categories",
+      "Registration numbers and VINs",
+      "Engine power or permitted maximum weight",
+      "Details of the owner — legal entity",
+      "Planned periods of use in Russia",
+      "Vehicle list in XLSX, XLS, CSV, or PDF format",
+    ],
+    cta: "Submit a Commercial Vehicle Application",
+  },
+  seo: {
+    title:
+      "Russian OSAGO for Vehicles from Kazakhstan — Price and Online Application | DIONIS",
+    description:
+      "Electronic Russian OSAGO for vehicles with Kazakhstan registration plates. Price calculation, document verification, and online policy issuance.",
+    serviceName:
+      "Russian OSAGO Insurance for Vehicles from Kazakhstan",
+    serviceType:
+      "Compulsory Motor Third-Party Liability Insurance",
+    audienceName:
+      "Individuals, legal entities, and commercial vehicle owners from Kazakhstan",
+    breadcrumbs: {
+      home: "Home",
+      services: "Insurance Products",
+      current: "Russian OSAGO",
+    },
+    channels: {
+      website: "Online Application",
+      phone: "Telephone Consultation",
+      whatsapp: "WhatsApp Consultation",
+      telegram: "Telegram Consultation",
+    },
   },
 };
 
 const kz: OsagoRfPageDictionary = {
   hero: {
-    title: "Қазақстаннан Ресейге баруға арналған автосақтандыру",
+    title: "Қазақстаннан келген автокөлікке арналған Ресей ОСАГО полисі",
     subtitle:
-      "Қазақстандық тіркеу нөмірі бар автокөлікке арналған ресейлік ОСАГО полисі. Құжаттарды тексеру, құнын есептеу және электрондық полисті онлайн алу.",
+      "Қазақстандық тіркеу нөмірі бар автокөлікпен Ресейге кіруге және оның аумағында жүруге арналған электрондық жауапкершілік сақтандыруы. Құжаттарды тексеріп, құнын есептеп, полисті PDF форматында жібереміз.",
     ctaOrder: "ОСАГО құнын есептеу",
     factsLabel: "Негізгі шарттар",
     facts: [
-      "Қазақстандық нөмірі бар автокөліктерге",
-      "Электрондық ОСАГО полисі",
-      "Төлемге дейін құжаттарды тексеру",
+      "Жеңіл және жүк автокөліктеріне",
+      "Жеке және заңды тұлғаларға",
+      "15 күннен бастап рәсімдеу мүмкіндігі",
+      "PDF форматындағы электрондық полис",
     ],
     carAlt:
-      "Ресейге баруға арналған қазақстандық нөмірі бар автокөлік",
+      "Ресейге сапарға шығатын қазақстандық тіркеу нөмірі бар автокөлік",
     policyAlt:
-      "Қазақстандық автокөлікке арналған электрондық ресейлік ОСАГО полисі",
+      "Қазақстаннан келген автокөлікке арналған электрондық Ресей ОСАГО полисі",
     logoAlt: "DIONIS сақтандыру брокері",
   },
 
   questionBlock: {
-    title: "Ресейге баруға арналған сақтандыру бойынша кеңес керек пе?",
+    title: "Ресейге сапарға арналған ОСАГО бойынша сұрақтарыңыз бар ма?",
     text1:
-      "Сақтандырудың қолжетімді мерзімдері, құнын есептеу тәртібі және ОСАГО рәсімдеуге қажетті құжаттар туралы түсіндіреміз.",
+      "Қолжетімді сақтандыру мерзімін, есептеу тәртібін, құжаттар тізімін және автокөлігіңізге полис рәсімдеу мүмкіндігін нақтылаймыз.",
     text2:
-      "Өтінімді толтырыңыз — менеджер автокөлік деректерін тексеріп, полисті рәсімдеу мүмкіндігін растайды.",
+      "Сұрағыңызды жіберіңіз — менеджер бағыт пен автокөлік деректерін тексеріп, сізбен байланысады.",
   },
 
   advantages: {
-    title: "ОСАГО полисін DIONIS арқылы рәсімдеудің артықшылықтары",
+    title: "Неліктен DIONIS-ке жүгінеді",
     items: [
       {
-        icon: "⏱",
         title: "Қашықтан рәсімдеу",
         text:
-          "Өтінім мен құжаттарды кеңсеге бармай-ақ онлайн жіберуге болады.",
+          "Өтінім мен құжаттарды кеңсеге бармай-ақ онлайн жіберуге болады. Дайын полис электрондық түрде беріледі.",
       },
       {
-        icon: "📄",
-        title: "Электрондық полис",
-        text:
-          "Рәсімделгеннен кейін полис PDF форматында e-mail арқылы жіберіледі.",
-      },
-      {
-        icon: "🛂",
-        title: "Қазақстандық автокөліктерге",
-        text:
-          "Қазақстандық тіркеу нөмірі бар автокөлікке ресейлік ОСАГО рәсімдеуге көмектесеміз.",
-      },
-      {
-        icon: "💳",
         title: "Төлемге дейін тексеру",
         text:
-          "Алдымен құжаттар мен автокөлік деректерін тексереміз, содан кейін құны мен төлем тәртібін растаймыз.",
+          "Алдымен құжаттарды, автокөлік пен жүргізушілер туралы деректерді және қолжетімді мерзімді тексеріп, содан кейін құны мен төлем тәртібін растаймыз.",
+      },
+      {
+        title: "Көліктің әртүрлі санаттары",
+        text:
+          "Жеңіл және жүк автокөліктеріне өтінім қабылдаймыз, сондай-ақ автобустар мен коммерциялық көлікке рәсімдеу мүмкіндігін тексереміз.",
+      },
+      {
+        title: "Жеке және заңды тұлғалар",
+        text:
+          "Жеке меншік иелеріне және ұйымдарға тиесілі автокөліктер бойынша деректерді дайындауға көмектесеміз.",
       },
     ],
   },
 
   howItWorks: {
-    title: "Ресейлік ОСАГО полисін онлайн қалай рәсімдеуге болады",
-    subtitle: "Полисті рәсімдеудің кезең-кезеңімен жүргізілетін тәртібі",
+    title: "Электрондық Ресей ОСАГО полисін қалай рәсімдеуге болады",
+    subtitle: "Құнын есептеу және полисті алу тәртібі",
     steps: [
       {
         title: "Өтінім бересіз",
         text:
-          "Автокөлік, жүргізушілер және Ресейге жоспарланған сапар мерзімі туралы деректерді көрсетесіз.",
+          "Сақтанушы, автокөлік, жүргізушілер, басталу күні және Ресейде жоспарланған пайдалану мерзімі туралы деректерді көрсетесіз.",
       },
       {
-        title: "Құжаттарды тексереміз",
+        title: "Құжаттарды жібересіз",
         text:
-          "Менеджер берілген ақпаратты, полисті рәсімдеу мүмкіндігін және қолжетімді сақтандыру мерзімін тексереді.",
+          "Автокөліктің тіркеу құжатын, сақтанушының жеке басын куәландыратын құжатты және барлық жүргізушінің куәліктерін бересіз.",
       },
       {
-        title: "Есептеуді аласыз",
+        title: "Расталған есепті аласыз",
         text:
-          "Тексеруден кейін полистің құнын хабарлап, төлем деректемелерін немесе төлем сілтемесін жібереміз.",
+          "Біз деректерді тексеріп, қолжетімді мерзім мен соңғы құнын растаймыз. Төлемге дейін полиске енгізілетін мәліметтерді тексересіз.",
       },
       {
-        title: "Полисті аласыз",
+        title: "Полисті алып, тексересіз",
         text:
-          "Төлем жасалып, рәсімдеу аяқталғаннан кейін электрондық ОСАГО полисін көрсетілген e-mail мекенжайына жібереміз.",
+          "Төлемнен кейін электрондық полисті PDF форматында жібереміз. Тіркеу нөмірін, VIN-ді, жүргізушілерді және қолданылу мерзімін құжатта және ақпараттық жүйеде тексеріңіз.",
       },
     ],
   },
 
   writeUs: {
-    title: "ОСАГО рәсімдеуге көмектесеміз",
+    title: "ОСАГО құнын есептеп, рәсімдеуге көмектесеміз",
     text:
-      "Бізге жазыңыз — құжаттарды тексеріп, құнын есептеп, полисті рәсімдеу мүмкіндігін растаймыз",
+      "Құжаттарды, сақтандыру мерзімін немесе нақты автокөлікке рәсімдеу мүмкіндігін тексеру қажет болса, бізге жазыңыз",
     whatsapp: "WhatsApp арқылы жазу",
     telegram: "Telegram арқылы жазу",
     phone: "Қоңырау шалу: +7 (727) 357-30-30",
   },
 
   info: {
-    title: "Қазақстандық автокөлікке арналған ресейлік ОСАГО дегеніміз не",
+    title: "Қазақстаннан Ресейге кіру үшін қандай сақтандыру қажет",
     paragraphs: [
-      "ОСАГО — көлік иесінің азаматтық-құқықтық жауапкершілігін міндетті сақтандыру. Полис жол-көлік оқиғасы салдарынан басқа адамдардың өміріне, денсаулығына немесе мүлкіне келтірілген зиянды өтеуге арналған.",
-      "Қазақстандық тіркеу нөмірі бар автокөлікті Ресей аумағында пайдалану үшін РФ аумағында танылатын азаматтық жауапкершілік сақтандыруы болуы қажет. Егер басқа жарамды сақтандыру өтемі болмаса, ресейлік ОСАГО полисі рәсімделеді.",
-      "ОСАГО автокөлік иесінің өз көлігін зақымданудан, ұрланудан, өрттен, табиғи апаттардан және басқа тәуекелдерден қорғамайды. Өз автокөлігіңізді қорғау үшін каско шарты қажет.",
-      "Электрондық полистің заңды күші бар. Оның деректерін Ресейдің сақтандыру ақпараттық жүйесінде тексеруге болады.",
+      "Қазақстандық тіркеу нөмірі бар автокөлікті Ресей аумағында пайдалану үшін Ресей Федерациясында жарамды азаматтық жауапкершілік сақтандыруы қажет. Егер автокөлікте Ресейде танылатын басқа сақтандыру болмаса, ресейлік ОСАГО полисін рәсімдеу керек.",
+      "ОСАГО жол-көлік оқиғасы кезінде үшінші тұлғалардың өміріне, денсаулығына, автокөлігіне немесе өзге мүлкіне келтірілген зиянды шарттар мен белгіленген лимиттер шегінде өтейді. Полис иесінің өз автокөлігінің зақымдануын, ұрлануын, бұзылуын немесе тозуын өтемейді.",
+      "Электрондық полистің заңды күші бар және онда көрсетілген мерзім ішінде қолданылады. Сақтандыру мерзімі автокөліктің Ресейде пайдаланылатын бүкіл кезеңін қамтуы тиіс.",
+      "Ресей ОСАГО полисі мен Green Card — әртүрлі сақтандыру өнімдері. Бірнеше ел арқылы өтетін сапарда әр аумаққа арналған сақтандыруды бөлек тексеру қажет.",
     ],
   },
 
   benefits: {
-    title: "Ресейлік ОСАГО полисі қандай қорғау береді",
+    title: "Ресей ОСАГО полисінің құны, мерзімі және шарттары",
     imageAlt:
-      "Қазақстандық тіркеу нөмірі бар автокөлікке арналған ресейлік ОСАГО",
+      "Қазақстандық нөмірі бар автокөлікке арналған Ресей ОСАГО полисінің қолданылу аумағы",
     items: [
       {
-        title: "Ресей аумағындағы сақтандыру өтемі",
+        title: "Құны жеке есептеледі",
         text:
-          "Полис көрсетілген мерзім ішінде Ресей Федерациясының аумағында азаматтық жауапкершіліктің сақтандырылғанын растайды.",
+          "Баға автокөлік санатына және қозғалтқыш қуатына, сақтанушы түріне, мерзімге, жүргізушілер тізіміне, олардың жасына және жүргізушілік өтіліне, сондай-ақ қолданылатын тарифтік коэффициенттерге байланысты.",
       },
       {
-        title: "Зардап шеккендерге зиянды өтеу",
+        title: "15 күннен бастап мерзім қолжетімді болуы мүмкін",
         text:
-          "Егер жүргізуші жол-көлік оқиғасына кінәлі болса, сақтандыру компаниясы үшінші тұлғалардың өміріне, денсаулығына немесе мүлкіне келтірілген зиянды белгіленген лимиттер шегінде өтейді.",
+          "Шетелдік автокөлікті уақытша пайдалану үшін шектеулі мерзімге сақтандыру мүмкін болуы ықтимал. Нақты мерзім құжаттар мен қолданыстағы ережелер тексерілгеннен кейін расталады.",
       },
       {
-        title: "Ресейдің барлық өңірінде жарамды",
+        title: "Жеңіл және жүк автокөліктері",
         text:
-          "Полис сақтандыру шартының мерзімі мен өзге де талаптары сақталған жағдайда Ресей аумағында қолданылады.",
+          "Есептеу кезінде көлік санаты, қозғалтқыш қуаты, рұқсат етілген массасы және пайдалану сипаты ескеріледі.",
       },
       {
-        title: "Сапар мерзіміне сәйкес кезең",
+        title: "Заңды тұлғаға рәсімдеу",
         text:
-          "Сақтандыру кезеңі жоспарланған сапар күндері мен ОСАГО ережелерінде қолжетімді мерзімдер ескеріле отырып таңдалады.",
+          "Ұйымға тиесілі автокөлік үшін компанияның тіркеу деректері мен өкіл туралы мәліметтер қосымша қажет. Соңғы құжаттар тізімі өтінімді тексеру кезінде расталады.",
       },
     ],
   },
 
   osagoCheckUpsell: {
-    title: "ОСАГО полисін тексеру",
+    title: "Электрондық ОСАГО полисін қалай тексеруге болады",
     text1:
-      "Егер полис рәсімделген болса, оның деректерін Ресейдің Ұлттық сақтандыру ақпараттық жүйесінде тексеруге болады.",
+      "Полисті алғаннан кейін оның Ресейдің Ұлттық сақтандыру ақпараттық жүйесінде тіркелгенін тексеріңіз.",
     text2:
-      "Тексеру полистің жүйеде тіркелгенін және автокөлік, сақтанушы мен қолданылу мерзімі туралы деректердің дұрыс көрсетілгенін растауға мүмкіндік береді.",
-    btn: "Полисті тексеру",
-    imageAlt: "Ресейлік ОСАГО полисін тексеру",
+      "Тіркеу нөмірін, VIN-ді, сақтанушыны, жүргізушілер тізімін және қолданылу мерзімін салыстырыңыз. Қате анықталса, сапар басталғанға дейін хабарлаңыз.",
+    btn: "Полисті ақпараттық жүйеде тексеру",
+    imageAlt: "Электрондық Ресей ОСАГО полисін тексеру",
   },
 
   greenCardUpsell: {
-    title: "Басқа елдерге сапар жоспарлап отырсыз ба?",
+    title: "Ресей ОСАГО полисі мен Green Card бірдей емес",
     text1:
-      "Ресейлік ОСАГО тек Ресей аумағында жүруге арналған. Түркияға, ЕО елдеріне және басқа мемлекеттерге кіру үшін бөлек халықаралық немесе шекаралық сақтандыру қажет болуы мүмкін.",
+      "Ресей ОСАГО полисі автокөлікті Ресей Федерациясының аумағында пайдалануға арналған. Green Card тиісті халықаралық полисте қамтылған деп көрсетілген елдер мен аумақтарда ғана қолданылады.",
     text2:
-      "Сапардың толық бағытын хабарлаңыз — әр ел үшін қандай сақтандыру қажет екенін тексереміз.",
-    btn: "Бағытты тексеру",
-    imageAlt:
-      "Халықаралық автосапарға арналған сақтандыру",
+      "Сапар бірнеше ел арқылы өтсе, толық бағытты жіберіңіз. Әр бөлікке қандай сақтандыру қажет екенін тексереміз.",
+    btn: "Бағыт бойынша сақтандыруды тексеру",
+    imageAlt: "Ресей ОСАГО полисі мен Green Card сақтандыруын салыстыру",
   },
 
   orderPrep: {
-    title: "Есептеу үшін қажетті деректерді дайындаңыз",
+    title: "ОСАГО рәсімдеу үшін қандай деректер қажет",
     text:
-      "Толық ақпарат полисті рәсімдеу мүмкіндігін жылдам тексеруге және оның құнын есептеуге көмектеседі.",
+      "Құжаттардың анық көшірмелерін дайындап, деректердің дұрыстығын тексеріңіз. Заңды тұлға үшін ұйым мен оның өкілі туралы мәліметтер де қажет.",
     items: [
       "Автокөліктің тіркеу куәлігі немесе техникалық паспорты",
       "Сақтанушының паспорты немесе жеке куәлігі",
-      "Көлікті басқаруға жіберілетін жүргізушілердің жүргізуші куәліктері",
-      "Ресейге жоспарланған сапар күндері",
-      "Полисті алу үшін байланыс телефоны және e-mail",
+      "Көлікті басқаруға жіберілетін барлық жүргізушінің куәлігі",
+      "Тіркеу нөмірі, VIN, маркасы, моделі және шығарылған жылы",
+      "Қозғалтқыш қуаты және көлік құралының санаты",
+      "Сақтандырудың басталу күні және жоспарланған мерзімі",
+      "Ұйым үшін — атауы, тіркеу деректері және өкілі туралы мәліметтер",
+      "Байланыс телефоны және полисті алу үшін e-mail",
     ],
   },
 
   faq: {
-    title: "Ресейге баруға арналған ОСАГО туралы сұрақтар",
+    title: "Қазақстаннан келген автокөлікке арналған ОСАГО туралы сұрақтар",
     intro:
-      "Қазақстандық тіркеу нөмірі бар автокөлік иелеріне арналған негізгі ақпарат.",
+      "Ресейге сапарға арналған электрондық сақтандырудың құны, мерзімі, құжаттары және рәсімделуі туралы жауаптар.",
     items: [
       {
         id: "mandatory",
         question:
-          "Қазақстандық автокөлікпен Ресейге бару үшін сақтандыру қажет пе?",
+          "Қазақстаннан Ресейге кіру үшін қандай сақтандыру қажет?",
         answer:
-          "Ресей аумағында автокөлікті пайдалану үшін РФ-та танылатын азаматтық жауапкершілік сақтандыруы қажет. Егер басқа жарамды сақтандыру өтемі болмаса, ресейлік ОСАГО полисін рәсімдеу керек.",
+          "Қазақстандық тіркеу нөмірі бар автокөлікті Ресей аумағында пайдалану үшін Ресей Федерациясында танылатын қолданыстағы азаматтық жауапкершілік сақтандыруы қажет. Әдетте ресейлік ОСАГО полисі рәсімделеді. Ол жол-көлік оқиғасы кезінде жүргізушінің басқа адамдарға, автокөліктерге немесе мүлікке келтірген зияны үшін жауапкершілігін өтейді, бірақ меншік иесінің өз автокөлігін зақымданудан, ұрланудан немесе бұзылудан сақтандырмайды.",
       },
       {
-        id: "what-covers",
-        question: "Ресейлік ОСАГО нені өтейді?",
-        answer:
-          "Полис жол-көлік оқиғасы салдарынан жүргізушінің үшінші тұлғалардың өміріне, денсаулығына немесе мүлкіне келтірген зияны үшін жауапкершілігін заңнамада және шартта белгіленген лимиттер шегінде өтейді.",
-      },
-      {
-        id: "own-car-damage",
+        id: "kazakhstan-plates",
         question:
-          "ОСАГО автокөлік иесінің өз көлігінің зақымдануын өтей ме?",
+          "Қазақстандық тіркеу нөмірі бар автокөлікке ОСАГО қажет пе?",
         answer:
-          "Жоқ. ОСАГО үшінші тұлғалар алдындағы жауапкершілікті өтейді. Автокөліктің зақымдануы, ұрлануы, өртенуі және басқа тәуекелдер каско шарты бойынша бөлек сақтандырылады.",
+          "Иә, егер автокөлік Ресейде пайдаланылса және Ресей Федерациясының аумағында танылатын басқа сақтандыруы болмаса. Полис автокөліктің Ресейде пайдаланылатын бүкіл кезеңінде жарамды болуы тиіс.",
+      },
+      {
+        id: "green-card",
+        question: "Ресейге сапар үшін Green Card қажет пе?",
+        answer:
+          "Қазақстаннан автокөлікпен Ресейге бару үшін дәл Ресей аумағында жарамды азаматтық жауапкершілік сақтандыруы қажет. Green Card полисін ресейлік ОСАГО-ның орнына қолдануға болмайды, өйткені Ресей 2023 жылдан бері «Жасыл карта» жүйесіне қатыспайды. Ресейге кіру және оның аумағында жүру үшін әдетте ресейлік ОСАГО полисі рәсімделеді.",
+      },
+      {
+        id: "remote-application",
+        question:
+          "Қазақстанда жүріп Ресей ОСАГО полисін рәсімдеуге бола ма?",
+        answer:
+          "Иә. Өтінімді, құжаттарды және жүргізушілер туралы деректерді қашықтан жіберуге болады. Мәліметтер тексеріліп, құны есептеліп, төлем жасалғаннан кейін электрондық полис көрсетілген e-mail мекенжайына PDF форматында жіберіледі.",
+      },
+      {
+        id: "online-policy",
+        question: "Ресей ОСАГО полисін онлайн рәсімдеуге бола ма?",
+        answer:
+          "Иә. Өтінім мен құжаттар онлайн жіберіледі, содан кейін менеджер рәсімдеу мүмкіндігін тексеріп, құнын есептейді. Дайын электрондық полис көрсетілген e-mail мекенжайына жіберіледі.",
+      },
+      {
+        id: "minimum-term",
+        question: "Полисті ең қысқа қандай мерзімге рәсімдеуге болады?",
+        answer:
+          "Ресейде уақытша пайдаланылатын шетелдік автокөлік үшін қысқа мерзімді ОСАГО қолжетімді болуы мүмкін. Ең төменгі мерзім қолданыстағы ережелерге, сақтандыру компаниясына, көлік құралының санатына және өтінім параметрлеріне байланысты. Қолжетімді мерзім құжаттар тексерілгеннен кейін расталады.",
+      },
+      {
+        id: "term-15-days",
+        question: "Ресей ОСАГО полисін 15 күнге рәсімдеуге бола ма?",
+        answer:
+          "Шетелдік автокөлікті уақытша пайдалану үшін полисті 15 күнге рәсімдеу мүмкін болуы ықтимал. Рәсімдеу мүмкіндігі мен нақты мерзім автокөлік, сақтанушы деректері және сақтандыру компаниясының қолданыстағы ережелері тексерілгеннен кейін расталады.",
+      },
+      {
+        id: "price",
+        question:
+          "Қазақстандық автокөлікке арналған ОСАГО қанша тұрады?",
+        answer:
+          "Бірыңғай белгіленген баға жоқ. Құны автокөліктің санаты мен қозғалтқыш қуатына, сақтанушының түріне, сақтандыру мерзіміне, жүргізушілер тізіміне, олардың жасы мен жүргізушілік өтіліне, сондай-ақ қолданылатын тарифтік коэффициенттерге байланысты.",
+      },
+      {
+        id: "price-15-days",
+        question: "15 күндік ОСАГО қанша тұрады?",
+        answer:
+          "15 күндік полистің құны жеке есептеледі. Бағаға автокөлік түрі, қозғалтқыш қуаты, меншік иесі мен жүргізушілер туралы деректер, сақтанушының санаты және сақтандыру компаниясының тарифтері әсер етеді. Нақты сома құжаттар мен автокөлік параметрлері алынғаннан кейін анықталады.",
       },
       {
         id: "documents",
         question: "ОСАГО рәсімдеу үшін қандай құжаттар қажет?",
         answer:
-          "Әдетте автокөліктің тіркеу құжаттары, сақтанушының жеке басын куәландыратын құжат, жүргізушілердің жүргізуші куәліктері және жоспарланған сапар күндері қажет. Нақты тізім өтінім тексерілгеннен кейін расталады.",
+          "Әдетте автокөліктің тіркеу құжаты немесе техникалық паспорты, сақтанушының паспорты не жеке куәлігі, басқаруға жіберілген жүргізушілердің куәліктері, тіркеу нөмірі, VIN және жоспарланған сапар мерзімі қажет. Заңды тұлға үшін ұйымның тіркеу деректері мен оның өкілі туралы мәліметтер қосымша сұратылады.",
       },
       {
-        id: "term",
-        question: "ОСАГО полисін қандай мерзімге рәсімдеуге болады?",
+        id: "truck",
+        question: "Жүк автокөлігіне ОСАГО рәсімдеуге бола ма?",
         answer:
-          "Қолжетімді мерзім қолданыстағы сақтандыру ережелеріне және автокөлік параметрлеріне байланысты. Полис автокөліктің Ресей аумағында пайдаланылатын бүкіл кезеңін қамтуы тиіс.",
+          "Иә, қазақстандық тіркеу нөмірі бар жүк автокөліктеріне өтінімдер қабылданады. Есептеу үшін көлік құралының санаты, қозғалтқыш қуаты, рұқсат етілген ең жоғары массасы, пайдалану сипаты және тіркеу құжаттары қажет.",
       },
       {
-        id: "electronic-policy",
-        question: "Электрондық ОСАГО полисі жарамды ма?",
+        id: "legal-entity",
+        question: "ОСАГО полисін заңды тұлғаға рәсімдеуге бола ма?",
         answer:
-          "Иә. Электрондық полистің заңды күші бар. PDF файлын телефонда сақтап, интернет болмаған жағдайға қағаз көшірмесін бірге алып жүруді ұсынамыз.",
+          "Иә, ұйымға тиесілі автокөлік үшін рәсімдеу мүмкіндігі тексеріледі. Компанияның толық атауы мен тіркеу деректері, өкілі туралы мәліметтер және автокөлік деректерін растайтын құжаттар қосымша қажет болады.",
       },
       {
-        id: "check",
-        question: "Рәсімделген полисті қалай тексеруге болады?",
+        id: "what-covers",
+        question: "Ресей ОСАГО полисі нені өтейді?",
         answer:
-          "Полис деректерін Ресейдің Ұлттық сақтандыру ақпараттық жүйесінде тексеруге болады. Автокөлік туралы мәліметтер мен қолданылу мерзімі электрондық құжаттағы деректермен сәйкес келуі тиіс.",
+          "ОСАГО жол-көлік оқиғасы кезінде жүргізушінің үшінші тұлғалардың өміріне, денсаулығына немесе мүлкіне келтірген зияны үшін жауапкершілігін шарт талаптары мен заңда белгіленген лимиттер шегінде өтейді.",
       },
       {
-        id: "valid-all-rf",
-        question: "ОСАГО Ресейдің барлық аумағында жарамды ма?",
+        id: "own-car-damage",
+        question:
+          "ОСАГО өз автокөлігінің зақымдануын өтей ме?",
         answer:
-          "Иә. Ресейлік ОСАГО полисі шарт талаптары сақталған жағдайда көрсетілген мерзім ішінде Ресей Федерациясының барлық өңірінде қолданылады.",
+          "Жоқ. ОСАГО кінәлі жүргізушінің автокөлігінің зақымдануын, ұрлануын, бұзылуын, табиғи тозуын, тасымалданатын жүкті немесе жеке заттарды өтемейді. Өз автокөлігін қорғау үшін бөлек каско сақтандыруы қажет.",
       },
       {
         id: "start-date",
+        question: "Полис қашан күшіне енеді?",
+        answer:
+          "Полис сақтандыру құжатында көрсетілген күн мен уақыттан бастап күшіне енеді. Сапарға дейін оның Ресей аумағында автокөлікті пайдалану басталған сәттен кеш емес әрекет ететінін тексеру қажет.",
+      },
+      {
+        id: "same-day",
         question: "Полисті Ресейге кіретін күні рәсімдеуге бола ма?",
         answer:
-          "Полистің қажетті күні күшіне ену мүмкіндігі рәсімдеу ережелері мен құжаттарды тексеру уақытына байланысты. Өтінімді сапар басталғанға дейін алдын ала беруді ұсынамыз.",
+          "Бұл өтінім берілген уақытқа, құжаттарды тексеру жылдамдығына және сақтандыру компаниясының рәсімдеу ережелеріне байланысты. Жарамды сақтандырусыз көлік жүргізбеу үшін құжаттарды алдын ала жіберу ұсынылады.",
+      },
+      {
+        id: "electronic-policy",
+        question: "Электрондық ОСАГО полисінің заңды күші бар ма?",
+        answer:
+          "Иә. Электрондық ОСАГО полисінің заңды күші бар. Полисті алғаннан кейін ондағы барлық деректерді тексеріп, PDF файлын телефонда сақтау қажет.",
+      },
+      {
+        id: "print-policy",
+        question: "Электрондық полисті басып шығару қажет пе?",
+        answer:
+          "Электрондық полистің қағаз көшірмесі әдетте міндетті емес. Дегенмен интернет болмаған, құрылғының қуаты таусылған немесе тексеру кезінде техникалық мәселе туындаған жағдайда PDF файлын телефонда сақтап, қосымша басып шығарылған көшірмені алып жүрген дұрыс.",
+      },
+      {
+        id: "check",
+        question: "Полистің жарамдылығын қалай тексеруге болады?",
+        answer:
+          "Полисті Ұлттық сақтандыру ақпараттық жүйесінде тексеруге болады. Жүйеде және электрондық құжатта тіркеу нөмірі, VIN, сақтанушы, жүргізушілер және қолданылу мерзімі дұрыс көрсетілгеніне көз жеткізу қажет.",
+      },
+      {
+        id: "valid-all-rf",
+        question: "ОСАГО Ресейдің бүкіл аумағында жарамды ма?",
+        answer:
+          "Ресей ОСАГО полисі шарт талаптары сақталған жағдайда көрсетілген мерзім ішінде Ресей Федерациясының бүкіл аумағында қолданылады.",
+      },
+      {
+        id: "outside-russia",
+        question:
+          "Ресей ОСАГО полисі Ресейден тыс жерде жарамды ма?",
+        answer:
+          "Жоқ. Ресей ОСАГО полисі автокөлікті Ресей Федерациясының аумағында пайдалануға арналған. Грузияға, Түркияға, Еуропалық одақ елдеріне немесе басқа мемлекеттерге бару үшін әр елдің сақтандыру талаптарын бөлек тексеріп, тиісті сақтандыруды рәсімдеу қажет.",
+      },
+      {
+        id: "multiple-drivers",
+        question: "Полиске бірнеше жүргізушіні енгізуге бола ма?",
+        answer:
+          "Иә. Полиске автокөлікті басқаруға жіберілген бірнеше жүргізушіні енгізуге болады. Әр жүргізушінің куәлік деректері қажет. Кейбір жағдайларда жүргізушілер тізімі шектелмеген полис қолжетімді болуы мүмкін, бірақ бұл нұсқа полис құнына әсер етеді.",
+      },
+      {
+        id: "accident-russia",
+        question: "Ресейде жол-көлік оқиғасы болғанда не істеу керек?",
+        answer:
+          "Автокөлікті тоқтатып, авариялық жарық сигналын қосып, авариялық тоқтау белгісін қою қажет. Зардап шеккендер болса, дереу төтенше жағдайлар қызметін шақырыңыз. Автокөліктердің орналасуын, зақымдарды, тіркеу нөмірлерін және оқиғаның мән-жайын тіркеп, екінші қатысушымен деректер алмасып, сақтандыру компаниясына хабарлаңыз. Дау туындаса, зардап шеккендер болса, өзге мүлік зақымдалса немесе рәсімдеу тәртібіне күмән болса, полиция қызметкерлерін шақыру қажет.",
+      },
+      {
+        id: "policy-error",
+        question:
+          "Полис деректерінде қате болса не істеу керек?",
+        answer:
+          "Полисті алғаннан кейін тіркеу нөмірін, VIN-ді, меншік иесі мен жүргізушілер туралы деректерді және қолданылу мерзімін дереу тексеру қажет. Қате анықталса, PDF файлын өз бетіңізше өзгертуге болмайды. Менеджерге немесе сақтандыру компаниясына дереу хабарласып, қате жолды көрсетіп, растайтын құжатты жіберіңіз. Түзету тәртібі қатенің сипаты мен полисті рәсімдеу кезеңіне байланысты.",
       },
     ],
+  },
+  commercialTransport: {
+  title: "Қазақстаннан келген жүк автокөліктеріне арналған Ресей ОСАГО полисі",
+  intro:
+    "Тартқыштар, жүк автокөліктері, автобустар және басқа да коммерциялық көлік үшін есептеу жеңіл автокөліктерден бөлек жүргізіледі. Көлік құралының санаты, рұқсат етілген ең жоғары массасы, қозғалтқыш қуаты, пайдалану сипаты, сапар мерзімі және меншік иесі туралы деректер ескеріледі.",
+
+  vehicleTypesTitle: "Қандай коммерциялық көліктерге өтінім беруге болады",
+  vehicleTypes: [
+    {
+      title: "Тартқыштар мен жүк автокөліктері",
+      text:
+        "Есептеу кезінде көлік құралының санаты, рұқсат етілген ең жоғары массасы, қозғалтқыш қуаты және тасымалдау сипаты ескеріледі.",
+    },
+    {
+      title: "Автобустар мен шағын автобустар",
+      text:
+        "Рәсімдеу мүмкіндігі көлік санаты, жолаушылар орындарының саны және көлікті пайдалану мақсаты ескеріле отырып тексеріледі.",
+    },
+    {
+      title: "Коммерциялық көлік",
+      text:
+        "Жүк және жолаушылар тасымалына, қызметтік және өзге де коммерциялық мақсаттарға пайдаланылатын көлікке өтінімдер қабылданады.",
+    },
+    {
+      title: "Заңды тұлғалардың көлігі",
+      text:
+        "Ұйымға тиесілі автокөлік үшін компанияның деректемелері және өтінім беретін өкіл туралы мәліметтер қосымша қажет болады.",
+    },
+    {
+      title: "Автопарктер",
+      text:
+        "Бірнеше автокөлік үшін бір өтінім беріп, жалпы есептеу үшін көлік құралдарының тізімін қоса беруге болады.",
+    },
+    {
+      title: "Халықаралық рейстер",
+      text:
+        "Қазақстан мен Ресей арасында тұрақты рейстер орындайтын көлік үшін сақтандыру мерзімі Ресей аумағында пайдаланылатын бүкіл кезеңді қамтуы тиіс.",
+    },
+  ],
+
+    fleetTitle: "Бірнеше автокөлікке ОСАГО рәсімдеу",
+    fleetText:
+      "Егер бірнеше автокөлікті сақтандыру қажет болса, көлік құралдарының санын көрсетіп, автопарк тізімін жүктеңіз. Тексеруден кейін әрбір автокөлік бойынша есеп дайындап, қандай қосымша құжаттар қажет екенін хабарлаймыз.",
+    fleetItems: [
+      "Өтінімдегі автокөліктер саны",
+      "Көлік құралдарының түрлері мен санаттары",
+      "Тіркеу нөмірлері және VIN",
+      "Қозғалтқыш қуаты немесе рұқсат етілген ең жоғары масса",
+      "Меншік иесі — заңды тұлға туралы деректер",
+      "Ресей аумағында жоспарланған пайдалану мерзімдері",
+      "XLSX, XLS, CSV немесе PDF форматындағы көлік құралдарының тізімі",
+    ],
+    cta: "Коммерциялық көлікке өтінім беру",
+  },
+  seo: {
+    title:
+      "Қазақстаннан келген автокөлікке арналған Ресей ОСАГО полисі — бағасы және онлайн рәсімдеу | DIONIS",
+    description:
+      "Қазақстандық тіркеу нөмірі бар автокөлікке арналған электрондық Ресей ОСАГО полисі. Құнын есептеу, құжаттарды тексеру және полисті онлайн рәсімдеу.",
+    serviceName:
+      "Қазақстаннан келген автокөліктерге Ресей ОСАГО полисін рәсімдеу",
+    serviceType:
+      "Көлік құралдары иелерінің азаматтық-құқықтық жауапкершілігін міндетті сақтандыру",
+    audienceName:
+      "Қазақстаннан келген жеке тұлғалар, заңды тұлғалар және коммерциялық көлік иелері",
+    breadcrumbs: {
+      home: "Басты бет",
+      services: "Сақтандыру өнімдері",
+      current: "Ресей ОСАГО полисі",
+    },
+    channels: {
+      website: "Сайттағы онлайн-өтінім",
+      phone: "Телефон арқылы кеңес беру",
+      whatsapp: "WhatsApp арқылы кеңес беру",
+      telegram: "Telegram арқылы кеңес беру",
+    },
   },
 };
 
