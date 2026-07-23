@@ -1,6 +1,7 @@
 // app/api/lead/route.ts
 import nodemailer from "nodemailer";
 import { NextResponse } from "next/server";
+import { verifyRecaptchaIfNeeded } from "@/lib/recaptcha";
 
 type InlineCtaMeta = {
   articleSlug?: string;
@@ -40,14 +41,6 @@ type LeadBody = InlineCtaBody | FullFormBody;
 
 type ContactNormalized = { email?: string; phone?: string; raw?: string };
 
-type RecaptchaVerifyResponse = {
-  success?: boolean;
-  score?: number;
-  action?: string;
-  challenge_ts?: string;
-  hostname?: string;
-  "error-codes"?: string[];
-};
 const BITRIX_COMM_LANG_FIELD = "UF_CRM_1753957395750";
 const BITRIX_COMM_LANG_BY_SITE_LANG: Record<string, number> = {
   ru: 3937,
@@ -231,44 +224,22 @@ export async function POST(req: Request) {
     // 3) reCAPTCHA v3 (prod)
     // -----------------------
     const isProd = process.env.NODE_ENV === "production";
-    const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
-
     const recaptchaToken =
       isRecord(raw) && "recaptchaToken" in raw
         ? safeString(raw.recaptchaToken)
         : "";
+    const recaptchaCheck = await verifyRecaptchaIfNeeded({
+      isProd,
+      token: recaptchaToken || null,
+      minScore: 0.3,
+      expectedHostnames: ["dionis-insurance.kz", "www.dionis-insurance.kz"],
+    });
 
-    if (isProd && recaptchaSecret && recaptchaToken) {
-      try {
-        const verifyRes = await fetch(
-          "https://www.google.com/recaptcha/api/siteverify",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body:
-              `secret=${encodeURIComponent(recaptchaSecret)}` +
-              `&response=${encodeURIComponent(recaptchaToken)}`,
-          }
-        );
-
-        const verifyUnknown = (await verifyRes.json()) as unknown;
-        const verifyData: RecaptchaVerifyResponse = isRecord(verifyUnknown)
-          ? (verifyUnknown as RecaptchaVerifyResponse)
-          : {};
-
-        if (
-          !verifyData.success ||
-          (typeof verifyData.score === "number" && verifyData.score < 0.3)
-        ) {
-          return NextResponse.json(
-            { ok: false, message: "Подтвердите, что вы не робот." },
-            { status: 400 }
-          );
-        }
-      } catch (e) {
-        console.error("reCAPTCHA verification error:", e);
-        // не блокируем при сбое проверки
-      }
+    if (!recaptchaCheck.ok) {
+      return NextResponse.json(
+        { ok: false, message: "Подтвердите, что вы не робот." },
+        { status: 400 }
+      );
     }
 
     // -----------------------

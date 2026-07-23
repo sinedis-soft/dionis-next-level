@@ -34,3 +34,17 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## reCAPTCHA
+
+The site uses reCAPTCHA v3 for public contact and lead forms. The public site key is built in as the default key for `dionis-insurance.kz`, and can be overridden with:
+
+```bash
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=6LegdGEtAAAAAC6sTGpO9rfqhNOWKQjrZ8XKek_e
+```
+
+Set the private verification key only in the deployment environment, not in git:
+
+```bash
+RECAPTCHA_SECRET_KEY=<set in hosting secrets>
+```

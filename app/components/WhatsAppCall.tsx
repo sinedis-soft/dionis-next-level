@@ -4,7 +4,7 @@
 import React, { useId, useState, type FormEvent } from "react";
 import type { WhatsAppCallDictionary } from "@/dictionaries/whatsappcall";
 import { RecaptchaLazy } from "@/components/RecaptchaLazy";
-import { getRecaptchaToken } from "@/lib/recaptcha";
+import { getRecaptchaSiteKey, getRecaptchaToken } from "@/lib/recaptcha";
 
 type Props = { dict: WhatsAppCallDictionary };
 
@@ -32,8 +32,7 @@ export function WhatsAppCall({ dict }: Props) {
   const hasError = formStatus === "error";
   const hasSuccess = formStatus === "success";
 
-  const recaptchaSiteKey =
-    (process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "").trim();
+  const recaptchaSiteKey = getRecaptchaSiteKey();
   const recaptchaEnabled = Boolean(recaptchaSiteKey);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {

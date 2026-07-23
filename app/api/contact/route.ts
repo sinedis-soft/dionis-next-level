@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { verifyRecaptchaIfNeeded } from "@/lib/recaptcha";
 
 const BITRIX_COMM_LANG_FIELD = "UF_CRM_1753957395750";
 const BITRIX_COMM_LANG_BY_SITE_LANG: Record<string, number> = {
@@ -53,43 +54,20 @@ export async function POST(req: Request) {
     }
 
 
-    const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
     const isProd = process.env.NODE_ENV === "production";
+    const recaptchaCheck = await verifyRecaptchaIfNeeded({
+      isProd,
+      token: typeof recaptchaToken === "string" ? recaptchaToken : null,
+      minScore: 0.3,
+      expectedHostnames: ["dionis-insurance.kz", "www.dionis-insurance.kz"],
+      expectedAction: "contact",
+    });
 
-    if (isProd && recaptchaSecret && recaptchaToken) {
-    try {
-        const verifyRes = await fetch(
-        "https://www.google.com/recaptcha/api/siteverify",
-        {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body:
-            `secret=${encodeURIComponent(recaptchaSecret)}` +
-            `&response=${encodeURIComponent(recaptchaToken)}`,
-        }
-        );
-
-        const verifyData = await verifyRes.json();
-        console.log("reCAPTCHA verify:", verifyData); // можно оставить для контроля на проде
-
-        if (
-        !verifyData.success ||
-        (typeof verifyData.score === "number" && verifyData.score < 0.3)
-        ) {
-        return new Response(
-            JSON.stringify({
-            ok: false,
-            message: "Подтвердите, что вы не робот.",
-            }),
-            { status: 400 }
-        );
-        }
-    } catch (e) {
-        console.error("reCAPTCHA verification error:", e);
-        // при ошибке reCAPTCHA можно либо блокировать, либо пропускать — тут пропускаем
-    }
+    if (!recaptchaCheck.ok) {
+      return new Response(
+        JSON.stringify({ ok: false, message: "Подтвердите, что вы не робот." }),
+        { status: 400 }
+      );
     }
 
 

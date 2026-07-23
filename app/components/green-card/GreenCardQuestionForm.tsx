@@ -1,5 +1,6 @@
 "use client";
 
+import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import Script from "next/script";
 import {
   useEffect,
@@ -162,7 +163,7 @@ export default function GreenCardQuestionForm({ homeContact, agreement, dict }: 
     honeypot: `gcq-website-${rid}`,
   };
 
-  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  const recaptchaSiteKey = getRecaptchaSiteKey();
   const isProd = process.env.NODE_ENV === "production";
   const shouldLoadRecaptcha = Boolean(isProd && recaptchaSiteKey);
   const isBusy = formStatus === "loading";
