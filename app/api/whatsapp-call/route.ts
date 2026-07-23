@@ -1,15 +1,8 @@
 // app/api/whatsapp-call/route.ts
 import nodemailer from "nodemailer";
 import { NextResponse } from "next/server";
+import { verifyRecaptchaIfNeeded } from "@/lib/recaptcha";
 
-type RecaptchaVerifyResponse = {
-  success?: boolean;
-  score?: number;
-  action?: string;
-  challenge_ts?: string;
-  hostname?: string;
-  "error-codes"?: string[];
-};
 const BITRIX_COMM_LANG_FIELD = "UF_CRM_1753957395750";
 const BITRIX_COMM_LANG_BY_SITE_LANG: Record<string, number> = {
   ru: 3937,
@@ -82,37 +75,20 @@ export async function POST(req: Request) {
     }
 
     const isProd = process.env.NODE_ENV === "production";
-    const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
+    const recaptchaCheck = await verifyRecaptchaIfNeeded({
+      isProd,
+      token: recaptchaToken || null,
+      minScore: 0.3,
+      expectedHostnames: ["dionis-insurance.kz", "www.dionis-insurance.kz"],
+      expectedAction: "whatsapp_call",
+    });
 
-    if (isProd && recaptchaSecret && recaptchaToken) {
-      try {
-        const verifyRes = await fetch(
-          "https://www.google.com/recaptcha/api/siteverify",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body:
-              `secret=${encodeURIComponent(recaptchaSecret)}` +
-              `&response=${encodeURIComponent(recaptchaToken)}`,
-          }
-        );
-
-        const verifyUnknown = (await verifyRes.json()) as RecaptchaVerifyResponse;
-
-        if (
-          !verifyUnknown.success ||
-          (typeof verifyUnknown.score === "number" && verifyUnknown.score < 0.3)
-        ) {
-          return NextResponse.json(
-            { ok: false, message: "Подтвердите, что вы не робот." },
-            { status: 400 }
-          );
-        }
-      } catch (e) {
-        console.error("reCAPTCHA verification error:", e);
-      }
+    if (!recaptchaCheck.ok) {
+      return NextResponse.json(
+        { ok: false, message: "Подтвердите, что вы не робот." },
+        { status: 400 }
+      );
     }
-
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
     const userAgent = req.headers.get("user-agent") || "unknown";

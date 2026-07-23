@@ -5,6 +5,7 @@ import { useCallback, useMemo, useState } from "react";
 import Image from "next/image";
 import Script from "next/script";
 
+import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 import ContactForm, { type ContactBlock, type ContactFormResult } from "@/components/ContactForm";
 import AgreementModal from "@/components/AgreementModal";
 import type { AgreementDictionary } from "@/dictionaries/agreement";
@@ -31,7 +32,7 @@ export default function ContactSection({
   const [agreementOpen, setAgreementOpen] = useState(false);
   const [needRecaptcha, setNeedRecaptcha] = useState(false);
 
-  const recaptchaSiteKey = useMemo(() => process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "", []);
+  const recaptchaSiteKey = useMemo(() => getRecaptchaSiteKey(), []);
 
   const openAgreement = useCallback(() => setAgreementOpen(true), []);
   const closeAgreement = useCallback(() => setAgreementOpen(false), []);

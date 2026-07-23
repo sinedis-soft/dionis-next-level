@@ -1,5 +1,6 @@
 // app/components/ContactForm.tsx
 "use client";
+import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 
 import React, { useState, type ChangeEvent, type FormEvent } from "react";
 import type { AgreementDictionary } from "@/dictionaries/agreement";
@@ -92,7 +93,7 @@ export default function ContactForm({
   const [formStatus, setFormStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [formMessage, setFormMessage] = useState("");
 
-  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  const recaptchaSiteKey = getRecaptchaSiteKey();
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const target = e.target;

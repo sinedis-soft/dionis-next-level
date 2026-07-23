@@ -1,5 +1,6 @@
 // components/osago-rf/OsagoRfQuestionForm.tsx
 "use client";
+import { getRecaptchaSiteKey } from "@/lib/recaptcha";
 
 import Script from "next/script";
 import React, { useState, type ChangeEvent, type FormEvent } from "react";
@@ -114,7 +115,7 @@ export default function OsagoRfQuestionForm({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAgreementOpen, setIsAgreementOpen] = useState(false);
 
-  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+  const recaptchaSiteKey = getRecaptchaSiteKey();
 
   function handleChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const target = e.target;

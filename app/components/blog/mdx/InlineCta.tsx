@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useId, useMemo, useState } from "react";
+import { RecaptchaLazy } from "@/components/RecaptchaLazy";
+import { getRecaptchaSiteKey, getRecaptchaToken } from "@/lib/recaptcha";
 
 type Variant = "conditions" | "compare" | "question";
 
@@ -70,6 +72,9 @@ export default function InlineCta({
 
   const [message, setMessage] = useState("");
   const [contact, setContact] = useState("");
+  const [recaptchaReady, setRecaptchaReady] = useState(false);
+  const recaptchaSiteKey = getRecaptchaSiteKey();
+  const recaptchaEnabled = Boolean(recaptchaSiteKey);
 
   const payloadMeta = useMemo(
     () => ({
@@ -88,7 +93,10 @@ export default function InlineCta({
     setSending(true);
 
     try {
-      // ✅ Вариант 1 (рекомендуется): отправка на API-роут (см. ниже)
+      const recaptchaToken = recaptchaEnabled
+        ? await getRecaptchaToken(recaptchaSiteKey, "lead_inline_cta")
+        : undefined;
+
       const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,6 +104,7 @@ export default function InlineCta({
           message: message.trim(),
           contact: contact.trim(),
           meta: payloadMeta,
+          recaptchaToken,
         }),
       });
 
@@ -194,6 +203,11 @@ export default function InlineCta({
                 </div>
               ) : (
                 <form onSubmit={onSubmit} className="u-space-y-3">
+                  <RecaptchaLazy
+                    siteKey={recaptchaSiteKey}
+                    enabled={recaptchaEnabled}
+                    onReady={() => setRecaptchaReady(true)}
+                  />
                   <div>
                     <label
                       htmlFor={`msg-${uid}`}
@@ -262,6 +276,9 @@ export default function InlineCta({
 
                     <p className="u-text-xs u-text-slate-500">
                       Нажимая «Отправить», вы соглашаетесь на обработку данных для ответа.
+                      {recaptchaEnabled
+                        ? ` Форма защищена reCAPTCHA${recaptchaReady ? "" : " (загружается)"}.`
+                        : ""}
                     </p>
                   </div>
                 </form>

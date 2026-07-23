@@ -4,6 +4,15 @@
 /* CLIENT: получение токена reCAPTCHA               */
 /* ------------------------------------------------ */
 
+export const DEFAULT_RECAPTCHA_SITE_KEY =
+  "6LegdGEtAAAAAC6sTGpO9rfqhNOWKQjrZ8XKek_e";
+
+export function getRecaptchaSiteKey(): string {
+  return (
+    process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || DEFAULT_RECAPTCHA_SITE_KEY
+  ).trim();
+}
+
 declare global {
   interface Window {
     grecaptcha?: {
