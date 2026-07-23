@@ -1,18 +1,19 @@
 # Dionis Insurance Broker
 
-> Licensed insurance broker website in Kazakhstan with information, calculators, and application forms for motor, transport, cargo, liability, property, life, and medical insurance.
+> Licensed insurance broker website in Kazakhstan with multilingual product pages, calculators, and application forms for motor, transport, cargo, liability, property, life, and medical insurance.
 
-Dionis Insurance Broker is a multilingual website for clients in Kazakhstan who need insurance information and broker-assisted applications. The site is available in Russian, Kazakh, and English at `/ru`, `/kz`, and `/en`. The localized homepages expose the main insurance directions, product links, broker specialization, license and association information, partners, leadership information, benefits, and key questions directly in the initial HTML.
+Dionis Insurance Broker is a public website for clients in Kazakhstan who need insurance information and broker-assisted applications. The site is available in Russian, Kazakh, and English at `/ru`, `/kz`, and `/en`. The localized homepages expose the main insurance directions, product links, broker specialization, license and association information, partners, leadership information, benefits, contacts, and key questions.
 
-Canonical public URLs do not use trailing slashes. The default discovery target is the Russian Kazakhstan entry point (`/ru`), while English alternates are marked for Kazakhstan users (`en-KZ`).
+Canonical public URLs do not use trailing slashes. The production domain is `https://dionis-insurance.kz`. The sitemap lists localized static pages, blog articles, and author pages. The `/privacy` locale routes redirect to `/privacy/cookies`; use the cookie policy and service regulation pages as the stable legal-reference URLs.
 
-The most important public content explains Green Card insurance for vehicles from Kazakhstan, Russian OSAGO/MTPL for foreign vehicles entering or travelling in Russia, the broader insurance product directory, practical route and transport articles, company information, contacts, and privacy/regulation pages.
+The most important public content explains Green Card insurance for vehicles from Kazakhstan, Russian OSAGO/MTPL for foreign vehicles entering or travelling in Russia, the broader insurance product directory, company information, contacts, privacy/regulation pages, and practical transport articles about routes, border checks, permits, fuel risk, and insurance limitations.
 
 Important insurance limitations:
 
 - The website represents an insurance broker, not an insurer, unless a specific page states otherwise.
 - Product availability, issuance, acceptance, terms, prices, routes, territorial coverage, and document requirements can depend on insurer rules, vehicle registration country, destination, route, dates, driver/client status, and current border or regulatory rules.
 - Motor third-party liability insurance should not be treated as coverage for own vehicle damage, medical treatment, cargo, fines, downtime, evacuation, or all travel risks unless the relevant policy terms explicitly say so.
+- Russian OSAGO/MTPL and Green Card insurance are different liability products. Russia has not participated in the current Green Card system since 30 June 2023, so route requirements must be checked by country.
 - One insurance policy may not cover an entire international route. A route can require different motor liability products in different countries.
 - Website information is for orientation and application support. Clients should verify current requirements before travel or transport operations.
 
@@ -23,7 +24,7 @@ Key topics:
 - Russian OSAGO/MTPL for non-resident and foreign-plate vehicles.
 - International motor routes from Kazakhstan to Russia, Georgia, Türkiye, Azerbaijan, Belarus, Iran, and European countries.
 - Transport, cargo, liability, property, life, and medical insurance categories.
-- Route risk, border requirements, documents, policy dates, and regulatory uncertainty.
+- Route risk, border requirements, fuel availability, transport permits, policy dates, and regulatory uncertainty.
 
 ## Main pages
 
@@ -44,11 +45,16 @@ Key topics:
 
 - [Из Казахстана в Европу на машине в 2026 году](https://dionis-insurance.kz/ru/blog/iz-kazahstana-v-evropu-na-mashine-2026): Russian guide about route options and checks for driving from Kazakhstan to Europe in 2026.
 - [2026 жылы Қазақстаннан Еуропаға көлікпен](https://dionis-insurance.kz/kz/blog/2026-jılı-qazaqstannan-ewropaga-kolikpen): Kazakh guide about driving from Kazakhstan to Europe in 2026.
+- [ОСАГО или Green Card: какая страховка нужна для поездки в Россию](https://dionis-insurance.kz/ru/blog/osago-ili-green-card-dlya-poezdki-v-rossiyu): Russian article comparing Russian OSAGO and Green Card requirements for travel to Russia and transit countries.
+- [ОСАГО немесе Green Card: Ресейге бару үшін қандай сақтандыру қажет](https://dionis-insurance.kz/kz/blog/osago-nemese-green-card-reseige-sapar): Kazakh article comparing Russian OSAGO and Green Card requirements for travel to Russia.
+- [OSAGO or Green Card: Which Insurance Do You Need for a Trip to Russia?](https://dionis-insurance.kz/en/blog/osago-or-green-card-for-trip-to-russia): English article comparing Russian OSAGO and Green Card requirements for foreign-registered vehicles.
 - [Международная страховка «Зелёная карта»](https://dionis-insurance.kz/ru/blog/green-card-history-kazakhstan-azerbaijan): Russian article about the Green Card system, Kazakhstan's status, and Azerbaijan-issued policies for vehicles from Kazakhstan.
 - [«Жасыл карта» халықаралық сақтандыруы](https://dionis-insurance.kz/kz/blog/green-card-history-kazakhstan-azerbaijan): Kazakh article about the Green Card system and Kazakhstan context.
 - [Казахстан упростил правила международных перевозок](https://dionis-insurance.kz/ru/blog/perevozki-kazakhstan-razresheniya-2026): Russian article about Kazakhstan international transport permit rule changes in 2026.
 - [Қазақстан халықаралық тасымал ережелерін жеңілдетті](https://dionis-insurance.kz/kz/blog/perevozki-kazakhstan-razresheniya-2026): Kazakh article about Kazakhstan international transport permit rule changes in 2026.
 - [Kazakhstan Has Simplified International Transport Rules](https://dionis-insurance.kz/en/blog/perevozki-kazakhstan-razresheniya-2026): English article about Kazakhstan international transport permit rule changes in 2026.
+- [Казахстан и Грузия запускают e-Permit](https://dionis-insurance.kz/ru/blog/kazakhstan-georgia-e-permit-2026): Russian article about the Kazakhstan-Georgia electronic permit pilot and 2026-2027 carrier quotas.
+- [Топливный кризис в России](https://dionis-insurance.kz/ru/blog/toplivnyy-krizis-v-rossii-perevozchiki-kazahstana-uzbekistana): Russian article about fuel availability risk for Kazakhstan and Uzbekistan carriers using Russian routes.
 - [Как выбрать КАСКО в Казахстане](https://dionis-insurance.kz/ru/blog/kak-vybrat-kasko-v-kazahstane): Russian practical guide to choosing CASCO insurance in Kazakhstan.
 
 ## Company and contact pages
@@ -62,14 +68,11 @@ Key topics:
 
 ## Legal and policy pages
 
-- [Privacy policy](https://dionis-insurance.kz/ru/privacy): Russian privacy information.
-- [Cookie policy](https://dionis-insurance.kz/ru/privacy/cookies): Russian cookie policy.
+- [Cookie policy](https://dionis-insurance.kz/ru/privacy/cookies): Russian cookie policy and privacy-related data-use information.
 - [Service regulation](https://dionis-insurance.kz/ru/privacy/regulation): Russian service regulation page.
-- [Құпиялылық саясаты](https://dionis-insurance.kz/kz/privacy): Kazakh privacy information.
-- [Cookie policy in Kazakh](https://dionis-insurance.kz/kz/privacy/cookies): Kazakh cookie policy.
+- [Cookie policy in Kazakh](https://dionis-insurance.kz/kz/privacy/cookies): Kazakh cookie policy and privacy-related data-use information.
 - [Service regulation in Kazakh](https://dionis-insurance.kz/kz/privacy/regulation): Kazakh service regulation page.
-- [Privacy policy in English](https://dionis-insurance.kz/en/privacy): English privacy information.
-- [Cookie policy in English](https://dionis-insurance.kz/en/privacy/cookies): English cookie policy.
+- [Cookie policy in English](https://dionis-insurance.kz/en/privacy/cookies): English cookie policy and privacy-related data-use information.
 - [Service regulation in English](https://dionis-insurance.kz/en/privacy/regulation): English service regulation page.
 
 ## Optional
@@ -77,5 +80,6 @@ Key topics:
 - [Russian blog index](https://dionis-insurance.kz/ru/blog): Russian index of practical insurance and transport articles.
 - [Kazakh blog index](https://dionis-insurance.kz/kz/blog): Kazakh index of practical insurance and transport articles.
 - [English blog index](https://dionis-insurance.kz/en/blog): English index of practical insurance and transport articles.
+- [Sergey Anatska author page](https://dionis-insurance.kz/ru/authors/sergey-anatska): Russian author page for Dionis insurance and transport articles.
 - [XML sitemap](https://dionis-insurance.kz/sitemap.xml): XML sitemap generated by the website.
 - [Robots.txt](https://dionis-insurance.kz/robots.txt): Crawler access file for the website.
