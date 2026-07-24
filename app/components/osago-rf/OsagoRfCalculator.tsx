@@ -2,6 +2,20 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import {
+  bufferedRub,
+  calculateOsagoRfPremium,
+  clamp,
+  convertRubToKzt,
+  formatKzt,
+  formatRub,
+  parseRubRate,
+  round2,
+  type OsagoRfMode as Mode,
+  type OsagoRfPolicyholderType as PolicyholderType,
+  type OsagoRfVehicleKind as VehicleKind,
+} from "@/lib/osago-rf-calculation";
+import { emitOsagoRfRubRate } from "@/lib/osago-rf-rate-events";
 
 export type OsagoRfCalculatorDictionary = {
   title: string;
@@ -72,144 +86,6 @@ export type OsagoRfCalculatorDictionary = {
 
 type Props = { dict: OsagoRfCalculatorDictionary };
 type NbkRateResponse = { ok: boolean; rate?: number | string; message?: string };
-
-type PolicyholderType = "legal" | "individual";
-type VehicleKind = "passenger" | "truck";
-type Mode = "multi" | "limited";
-
-const KT = 1.7;
-const KBM = 1.17;
-
-const KO_MULTIDRIVE_INDIVIDUAL = 3.16;
-const KO_MULTIDRIVE_LEGAL = 1.97;
-
-const KVS_TABLE: Array<Array<number | null>> = [
-  [2.27, 1.92, 1.84, 1.65, 1.62, null, null, null],
-  [1.88, 1.72, 1.71, 1.13, 1.1, 1.09, null, null],
-  [1.72, 1.6, 1.54, 1.09, 1.08, 1.07, 1.02, null],
-  [1.56, 1.5, 1.48, 1.05, 1.04, 1.01, 0.97, 0.95],
-  [1.54, 1.47, 1.46, 1.0, 0.97, 0.95, 0.94, 0.93],
-  [1.5, 1.44, 1.43, 0.96, 0.95, 0.94, 0.93, 0.91],
-  [1.46, 1.4, 1.39, 0.93, 0.92, 0.91, 0.9, 0.86],
-  [1.43, 1.36, 1.35, 0.91, 0.9, 0.89, 0.88, 0.83],
-];
-
-function round2(n: number): number {
-  return Math.round(n * 100) / 100;
-}
-
-function clamp(n: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, n));
-}
-
-function parseRate(raw: string): number {
-  const normalized = raw.replace(",", ".").trim();
-  return Number(normalized);
-}
-
-function formatKzt(value: number): string {
-  const rounded = round2(value);
-  return new Intl.NumberFormat("ru-RU", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(rounded);
-}
-
-function formatRub(value: number): string {
-  const rounded = round2(value);
-  return new Intl.NumberFormat("ru-RU", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(rounded);
-}
-
-function kmByHpPassenger(hp: number): number {
-  if (hp >= 70 && hp < 100) return 1.1;
-  if (hp >= 100 && hp < 120) return 1.2;
-  if (hp >= 120 && hp <= 150) return 1.4;
-  return 1.6;
-}
-
-function kpByMonths(months: number): number {
-  if (months === 0.5) return 0.2;
-  if (months === 1) return 0.3;
-  if (months === 2) return 0.4;
-  if (months === 3) return 0.5;
-  if (months === 4) return 0.6;
-  if (months === 5) return 0.65;
-  if (months === 6) return 0.7;
-  if (months === 7) return 0.8;
-  if (months === 8) return 0.9;
-  if (months === 9) return 0.95;
-  return 1.0;
-}
-
-function ageGroupIndex(driverAge: number): number {
-  if (driverAge >= 18 && driverAge <= 21) return 0;
-  if (driverAge >= 22 && driverAge <= 24) return 1;
-  if (driverAge >= 25 && driverAge <= 29) return 2;
-  if (driverAge >= 30 && driverAge <= 34) return 3;
-  if (driverAge >= 35 && driverAge <= 39) return 4;
-  if (driverAge >= 40 && driverAge <= 49) return 5;
-  if (driverAge >= 50 && driverAge <= 59) return 6;
-  return 7;
-}
-
-function expBandIndex(expYears: number): number {
-  if (expYears < 1) return 0;
-  if (expYears < 2) return 1;
-  if (expYears < 3) return 2;
-  if (expYears < 5) return 3;
-  if (expYears < 7) return 4;
-  if (expYears < 10) return 5;
-  if (expYears < 15) return 6;
-  return 7;
-}
-
-function kvsByAgeExp(driverAge: number, expYears: number): number {
-  const r = ageGroupIndex(driverAge);
-  const c = expBandIndex(expYears);
-  const row = KVS_TABLE[r];
-  const v = row[c];
-
-  if (typeof v === "number") return v;
-
-  for (let i = c; i >= 0; i--) {
-    const vv = row[i];
-    if (typeof vv === "number") return vv;
-  }
-
-  return 1.0;
-}
-
-function koMultidriveByPolicyholder(policyholderType: PolicyholderType): number {
-  return policyholderType === "legal" ? KO_MULTIDRIVE_LEGAL : KO_MULTIDRIVE_INDIVIDUAL;
-}
-
-function bstByRules(args: {
-  policyholderType: PolicyholderType;
-  vehicleKind: VehicleKind;
-  term: number;
-  useExp: boolean;
-}): number {
-  const isLegal = args.policyholderType === "legal";
-  const isTruck = args.vehicleKind === "truck";
-  const isShort = args.term <= 3;
-
-  if (isLegal && !args.useExp) return isShort ? 3300 : 3800;
-  if (isLegal && !isTruck) {
-    if (args.useExp) return 6580;
-  }
-  if (isLegal && isTruck) {
-    if (args.useExp) return 17201;
-  }
-  if (!isLegal && !isTruck) {
-    if (args.useExp) return isShort ? 4400 : 5500;
-    return isShort ? 2400 : 2500;
-  }
-  if (args.useExp) return isShort ? 4400 : 5500;
-  return isShort ? 2700 : 2900;
-}
 
 function replaceTokensCompat(tpl: string, vars: Record<string, string>): string {
   return tpl.replace(/\{(\w+)\}/g, (_m, k: string) => vars[k] ?? "");
@@ -359,6 +235,11 @@ export default function OsagoRfCalculator({ dict }: Props) {
   const isLimited = mode === "limited";
 
   useEffect(() => {
+    const parsed = parseRubRate(rubRate);
+    if (Number.isFinite(parsed) && parsed > 0) emitOsagoRfRubRate(parsed);
+  }, [rubRate]);
+
+  useEffect(() => {
     const normalized = normalizeTerm(term, termMax);
     if (normalized !== term) setTerm(normalized);
   }, [term, termMax]);
@@ -366,7 +247,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
   useEffect(() => {
     async function autoFillRubRate() {
       try {
-        const resp = await fetch("/api/nbk-rate-rub");
+        const resp = await fetch("/api/nbk-rate-rub", { cache: "no-store" });
         const data = (await resp.json()) as NbkRateResponse;
 
         if (!resp.ok || !data?.ok || !data.rate) {
@@ -379,6 +260,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
         }
 
         setRubRate(parsed.toFixed(4));
+        emitOsagoRfRubRate(parsed);
         setAutoRateNote(dict.autoRateOk);
       } catch (e) {
         console.warn("NBK RUB rate auto-fill failed:", e);
@@ -389,43 +271,28 @@ export default function OsagoRfCalculator({ dict }: Props) {
     autoFillRubRate();
   }, [dict.autoRateOk, dict.autoRateError]);
 
-  const KM = useMemo(() => (isTruck ? 1 : kmByHpPassenger(hp)), [isTruck, hp]);
-  const KP = useMemo(() => kpByMonths(term), [term]);
-  const kvs = useMemo(() => kvsByAgeExp(driverAge, driverExp), [driverAge, driverExp]);
-
-  const bstLimited = useMemo(
-    () => bstByRules({ policyholderType, vehicleKind, term, useExp: true }),
-    [policyholderType, vehicleKind, term]
-  );
-
-  const bstMulti = useMemo(
-    () => bstByRules({ policyholderType, vehicleKind, term, useExp: false }),
-    [policyholderType, vehicleKind, term]
-  );
-
   const premiumLimitedRub = useMemo(
-    () => round2(bstLimited * KT * KBM * KM * kvs * KP),
-    [bstLimited, KM, kvs, KP]
+    () => calculateOsagoRfPremium({ policyholderType, vehicleKind, mode: "limited", hp, term, driverAge, driverExp }).baseRub,
+    [policyholderType, vehicleKind, hp, term, driverAge, driverExp]
   );
 
-  const premiumMultiRub = useMemo(() => {
-    const KO = koMultidriveByPolicyholder(policyholderType);
-    return round2(bstMulti * KT * KBM * KM * KO * KP);
-  }, [bstMulti, KM, policyholderType, KP]);
+  const premiumMultiRub = useMemo(
+    () => calculateOsagoRfPremium({ policyholderType, vehicleKind, mode: "multi", hp, term }).baseRub,
+    [policyholderType, vehicleKind, hp, term]
+  );
 
   const activePremiumRub = isLimited ? premiumLimitedRub : premiumMultiRub;
 
   const premiumsKzt = useMemo(() => {
-    const kztPerRub = parseRate(rubRate);
+    const kztPerRub = parseRubRate(rubRate);
     if (!Number.isFinite(kztPerRub) || kztPerRub <= 0) return null;
 
-    const limitedBufferedRub = premiumLimitedRub * 1.05;
-    const multiBufferedRub = premiumMultiRub * 1.05;
+    const limitedKzt = convertRubToKzt(bufferedRub(premiumLimitedRub), kztPerRub);
+    const multiKzt = convertRubToKzt(bufferedRub(premiumMultiRub), kztPerRub);
 
-    return {
-      limitedKzt: round2(limitedBufferedRub * kztPerRub),
-      multiKzt: round2(multiBufferedRub * kztPerRub),
-    };
+    if (limitedKzt === null || multiKzt === null) return null;
+
+    return { limitedKzt, multiKzt };
   }, [rubRate, premiumLimitedRub, premiumMultiRub]);
 
   const betterHint = useMemo(() => {
@@ -451,20 +318,20 @@ export default function OsagoRfCalculator({ dict }: Props) {
   }, [isLimited, premiumsKzt, dict]);
 
   const resultText = useMemo(() => {
-    const kztPerRub = parseRate(rubRate);
-    const bufferedRub = round2(activePremiumRub * 1.05);
+    const kztPerRub = parseRubRate(rubRate);
+    const rubWithBuffer = bufferedRub(activePremiumRub);
 
     if (!Number.isFinite(kztPerRub) || kztPerRub <= 0) {
       return {
-        rub: `${dict.result.rubLinePrefix} ${formatRub(bufferedRub)} RUB`,
+        rub: `${dict.result.rubLinePrefix} ${formatRub(rubWithBuffer)} RUB`,
         kzt: dict.errors.invalidRate,
       };
     }
 
-    const kztRounded = round2(bufferedRub * kztPerRub);
+    const kztRounded = convertRubToKzt(rubWithBuffer, kztPerRub) ?? 0;
 
     return {
-      rub: `${dict.result.rubLinePrefix} ${formatRub(bufferedRub)} RUB`,
+      rub: `${dict.result.rubLinePrefix} ${formatRub(rubWithBuffer)} RUB`,
       kzt: `${dict.result.kztLinePrefix} ${formatKzt(kztRounded)}\u00A0₸`,
     };
   }, [rubRate, activePremiumRub, dict]);
@@ -740,7 +607,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                   <div className="gc-calc__resultLabel">{dict.result.title}</div>
                   <div className="gc-calc__resultValue">
                     <span className="gc-calc__approx">{dict.result.rubLinePrefix}</span>
-                    <span className="gc-calc__kzt">{formatRub(round2(activePremiumRub * 1.05))} RUB</span>
+                    <span className="gc-calc__kzt">{formatRub(bufferedRub(activePremiumRub))} RUB</span>
                   </div>
                 </div>
 
@@ -923,7 +790,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
                 <div className="gc-calc__resultLabel">{dict.result.title}</div>
                 <div className="gc-calc__resultValue">
                   <span className="gc-calc__approx">{dict.result.rubLinePrefix}</span>
-                  <span className="gc-calc__kzt">{formatRub(round2(activePremiumRub * 1.05))} RUB</span>
+                  <span className="gc-calc__kzt">{formatRub(bufferedRub(activePremiumRub))} RUB</span>
                 </div>
               </div>
 
