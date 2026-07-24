@@ -19,10 +19,26 @@ const ranges = [
   { key: "hp120_150", hp: 130 },
   { key: "hp150plus", hp: 160 },
 ] as const;
-const terms = [
+const featuredTerms = [
   { key: "d15", months: 0.5, query: "15d" },
   { key: "m1", months: 1, query: "1m" },
   { key: "m12", months: 12, query: "12m" },
+] as const;
+
+const tableTerms = [
+  { key: "d15", months: 0.5 },
+  { key: "m1", months: 1 },
+  { key: "m2", months: 2 },
+  { key: "m3", months: 3 },
+  { key: "m4", months: 4 },
+  { key: "m5", months: 5 },
+  { key: "m6", months: 6 },
+  { key: "m7", months: 7 },
+  { key: "m8", months: 8 },
+  { key: "m9", months: 9 },
+  { key: "m10", months: 10 },
+  { key: "m11", months: 11 },
+  { key: "m12", months: 12 },
 ] as const;
 
 export default function OsagoPassengerPriceCards({ lang, dict, variant = "cards" }: Props) {
@@ -61,7 +77,7 @@ export default function OsagoPassengerPriceCards({ lang, dict, variant = "cards"
 
   const rows = useMemo(() => ranges.map((range) => ({
     ...range,
-    prices: terms.map((term) => ({
+    prices: featuredTerms.map((term) => ({
       ...term,
       price: calculateOsagoRfPremium({ policyholderType: "individual", vehicleKind: "passenger", mode: "multi", hp: range.hp, term: term.months }),
     })),
@@ -109,7 +125,7 @@ export default function OsagoPassengerPriceCards({ lang, dict, variant = "cards"
           <div className="osago-price-table__scroll">
             <table>
               <thead><tr><th>{dict.table.termHeader}</th>{ranges.map((r) => <th key={r.key}>{dict.cards.ranges[r.key]}</th>)}</tr></thead>
-              <tbody>{terms.map((term) => <tr key={term.key}><th>{dict.cards.terms[term.key]}</th>{rows.map((r) => { const price = r.prices.find((p) => p.key === term.key)?.price; const kzt = price && rate ? convertRubToKzt(price.bufferedRub, rate) : null; return <td key={r.key}>{kzt === null ? dict.table.pending : `${formatKzt(kzt)} ₸`}</td>; })}</tr>)}</tbody>
+              <tbody>{tableTerms.map((term) => <tr key={term.key}><th>{dict.cards.terms[term.key]}</th>{ranges.map((range) => { const price = calculateOsagoRfPremium({ policyholderType: "individual", vehicleKind: "passenger", mode: "multi", hp: range.hp, term: term.months }); const kzt = rate ? convertRubToKzt(price.bufferedRub, rate) : null; return <td key={range.key}>{kzt === null ? dict.table.pending : `${formatKzt(kzt)} ₸`}</td>; })}</tr>)}</tbody>
             </table>
           </div>
         </div> : null}
