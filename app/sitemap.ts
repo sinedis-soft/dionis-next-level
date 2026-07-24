@@ -32,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "",
     "/green-card",
     "/osago-rf",
+    "/osago-rf/passenger-car-prices",
     "/products",
     "/blog",
     "/contacts",
@@ -51,7 +52,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency:
           route === "" ||
           route === "/green-card" ||
-          route === "/osago-rf"
+          route === "/osago-rf" ||
+          route === "/osago-rf/passenger-car-prices"
             ? "weekly"
             : "monthly",
         priority:
@@ -59,8 +61,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             ? 1.0
             : route === "/green-card"
             ? 0.9
-            : route === "/osago-rf"
+            : route === "/osago-rf" ||
+          route === "/osago-rf/passenger-car-prices"
             ? 0.8
+            : route === "/osago-rf/passenger-car-prices"
+            ? 0.7
             : 0.6,
       });
     }
