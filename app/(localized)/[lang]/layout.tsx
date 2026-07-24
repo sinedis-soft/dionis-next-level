@@ -6,8 +6,6 @@ import { Suspense } from "react";
 
 import type { Metadata, Viewport } from "next";
 
-import Script from "next/script";
-
 import type { Lang } from "@/dictionaries/header";
 
 import Header from "@/components/Header";
@@ -108,7 +106,11 @@ export default async function LangLayout({
         publisher: {
           "@id": `${SITE_URL}/#organization`,
         },
-        inLanguage: [langToIana("ru"), langToIana("kz"), langToIana("en")],
+        inLanguage: [
+          langToIana("ru"),
+          langToIana("kz"),
+          langToIana("en"),
+        ],
       },
       {
         "@type": "InsuranceAgency",
@@ -121,7 +123,11 @@ export default async function LangLayout({
         description:
           "Licensed insurance broker providing independent insurance brokerage services.",
         areaServed: ["KZ"],
-        knowsLanguage: [langToIana("ru"), langToIana("kz"), langToIana("en")],
+        knowsLanguage: [
+          langToIana("ru"),
+          langToIana("kz"),
+          langToIana("en"),
+        ],
       },
     ],
   };
@@ -132,12 +138,11 @@ export default async function LangLayout({
         className="u-min-h-screen u-flex u-flex-col"
         suppressHydrationWarning
       >
-        <Script
+        <script
           id={`site-jsonld-${lang}`}
           type="application/ld+json"
-          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(jsonLd),
+            __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
           }}
         />
 
