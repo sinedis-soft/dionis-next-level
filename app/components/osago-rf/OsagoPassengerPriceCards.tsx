@@ -6,7 +6,9 @@ import { useEffect, useMemo, useState } from "react";
 import type { Lang } from "@/dictionaries/header";
 import type { OsagoRfPassengerPricesDictionary } from "@/dictionaries/osagoRfPassengerPrices";
 import { calculateOsagoRfPremium, convertRubToKzt, formatKzt, formatRub } from "@/lib/osago-rf-calculation";
+
 import { emitOsagoRfRubRate, OSAGO_RF_RUB_RATE_EVENT, readOsagoRfRubRateEvent } from "@/lib/osago-rf-rate-events";
+
 
 type Props = { lang: Lang; dict: OsagoRfPassengerPricesDictionary; variant?: "cards" | "table" };
 type NbkRateResponse = { ok: boolean; rate?: number | string; message?: string };
@@ -28,6 +30,7 @@ export default function OsagoPassengerPriceCards({ lang, dict, variant = "cards"
 
   useEffect(() => {
     let active = true;
+
     fetch("/api/nbk-rate-rub", { cache: "no-store" })
       .then((resp) => resp.json() as Promise<NbkRateResponse>)
       .then((data) => {
@@ -36,10 +39,12 @@ export default function OsagoPassengerPriceCards({ lang, dict, variant = "cards"
           setRate(next);
           emitOsagoRfRubRate(next);
         }
+
       })
       .catch(() => {
         if (active) setRate(null);
       });
+
     const handleSharedRate = (event: Event) => {
       const next = readOsagoRfRubRateEvent(event);
       if (next !== null) setRate(next);
@@ -51,6 +56,7 @@ export default function OsagoPassengerPriceCards({ lang, dict, variant = "cards"
       active = false;
       window.removeEventListener(OSAGO_RF_RUB_RATE_EVENT, handleSharedRate);
     };
+
   }, []);
 
   const rows = useMemo(() => ranges.map((range) => ({
@@ -68,6 +74,7 @@ export default function OsagoPassengerPriceCards({ lang, dict, variant = "cards"
           <h2 id="osago-passenger-prices-heading" className="gc-h2">{variant === "table" ? dict.table.title : dict.cards.title}</h2>
           <p className="gc-text-muted">{variant === "table" ? dict.table.subtitle : dict.cards.subtitle}</p>
           {rate ? <p className="osago-price__rate">{dict.cards.rateUsed}: {rate.toFixed(4)} KZT/RUB</p> : null}
+
         </div>
 
         {variant === "cards" ? <div className="osago-price__groups">

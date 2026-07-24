@@ -15,7 +15,9 @@ import {
   type OsagoRfPolicyholderType as PolicyholderType,
   type OsagoRfVehicleKind as VehicleKind,
 } from "@/lib/osago-rf-calculation";
+
 import { emitOsagoRfRubRate } from "@/lib/osago-rf-rate-events";
+
 
 export type OsagoRfCalculatorDictionary = {
   title: string;
