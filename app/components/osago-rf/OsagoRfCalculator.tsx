@@ -16,6 +16,9 @@ import {
   type OsagoRfVehicleKind as VehicleKind,
 } from "@/lib/osago-rf-calculation";
 
+import { emitOsagoRfRubRate } from "@/lib/osago-rf-rate-events";
+
+
 export type OsagoRfCalculatorDictionary = {
   title: string;
   subtitle: string;
@@ -234,6 +237,11 @@ export default function OsagoRfCalculator({ dict }: Props) {
   const isLimited = mode === "limited";
 
   useEffect(() => {
+    const parsed = parseRubRate(rubRate);
+    if (Number.isFinite(parsed) && parsed > 0) emitOsagoRfRubRate(parsed);
+  }, [rubRate]);
+
+  useEffect(() => {
     const normalized = normalizeTerm(term, termMax);
     if (normalized !== term) setTerm(normalized);
   }, [term, termMax]);
@@ -241,7 +249,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
   useEffect(() => {
     async function autoFillRubRate() {
       try {
-        const resp = await fetch("/api/nbk-rate-rub");
+        const resp = await fetch("/api/nbk-rate-rub", { cache: "no-store" });
         const data = (await resp.json()) as NbkRateResponse;
 
         if (!resp.ok || !data?.ok || !data.rate) {
@@ -254,6 +262,7 @@ export default function OsagoRfCalculator({ dict }: Props) {
         }
 
         setRubRate(parsed.toFixed(4));
+        emitOsagoRfRubRate(parsed);
         setAutoRateNote(dict.autoRateOk);
       } catch (e) {
         console.warn("NBK RUB rate auto-fill failed:", e);
