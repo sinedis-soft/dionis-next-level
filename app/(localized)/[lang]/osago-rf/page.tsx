@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import type { CSSProperties } from "react";
 
 import { BrokerSection } from "@/components/BrokerSection";
@@ -581,6 +582,26 @@ export default async function OsagoRfPage({
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="gc-section gc-info-strip" aria-labelledby="osago-rf-passenger-prices-link">
+          <div className="gc-container">
+            <article className="gc-info-strip__card">
+              <div className="gc-info-strip__header">
+                <h2 id="osago-rf-passenger-prices-link" className="gc-info-strip__title">
+                  {osagoPageDict.passengerPricesLink.title}
+                </h2>
+              </div>
+              <div className="gc-info-strip__body">
+                <p>{osagoPageDict.passengerPricesLink.text}</p>
+                <div className="gc-mt-12">
+                  <Link href={`/${lang}/osago-rf/passenger-car-prices`} className="btn btn-secondary btn-wide">
+                    {osagoPageDict.passengerPricesLink.cta}
+                  </Link>
+                </div>
+              </div>
+            </article>
           </div>
         </section>
 

@@ -12,6 +12,12 @@ export type OsagoRfPageDictionary = {
     logoAlt: string;
   };
 
+  passengerPricesLink: {
+    title: string;
+    text: string;
+    cta: string;
+  };
+
   questionBlock: {
     title: string;
     text1: string;
@@ -139,6 +145,12 @@ const ru: OsagoRfPageDictionary = {
     policyAlt:
       "Электронный полис ОСАГО России для автомобиля из Казахстана",
     logoAlt: "Страховой брокер DIONIS",
+  },
+
+  passengerPricesLink: {
+    title: "Ориентировочные цены для легковых авто",
+    text: "Посмотрите отдельную страницу с карточками стоимости ОСАГО РФ для физических лиц, легковых автомобилей и мультидрайва по диапазонам мощности.",
+    cta: "Смотреть цены для легковых авто",
   },
 
   questionBlock: {
@@ -542,6 +554,12 @@ const en: OsagoRfPageDictionary = {
     logoAlt: "DIONIS Insurance Broker",
   },
 
+  passengerPricesLink: {
+    title: "Estimated passenger car prices",
+    text: "Open a dedicated page with Russian OSAGO price cards for individuals, passenger cars and unlimited drivers by engine-power range.",
+    cta: "View passenger car prices",
+  },
+
   questionBlock: {
     title: "Still have questions about OSAGO for travel to Russia?",
     text1:
@@ -940,6 +958,12 @@ const kz: OsagoRfPageDictionary = {
     policyAlt:
       "Қазақстаннан келген автокөлікке арналған электрондық Ресей ОСАГО полисі",
     logoAlt: "DIONIS сақтандыру брокері",
+  },
+
+  passengerPricesLink: {
+    title: "Жеңіл автоға бағдарлы бағалар",
+    text: "Жеке тұлғаларға, жеңіл автомобильдерге және мультидрайв режиміне арналған РФ ОСАҒО бағаларының жеке бетін қуат диапазондары бойынша қараңыз.",
+    cta: "Жеңіл авто бағаларын көру",
   },
 
   questionBlock: {

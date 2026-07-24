@@ -35,6 +35,7 @@ Key topics:
 - [Green Card insurance in Kazakh](https://dionis-insurance.kz/kz/green-card): Kazakh page about Green Card insurance for vehicles from Kazakhstan.
 - [Green Card insurance in English](https://dionis-insurance.kz/en/green-card): English page about Green Card insurance for vehicles from Kazakhstan.
 - [ОСАГО РФ](https://dionis-insurance.kz/ru/osago-rf): Russian page about Russian OSAGO/MTPL for vehicles with foreign plates.
+- [Стоимость ОСАГО РФ для легковых авто](https://dionis-insurance.kz/ru/osago-rf/passenger-car-prices): Multilingual estimated Russian OSAGO price page for individual passenger cars with unlimited drivers.
 - [РФ ОСАҒО](https://dionis-insurance.kz/kz/osago-rf): Kazakh page about Russian OSAGO/MTPL for non-resident vehicles.
 - [Russian MTPL / OSAGO RF](https://dionis-insurance.kz/en/osago-rf): English page about Russian OSAGO/MTPL for foreign vehicles.
 - [All insurance products](https://dionis-insurance.kz/ru/products): Russian product directory for motor, property, cargo, liability, life, and medical insurance categories.
