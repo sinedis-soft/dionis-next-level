@@ -129,36 +129,37 @@ export type OsagoRfPageDictionary = {
 
 const ru: OsagoRfPageDictionary = {
   hero: {
-    title: "ОСАГО России для автомобиля из Казахстана",
+    title: "Страховка в Россию на автомобиль из Казахстана",
     subtitle:
-      "Электронная страховка для въезда и поездок по России на автомобиле с казахстанскими регистрационными номерами. Проверим документы, рассчитаем стоимость и отправим полис в PDF.",
-    ctaOrder: "Рассчитать стоимость ОСАГО",
+      "Электронный полис ОСАГО РФ для въезда и поездок по России на автомобиле с казахстанскими номерами. Проверим документы, рассчитаем стоимость и отправим готовую страховку в PDF.",
+    ctaOrder: "Рассчитать стоимость страховки",
     factsLabel: "Основные условия",
     facts: [
       "Для легковых и грузовых автомобилей",
       "Для физических и юридических лиц",
-      "Возможность оформления от 15 дней",
-      "Электронный полис в PDF",
+      "Срок страхования от 15 дней",
+      "Электронный полис ОСАГО в PDF",
     ],
     carAlt:
-      "Автомобиль с казахстанскими регистрационными номерами для поездки в Россию",
+      "Автомобиль с казахстанскими номерами для поездки в Россию",
     policyAlt:
-      "Электронный полис ОСАГО России для автомобиля из Казахстана",
+      "Электронная страховка ОСАГО РФ для автомобиля из Казахстана",
     logoAlt: "Страховой брокер DIONIS",
   },
 
   passengerPricesLink: {
-    title: "Ориентировочные цены для легковых авто",
-    text: "Посмотрите отдельную страницу с карточками стоимости ОСАГО РФ для физических лиц, легковых автомобилей и мультидрайва по диапазонам мощности.",
-    cta: "Смотреть цены для легковых авто",
+    title: "Цены на страховку в Россию для легковых автомобилей",
+    text:
+      "Посмотрите ориентировочную стоимость ОСАГО РФ для легковых автомобилей физических лиц. Цены указаны по срокам страхования и мощности автомобиля для полиса без ограничения количества водителей.",
+    cta: "Посмотреть цены",
   },
 
   questionBlock: {
-    title: "Остались вопросы по ОСАГО для поездки в Россию?",
+    title: "Остались вопросы о страховке для поездки в Россию?",
     text1:
-      "Уточним доступный срок страхования, порядок расчёта, перечень документов и возможность оформления для вашего автомобиля.",
+      "Уточним доступный срок страхования, порядок расчёта стоимости, необходимые документы и возможность оформления ОСАГО РФ для вашего автомобиля.",
     text2:
-      "Отправьте вопрос — менеджер проверит маршрут и данные автомобиля и свяжется с вами.",
+      "Отправьте вопрос — менеджер проверит данные автомобиля и поможет оформить страховку для въезда в Россию.",
   },
 
   advantages: {
@@ -511,7 +512,7 @@ const ru: OsagoRfPageDictionary = {
   },
   seo: {
     title:
-      "ОСАГО России для авто из Казахстана — цена и оформление онлайн | DIONIS",
+      "Страховка в Россию для авто из Казахстана онлайн | DIONIS",
     description:
       "Электронное ОСАГО России для автомобиля с казахстанскими номерами. Расчёт стоимости, проверка документов и получение полиса онлайн.",
     serviceName:
@@ -536,36 +537,37 @@ const ru: OsagoRfPageDictionary = {
 
 const en: OsagoRfPageDictionary = {
   hero: {
-    title: "Russian OSAGO for a Vehicle from Kazakhstan",
+    title: "Car Insurance for Travel from Kazakhstan to Russia",
     subtitle:
-      "Electronic motor liability insurance for entering and driving in Russia with Kazakhstan registration plates. We verify the documents, calculate the price, and send the policy as a PDF.",
-    ctaOrder: "Calculate the OSAGO price",
-    factsLabel: "Key conditions",
+      "Electronic Russian MTPL insurance for entering and travelling within Russia in a vehicle with Kazakhstan registration plates. We will check your documents, calculate the price, and send the completed policy as a PDF.",
+    ctaOrder: "Calculate the Insurance Cost",
+    factsLabel: "Key Conditions",
     facts: [
-      "For passenger cars and trucks",
-      "For individuals and legal entities",
-      "Possible coverage from 15 days",
-      "Electronic policy in PDF",
+      "For Passenger Cars and Commercial Vehicles",
+      "For Individuals and Legal Entities",
+      "Coverage from 15 Days",
+      "Electronic Russian MTPL Policy in PDF",
     ],
     carAlt:
       "Vehicle with Kazakhstan registration plates travelling to Russia",
     policyAlt:
-      "Electronic Russian OSAGO policy for a vehicle from Kazakhstan",
+      "Electronic Russian MTPL insurance for a vehicle from Kazakhstan",
     logoAlt: "DIONIS Insurance Broker",
   },
 
   passengerPricesLink: {
-    title: "Estimated passenger car prices",
-    text: "Open a dedicated page with Russian OSAGO price cards for individuals, passenger cars and unlimited drivers by engine-power range.",
-    cta: "View passenger car prices",
+    title: "Car Insurance Prices for Travel to Russia",
+    text:
+      "View the estimated cost of Russian MTPL insurance for privately owned passenger cars. Prices are shown by insurance period and engine power for policies with no restriction on the number of drivers.",
+    cta: "View Prices",
   },
 
   questionBlock: {
-    title: "Still have questions about OSAGO for travel to Russia?",
+    title: "Still Have Questions About Insurance for Travel to Russia?",
     text1:
-      "We will clarify the available insurance period, pricing procedure, required documents, and whether your vehicle can be insured.",
+      "We will explain the available insurance periods, how the price is calculated, which documents are required, and whether Russian MTPL insurance can be issued for your vehicle.",
     text2:
-      "Send your question, and our manager will review the route and vehicle details and contact you.",
+      "Send us your question — a manager will check the vehicle details and help you arrange insurance for entering Russia.",
   },
 
   advantages: {
@@ -917,7 +919,7 @@ const en: OsagoRfPageDictionary = {
   },
   seo: {
     title:
-      "Russian OSAGO for Vehicles from Kazakhstan — Price and Online Application | DIONIS",
+      "Car Insurance for Travel to Russia from Kazakhstan Online | DIONIS",
     description:
       "Electronic Russian OSAGO for vehicles with Kazakhstan registration plates. Price calculation, document verification, and online policy issuance.",
     serviceName:
@@ -942,36 +944,37 @@ const en: OsagoRfPageDictionary = {
 
 const kz: OsagoRfPageDictionary = {
   hero: {
-    title: "Қазақстаннан келген автокөлікке арналған Ресей ОСАГО полисі",
+    title: "Қазақстаннан автокөлікпен Ресейге баруға арналған сақтандыру",
     subtitle:
-      "Қазақстандық тіркеу нөмірі бар автокөлікпен Ресейге кіруге және оның аумағында жүруге арналған электрондық жауапкершілік сақтандыруы. Құжаттарды тексеріп, құнын есептеп, полисті PDF форматында жібереміз.",
-    ctaOrder: "ОСАГО құнын есептеу",
+      "Қазақстандық нөмірі бар автокөлікпен Ресейге кіруге және ел аумағында жүруге арналған РФ ОСАГО электрондық полисі. Құжаттарды тексеріп, құнын есептейміз және дайын сақтандыру полисін PDF форматында жібереміз.",
+    ctaOrder: "Сақтандыру құнын есептеу",
     factsLabel: "Негізгі шарттар",
     facts: [
-      "Жеңіл және жүк автокөліктеріне",
-      "Жеке және заңды тұлғаларға",
-      "15 күннен бастап рәсімдеу мүмкіндігі",
-      "PDF форматындағы электрондық полис",
+      "Жеңіл және жүк автокөліктеріне арналған",
+      "Жеке және заңды тұлғалар үшін",
+      "Сақтандыру мерзімі 15 күннен басталады",
+      "PDF форматындағы ОСАГО электрондық полисі",
     ],
     carAlt:
-      "Ресейге сапарға шығатын қазақстандық тіркеу нөмірі бар автокөлік",
+      "Ресейге баруға арналған қазақстандық нөмірі бар автокөлік",
     policyAlt:
-      "Қазақстаннан келген автокөлікке арналған электрондық Ресей ОСАГО полисі",
+      "Қазақстаннан баратын автокөлікке арналған РФ ОСАГО электрондық сақтандыру полисі",
     logoAlt: "DIONIS сақтандыру брокері",
   },
 
   passengerPricesLink: {
-    title: "Жеңіл автоға бағдарлы бағалар",
-    text: "Жеке тұлғаларға, жеңіл автомобильдерге және мультидрайв режиміне арналған РФ ОСАҒО бағаларының жеке бетін қуат диапазондары бойынша қараңыз.",
-    cta: "Жеңіл авто бағаларын көру",
+    title: "Жеңіл автокөліктермен Ресейге баруға арналған сақтандыру бағалары",
+    text:
+      "Жеке тұлғалардың жеңіл автокөліктеріне арналған РФ ОСАГО полисінің болжамды құнын қараңыз. Бағалар жүргізушілер саны шектелмейтін полис үшін сақтандыру мерзімі мен автокөлік қуатына қарай көрсетілген.",
+    cta: "Бағаларды қарау",
   },
 
   questionBlock: {
-    title: "Ресейге сапарға арналған ОСАГО бойынша сұрақтарыңыз бар ма?",
+    title: "Ресейге баруға арналған сақтандыру бойынша сұрақтарыңыз қалды ма?",
     text1:
-      "Қолжетімді сақтандыру мерзімін, есептеу тәртібін, құжаттар тізімін және автокөлігіңізге полис рәсімдеу мүмкіндігін нақтылаймыз.",
+      "Қолжетімді сақтандыру мерзімін, құнын есептеу тәртібін, қажетті құжаттарды және автокөлігіңізге РФ ОСАГО полисін рәсімдеу мүмкіндігін нақтылап береміз.",
     text2:
-      "Сұрағыңызды жіберіңіз — менеджер бағыт пен автокөлік деректерін тексеріп, сізбен байланысады.",
+      "Сұрағыңызды жіберіңіз — менеджер автокөлік деректерін тексеріп, Ресейге кіруге арналған сақтандыруды рәсімдеуге көмектеседі.",
   },
 
   advantages: {
@@ -1323,7 +1326,7 @@ const kz: OsagoRfPageDictionary = {
   },
   seo: {
     title:
-      "Қазақстаннан келген автокөлікке арналған Ресей ОСАГО полисі — бағасы және онлайн рәсімдеу | DIONIS",
+      "Қазақстаннан Ресейге баратын автокөлікке сақтандыру | DIONIS",
     description:
       "Қазақстандық тіркеу нөмірі бар автокөлікке арналған электрондық Ресей ОСАГО полисі. Құнын есептеу, құжаттарды тексеру және полисті онлайн рәсімдеу.",
     serviceName:

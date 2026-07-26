@@ -3,44 +3,21 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { GreenCardPageDictionary } from "@/dictionaries/greenCardPage";
-
-type RegionKey = "group1" | "group2";
-type VehicleKey =
-  | "passenger"
-  | "bus"
-  | "truck"
-  | "trailer"
-  | "motorcycle"
-  | "tractor";
-type PeriodKey = "1" | "3" | "6" | "12";
-
-const RATES_USD: Record<
-  RegionKey,
-  Record<VehicleKey, Record<PeriodKey, number>>
-> = {
-  group1: {
-    passenger: { 1: 14.12, 3: 35.29, 6: 70.59, 12: 128.24 },
-    bus: { 1: 132.35, 3: 338.24, 6: 505.88, 12: 958.82 },
-    truck: { 1: 58.82, 3: 79.41, 6: 176.47, 12: 329.41 },
-    trailer: { 1: 5.88, 3: 8.82, 6: 35.29, 12: 58.82 },
-    motorcycle: { 1: 11.76, 3: 29.41, 6: 47.06, 12: 70.59 },
-    tractor: { 1: 20.59, 3: 44.12, 6: 67.65, 12: 88.24 },
-  },
-  group2: {
-    passenger: { 1: 50.0, 3: 114.71, 6: 217.65, 12: 411.76 },
-    bus: { 1: 215.88, 3: 450.0, 6: 777.06, 12: 1405.29 },
-    truck: { 1: 105.88, 3: 311.76, 6: 588.24, 12: 882.35 },
-    trailer: { 1: 14.71, 3: 38.24, 6: 65.88, 12: 82.35 },
-    motorcycle: { 1: 38.24, 3: 83.53, 6: 120.0, 12: 157.06 },
-    tractor: { 1: 40.59, 3: 92.35, 6: 132.35, 12: 172.35 },
-  },
-};
+import {
+  calculateGreenCardPrice,
+  formatGreenCardKzt,
+  type GreenCardMarkupMode,
+  type GreenCardPeriodKey,
+  type GreenCardRegionKey,
+  type GreenCardVehicleKey,
+} from "@/lib/greenCardPricing";
 
 type Props = { dict: GreenCardPageDictionary["calculator"] };
 type NbkRateResponse = { ok: boolean; rate?: number | string; message?: string };
-
-type MarkupMode = "weekday" | "holiday";
-const MARKUP: Record<MarkupMode, number> = { weekday: 1.015, holiday: 1.02 };
+type RegionKey = GreenCardRegionKey;
+type VehicleKey = GreenCardVehicleKey;
+type PeriodKey = GreenCardPeriodKey;
+type MarkupMode = GreenCardMarkupMode;
 
 const REGION_ITEMS: Array<{
   key: RegionKey;
@@ -73,18 +50,6 @@ const PERIOD_ITEMS: Array<{
   { key: "12", labelKey: "12" },
 ];
 
-function formatKzt(value: number): string {
-  const rounded = Math.round(value * 100) / 100;
-  return new Intl.NumberFormat("ru-RU", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(rounded);
-}
-
-function applyNewMarkup(legacyPrice: number, mode: MarkupMode): number {
-  const updated = legacyPrice * MARKUP[mode];
-  return Math.round(updated * 100) / 100;
-}
 
 function parseRateSafe(raw: string): number {
   const cleaned = raw.replace(/\s/g, "").replace(/[^0-9.,]/g, "");
@@ -133,16 +98,22 @@ export default function GreenCardCalculator({ dict }: Props) {
 
   const result = useMemo(() => {
     if (!Number.isFinite(kztRate) || kztRate <= 0) {
-      return { error: dict.errorInvalidRate };
+      return {
+        error: dict.errorInvalidRate,
+      };
     }
 
-    const legacyUsd = RATES_USD[region][vehicle][period];
-    const priceUsd = applyNewMarkup(legacyUsd, markupMode);
-    const priceKzt = Math.round(priceUsd * kztRate * 100) / 100;
+    const price = calculateGreenCardPrice({
+      region,
+      vehicle,
+      period,
+      kztRate,
+      markupMode,
+    });
 
     return {
-      usd: `${priceUsd.toFixed(2)}$`,
-      kzt: `${formatKzt(priceKzt)}\u00A0₸`,
+      usd: `${price.usd.toFixed(2)}$`,
+      kzt: `${formatGreenCardKzt(price.kzt)}\u00A0₸`,
       approx: dict.resultApprox,
     };
   }, [
@@ -154,6 +125,8 @@ export default function GreenCardCalculator({ dict }: Props) {
     region,
     vehicle,
   ]);
+
+
 
   const selectedVehicleLabel =
     dict.vehicleOptions[

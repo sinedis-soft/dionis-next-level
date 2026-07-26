@@ -37,6 +37,36 @@ export type GreenCardPageDictionary = {
     telegram: string;
     phone: string;
   };
+  priceCards: {
+    title: string;
+    subtitle: string;
+    periodLabel: string;
+    periodValue: string;
+    priceLabel: string;
+    approximate: string;
+    loading: string;
+    rateError: string;
+    note: string;
+    button: string;
+    cards: {
+      passengerEurope: {
+        vehicle: string;
+        territory: string;
+      };
+      passengerRegional: {
+        vehicle: string;
+        territory: string;
+      };
+      truckEurope: {
+        vehicle: string;
+        territory: string;
+      };
+      truckRegional: {
+        vehicle: string;
+        territory: string;
+      };
+    };
+  };
   calculator: {
     title: string;
     subtitle: string;
@@ -114,6 +144,38 @@ const ru: GreenCardPageDictionary = {
     text1:
       "Напишите нам — и мы подберём оптимальный вариант страхования под ваш маршрут.",
     text2: "Для заказа самой Зеленой карты заполните заявку выше.",
+  },
+  priceCards: {
+    title: "Цена на Зелёную карту",
+    subtitle:
+      "Ориентировочная стоимость полиса сроком на 1 месяц для автомобилей, зарегистрированных в Казахстане.",
+    periodLabel: "Срок страхования",
+    periodValue: "1 месяц",
+    priceLabel: "Стоимость",
+    approximate: "≈",
+    loading: "Рассчитываем…",
+    rateError: "Не удалось загрузить актуальный курс тенге.",
+    note:
+      "Стоимость рассчитывается по актуальному курсу НБРК и носит справочный характер. Итоговая цена определяется при оформлении полиса.",
+    button: "Оформить полис",
+    cards: {
+      passengerEurope: {
+        vehicle: "Легковой автомобиль",
+        territory: "Европа + Турция",
+      },
+      passengerRegional: {
+        vehicle: "Легковой автомобиль",
+        territory: "Турция + Молдова + Украина",
+      },
+      truckEurope: {
+        vehicle: "Грузовой автомобиль",
+        territory: "Европа + Турция",
+      },
+      truckRegional: {
+        vehicle: "Грузовой автомобиль",
+        territory: "Турция + Молдова + Украина",
+      },
+    },
   },
 
   calculator: {
@@ -426,6 +488,38 @@ const en: GreenCardPageDictionary = {
       "Write to us — we will answer and select the optimal insurance solution for your route.",
     text2: "To order the Green Card itself, please fill out the application form above.",
   },
+  priceCards: {
+    title: "Green Card prices",
+    subtitle:
+      "Estimated one-month policy prices for vehicles registered in Kazakhstan.",
+    periodLabel: "Policy period",
+    periodValue: "1 month",
+    priceLabel: "Price",
+    approximate: "≈",
+    loading: "Calculating…",
+    rateError: "The current KZT exchange rate could not be loaded.",
+    note:
+      "The price is calculated using the current NBK exchange rate and is provided for reference only. The final price is confirmed when the policy is issued.",
+    button: "Apply for a policy",
+    cards: {
+      passengerEurope: {
+        vehicle: "Passenger car",
+        territory: "Europe + Türkiye",
+      },
+      passengerRegional: {
+        vehicle: "Passenger car",
+        territory: "Türkiye + Moldova + Ukraine",
+      },
+      truckEurope: {
+        vehicle: "Truck",
+        territory: "Europe + Türkiye",
+      },
+      truckRegional: {
+        vehicle: "Truck",
+        territory: "Türkiye + Moldova + Ukraine",
+      },
+    },
+  },
 
   calculator: {
     title: "Green Card price calculator",
@@ -737,6 +831,39 @@ const kz: GreenCardPageDictionary = {
       "Бізге жазыңыз — маршрутыңызға сәйкес ең тиімді сақтандыру нұсқасын ұсынамыз.",
     text2:
       "Жасыл картаның өзіне тапсырыс беру үшін жоғарыдағы өтінімді толтырыңыз.",
+  },
+
+  priceCards: {
+    title: "Green Card бағасы",
+    subtitle:
+      "Қазақстанда тіркелген көлік құралдары үшін 1 айлық полистің болжамды құны.",
+    periodLabel: "Сақтандыру мерзімі",
+    periodValue: "1 ай",
+    priceLabel: "Құны",
+    approximate: "≈",
+    loading: "Есептелуде…",
+    rateError: "Теңгенің қолданыстағы бағамын жүктеу мүмкін болмады.",
+    note:
+      "Құны Ұлттық Банктің қолданыстағы бағамы бойынша есептеледі және анықтамалық сипатта беріледі. Нақты баға полисті рәсімдеу кезінде белгіленеді.",
+    button: "Полисті рәсімдеу",
+    cards: {
+      passengerEurope: {
+        vehicle: "Жеңіл автомобиль",
+        territory: "Еуропа + Түркия",
+      },
+      passengerRegional: {
+        vehicle: "Жеңіл автомобиль",
+        territory: "Түркия + Молдова + Украина",
+      },
+      truckEurope: {
+        vehicle: "Жүк автомобилі",
+        territory: "Еуропа + Түркия",
+      },
+      truckRegional: {
+        vehicle: "Жүк автомобилі",
+        territory: "Түркия + Молдова + Украина",
+      },
+    },
   },
 
   calculator: {

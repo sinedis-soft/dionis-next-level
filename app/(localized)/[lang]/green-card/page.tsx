@@ -14,7 +14,7 @@ import {
 } from "@/dictionaries/greenCardPage";
 import { getWhatsAppCallDictionary } from "@/dictionaries/whatsappcall";
 import { WhatsAppCall } from "@/components/WhatsAppCall";
-
+import GreenCardPriceCards from "@/components/green-card/GreenCardPriceCards";
 import GreenCardInfoBlocks from "@/components/green-card/GreenCardInfoBlocks";
 import { GreenCardOrderForm } from "@/components/green-card/GreenCardOrderForm";
 import { BrokerSection } from "@/components/BrokerSection";
@@ -336,6 +336,13 @@ export default async function GreenCardPage({
           </div>
         </section>
 
+        <GreenCardPriceCards
+          dict={gcPageDict.priceCards}
+          lang={lang}
+        />
+
+        <GreenCardInfoBlocks dict={gcPageDict} />
+
         <section className="gc-section" id="green-card-calculator">
           <div className="gc-container">
             <div className="legacy-form-scope legacy-form-card">
@@ -430,8 +437,6 @@ export default async function GreenCardPage({
             </div>
           </div>
         </section>
-
-        <GreenCardInfoBlocks dict={gcPageDict} />
 
         <section className="gc-section gc-section--muted">
           <div className="gc-container">

@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -585,6 +586,8 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
+        <OsagoHowItWorksSection dict={osagoPageDict} />
+
         <section className="gc-section gc-info-strip" aria-labelledby="osago-rf-passenger-prices-link">
           <div className="gc-container">
             <article className="gc-info-strip__card">
@@ -602,6 +605,29 @@ export default async function OsagoRfPage({
                 </div>
               </div>
             </article>
+          </div>
+        </section>
+
+        <section id="osago-rf-order" className="gc-section gc-order-section">
+          <div className="gc-container gc-order-layout">
+            <aside
+              className="gc-order-prep"
+              aria-labelledby="osago-rf-order-prep-heading"
+            >
+              <h2 id="osago-rf-order-prep-heading" className="gc-order-prep__title">
+                {osagoPageDict.orderPrep.title}
+              </h2>
+              <p className="gc-order-prep__text">{osagoPageDict.orderPrep.text}</p>
+              <ul className="gc-order-prep__list">
+                {osagoPageDict.orderPrep.items.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </aside>
+
+            <div className="legacy-form-scope legacy-form-card gc-order-form-card">
+              <OsagoOrderForm dict={osagoFormDict} />
+            </div>
           </div>
         </section>
 
@@ -658,7 +684,7 @@ export default async function OsagoRfPage({
           /*orderAnchor={orderAnchor}*/
         />
 
-        <OsagoHowItWorksSection dict={osagoPageDict} />
+        
 
         <section className="gc-advantages" aria-labelledby="advantages-heading">
           <div className="gc-container">
@@ -680,28 +706,7 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
-        <section id="osago-rf-order" className="gc-section gc-order-section">
-          <div className="gc-container gc-order-layout">
-            <aside
-              className="gc-order-prep"
-              aria-labelledby="osago-rf-order-prep-heading"
-            >
-              <h2 id="osago-rf-order-prep-heading" className="gc-order-prep__title">
-                {osagoPageDict.orderPrep.title}
-              </h2>
-              <p className="gc-order-prep__text">{osagoPageDict.orderPrep.text}</p>
-              <ul className="gc-order-prep__list">
-                {osagoPageDict.orderPrep.items.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </aside>
-
-            <div className="legacy-form-scope legacy-form-card gc-order-form-card">
-              <OsagoOrderForm dict={osagoFormDict} />
-            </div>
-          </div>
-        </section>
+        
 
         <section id="write-us" className="gc-section gc-writeus-section">
           <div className="gc-container">
