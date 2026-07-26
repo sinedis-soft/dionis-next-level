@@ -196,13 +196,13 @@ export default async function GreenCardPage({
       lang === "ru"
         ? "Зелёная карта для авто из Казахстана"
         : lang === "kz"
-          ? "Қазақстаннан автокөлікке Green Card"
+          ? "Қазақстаннан автокөлікке Жасыл карта"
           : "Green Card insurance for vehicles from Kazakhstan",
     description:
       lang === "ru"
         ? "Оформление международного полиса «Зелёная карта» для поездок за границу на автомобиле из Казахстана."
         : lang === "kz"
-          ? "Қазақстаннан шетелге сапарлар үшін халықаралық Green Card полисін рәсімдеу."
+          ? "Қазақстаннан шетелге сапарлар үшін халықаралық Жасыл карта полисін рәсімдеу."
           : "International Green Card liability insurance for trips abroad with a vehicle from Kazakhstan.",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#insurance-broker` },
