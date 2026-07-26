@@ -512,7 +512,7 @@ const ru: OsagoRfPageDictionary = {
   },
   seo: {
     title:
-      "Страховка в Россию для авто из Казахстана онлайн | DIONIS",
+      "Страховка в Россию для авто из Казахстана онлайн",
     description:
       "Электронное ОСАГО России для автомобиля с казахстанскими номерами. Расчёт стоимости, проверка документов и получение полиса онлайн.",
     serviceName:
@@ -919,7 +919,7 @@ const en: OsagoRfPageDictionary = {
   },
   seo: {
     title:
-      "Car Insurance for Travel to Russia from Kazakhstan Online | DIONIS",
+      "Car Insurance for Travel to Russia from Kazakhstan Online",
     description:
       "Electronic Russian OSAGO for vehicles with Kazakhstan registration plates. Price calculation, document verification, and online policy issuance.",
     serviceName:
@@ -1326,7 +1326,7 @@ const kz: OsagoRfPageDictionary = {
   },
   seo: {
     title:
-      "Қазақстаннан Ресейге баратын автокөлікке сақтандыру | DIONIS",
+      "Қазақстаннан Ресейге баратын автокөлікке сақтандыру",
     description:
       "Қазақстандық тіркеу нөмірі бар автокөлікке арналған электрондық Ресей ОСАГО полисі. Құнын есептеу, құжаттарды тексеру және полисті онлайн рәсімдеу.",
     serviceName:
