@@ -138,6 +138,7 @@ const ru: OsagoRfPageDictionary = {
       "Для легковых и грузовых автомобилей",
       "Для физических и юридических лиц",
       "Срок страхования от 15 дней",
+      "Цена: от 10900 ₸",
       "Электронный полис ОСАГО в PDF",
     ],
     carAlt:
@@ -546,6 +547,7 @@ const en: OsagoRfPageDictionary = {
       "For Passenger Cars and Commercial Vehicles",
       "For Individuals and Legal Entities",
       "Coverage from 15 Days",
+      "Price: from 10,900 ₸",
       "Electronic Russian MTPL Policy in PDF",
     ],
     carAlt:
@@ -953,6 +955,7 @@ const kz: OsagoRfPageDictionary = {
       "Жеңіл және жүк автокөліктеріне арналған",
       "Жеке және заңды тұлғалар үшін",
       "Сақтандыру мерзімі 15 күннен басталады",
+      "Бағасы: 10 900 ₸-ден бастап",
       "PDF форматындағы ОСАГО электрондық полисі",
     ],
     carAlt:

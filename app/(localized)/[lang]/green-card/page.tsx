@@ -217,16 +217,19 @@ export default async function GreenCardPage({
       "Для авто из Казахстана",
       "ЕС, Турция и страны системы",
       "Стоимость до оплаты",
+      "Цена: от 7000 ₸",
     ],
     kz: [
       "Қазақстанда тіркелген көлікке",
       "ЕО, Түркия және жүйе елдері",
       "Құны төлемге дейін",
+      "Бағасы: 7 000 ₸-ден бастап",
     ],
     en: [
       "For vehicles from Kazakhstan",
       "EU, Türkiye and Green Card states",
       "Price before payment",
+      "Price: from 7,000 ₸",
     ],
   };
 
