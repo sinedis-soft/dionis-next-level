@@ -218,18 +218,21 @@ export default async function GreenCardPage({
       "ЕС, Турция и страны системы",
       "Стоимость до оплаты",
       "Цена: от 7000 ₸",
+      "Электронный полис «Зелёная карта» в формате PDF",
     ],
     kz: [
       "Қазақстанда тіркелген көлікке",
       "ЕО, Түркия және жүйе елдері",
       "Құны төлемге дейін",
       "Бағасы: 7 000 ₸-ден бастап",
+      "«Жасыл карта» сақтандыру полисінің PDF форматындағы электрондық нұсқасы",
     ],
     en: [
       "For vehicles from Kazakhstan",
       "EU, Türkiye and Green Card states",
       "Price before payment",
       "Price: from 7,000 ₸",
+      "Electronic Green card Policy in PDF",
     ],
   };
 
