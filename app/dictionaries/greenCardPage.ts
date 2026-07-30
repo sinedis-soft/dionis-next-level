@@ -4,6 +4,7 @@ export type GreenCardPageDictionary = {
   hero: {
     title: string;
     subtitle: string;
+    priceFrom: string;
     ctaOrder: string;
     carAlt: string;
     policyAlt: string;
@@ -133,6 +134,7 @@ const ru: GreenCardPageDictionary = {
     title: "ЗЕЛЕНАЯ КАРТА В ЕВРОПУ И ТУРЦИЮ",
     subtitle:
       "Международная страховка ответственности для автомобилей, зарегистрированных в Казахстане. Обязательна при въезде в страны ЕС, Турцию и другие государства.",
+    priceFrom: "Цена: от {price}",
     ctaOrder: "Заказать Зеленую карту",
     carAlt: "Автомобиль с полисом Зеленой карты",
     policyAlt: "Полис Зеленой карты",
@@ -476,6 +478,7 @@ const en: GreenCardPageDictionary = {
     title: "GREEN CARD",
     subtitle:
       "International motor third-party liability insurance for vehicles registered in Kazakhstan. Required when entering EU countries, Turkey, and other states.",
+    priceFrom: "Price: from {price}",
     ctaOrder: "Order a Green Card",
     carAlt: "Car with Green Card insurance",
     policyAlt: "Green Card policy sample",
@@ -819,6 +822,7 @@ const kz: GreenCardPageDictionary = {
     title: "ЕУРОПА МЕН ТҮРКИЯҒА ЖАСЫЛ КАРТА",
     subtitle:
       "Қазақстанда тіркелген автокөліктерге арналған азаматтық-құқықтық жауапкершіліктің халықаралық сақтандыруы. Еуропалық Одақ елдеріне, Түркияға және басқа мемлекеттерге кіру кезінде міндетті.",
+    priceFrom: "Бағасы: {price}-ден бастап",
     ctaOrder: "ЖАСЫЛ КАРТА рәсімдеу",
     carAlt: "Green Card полисі бар автомобиль",
     policyAlt: "Green Card полисінің үлгісі",

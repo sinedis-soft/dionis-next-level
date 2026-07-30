@@ -11,7 +11,7 @@ import {
   formatGreenCardKzt,
   type GreenCardRegionKey,
   type GreenCardVehicleKey,
-} from "@/lib/greenCardPricing";
+} from "@/lib/green-card/calculateGreenCardPrice";
 
 type NbkRateResponse = {
   ok: boolean;

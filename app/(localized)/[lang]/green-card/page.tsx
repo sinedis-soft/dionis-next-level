@@ -23,8 +23,17 @@ import FAQSection from "@/components/green-card/FAQSection";
 import GreenCardQuestionForm from "@/components/green-card/GreenCardQuestionForm";
 import DeferredHydration from "@/components/DeferredHydration";
 import { buildAlternates } from "@/lib/seoAlternates";
+import {
+  calculateGreenCardPrice,
+  formatGreenCardKzt,
+} from "@/lib/green-card/calculateGreenCardPrice";
+import {
+  getNbkUsdRate,
+  GREEN_CARD_FALLBACK_KZT_RATE,
+} from "@/lib/green-card/getNbkUsdRate";
 
 export const dynamicParams = false;
+export const revalidate = 28800;
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
@@ -212,26 +221,53 @@ export default async function GreenCardPage({
   const osagoLink = `/${lang}/osago-rf`;
   const orderAnchor = "#green-card-order";
 
+  let heroPriceFact: string | null = null;
+  let kztRate = GREEN_CARD_FALLBACK_KZT_RATE;
+
+  try {
+    kztRate = await getNbkUsdRate(revalidate);
+  } catch (error) {
+    console.error(
+      "Green Card hero rate loading failed; using the fallback rate",
+      error,
+    );
+  }
+
+  try {
+    const { kzt } = calculateGreenCardPrice({
+      region: "group1",
+      vehicle: "passenger",
+      period: "1",
+      kztRate,
+      markupMode: "weekday",
+    });
+    const formattedPrice = `${formatGreenCardKzt(kzt, "ru-RU", 0)}\u00A0₸`;
+
+    heroPriceFact = gcPageDict.hero.priceFrom.replace(
+      "{price}",
+      formattedPrice,
+    );
+  } catch (error) {
+    console.error("Green Card hero price calculation failed", error);
+  }
+
   const heroFacts: Record<Lang, string[]> = {
     ru: [
       "Для авто из Казахстана",
       "ЕС, Турция и страны системы",
       "Стоимость до оплаты",
-      "Цена: от 7000 ₸",
       "Электронный полис «Зелёная карта» в формате PDF",
     ],
     kz: [
       "Қазақстанда тіркелген көлікке",
       "ЕО, Түркия және жүйе елдері",
       "Құны төлемге дейін",
-      "Бағасы: 7 000 ₸-ден бастап",
       "«Жасыл карта» сақтандыру полисінің PDF форматындағы электрондық нұсқасы",
     ],
     en: [
       "For vehicles from Kazakhstan",
       "EU, Türkiye and Green Card states",
       "Price before payment",
-      "Price: from 7,000 ₸",
       "Electronic Green card Policy in PDF",
     ],
   };
@@ -294,7 +330,11 @@ export default async function GreenCardPage({
                 className="gc-hero__facts"
                 aria-label={gcPageDict.hero.title}
               >
-                {heroFacts[lang].map((fact) => (
+                {[
+                  ...heroFacts[lang].slice(0, 3),
+                  ...(heroPriceFact ? [heroPriceFact] : []),
+                  ...heroFacts[lang].slice(3),
+                ].map((fact) => (
                   <span key={fact}>{fact}</span>
                 ))}
               </div>

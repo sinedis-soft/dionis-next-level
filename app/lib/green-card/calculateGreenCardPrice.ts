@@ -14,10 +14,7 @@ export type GreenCardMarkupMode = "weekday" | "holiday";
 
 const RATES_USD: Record<
   GreenCardRegionKey,
-  Record<
-    GreenCardVehicleKey,
-    Record<GreenCardPeriodKey, number>
-  >
+  Record<GreenCardVehicleKey, Record<GreenCardPeriodKey, number>>
 > = {
   group1: {
     passenger: { 1: 14.12, 3: 35.29, 6: 70.59, 12: 128.24 },
@@ -27,7 +24,6 @@ const RATES_USD: Record<
     motorcycle: { 1: 11.76, 3: 29.41, 6: 47.06, 12: 70.59 },
     tractor: { 1: 20.59, 3: 44.12, 6: 67.65, 12: 88.24 },
   },
-
   group2: {
     passenger: { 1: 50.0, 3: 114.71, 6: 217.65, 12: 411.76 },
     bus: { 1: 215.88, 3: 450.0, 6: 777.06, 12: 1405.29 },
@@ -55,30 +51,25 @@ export function calculateGreenCardPrice({
   period: GreenCardPeriodKey;
   kztRate: number;
   markupMode?: GreenCardMarkupMode;
-}): {
-  usd: number;
-  kzt: number;
-} {
+}): { usd: number; kzt: number } {
+  if (!Number.isFinite(kztRate) || kztRate <= 0) {
+    throw new RangeError("The KZT exchange rate must be a positive number");
+  }
+
   const baseUsd = RATES_USD[region][vehicle][period];
+  const priceUsd = Math.round(baseUsd * MARKUP[markupMode] * 100) / 100;
+  const priceKzt = Math.round(priceUsd * kztRate * 100) / 100;
 
-  const priceUsd =
-    Math.round(baseUsd * MARKUP[markupMode] * 100) / 100;
-
-  const priceKzt =
-    Math.round(priceUsd * kztRate * 100) / 100;
-
-  return {
-    usd: priceUsd,
-    kzt: priceKzt,
-  };
+  return { usd: priceUsd, kzt: priceKzt };
 }
 
 export function formatGreenCardKzt(
   value: number,
   locale = "ru-RU",
+  fractionDigits = 2,
 ): string {
   return new Intl.NumberFormat(locale, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
   }).format(value);
 }

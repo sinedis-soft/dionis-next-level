@@ -10,7 +10,7 @@ import {
   type GreenCardPeriodKey,
   type GreenCardRegionKey,
   type GreenCardVehicleKey,
-} from "@/lib/greenCardPricing";
+} from "@/lib/green-card/calculateGreenCardPrice";
 
 type Props = { dict: GreenCardPageDictionary["calculator"] };
 type NbkRateResponse = { ok: boolean; rate?: number | string; message?: string };
