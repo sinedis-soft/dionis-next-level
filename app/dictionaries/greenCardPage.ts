@@ -133,9 +133,9 @@ const ru: GreenCardPageDictionary = {
   hero: {
     title: "ЗЕЛЕНАЯ КАРТА В ЕВРОПУ И ТУРЦИЮ",
     subtitle:
-      "Международная страховка ответственности для автомобилей, зарегистрированных в Казахстане. Обязательна при въезде в страны ЕС, Турцию и другие государства.",
+      "Green Card - Международная страховка ответственности для автомобилей, зарегистрированных в Казахстане. Обязательна при въезде в страны ЕС, Турцию и другие государства.",
     priceFrom: "Цена: от {price}",
-    ctaOrder: "Заказать Зеленую карту",
+    ctaOrder: "Купить Зеленую карту",
     carAlt: "Автомобиль с полисом Зеленой карты",
     policyAlt: "Полис Зеленой карты",
     logoAlt: "Логотип Dionis Insurance Broker",
@@ -188,7 +188,7 @@ const ru: GreenCardPageDictionary = {
       vehicle: "Категория ТС",
       period: "Срок действия",
       rate: "Курс тенге за $",
-      orderEuropeLabel: "ЗАКАЗАТЬ ЗЕЛЕНУЮ КАРТУ В ЕВРОПУ",
+      orderEuropeLabel: "КУПИТЬ ЗЕЛЕНУЮ КАРТУ В ЕВРОПУ И/ИЛИ ТУРЦИЮ",
       orderEuropeHref: "/ru/green-card#green-card-order",
     },
     regionOptions: {
@@ -477,7 +477,7 @@ const en: GreenCardPageDictionary = {
   hero: {
     title: "GREEN CARD",
     subtitle:
-      "International motor third-party liability insurance for vehicles registered in Kazakhstan. Required when entering EU countries, Turkey, and other states.",
+      "Green Card - International motor third-party liability insurance for vehicles registered in Kazakhstan. Required when entering EU countries, Turkey, and other states.",
     priceFrom: "Price: from {price}",
     ctaOrder: "Order a Green Card",
     carAlt: "Car with Green Card insurance",
@@ -532,7 +532,7 @@ const en: GreenCardPageDictionary = {
       vehicle: "Vehicle category",
       period: "Policy period",
       rate: "KZT per 1 USD",
-      orderEuropeLabel: "ORDER A GREEN CARD FOR EUROPE",
+      orderEuropeLabel: "BUY A GREEN CARD FOR EUROPE OR/AND TURKY",
       orderEuropeHref: "/en/green-card#green-card-order",
     },
     regionOptions: {
@@ -821,7 +821,7 @@ const kz: GreenCardPageDictionary = {
   hero: {
     title: "ЕУРОПА МЕН ТҮРКИЯҒА ЖАСЫЛ КАРТА",
     subtitle:
-      "Қазақстанда тіркелген автокөліктерге арналған азаматтық-құқықтық жауапкершіліктің халықаралық сақтандыруы. Еуропалық Одақ елдеріне, Түркияға және басқа мемлекеттерге кіру кезінде міндетті.",
+      "Green Card - Қазақстанда тіркелген автокөліктерге арналған азаматтық-құқықтық жауапкершіліктің халықаралық сақтандыруы. Еуропалық Одақ елдеріне, Түркияға және басқа мемлекеттерге кіру кезінде міндетті.",
     priceFrom: "Бағасы: {price}-ден бастап",
     ctaOrder: "ЖАСЫЛ КАРТА рәсімдеу",
     carAlt: "Green Card полисі бар автомобиль",
@@ -878,7 +878,7 @@ const kz: GreenCardPageDictionary = {
       vehicle: "Көлік құралының санаты",
       period: "Полис мерзімі",
       rate: "1 АҚШ долларына теңге курсы",
-      orderEuropeLabel: "ЕУРОПАҒА ЖАСЫЛ КАРТА ТАПСЫРЫС БЕРУ",
+      orderEuropeLabel: "ЕУРОПАҒА ЖАСЫЛ КАРТА САТЫП АЛУ",
       orderEuropeHref: "/kz/green-card#green-card-order",
     },
     regionOptions: {
