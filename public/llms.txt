@@ -41,6 +41,7 @@ Key topics:
 - [All insurance products](https://dionis-insurance.kz/ru/products): Russian product directory for motor, property, cargo, liability, life, and medical insurance categories.
 - [Барлық сақтандыру өнімдері](https://dionis-insurance.kz/kz/products): Kazakh product directory.
 - [All insurance products in English](https://dionis-insurance.kz/en/products): English product directory.
+- [Страхование для юридических лиц и грузоперевозчиков](https://dionis-insurance.kz/ru/legal): Russian corporate transport insurance page covering Russian OSAGO for Kazakhstan legal entities, payment in tenge, accounting documents, cargo insurance, CMR carrier liability, and freight forwarder liability.
 
 ## Practical articles
 
