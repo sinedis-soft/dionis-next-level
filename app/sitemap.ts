@@ -42,6 +42,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/privacy/regulation",
   ];
 
+  // Russian corporate transport insurance landing page. Localized versions
+  // will be added after their regulated copy has been editorially approved.
+  urls.push({
+    url: `${BASE_URL}/ru/legal`,
+    lastModified: "2026-08-02",
+    changeFrequency: "monthly",
+    priority: 0.8,
+  });
+
   for (const lang of SUPPORTED_LANGS) {
     const prefix = `/${lang}`;
 
