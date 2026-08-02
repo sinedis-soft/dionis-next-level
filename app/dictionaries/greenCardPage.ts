@@ -131,10 +131,10 @@ export type GreenCardPageDictionary = {
 
 const ru: GreenCardPageDictionary = {
   hero: {
-    title: "ЗЕЛЕНАЯ КАРТА В ЕВРОПУ И ТУРЦИЮ",
+    title: "Зелёная карта для авто из Казахстана в Европу и Турцию",
     subtitle:
       "Green Card - Международная страховка ответственности для автомобилей, зарегистрированных в Казахстане. Обязательна при въезде в страны ЕС, Турцию и другие государства.",
-    priceFrom: "Цена: от {price}",
+    priceFrom: "Цена от {price} — Турция, Молдова, Украина",
     ctaOrder: "Купить Зеленую карту",
     carAlt: "Автомобиль с полисом Зеленой карты",
     policyAlt: "Полис Зеленой карты",
@@ -475,10 +475,10 @@ const ru: GreenCardPageDictionary = {
 
 const en: GreenCardPageDictionary = {
   hero: {
-    title: "GREEN CARD",
+    title: "Green Card for vehicles registered in Kazakhstan travelling to Europe and Turkey",
     subtitle:
-      "Green Card - International motor third-party liability insurance for vehicles registered in Kazakhstan. Required when entering EU countries, Turkey, and other states.",
-    priceFrom: "Price: from {price}",
+      "International motor third-party liability insurance for vehicles registered in Kazakhstan. Required when entering EU countries, Turkey, and other states.",
+    priceFrom: "Price from ₸{price} — Turkey, Moldova and Ukraine",
     ctaOrder: "Order a Green Card",
     carAlt: "Car with Green Card insurance",
     policyAlt: "Green Card policy sample",
@@ -507,19 +507,19 @@ const en: GreenCardPageDictionary = {
     cards: {
       passengerEurope: {
         vehicle: "Passenger car",
-        territory: "Europe + Türkiye",
+        territory: "Europe + Turkey",
       },
       passengerRegional: {
         vehicle: "Passenger car",
-        territory: "Türkiye + Moldova + Ukraine",
+        territory: "Turkey + Moldova + Ukraine",
       },
       truckEurope: {
         vehicle: "Truck",
-        territory: "Europe + Türkiye",
+        territory: "Europe + Turkey",
       },
       truckRegional: {
         vehicle: "Truck",
-        territory: "Türkiye + Moldova + Ukraine",
+        territory: "Turkey + Moldova + Ukraine",
       },
     },
   },
@@ -819,10 +819,10 @@ const en: GreenCardPageDictionary = {
 
 const kz: GreenCardPageDictionary = {
   hero: {
-    title: "ЕУРОПА МЕН ТҮРКИЯҒА ЖАСЫЛ КАРТА",
+    title: "Қазақстанда тіркелген автокөліктерге Еуропа мен Түркияға арналған Жасыл карта",
     subtitle:
       "Green Card - Қазақстанда тіркелген автокөліктерге арналған азаматтық-құқықтық жауапкершіліктің халықаралық сақтандыруы. Еуропалық Одақ елдеріне, Түркияға және басқа мемлекеттерге кіру кезінде міндетті.",
-    priceFrom: "Бағасы: {price}-ден бастап",
+    priceFrom: "Бағасы {price} ₸-ден бастап — Түркия, Молдова, Украина",
     ctaOrder: "ЖАСЫЛ КАРТА рәсімдеу",
     carAlt: "Green Card полисі бар автомобиль",
     policyAlt: "Green Card полисінің үлгісі",

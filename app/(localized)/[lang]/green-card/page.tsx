@@ -209,10 +209,10 @@ export default async function GreenCardPage({
           : "Green Card insurance for vehicles from Kazakhstan",
     description:
       lang === "ru"
-        ? "Оформление международного полиса «Зелёная карта» для поездок за границу на автомобиле из Казахстана."
+        ? "Покупка online международного полиса «GREEN CARD» для поездок за границу на казахстанском авто."
         : lang === "kz"
-          ? "Қазақстаннан шетелге сапарлар үшін халықаралық Жасыл карта полисін рәсімдеу."
-          : "International Green Card liability insurance for trips abroad with a vehicle from Kazakhstan.",
+          ? "Қазақстандық автокөлікпен шетелге шығу үшін халықаралық «GREEN CARD» сақтандыру полисін онлайн сатып алу."
+          : "Buy an international GREEN CARD insurance policy online for travelling abroad in a vehicle from Kazakhstan.",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@id": `${SITE_URL}/#insurance-broker` },
     inLanguage: langToIana(lang),
@@ -256,18 +256,18 @@ export default async function GreenCardPage({
       "Для авто из Казахстана",
       "ЕС, Турция и страны системы",
       "Стоимость до оплаты",
-      "Покупка ONLINE",
-      "Сроки: 1 месяц, 3 месяца, 6 месяцев, 12 месяцев",
-      "Страховая компания: PAŞA Sığorta",
+      "Онлайн-оформление",
+      "Срок: 1, 3, 6 или 12 месяцев",
+      "Страховщик: PAŞA Sığorta",
       "Электронный полис «Зелёная карта» в формате PDF",
     ],
     kz: [
       "Қазақстанда тіркелген автокөліктер үшін",
       "ЕО, Түркия және жүйеге қатысушы елдер",
       "Төлем жасалғанға дейінгі нақты құны",
-      "Онлайн сатып алу",
-      "Мерзімдері: 1 ай, 3 ай, 6 ай, 12 ай",
-      "Сақтандыру компаниясы: PAŞA Sığorta",
+      "Онлайн рәсімдеу",
+      "Мерзімі: 1, 3, 6 немесе 12 ай",
+      "Сақтандырушы: PAŞA Sığorta",
       "PDF форматындағы электрондық «Жасыл карта» полисі",
     ],
 
@@ -275,9 +275,9 @@ export default async function GreenCardPage({
       "For vehicles registered in Kazakhstan",
       "The EU, Türkiye, and participating countries",
       "The exact price before payment",
-      "Purchase online",
-      "Policy periods: 1 month, 3 months, 6 months, or 12 months",
-      "Insurance company: PAŞA Sığorta",
+      "Online application",
+      "Term: 1, 3, 6, or 12 months",
+      "Insurer: PAŞA Sığorta",
       "Electronic Green Card policy in PDF format",
     ],
   };
