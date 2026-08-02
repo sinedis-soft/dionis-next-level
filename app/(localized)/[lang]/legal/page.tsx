@@ -1,94 +1,135 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+// app/[lang]/legal/page.tsx
+export const dynamic = "force-static";
+export const dynamicParams = false;
 
-import Breadcrumbs from "@/components/Breadcrumbs";
+import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
 
-import styles from "./page.module.css";
+import {
+  getLegalDictionary,
+  type LegalDictionary,
+} from "@/dictionaries/legal";
+import { buildAlternates } from "@/lib/seoAlternates";
 
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.kz").replace(/\/$/, "");
-const title = "Страхование для грузоперевозчиков и юридических лиц в Казахстане | Дионис";
-const description = "Российское ОСАГО для автомобилей юридических лиц и нерезидентов, оплата в тенге и документы для бухгалтерии. Страхование грузов, CMR и ответственности экспедитора.";
+import LegalPage from "@/components/LegalPage";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
-const faq = [
-  ["Можно ли оплатить российское ОСАГО в тенге?", "Да. Казахстанское юридическое лицо может получить счёт и произвести оплату в тенге по согласованной схеме оформления."],
-  ["Нужно ли передавать водителю наличные?", "Нет. Компания может самостоятельно оплатить страховку безналичным способом. Водителю не потребуется искать страховой офис в России или оплачивать полис собственными деньгами."],
-  ["Получит ли компания документы для бухгалтерии?", "Да. Перечень документов согласовывается до оплаты и зависит от выбранного страхового продукта и схемы оформления."],
-  ["Можно ли оформить ОСАГО сразу на несколько автомобилей?", "Да. Для автопарка можно направить единый список транспортных средств. Каждый автомобиль и прицеп при необходимости страхуются отдельным полисом."],
-  ["Российское ОСАГО покрывает перевозимый груз?", "Нет. ОСАГО покрывает гражданскую ответственность владельца транспортного средства перед третьими лицами. Для защиты груза оформляется отдельный договор страхования груза."],
-  ["Чем отличается страхование груза от страхования ответственности перевозчика?", "Страхование груза защищает имущественные интересы владельца груза. Страхование CMR защищает ответственность перевозчика при предъявлении к нему обоснованных требований."],
-  ["Может ли экспедитор оформить полис ответственности без собственных автомобилей?", "Да. Ответственность экспедитора может страховаться отдельно от ответственности фактического перевозчика."],
-] as const;
+const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.kz"
+).replace(/\/$/, "");
 
-export const dynamicParams = false;
-export function generateStaticParams(): Array<{ lang: Lang }> { return [{ lang: "ru" }]; }
+const ALLOWED_LANGS: Lang[] = ["ru", "kz", "en"];
 
-export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
-  const { lang } = await params;
-  if (lang !== "ru") return {};
-  const url = `${SITE_URL}/ru/legal`;
-  return { title, description, alternates: { canonical: url }, openGraph: { type: "website", url, title, description, locale: "ru_RU" } };
+function normalizeLang(value: string): Lang {
+  return (ALLOWED_LANGS as readonly string[]).includes(value)
+    ? (value as Lang)
+    : "ru";
 }
 
-const bullets = (items: readonly string[]) => <ul>{items.map((item) => <li key={item}>{item}</li>)}</ul>;
+export function generateStaticParams(): Array<{ lang: Lang }> {
+  return ALLOWED_LANGS.map((lang) => ({ lang }));
+}
 
-export default async function LegalTransportInsurancePage({ params }: { params: Promise<{ lang: string }> }) {
-  const { lang } = await params;
-  if (lang !== "ru") notFound();
-  const quoteHref = "/ru/contacts?subject=business-transport-insurance";
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang: rawLang } = await params;
+  const lang = normalizeLang(rawLang);
+
+  const dictionary = getLegalDictionary(lang);
+  const pagePath = `/${dictionary.route.slug}`;
+  const pageUrl = `${SITE_URL}/${lang}${pagePath}`;
+
+  return {
+    title: dictionary.seo.title,
+    description: dictionary.seo.description,
+    alternates: buildAlternates(lang, pagePath),
+    openGraph: {
+      type: "website",
+      url: pageUrl,
+      title: dictionary.seo.title,
+      description: dictionary.seo.description,
+      locale: dictionary.seo.openGraphLocale,
+    },
+  };
+}
+
+export default async function Page({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}) {
+  const { lang: rawLang } = await params;
+  const lang = normalizeLang(rawLang);
+
+  const dictionary: LegalDictionary = getLegalDictionary(lang);
+  const pageUrl = `${SITE_URL}/${lang}/${dictionary.route.slug}`;
+  const quoteHref =
+    `/${lang}/contacts?subject=${dictionary.route.quoteSubject}`;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
-      { "@type": "Service", name: "Страхование для юридических лиц и грузоперевозчиков", provider: { "@id": `${SITE_URL}/#insurance-broker` }, areaServed: { "@type": "Country", name: "Kazakhstan" }, url: `${SITE_URL}/ru/legal`, description },
-      { "@type": "FAQPage", mainEntity: faq.map(([name, text]) => ({ "@type": "Question", name, acceptedAnswer: { "@type": "Answer", text } })) },
+      {
+        "@type": "Service",
+        name: dictionary.schema.serviceName,
+        provider: {
+          "@id": `${SITE_URL}/#insurance-broker`,
+        },
+        areaServed: {
+          "@type": "Country",
+          name: dictionary.schema.countryName,
+        },
+        url: pageUrl,
+        description: dictionary.seo.description,
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: dictionary.faq.items.map(
+          ({ question, answer }) => ({
+            "@type": "Question",
+            name: question,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: answer,
+            },
+          })
+        ),
+      },
     ],
   };
 
-  return <main className={styles.page}>
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-    <section className={styles.hero}>
-      <div className={styles.container}>
-        <Breadcrumbs lang="ru" items={[{ label: "Главная", href: "/ru" }, { label: "Страхование для бизнеса" }]} />
-        <div className={styles.heroGrid}>
-          <div>
-            <p className={styles.eyebrow}>Страховые решения для транспортного бизнеса</p>
-            <h1 className={styles.title}>Страхование для юридических лиц и грузоперевозчиков</h1>
-            <p className={styles.lead}>Оформляем полисы для транспортных, логистических и экспедиторских компаний Казахстана: для автомобилей, грузов и ответственности на маршрутах по Казахстану, России, СНГ и другим странам.</p>
-            <p className={styles.promise}><strong>Оплата в тенге. Без передачи наличных водителю. С документами для бухгалтерского учёта.</strong></p>
-            <div className={styles.actions}><Link className={styles.primary} href={quoteHref}>Рассчитать страховку для компании</Link><a className={styles.secondary} href="tel:+77273573030">Связаться со страховым брокером</a></div>
-          </div>
-          <aside className={styles.heroCard} aria-label="Основные преимущества"><strong>Компания получает</strong><ul><li>предварительную проверку маршрута и документов</li><li>счёт и безналичную оплату в тенге</li><li>электронный полис и согласованный комплект документов</li></ul></aside>
-        </div>
+  return (
+    <main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+
+      <div className="gc-container legal-breadcrumbs">
+        <Breadcrumbs
+          lang={lang}
+          items={[
+            {
+              label: dictionary.breadcrumbs.home,
+              href: `/${lang}`,
+            },
+            {
+              label: dictionary.breadcrumbs.current,
+            },
+          ]}
+        />
       </div>
-    </section>
 
-    <section className={styles.section} id="osago"><div className={styles.container}>
-      <header className={styles.sectionHeader}><p className={styles.eyebrow}>Основной продукт</p><h2>Российское ОСАГО для автомобилей юридических лиц</h2><p>Перед въездом или началом работы автомобиля в России нужно проверить наличие действующего российского ОСАГО: казахстанский полис обязательного автострахования на территории РФ не действует.</p></header>
-      <div className={styles.contentGrid}>
-        <article className={styles.card}><h3>Для каких автомобилей</h3><p>Оформляем российское ОСАГО для автомобилей с казахстанскими регистрационными номерами, принадлежащих юридическим лицам и ИП.</p>{bullets(["грузовые автомобили и тягачи", "прицепы и полуприцепы", "автобусы", "легковые служебные автомобили", "автомобили транспортных и логистических компаний", "транспорт в аренде или лизинге"])}</article>
-        <article className={styles.card}><h3>Оплата непосредственно компанией</h3><p>Страховку можно оплатить от имени юридического лица в тенге. Не потребуется искать российскую карту, использовать неофициальные обменные схемы, переводить деньги водителю или самостоятельно искать страховщика в России.</p><p>Мы организуем оформление и предоставим документы для бухгалтерии.</p></article>
-        <article className={styles.card}><h3>Документы для бухгалтерского учёта</h3>{bullets(["страховой полис", "счёт на оплату", "договор или заявление, если предусмотрено процедурой", "акт оказанных услуг или иной закрывающий документ", "электронные копии документов"])}</article>
-        <article className={styles.card}><h3>Данные для предварительного расчёта</h3>{bullets(["свидетельство о регистрации и БИН компании", "адрес и банковские реквизиты", "свидетельство о регистрации и сведения о собственнике автомобиля", "госномер, марка, модель, год выпуска и мощность", "период страхования", "сведения о водителях для полиса с ограничениями"])}</article>
-      </div>
-      <div className={styles.note}>Состав документов зависит от продукта, страховой компании и схемы оформления. До оплаты мы согласуем перечень с вашей бухгалтерией. Точный набор данных зависит от категории автомобиля и условий страховщика.</div>
-      <h3>Как оформить российское ОСАГО</h3><ol className={styles.steps}><li>Направить документы на автомобиль и данные страхователя.</li><li>Получить расчёт стоимости.</li><li>Получить счёт в тенге.</li><li>Оплатить счёт безналично.</li><li>Получить электронный полис и документы.</li></ol>
-      <Link className={styles.sectionCta} href={quoteHref}>Рассчитать ОСАГО для компании</Link>
-    </div></section>
-
-    <section className={`${styles.section} ${styles.sectionAlt}`}><div className={styles.container}><header className={styles.sectionHeader}><h2>Дополнительные решения для транспортного бизнеса</h2><p>Подбираем отдельный полис под автомобиль, груз или ответственность. Один вид страхования не заменяет другой.</p></header><div className={styles.contentGrid}>
-      <article className={styles.card}><h3>Зелёная карта для международных поездок</h3><p>Международный полис гражданской ответственности может потребоваться в странах системы Green Card — с учётом маршрута, регистрации автомобиля и действующих правил въезда.</p>{bullets(["проверим необходимость полиса по маршруту", "уточним территорию и срок действия", "подготовим документы юридического лица", "организуем оплату в тенге"])}<div className={styles.note}>До оформления отдельно проверяется каждая страна маршрута: один полис может действовать не на всём пути.</div></article>
-      <article className={styles.card}><h3>Страхование грузов</h3><p>Защищает имущественные интересы владельца товара при повреждении, гибели или утрате груза. Возможно страхование одной или нескольких перевозок либо генеральный договор.</p>{bullets(["перевозки по Казахстану, импорт и экспорт", "автомобильные, железнодорожные, морские, авиационные и мультимодальные маршруты", "оборудование, материалы, продукты, электроника, техника, сырьё, контейнерные и сборные грузы"])}<p>Для расчёта нужны стоимость и характеристики груза, маршрут, перевозчик, транспорт и условия перевозки.</p></article>
-      <article className={styles.card}><h3>Ответственность перевозчика по CMR</h3><p>Полис может защищать перевозчика при требованиях из-за утраты, недостачи или повреждения груза в международной автоперевозке — в пределах Конвенции CMR, договора и применимого права.</p>{bullets(["география и направления", "автопарк и виды грузов", "оборот и максимальная стоимость груза в машине", "субподрядчики и история убытков", "лимит ответственности и специальные грузы"])}<div className={styles.note}>Ответственность перевозчика и сам груз — разные объекты страхования. CMR не заменяет страхование груза.</div></article>
-      <article className={styles.card}><h3>Ответственность экспедитора</h3><p>Для компаний, которые организуют перевозки, выбирают перевозчиков, оформляют документы и координируют доставку.</p>{bullets(["утрата или повреждение груза", "ошибка при выборе перевозчика или оформлении документов", "нарушение инструкции клиента или просрочка", "ошибка маршрута или выдача ненадлежащему получателю", "действия субподрядчиков и связанные расходы"])}<p>Не все риски входят в каждый полис. Объём покрытия определяется правилами страховщика. Для расчёта нужны оборот, география, виды грузов, договоры и история претензий.</p></article>
-    </div></div></section>
-
-    <section className={styles.section}><div className={styles.container}><header className={styles.sectionHeader}><h2>Почему компании обращаются в «Дионис»</h2></header><div className={styles.benefits}>{[["Работа с юрлицами","Учитываем требования транспортной компании, бухгалтерии и руководителя."],["Оплата в тенге","Без иностранной карты и передачи наличных водителю."],["Бухгалтерские документы","Согласуем состав документов до оплаты."],["Комплексное страхование","Авто, грузы и ответственность через одного брокера."],["Предварительная проверка","Проверяем маршрут, документы и категорию транспорта."],["Сопровождение","Объясняем условия и порядок действий при страховом событии."]].map(([heading,text]) => <article className={styles.benefit} key={heading}><h3>{heading}</h3><p>{text}</p></article>)}</div></div></section>
-
-    <section className={`${styles.section} ${styles.sectionAlt}`} id="quote"><div className={styles.container}><header className={styles.sectionHeader}><h2>Получить предложение для компании</h2><p>Для первого расчёта достаточно сообщить название и БИН компании, контактное лицо, вид страхования, количество автомобилей, страны перевозок, типы грузов и желаемый период. Мы уточним недостающие данные и подготовим предложение.</p><Link className={styles.sectionCta} href={quoteHref}>Получить расчёт</Link></header></div></section>
-
-    <section className={styles.section}><div className={styles.container}><header className={styles.sectionHeader}><h2>Частые вопросы</h2></header><div className={styles.faq}>{faq.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div></div></section>
-
-    <section className={styles.disclaimer}><div className={styles.container}><h2>Важная информация</h2><p>Условия, территория действия, страховые риски, исключения, лимиты ответственности и перечень документов определяются договором и правилами конкретной страховой компании.</p><p>Информация на странице не является страховым полисом, гарантией страхового покрытия или окончательным коммерческим предложением.</p><p><strong>ТОО «Страховой брокер Дионис»</strong><br />Страховые решения для перевозчиков, экспедиторов и юридических лиц Казахстана.</p></div></section>
-  </main>;
+      <LegalPage
+        lang={lang}
+        dictionary={dictionary}
+        quoteHref={quoteHref}
+      />
+    </main>
+  );
 }

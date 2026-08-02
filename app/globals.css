@@ -5766,3 +5766,300 @@ input.field:focus, select.field:focus, textarea.field:focus{
 @media (min-width:768px){.osago-price__cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (min-width:1024px){.osago-price__cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:640px){.osago-price-card .btn{width:100%}.osago-price-card__price{font-size:1.45rem}}
+
+/* =========================================================
+   LEGAL / BUSINESS TRANSPORT INSURANCE PAGE
+   Использует существующие глобальные gc-, card-, btn- классы
+   ========================================================= */
+
+.legal-eyebrow {
+  margin: 0 0 14px;
+  color: var(--brand-blue);
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.legal-promise {
+  max-width: 720px;
+  margin-top: 22px;
+  padding: 14px 16px;
+  border-left: 4px solid var(--brand-gold-ui);
+  border-radius: 0 12px 12px 0;
+  background: rgba(235, 202, 69, 0.13);
+  color: var(--brand-blue-dark);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+/* Правая карточка hero */
+
+.legal-hero-card {
+  max-width: 520px;
+  width: 100%;
+  justify-self: center;
+  background: var(--brand-blue);
+  background-image: var(--blue-grad);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 24px 60px rgba(15, 34, 56, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.12) inset;
+}
+
+.legal-hero-card:hover,
+.legal-hero-card:focus-within {
+  transform: none;
+  box-shadow:
+    0 28px 70px rgba(15, 34, 56, 0.27),
+    0 1px 0 rgba(255, 255, 255, 0.16) inset;
+}
+
+.legal-hero-card .card-title {
+  color: #fff;
+  font-size: 21px;
+}
+
+.legal-check-list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legal-check-list li {
+  position: relative;
+  padding-left: 28px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.legal-check-list li::before {
+  content: "✓";
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--brand-gold-ui);
+  font-size: 17px;
+  font-weight: 900;
+}
+
+/* Заголовки секций */
+
+.legal-section-header {
+  max-width: 840px;
+  margin-bottom: 30px;
+}
+
+.legal-section-title-left {
+  text-align: left;
+}
+
+.legal-section-intro-left {
+  max-width: 820px;
+  margin-left: 0;
+  text-align: left;
+}
+
+.legal-section-note {
+  margin-top: 24px;
+  border-left: 4px solid var(--brand-gold-ui);
+  border-radius: 0 12px 12px 0;
+  line-height: 1.6;
+}
+
+/* Карточки */
+
+.legal-grid {
+  gap: 20px;
+  align-items: stretch;
+}
+
+.legal-grid > .card {
+  height: 100%;
+}
+
+.legal-list {
+  display: grid;
+  gap: 8px;
+  margin: 2px 0 0;
+  padding-left: 20px;
+  color: rgba(0, 0, 0, 0.7);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.legal-list li::marker {
+  color: var(--brand-gold-text);
+}
+
+.legal-benefits-grid {
+  gap: 20px;
+  align-items: stretch;
+}
+
+.legal-benefits-grid > .card {
+  height: 100%;
+}
+
+/* Этапы оформления */
+
+.legal-steps-block {
+  margin-top: 34px;
+}
+
+.legal-steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legal-steps li {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.legal-step-number {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--brand-blue-dark);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.legal-section-cta {
+  margin-top: 26px;
+}
+
+/* Блок заявки */
+
+.legal-quote-card {
+  max-width: 900px;
+  border-left: 5px solid var(--brand-gold-ui);
+}
+
+/* FAQ */
+
+.legal-faq {
+  max-width: 920px;
+}
+
+.legal-faq summary {
+  list-style: none;
+}
+
+.legal-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.legal-faq details[open] .faq-acc__sign {
+  transform: rotate(45deg);
+}
+
+.legal-faq .faq-acc__sign {
+  transition: transform 180ms ease;
+}
+
+/* Disclaimer */
+
+.legal-disclaimer {
+  padding: 48px 0;
+  background: var(--brand-blue-dark);
+  color: #fff;
+}
+
+.legal-disclaimer__title {
+  margin: 0;
+  color: #fff;
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 900;
+}
+
+.legal-disclaimer__text {
+  max-width: 920px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* Адаптивность */
+
+@media (min-width: 1024px) {
+  .legal-hero-card {
+    justify-self: end;
+  }
+}
+
+@media (max-width: 1023px) {
+  .legal-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .legal-hero-card {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 760px) {
+  .legal-grid,
+  .legal-benefits-grid,
+  .legal-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .legal-promise {
+    font-size: 15px;
+  }
+
+  .legal-hero-card {
+    max-width: none;
+  }
+
+  .legal-section-header {
+    margin-bottom: 24px;
+  }
+
+  .legal-section-cta {
+    width: 100%;
+    height: auto;
+    min-height: var(--btn-h);
+    padding: 12px 16px;
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .legal-promise {
+    background: rgba(235, 202, 69, 0.1);
+    color: #f3f4f6;
+  }
+
+  .legal-list,
+  .legal-steps li {
+    color: rgba(255, 255, 255, 0.76);
+  }
+
+  .legal-quote-card {
+    background: #111;
+  }
+}

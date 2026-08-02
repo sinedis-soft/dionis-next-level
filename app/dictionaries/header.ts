@@ -8,6 +8,7 @@ export const HEADER_DICTIONARY: Record<
     insurances: string;
     greenCard: string;
     osagoRu: string;
+    forlegal: string;
     allProducts: string;
     blog: string;
     contacts: string;
@@ -28,6 +29,7 @@ export const HEADER_DICTIONARY: Record<
     insurances: "Страхование",
     greenCard: "Зелёная карта",
     osagoRu: "ОСАГО для поездки в Россию",
+    forlegal:"Страхование для грузоперевозчиков",
     allProducts: "Все страховые продукты",
     blog: "Блог",
     contacts: "Контакты",
@@ -48,6 +50,7 @@ export const HEADER_DICTIONARY: Record<
     insurances: "Сақтандыру",
     greenCard: "Жасыл карта",
     osagoRu: "Ресейге баруға арналған ОСАГО",
+    forlegal: "Жүк тасымалдаушыларға арналған сақтандыру",
     allProducts: "Барлық сақтандыру өнімдері",
     blog: "Блог",
     contacts: "Байланыс",
@@ -68,6 +71,7 @@ export const HEADER_DICTIONARY: Record<
     insurances: "Insurance",
     greenCard: "Green Card",
     osagoRu: "OSAGO for travel to Russia",
+    forlegal: "Insurance for Freight Carriers",
     allProducts: "All insurance products",
     blog: "Blog",
     contacts: "Contacts",

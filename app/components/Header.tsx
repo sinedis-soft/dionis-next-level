@@ -194,6 +194,16 @@ export default function Header({ lang }: { lang: Lang }) {
                   </Link>
 
                   <Link
+                    href={`${base}/legal`}
+                    className={cx("hdr__dditem", isActive(`${base}/legal`) && "is-active")}
+                    role="menuitem"
+                    aria-current={isActive(`${base}/legal`) ? "page" : undefined}
+                    onClick={() => setInsuranceDesktopOpen(false)}
+                  >
+                    {t.forlegal}
+                  </Link>
+
+                  <Link
                     href={`${base}/products`}
                     className={cx("hdr__dditem", isActive(`${base}/products`) && "is-active")}
                     role="menuitem"
@@ -306,6 +316,9 @@ export default function Header({ lang }: { lang: Lang }) {
                       </Link>
                       <Link href={`${base}/osago-rf`} className={cx("mnav__sublink", isActive(`${base}/osago-rf`) && "is-active")} aria-current={isActive(`${base}/osago-rf`) ? "page" : undefined} onClick={() => setMenuOpen(false)}>
                         {t.osagoRu}
+                      </Link>
+                      <Link href={`${base}/legal`} className={cx("mnav__sublink", isActive(`${base}/legal`) && "is-active")} aria-current={isActive(`${base}/legal`) ? "page" : undefined} onClick={() => setMenuOpen(false)}>
+                        {t.forlegal}
                       </Link>
                       <Link href={`${base}/products`} className={cx("mnav__sublink", isActive(`${base}/products`) && "is-active")} aria-current={isActive(`${base}/products`) ? "page" : undefined} onClick={() => setMenuOpen(false)}>
                         {t.allProducts}
