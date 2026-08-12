@@ -14,6 +14,7 @@ import CookieConsent from "@/components/CookieConsent";
 
 import AnalyticsScripts from "@/components/AnalyticsScripts";
 import AnalyticsManager from "@/components/AnalyticsManager";
+import BitrixOpenLineWidget from "@/components/BitrixOpenLineWidget";
 
 const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL || "https://dionis-insurance.kz"
@@ -159,6 +160,7 @@ export default async function LangLayout({
 
         <SiteFooter lang={lang} />
         <CookieConsent lang={lang} />
+        <BitrixOpenLineWidget />
       </body>
     </html>
   );
