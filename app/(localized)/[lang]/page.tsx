@@ -16,6 +16,7 @@ import {
   formatOsagoHeroPriceKzt,
   getOsagoHeroPriceKzt,
 } from "@/lib/osago-rf/getHeroPrice";
+import { getGreenCardHeroPrice } from "@/lib/green-card/getHeroPrice";
 
 export function generateStaticParams(): Array<{ lang: Lang }> {
   return [{ lang: "ru" }, { lang: "kz" }, { lang: "en" }];
@@ -64,14 +65,32 @@ export default async function Page({
 
   const t: HomeDictionary = getHomeDictionary(lang);
   const agreement: AgreementDictionary = getAgreementDictionary(lang);
-  let osagoPrice: string | null = null;
+  const [osagoResult, greenCardResult] = await Promise.allSettled([
+    getOsagoHeroPriceKzt(3600),
+    getGreenCardHeroPrice(28800),
+  ]);
 
-  try {
-    const priceKzt = await getOsagoHeroPriceKzt(3600);
-    osagoPrice = formatOsagoHeroPriceKzt(priceKzt, lang);
-  } catch (error) {
-    console.error("OSAGO home price calculation failed", error);
+  const osagoPrice = osagoResult.status === "fulfilled"
+    ? formatOsagoHeroPriceKzt(osagoResult.value, lang)
+    : null;
+  const greenCardPrice = greenCardResult.status === "fulfilled"
+    ? greenCardResult.value
+    : null;
+
+  if (osagoResult.status === "rejected") {
+    console.error("OSAGO home price calculation failed", osagoResult.reason);
+  }
+  if (greenCardResult.status === "rejected") {
+    console.error("Green Card home price calculation failed", greenCardResult.reason);
   }
 
-  return <HomeClient lang={lang} t={t} agreement={agreement} osagoPrice={osagoPrice} />;
+  return (
+    <HomeClient
+      lang={lang}
+      t={t}
+      agreement={agreement}
+      osagoPrice={osagoPrice}
+      greenCardPrice={greenCardPrice}
+    />
+  );
 }

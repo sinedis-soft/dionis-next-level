@@ -20,6 +20,7 @@ type Props = {
   t: HomeDictionary;
   agreement: AgreementDictionary;
   osagoPrice: string | null;
+  greenCardPrice: string | null;
 };
 
 /* локальный helper */
@@ -112,10 +113,19 @@ function BenefitIcon({ index }: { index: number }) {
   }
 }
 
-export default function HomeClient({ lang, t, agreement, osagoPrice }: Props) {
+export default function HomeClient({
+  lang,
+  t,
+  agreement,
+  osagoPrice,
+  greenCardPrice,
+}: Props) {
   const greenCardLink = `/${lang}/green-card`;
   const osagoLink = `/${lang}/osago-rf`;
   const productsLink = `/${lang}/products`;
+  const greenCardPriceLabel = greenCardPrice
+    ? t.services.greenCardCard.price.replace("{price}", greenCardPrice)
+    : null;
   const osagoPriceLabel = osagoPrice
     ? t.services.osagoCard.price.replace("{price}", osagoPrice)
     : null;
@@ -332,9 +342,11 @@ export default function HomeClient({ lang, t, agreement, osagoPrice }: Props) {
                 </div>
 
                 <div className="hp-serviceCard__meta">
-                  <span className="hp-serviceCard__price">
-                    {t.services.greenCardCard.price}
-                  </span>
+                  {greenCardPriceLabel && (
+                    <span className="hp-serviceCard__price">
+                      {greenCardPriceLabel}
+                    </span>
+                  )}
                   <span className="hp-serviceCard__term">
                     {t.services.greenCardCard.term}
                   </span>
