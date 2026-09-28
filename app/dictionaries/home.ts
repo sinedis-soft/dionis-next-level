@@ -293,7 +293,7 @@ const ru: HomeDictionary = {
         "Обязательное страхование гражданской ответственности для въезда в Россию на иностранном транспорте.",
       text2:
         "Работаем с физическими лицами, юридическими лицами и перевозчиками. Помогаем оформить без лишней бюрократии.",
-      price: "от 9 000 ₸",
+      price: "от {price}",
       term: "от 15 дней",
       cta: "Подробнее об ОСАГО РФ",
       imageAlt: "ОСАГО РФ для въезда в Россию",
@@ -575,7 +575,7 @@ const kz: HomeDictionary = {
         "Шетелдік көлік құралымен Ресейге кіру үшін азаматтық-құқықтық жауапкершілікті міндетті сақтандыру.",
       text2:
         "Жеке тұлғалармен, заңды тұлғалармен және тасымалдаушылармен жұмыс істейміз. Артық бюрократиясыз сақтандыруды рәсімдеуге көмектесеміз.",
-      price: "9 000 ₸-ден бастап",
+      price: "{price}-ден бастап",
       term: "15 күннен бастап",
       cta: "РФ ОСАГО туралы толығырақ",
       imageAlt: "Ресейге кіруге арналған РФ ОСАГО",
@@ -854,7 +854,7 @@ const en: HomeDictionary = {
         "Mandatory third-party liability insurance for entering Russia with a foreign-registered vehicle.",
       text2:
         "We work with individuals, legal entities, and carriers. We help arrange the insurance without unnecessary bureaucracy.",
-      price: "from ₸9,000",
+      price: "from {price}",
       term: "from 15 days",
       cta: "Learn more about Russian OSAGO",
       imageAlt: "Russian OSAGO insurance for entry into Russia",
