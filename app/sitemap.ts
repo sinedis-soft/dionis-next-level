@@ -17,11 +17,13 @@ const BASE_URL = (
 
 const SUPPORTED_LANGS: Lang[] = ["ru", "kz", "en"];
 
-/*
-  Стабильная дата для статических страниц.
-  Меняется только вручную.
-*/
-const STATIC_LASTMOD = "2026-05-08";
+// Set only for routes with a verified, meaningful content update.
+// Keep this in sync with the published page, not every repository commit.
+const PAGE_LASTMOD: Record<string, string> = {
+  "": "2026-09-28",
+  "/green-card": "2026-09-28",
+  "/osago-rf": "2026-09-28",
+};
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const urls: MetadataRoute.Sitemap = [];
@@ -57,7 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const route of staticRoutes) {
       urls.push({
         url: `${BASE_URL}${prefix}${route}`,
-        lastModified: STATIC_LASTMOD,
+        ...(PAGE_LASTMOD[route] ? { lastModified: PAGE_LASTMOD[route] } : {}),
         changeFrequency:
           route === "" ||
           route === "/green-card" ||
@@ -106,7 +108,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const lang of SUPPORTED_LANGS) {
       urls.push({
         url: `${BASE_URL}/${lang}/authors/${author.slug}`,
-        lastModified: STATIC_LASTMOD,
         changeFrequency: "monthly",
         priority: 0.5,
       });
