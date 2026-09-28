@@ -281,7 +281,7 @@ const ru: HomeDictionary = {
         "Полис международного автострахования для выезда за границу. Работаем с перевозчиками и частными лицами.",
       text2:
         "Для казахстанских авто. Подберём срок и территорию действия под ваш маршрут.",
-      price: "от $74",
+      price: "от {price}",
       term: "от 30 дней",
       cta: "Подробнее о Зелёной карте",
       imageAlt: "Зелёная карта для выезда за границу",
@@ -563,7 +563,7 @@ const kz: HomeDictionary = {
         "Шетелге шығуға арналған халықаралық автосақтандыру полисі. Жеке тұлғалармен және тасымалдаушылармен жұмыс істейміз.",
       text2:
         "Қазақстандық көліктер үшін. Маршрутыңызға сәйкес мерзім мен аумақты таңдап береміз.",
-      price: "74$ бастап",
+      price: "{price}-ден бастап",
       term: "30 күннен бастап",
       cta: "Жасыл карта туралы толығырақ",
       imageAlt: "Шетелге шығуға арналған Жасыл карта",
@@ -842,7 +842,7 @@ const en: HomeDictionary = {
         "International motor third-party liability insurance for travelling abroad. We work with carriers and individuals.",
       text2:
         "For Kazakh vehicles. We will select coverage period and territory to match your route.",
-      price: "from $74",
+      price: "from {price}",
       term: "from 30 days",
       cta: "Learn more about Green Card",
       imageAlt: "Green Card insurance for travelling abroad",
