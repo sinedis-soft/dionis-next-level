@@ -586,6 +586,14 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
+        <section className="gc-section">
+          <div className="gc-container">
+            <div className="legacy-form-scope legacy-form-card">
+              <WhatsAppCall dict={whatsappCallDict} />
+            </div>
+          </div>
+        </section>
+
         <section className="gc-section" id="osago-rf-calculator">
           <div className="gc-container">
             <div className="legacy-form-scope legacy-form-card">
@@ -829,13 +837,7 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
-        <section className="gc-section">
-          <div className="gc-container">
-            <div className="legacy-form-scope legacy-form-card">
-              <WhatsAppCall dict={whatsappCallDict} />
-            </div>
-          </div>
-        </section>
+        
 
         <FAQSection dict={osagoPageDict.faq} />
         <BrokerSection broker={homeDict.broker} />

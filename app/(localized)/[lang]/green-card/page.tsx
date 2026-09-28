@@ -397,6 +397,14 @@ export default async function GreenCardPage({
           lang={lang}
         />
 
+        <section className="gc-section">
+          <div className="gc-container">
+            <div className="legacy-form-scope legacy-form-card">
+              <WhatsAppCall dict={whatsappCallDict} />
+            </div>
+          </div>
+        </section>
+
         <GreenCardInfoBlocks dict={gcPageDict} />
 
         <section className="gc-section" id="green-card-calculator">
@@ -603,13 +611,7 @@ export default async function GreenCardPage({
           </section>
         </DeferredHydration>
 
-        <section className="gc-section">
-          <div className="gc-container">
-            <div className="legacy-form-scope legacy-form-card">
-              <WhatsAppCall dict={whatsappCallDict} />
-            </div>
-          </div>
-        </section>
+        
 
         <section className="gc-section gc-section--muted">
           <div className="gc-container">
