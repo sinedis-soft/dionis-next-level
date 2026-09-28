@@ -70,6 +70,16 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(canonicalUrl, 301);
   }
 
+  // Keep links to the original Unicode slug working after the article URL changes.
+  if (
+    pathname === "/kz/blog/2026-jılı-qazaqstannan-ewropaga-kolikpen" ||
+    pathname === "/kz/blog/2026-j%C4%B1l%C4%B1-qazaqstannan-ewropaga-kolikpen"
+  ) {
+    const destination = request.nextUrl.clone();
+    destination.pathname = "/kz/blog/2026-jili-qazaqstannan-ewropaga-kolikpen";
+    return NextResponse.redirect(destination, 301);
+  }
+
   if (shouldSkip(pathname)) return NextResponse.next();
 
   const selectedLang = request.cookies.get(LANGUAGE_COOKIE)?.value;
