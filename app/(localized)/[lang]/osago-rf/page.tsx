@@ -23,8 +23,13 @@ import {
 import { getWhatsAppCallDictionary } from "@/dictionaries/whatsappcall";
 import { keepShortWords } from "@/lib/keepShortWords";
 import { buildAlternates } from "@/lib/seoAlternates";
+import {
+  formatOsagoHeroPriceKzt,
+  getOsagoHeroPriceKzt,
+} from "@/lib/osago-rf/getHeroPrice";
 
 export const dynamicParams = false;
+export const revalidate = 60;
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
@@ -356,6 +361,19 @@ export default async function OsagoRfPage({
   const osagoPageDict = getOsagoRfPageDictionary(lang);
   const osagoCalcDict = getOsagoRfCalculatorDictionary(lang);
   const whatsappCallDict = getWhatsAppCallDictionary(lang);
+  let osagoPrice: string | null = null;
+
+  try {
+    const priceKzt = await getOsagoHeroPriceKzt(3600);
+    osagoPrice = formatOsagoHeroPriceKzt(priceKzt, lang);
+  } catch (error) {
+    console.error("OSAGO hero price calculation failed", error);
+  }
+
+  const heroFacts = osagoPageDict.hero.facts.flatMap((fact) => {
+    if (!fact.includes("{price}")) return [fact];
+    return osagoPrice ? [fact.replace("{price}", osagoPrice)] : [];
+  });
 
   const pageUrl = `${SITE_URL}/${lang}/osago-rf`;
   const greenCardLink = `/${lang}/green-card`;
@@ -555,7 +573,7 @@ export default async function OsagoRfPage({
                 className="gc-hero__facts"
                 aria-label={osagoPageDict.hero.factsLabel}
               >
-                {osagoPageDict.hero.facts.map((fact) => (
+                {heroFacts.map((fact) => (
                   <span key={fact}>{fact}</span>
                 ))}
               </div>
