@@ -24,10 +24,10 @@ export function clamp(n: number, min: number, max: number): number { return Math
 export function parseRubRate(raw: string): number { return Number(raw.replace(",", ".").trim()); }
 
 export function formatKzt(value: number): string {
-  return new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(round2(value));
+  return new Intl.NumberFormat("ru-KZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(round2(value));
 }
 export function formatRub(value: number): string {
-  return new Intl.NumberFormat("ru-RU", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(round2(value));
+  return new Intl.NumberFormat("ru-KZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(round2(value));
 }
 export function kmByHpPassenger(hp: number): number {
   if (hp >= 70 && hp < 100) return 1.1;

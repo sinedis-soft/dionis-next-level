@@ -40,7 +40,7 @@ export const dynamicParams = false;
 function localeByLang(lang: Lang) {
   if (lang === "kz") return "kk-KZ";
   if (lang === "en") return "en-KZ";
-  return "ru-RU";
+  return "ru-KZ";
 }
 
 function absoluteUrl(path?: string): string {

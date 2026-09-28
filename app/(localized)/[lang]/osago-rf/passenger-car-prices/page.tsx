@@ -75,7 +75,7 @@ function normalizeLang(value: unknown): Lang {
 function langToIana(lang: Lang): string {
   if (lang === "kz") return "kk-KZ";
   if (lang === "en") return "en-KZ";
-  return "ru-RU";
+  return "ru-KZ";
 }
 
 function langToOgLocale(lang: Lang): string {

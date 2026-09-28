@@ -29,5 +29,5 @@ export async function getGreenCardHeroPrice(revalidate: number): Promise<string>
     markupMode: "weekday",
   });
 
-  return `${formatGreenCardKzt(kzt, "ru-RU", 0)}\u00A0₸`;
+  return `${formatGreenCardKzt(kzt, "ru-KZ", 0)}\u00A0₸`;
 }

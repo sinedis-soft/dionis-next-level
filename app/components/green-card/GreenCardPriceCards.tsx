@@ -35,9 +35,9 @@ type Props = {
 
 function getLocale(lang: Lang): string {
   if (lang === "kz") return "kk-KZ";
-  if (lang === "en") return "en-US";
+  if (lang === "en") return "en-KZ";
 
-  return "ru-RU";
+  return "ru-KZ";
 }
 
 export default function GreenCardPriceCards({

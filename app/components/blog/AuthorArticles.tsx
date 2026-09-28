@@ -48,7 +48,7 @@ export default function AuthorArticles({ lang, items }: Props) {
 
             <div className="u-mt-3 u-text-xs u-text-gray-500">
               {new Date(x.publishedAt).toLocaleDateString(
-                lang === "kz" ? "kk-KZ" : lang === "en" ? "en-KZ" : "ru-RU",
+                lang === "kz" ? "kk-KZ" : lang === "en" ? "en-KZ" : "ru-KZ",
               )}
             </div>
           </a>

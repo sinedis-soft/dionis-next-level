@@ -65,7 +65,7 @@ export function calculateGreenCardPrice({
 
 export function formatGreenCardKzt(
   value: number,
-  locale = "ru-RU",
+  locale = "ru-KZ",
   fractionDigits = 2,
 ): string {
   return new Intl.NumberFormat(locale, {

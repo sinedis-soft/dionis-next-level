@@ -56,7 +56,7 @@ export async function getOsagoHeroPriceKzt(revalidate: number): Promise<number> 
 }
 
 export function formatOsagoHeroPriceKzt(price: number, lang: "ru" | "kz" | "en"): string {
-  const locale = lang === "en" ? "en-US" : "ru-RU";
+  const locale = lang === "en" ? "en-KZ" : "ru-KZ";
   return `${new Intl.NumberFormat(locale, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
