@@ -586,6 +586,32 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
+        <section className="gc-section" id="osago-rf-calculator">
+          <div className="gc-container">
+            <div className="legacy-form-scope legacy-form-card">
+              <div className="modern-only">
+                <DeferredHydration rootMargin="800px" minDelayMs={150}>
+                  <OsagoRfCalculator dict={osagoCalcDict} />
+                </DeferredHydration>
+              </div>
+
+              <div className="legacy-only">
+                <h2 className="gc-h2">{keepShortWords(osagoCalcDict.title)}</h2>
+                <p className="gc-text-muted">{osagoCalcDict.subtitle}</p>
+                <div className="gc-mt-12">
+                  <a
+                    href={orderAnchor}
+                    className="btn btn-secondary btn-wide"
+                    role="button"
+                  >
+                    {osagoPageDict.hero.ctaOrder}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <OsagoHowItWorksSection dict={osagoPageDict} />
 
         <section className="gc-section gc-info-strip" aria-labelledby="osago-rf-passenger-prices-link">
@@ -651,31 +677,7 @@ export default async function OsagoRfPage({
           </div>
         </section>
 
-        <section className="gc-section" id="osago-rf-calculator">
-          <div className="gc-container">
-            <div className="legacy-form-scope legacy-form-card">
-              <div className="modern-only">
-                <DeferredHydration rootMargin="800px" minDelayMs={150}>
-                  <OsagoRfCalculator dict={osagoCalcDict} />
-                </DeferredHydration>
-              </div>
-
-              <div className="legacy-only">
-                <h2 className="gc-h2">{keepShortWords(osagoCalcDict.title)}</h2>
-                <p className="gc-text-muted">{osagoCalcDict.subtitle}</p>
-                <div className="gc-mt-12">
-                  <a
-                    href={orderAnchor}
-                    className="btn btn-secondary btn-wide"
-                    role="button"
-                  >
-                    {osagoPageDict.hero.ctaOrder}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        
 
         <OsagoCoverageSection dict={osagoPageDict} />
 

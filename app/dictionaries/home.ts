@@ -288,12 +288,12 @@ const ru: HomeDictionary = {
     },
 
     osagoCard: {
-      title: "Зелёная карта в Россию",
+      title: "Автостраховка для въезда в Россию",
       text1:
         "Обязательное страхование гражданской ответственности для въезда в Россию на иностранном транспорте.",
       text2:
-        "Работаем с юридическими лицами и перевозчиками. Помогаем оформить без лишней бюрократии.",
-      price: "от $38",
+        "Работаем с физическими лицами, юридическими лицами и перевозчиками. Помогаем оформить без лишней бюрократии.",
+      price: "от 13 000 ₸",
       term: "от 15 дней",
       cta: "Подробнее об ОСАГО РФ",
       imageAlt: "ОСАГО РФ для въезда в Россию",
@@ -570,15 +570,15 @@ const kz: HomeDictionary = {
     },
 
     osagoCard: {
-      title: "Ресейге кіру үшін автокөлік сақтандыруы",
+      title: "Ресейге кіруге арналған автосақтандыру",
       text1:
-        "Ресейге шетелдік нөмірмен кіруге арналған міндетті азаматтық жауапкершілік сақтандыруы.",
+        "Шетелдік көлік құралымен Ресейге кіру үшін азаматтық-құқықтық жауапкершілікті міндетті сақтандыру.",
       text2:
-        "Заңды тұлғалармен және тасымалдаушылармен жұмыс істейміз. Артық бюрократиясыз рәсімдеуге көмектесеміз.",
-      price: "38$ бастап",
+        "Жеке тұлғалармен, заңды тұлғалармен және тасымалдаушылармен жұмыс істейміз. Артық бюрократиясыз сақтандыруды рәсімдеуге көмектесеміз.",
+      price: "13 000 ₸-ден бастап",
       term: "15 күннен бастап",
       cta: "РФ ОСАГО туралы толығырақ",
-      imageAlt: "Ресейге кіруге арналған ОСАГО полисі",
+      imageAlt: "Ресейге кіруге арналған РФ ОСАГО",
     },
 
     otherServices: [
@@ -849,15 +849,15 @@ const en: HomeDictionary = {
     },
 
     osagoCard: {
-      title: "Russian OSAGO for non-residents",
+      title: "Car Insurance for Entry into Russia",
       text1:
-        "Mandatory third-party liability insurance for entering Russia on foreign vehicles.",
+        "Mandatory third-party liability insurance for entering Russia with a foreign-registered vehicle.",
       text2:
-        "We work with legal entities and carriers. We help issue the policy without unnecessary bureaucracy.",
-      price: "from $38",
+        "We work with individuals, legal entities, and carriers. We help arrange the insurance without unnecessary bureaucracy.",
+      price: "from ₸13,000",
       term: "from 15 days",
       cta: "Learn more about Russian OSAGO",
-      imageAlt: "OSAGO policy for entering Russia",
+      imageAlt: "Russian OSAGO insurance for entry into Russia",
     },
 
     otherServices: [

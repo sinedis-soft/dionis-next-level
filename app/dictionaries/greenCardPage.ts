@@ -315,7 +315,7 @@ const ru: GreenCardPageDictionary = {
   },
 
   osagoUpsell: {
-    title: "Российское ОСАГО (Зеленая карта в РФ)",
+    title: "Российское ОСАГО (Автостраховка в РФ)",
     text1:
       "Возможно, вам также потребуется российское ОСАГО для въезда на территорию РФ.",
     text2:
@@ -659,7 +659,7 @@ const en: GreenCardPageDictionary = {
   },
 
   osagoUpsell: {
-    title: "Russian MTPL (Green Card in Russia)",
+    title: "Russian MTPL (CAR INSURANCE FOR RUSSIA)",
     text1:
       "You may also need Russian MTPL insurance to enter the territory of the Russian Federation.",
     text2:
@@ -1005,7 +1005,7 @@ const kz: GreenCardPageDictionary = {
   },
 
   osagoUpsell: {
-    title: "Ресейлік ОСАГО (РФ-тағы Green Card)",
+    title: "Ресейлік ОСАГО (РФ-тағы автосақтандыру)",
     text1:
       "РФ аумағына кіру үшін сізге ресейлік ОСАГО полисі де қажет болуы мүмкін.",
     text2:

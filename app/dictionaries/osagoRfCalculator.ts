@@ -64,7 +64,7 @@ const ru: OsagoRfCalculatorDictionary = {
   },
 
   cta: {
-    orderGreenCardToRussia: "ЗАКАЗАТЬ ЗЕЛЕНУЮ КАРТУ В РОССИЮ",
+    orderGreenCardToRussia: "ЗАКАЗАТЬ АВТОСТРАХОВКУ В РОССИЮ",
     orderHref: "/ru/osago-rf#osago-rf-order",
   },
 
@@ -134,8 +134,8 @@ const en: OsagoRfCalculatorDictionary = {
   },
 
   cta: {
-    orderGreenCardToRussia: "ORDER GREEN CARD TO RUSSIA",
-    orderHref: "/en/osago-rf#osago-rf-order",
+    orderGreenCardToRussia: "ORDER CAR INSURANCE FOR RUSSIA",
+    orderHref: "/ru/osago-rf#osago-rf-order",
   },
 
   errors: {
@@ -204,8 +204,8 @@ const kz: OsagoRfCalculatorDictionary = {
   },
 
   cta: {
-    orderGreenCardToRussia: "РЕСЕЙГЕ «ЖАСЫЛ КАРТАНЫ» ТАПСЫРЫС БЕРУ",
-    orderHref: "/kz/osago-rf#osago-rf-order",
+    orderGreenCardToRussia: "РЕСЕЙГЕ АВТОСАҚТАНДЫРУҒА ТАПСЫРЫС БЕРУ",
+    orderHref: "/ru/osago-rf#osago-rf-order",
   },
 
   errors: {
