@@ -12,6 +12,10 @@ import {
 } from "@/dictionaries/agreement";
 import HomeClient from "@/components/HomeClient";
 import { buildAlternates } from "@/lib/seoAlternates";
+import {
+  formatOsagoHeroPriceKzt,
+  getOsagoHeroPriceKzt,
+} from "@/lib/osago-rf/getHeroPrice";
 
 export function generateStaticParams(): Array<{ lang: Lang }> {
   return [{ lang: "ru" }, { lang: "kz" }, { lang: "en" }];
@@ -60,6 +64,14 @@ export default async function Page({
 
   const t: HomeDictionary = getHomeDictionary(lang);
   const agreement: AgreementDictionary = getAgreementDictionary(lang);
+  let osagoPrice: string | null = null;
 
-  return <HomeClient lang={lang} t={t} agreement={agreement} />;
+  try {
+    const priceKzt = await getOsagoHeroPriceKzt(3600);
+    osagoPrice = formatOsagoHeroPriceKzt(priceKzt, lang);
+  } catch (error) {
+    console.error("OSAGO home price calculation failed", error);
+  }
+
+  return <HomeClient lang={lang} t={t} agreement={agreement} osagoPrice={osagoPrice} />;
 }
