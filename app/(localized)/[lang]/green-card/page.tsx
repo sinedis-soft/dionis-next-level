@@ -23,14 +23,7 @@ import FAQSection from "@/components/green-card/FAQSection";
 import GreenCardQuestionForm from "@/components/green-card/GreenCardQuestionForm";
 import DeferredHydration from "@/components/DeferredHydration";
 import { buildAlternates } from "@/lib/seoAlternates";
-import {
-  calculateGreenCardPrice,
-  formatGreenCardKzt,
-} from "@/lib/green-card/calculateGreenCardPrice";
-import {
-  getNbkUsdRate,
-  GREEN_CARD_FALLBACK_KZT_RATE,
-} from "@/lib/green-card/getNbkUsdRate";
+import { getGreenCardHeroPrice } from "@/lib/green-card/getHeroPrice";
 
 export const dynamicParams = false;
 export const revalidate = 28800;
@@ -222,31 +215,10 @@ export default async function GreenCardPage({
   const orderAnchor = "#green-card-order";
 
   let heroPriceFact: string | null = null;
-  let kztRate = GREEN_CARD_FALLBACK_KZT_RATE;
 
   try {
-    kztRate = await getNbkUsdRate(revalidate);
-  } catch (error) {
-    console.error(
-      "Green Card hero rate loading failed; using the fallback rate",
-      error,
-    );
-  }
-
-  try {
-    const { kzt } = calculateGreenCardPrice({
-      region: "group1",
-      vehicle: "passenger",
-      period: "1",
-      kztRate,
-      markupMode: "weekday",
-    });
-    const formattedPrice = `${formatGreenCardKzt(kzt, "ru-RU", 0)}\u00A0₸`;
-
-    heroPriceFact = gcPageDict.hero.priceFrom.replace(
-      "{price}",
-      formattedPrice,
-    );
+    const formattedPrice = await getGreenCardHeroPrice(revalidate);
+    heroPriceFact = gcPageDict.hero.priceFrom.replace("{price}", formattedPrice);
   } catch (error) {
     console.error("Green Card hero price calculation failed", error);
   }
