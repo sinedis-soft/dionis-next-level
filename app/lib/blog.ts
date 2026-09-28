@@ -124,6 +124,7 @@ export type BlogArticleCard = Pick<
   | "title"
   | "seoDescription"
   | "publishedAt"
+  | "modifiedAt"
   | "readingTime"
   | "image"
   | "imageAlt"
@@ -290,6 +291,7 @@ function frontmatterToCard(fm: BlogFrontmatter): BlogArticleCard {
     seoDescription: fm.seoDescription,
     excerpt: safeExcerpt(fm.seoDescription),
     publishedAt: fm.publishedAt,
+    modifiedAt: fm.modifiedAt,
     readingTime: fm.readingTime,
     image: fm.image,
     imageAlt: fm.imageAlt,

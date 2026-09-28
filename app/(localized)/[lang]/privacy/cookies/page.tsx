@@ -4,6 +4,7 @@ export const dynamicParams = false;
 
 import type { Metadata } from "next";
 import type { Lang } from "@/dictionaries/header";
+import { buildAlternates } from "@/lib/seoAlternates";
 
 import {
   getCookiesPolicyDictionary,
@@ -36,6 +37,7 @@ export async function generateMetadata({
   return {
     title: t.seo.title,
     description: t.seo.description,
+    alternates: buildAlternates(lang, "/privacy/cookies"),
   };
 }
 
