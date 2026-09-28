@@ -4,11 +4,7 @@ import type { MetadataRoute } from "next";
 
 import type { Lang } from "@/dictionaries/header";
 
-import {
-  getAllArticleSlugs,
-  getArticleBySlug,
-  getAllAuthors,
-} from "@/lib/blog";
+import { getAllArticles, getAllAuthors } from "@/lib/blog";
 
 const BASE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ||
@@ -39,65 +35,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/blog",
     "/contacts",
     "/about",
-    "/privacy",
+    "/legal",
     "/privacy/cookies",
     "/privacy/regulation",
   ];
-
-  // Russian corporate transport insurance landing page. Localized versions
-  // will be added after their regulated copy has been editorially approved.
-  urls.push({
-    url: `${BASE_URL}/ru/legal`,
-    lastModified: "2026-08-02",
-    changeFrequency: "monthly",
-    priority: 0.8,
-  });
 
   for (const lang of SUPPORTED_LANGS) {
     const prefix = `/${lang}`;
 
     for (const route of staticRoutes) {
+      const lastModified =
+        PAGE_LASTMOD[route] ??
+        (route === "/legal" && lang === "ru" ? "2026-08-02" : undefined);
+
       urls.push({
         url: `${BASE_URL}${prefix}${route}`,
-        ...(PAGE_LASTMOD[route] ? { lastModified: PAGE_LASTMOD[route] } : {}),
-        changeFrequency:
-          route === "" ||
-          route === "/green-card" ||
-          route === "/osago-rf" ||
-          route === "/osago-rf/passenger-car-prices"
-            ? "weekly"
-            : "monthly",
-        priority:
-          route === ""
-            ? 1.0
-            : route === "/green-card"
-            ? 0.9
-            : route === "/osago-rf" ||
-          route === "/osago-rf/passenger-car-prices"
-            ? 0.8
-            : route === "/osago-rf/passenger-car-prices"
-            ? 0.7
-            : 0.6,
+        ...(lastModified ? { lastModified } : {}),
       });
     }
   }
 
   /* ---------- BLOG ARTICLES ---------- */
 
-  const slugs = await getAllArticleSlugs();
+  for (const lang of SUPPORTED_LANGS) {
+    const articles = await getAllArticles(lang);
 
-  for (const { lang, slug } of slugs) {
-    const article = await getArticleBySlug(lang, slug);
-
-    if (!article) continue;
-
-    urls.push({
-      url: `${BASE_URL}/${lang}/blog/${slug}`,
-      lastModified:
-        article.modifiedAt ?? article.publishedAt,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    });
+    for (const article of articles) {
+      urls.push({
+        url: `${BASE_URL}/${lang}/blog/${article.slug}`,
+        lastModified: article.modifiedAt ?? article.publishedAt,
+      });
+    }
   }
 
   /* ---------- AUTHORS ---------- */
@@ -108,8 +76,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     for (const lang of SUPPORTED_LANGS) {
       urls.push({
         url: `${BASE_URL}/${lang}/authors/${author.slug}`,
-        changeFrequency: "monthly",
-        priority: 0.5,
       });
     }
   }
