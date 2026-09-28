@@ -108,7 +108,7 @@ const ru: LegalDictionary = {
       "Страхование для грузоперевозчиков и юридических лиц в Казахстане | Дионис",
     description:
       "Российское ОСАГО для автомобилей юридических лиц и нерезидентов, оплата в тенге и документы для бухгалтерии. Страхование грузов, CMR и ответственности экспедитора.",
-    openGraphLocale: "ru_RU",
+    openGraphLocale: "ru_KZ",
   },
 
   route: {
@@ -622,7 +622,7 @@ const en: LegalDictionary = {
       "Insurance for Freight Carriers and Legal Entities in Kazakhstan | Dionis",
     description:
       "Russian OSAGO insurance for vehicles owned by legal entities and non-residents, payment in tenge, and accounting documents. Cargo, CMR carrier liability, and freight forwarder liability insurance.",
-    openGraphLocale: "en_US",
+    openGraphLocale: "en_KZ",
   },
 
   route: {

@@ -80,8 +80,8 @@ function langToIana(lang: Lang): string {
 
 function langToOgLocale(lang: Lang): string {
   if (lang === "kz") return "kk_KZ";
-  if (lang === "en") return "en_US";
-  return "ru_RU";
+  if (lang === "en") return "en_KZ";
+  return "ru_KZ";
 }
 
 function schemaPrice(value: number): string {

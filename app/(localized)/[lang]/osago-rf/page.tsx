@@ -46,7 +46,7 @@ function normalizeLang(value: unknown): Lang {
 }
 
 function langToOgLocale(lang: Lang): string {
-  return lang === "ru" ? "ru_RU" : lang === "kz" ? "kk_KZ" : "en_US";
+  return lang === "ru" ? "ru_KZ" : lang === "kz" ? "kk_KZ" : "en_KZ";
 }
 
 function langToIana(lang: Lang): string {
