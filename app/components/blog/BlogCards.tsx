@@ -3,10 +3,11 @@ import Image from "next/image";
 import type { Lang } from "@/dictionaries/header";
 import type { BlogArticleCard } from "@/lib/blog";
 
-function localeByLang(lang: Lang) {
-  if (lang === "kz") return "kk-KZ";
-  if (lang === "en") return "en-KZ";
-  return "ru-KZ";
+function formatPublishedAt(iso: string, lang: Lang): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (!match) return iso;
+  const [, year, month, day] = match;
+  return lang === "en" ? `${month}/${day}/${year}` : `${day}.${month}.${year}`;
 }
 
 export default function BlogCards({
@@ -16,8 +17,6 @@ export default function BlogCards({
   lang: Lang;
   articles: BlogArticleCard[];
 }) {
-  const locale = localeByLang(lang);
-
   return (
     <div className="bc-grid">
       {articles.map((a) => (
@@ -50,7 +49,7 @@ export default function BlogCards({
             <p className="bc-excerpt">{a.excerpt}</p>
 
             <div className="bc-meta">
-              <span>{new Date(a.publishedAt).toLocaleDateString(locale)}</span>
+              <span>{formatPublishedAt(a.publishedAt, lang)}</span>
               <span className="bc-dot" aria-hidden="true">
                 •
               </span>
